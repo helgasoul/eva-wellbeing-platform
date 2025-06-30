@@ -8,43 +8,43 @@
 @layer base {
   :root {
     --background: #FEFEFE;
-    --foreground: #2D2D2D;
+    --foreground: #5A4A47;
 
     --card: #FFFFFF;
-    --card-foreground: #2D2D2D;
+    --card-foreground: #5A4A47;
 
     --popover: #FFFFFF;
-    --popover-foreground: #2D2D2D;
+    --popover-foreground: #5A4A47;
 
-    --primary: #E89692;
+    --primary: #C49A96;
     --primary-foreground: #FFFFFF;
 
-    --secondary: #F4E8E5;
-    --secondary-foreground: #5A4A47;
+    --secondary: #F0E6E3;
+    --secondary-foreground: #6B5B58;
 
     --muted: #F8F5F2;
-    --muted-foreground: #6B6B6B;
+    --muted-foreground: #8A7B78;
 
-    --accent: #D4E5D4;
-    --accent-foreground: #2D5A2D;
+    --accent: #E8D5D1;
+    --accent-foreground: #6B5B58;
 
     --destructive: #EF4444;
     --destructive-foreground: #FFFFFF;
 
     --border: #E8D5CF;
     --input: #F4E8E5;
-    --ring: #E89692;
+    --ring: #C49A96;
 
     --radius: 12px;
 
     --sidebar-background: #FEFEFE;
-    --sidebar-foreground: #2D2D2D;
-    --sidebar-primary: #E89692;
+    --sidebar-foreground: #5A4A47;
+    --sidebar-primary: #C49A96;
     --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #F4E8E5;
-    --sidebar-accent-foreground: #5A4A47;
+    --sidebar-accent: #F0E6E3;
+    --sidebar-accent-foreground: #6B5B58;
     --sidebar-border: #E8D5CF;
-    --sidebar-ring: #E89692;
+    --sidebar-ring: #C49A96;
   }
 
   .dark {
@@ -57,7 +57,7 @@
     --popover: #2A2A2A;
     --popover-foreground: #F5F5F5;
 
-    --primary: #E89692;
+    --primary: #C49A96;
     --primary-foreground: #FFFFFF;
 
     --secondary: #3A3A3A;
@@ -74,16 +74,16 @@
 
     --border: #3A3A3A;
     --input: #2F2F2F;
-    --ring: #E89692;
+    --ring: #C49A96;
 
     --sidebar-background: #1A1A1A;
     --sidebar-foreground: #F5F5F5;
-    --sidebar-primary: #E89692;
+    --sidebar-primary: #C49A96;
     --sidebar-primary-foreground: #FFFFFF;
     --sidebar-accent: #2A2A2A;
     --sidebar-accent-foreground: #D0D0D0;
     --sidebar-border: #3A3A3A;
-    --sidebar-ring: #E89692;
+    --sidebar-ring: #C49A96;
   }
 }
 
@@ -98,17 +98,17 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-playfair;
+    @apply font-playfair text-foreground;
   }
 }
 
 @layer components {
   .eva-gradient {
-    background: linear-gradient(135deg, #F4E8E5 0%, #E6E1F4 50%, #D4E5D4 100%);
+    background: linear-gradient(135deg, #F0E6E3 0%, #E8D5D1 50%, #F8F5F2 100%);
   }
   
   .eva-card {
-    @apply bg-white/80 backdrop-blur-sm border border-eva-rose-dark/20 rounded-2xl shadow-lg;
+    @apply bg-white/80 backdrop-blur-sm border border-eva-dusty-rose/20 rounded-2xl shadow-lg;
   }
   
   .eva-button {
@@ -116,6 +116,6 @@
   }
   
   .eva-input {
-    @apply bg-white/70 border border-eva-rose-dark/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+    @apply bg-white/70 border border-eva-dusty-rose/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
   }
 }

@@ -63,6 +63,31 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Community Image Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-eva-gradient to-eva-pearl">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="relative overflow-hidden rounded-3xl shadow-2xl animate-fade-in">
+              <img 
+                src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
+                alt="Сообщество женщин Eva - поддержка и взаимопонимание"
+                className="w-full h-auto object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"></div>
+            </div>
+            <div className="mt-8">
+              <h2 className="text-2xl md:text-3xl font-playfair font-semibold text-foreground mb-4">
+                Вы не одни в этом пути
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Присоединяйтесь к тысячам женщин, которые поддерживают друг друга 
+                и делятся опытом на пути к здоровью и благополучию
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 px-4 bg-eva-warm">
         <div className="container mx-auto">
@@ -85,7 +110,7 @@ const Home = () => {
                   className="eva-card p-8 text-center group hover:shadow-xl transition-all duration-300 animate-slide-in"
                   style={{ animationDelay: `${index * 0.2}s` }}
                 >
-                  <div className="inline-flex p-4 bg-gradient-to-br from-eva-coral to-primary rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <div className="inline-flex p-4 bg-gradient-to-br from-eva-dusty-rose to-primary rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
                     <IconComponent className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="text-xl font-playfair font-semibold text-foreground mb-4">
@@ -125,7 +150,7 @@ const Home = () => {
             </div>
             <div className="eva-card p-8">
               <div className="text-center">
-                <div className="inline-flex p-6 bg-gradient-to-br from-eva-lavender to-eva-lavender-dark rounded-full mb-6">
+                <div className="inline-flex p-6 bg-gradient-to-br from-eva-soft-pink to-eva-warm-beige rounded-full mb-6">
                   <Heart className="h-12 w-12 text-primary" />
                 </div>
                 <h3 className="text-2xl font-playfair font-semibold text-foreground mb-4">

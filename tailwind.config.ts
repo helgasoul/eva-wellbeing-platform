@@ -63,18 +63,16 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Eva brand colors - warm, caring palette
+				// Eva brand colors - updated with softer tones from the image
 				eva: {
-					rose: '#F4E8E5',
-					'rose-dark': '#E8D5CF',
-					coral: '#F5A5A1',
-					'coral-dark': '#E89692',
-					sage: '#D4E5D4',
-					'sage-dark': '#C1D4C1',
-					lavender: '#E6E1F4',
-					'lavender-dark': '#D6CEE8',
-					cream: '#FDF9F6',
-					warm: '#F8F5F2'
+					'dusty-rose': '#C49A96',
+					'soft-pink': '#E8D5D1',
+					'warm-beige': '#F0E6E3',
+					'cream': '#F8F5F2',
+					'mauve': '#B5918D',
+					'blush': '#D4B5B1',
+					'pearl': '#F4F0ED',
+					'taupe': '#9C8480'
 				}
 			},
 			borderRadius: {
