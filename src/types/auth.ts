@@ -5,8 +5,8 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   avatar?: string;
   createdAt: Date;
 }
@@ -14,6 +14,7 @@ export interface User {
 export interface LoginCredentials {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 export interface RegisterData {
@@ -23,6 +24,29 @@ export interface RegisterData {
   firstName: string;
   lastName: string;
   role: UserRole;
+  agreeToTerms: boolean;
+  agreeToPrivacy: boolean;
+}
+
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface LoginForm {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+export interface RegisterForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: UserRole;
+  agreeToTerms: boolean;
+  agreeToPrivacy: boolean;
 }
 
 export interface AuthContextType {
@@ -30,5 +54,7 @@ export interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
+  forgotPassword: (email: string) => Promise<void>;
   isLoading: boolean;
+  error: string | null;
 }

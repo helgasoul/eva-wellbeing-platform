@@ -1,88 +1,95 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { RoleSelector } from './RoleSelector';
 import { UserRole } from '@/types/auth';
+import { useAuth } from '@/context/AuthContext';
+
+const registerSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, 'Имя обязательно')
+    .min(2, 'Имя должно содержать минимум 2 символа'),
+  lastName: z
+    .string()
+    .min(1, 'Фамилия обязательна')
+    .min(2, 'Фамилия должна содержать минимум 2 символа'),
+  email: z
+    .string()
+    .min(1, 'Email обязателен')
+    .email('Введите корректный email'),
+  password: z
+    .string()
+    .min(6, 'Пароль должен содержать минимум 6 символов'),
+  confirmPassword: z
+    .string()
+    .min(1, 'Подтвердите пароль'),
+  role: z.enum(['patient', 'doctor', 'admin'], {
+    required_error: 'Выберите роль',
+  }),
+  agreeToTerms: z
+    .boolean()
+    .refine(val => val === true, 'Необходимо согласиться с условиями использования'),
+  agreeToPrivacy: z
+    .boolean()
+    .refine(val => val === true, 'Необходимо согласиться с политикой конфиденциальности'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Пароли не совпадают',
+  path: ['confirmPassword'],
+});
+
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 export const RegisterForm = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    role: 'patient' as UserRole
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const { register: registerUser, isLoading, error } = useAuth();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      role: 'patient',
+      agreeToTerms: false,
+      agreeToPrivacy: false,
+    },
+  });
+
+  const selectedRole = watch('role');
+  const agreeToTerms = watch('agreeToTerms');
+  const agreeToPrivacy = watch('agreeToPrivacy');
+
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      await registerUser(data);
+    } catch (error) {
+      // Error handling is done in AuthContext
+      console.error('Registration error:', error);
     }
   };
 
   const handleRoleChange = (role: UserRole) => {
-    setFormData(prev => ({ ...prev, role }));
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'Имя обязательно';
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Фамилия обязательна';
-    }
-
-    if (!formData.email) {
-      newErrors.email = 'Email обязателен';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Введите корректный email';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Пароль обязателен';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Пароль должен содержать минимум 6 символов';
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Подтвердите пароль';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Пароли не совпадают';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-    try {
-      // Here you would implement actual registration logic
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
-      console.log('Register attempt:', formData);
-    } catch (error) {
-      console.error('Registration error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    setValue('role', role);
   };
 
   return (
@@ -96,24 +103,29 @@ export const RegisterForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="mb-6">
+          <ErrorMessage message={error} />
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="firstName">Имя</Label>
             <div className="relative">
               <Input
                 id="firstName"
-                name="firstName"
                 type="text"
-                value={formData.firstName}
-                onChange={handleChange}
+                {...register('firstName')}
                 className={`eva-input pl-10 ${errors.firstName ? 'border-destructive' : ''}`}
                 placeholder="Ваше имя"
+                autoComplete="given-name"
               />
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
             {errors.firstName && (
-              <p className="text-destructive text-sm">{errors.firstName}</p>
+              <ErrorMessage message={errors.firstName.message!} />
             )}
           </div>
 
@@ -122,17 +134,16 @@ export const RegisterForm = () => {
             <div className="relative">
               <Input
                 id="lastName"
-                name="lastName"
                 type="text"
-                value={formData.lastName}
-                onChange={handleChange}
+                {...register('lastName')}
                 className={`eva-input pl-10 ${errors.lastName ? 'border-destructive' : ''}`}
                 placeholder="Ваша фамилия"
+                autoComplete="family-name"
               />
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
             {errors.lastName && (
-              <p className="text-destructive text-sm">{errors.lastName}</p>
+              <ErrorMessage message={errors.lastName.message!} />
             )}
           </div>
         </div>
@@ -142,17 +153,16 @@ export const RegisterForm = () => {
           <div className="relative">
             <Input
               id="email"
-              name="email"
               type="email"
-              value={formData.email}
-              onChange={handleChange}
+              {...register('email')}
               className={`eva-input pl-10 ${errors.email ? 'border-destructive' : ''}`}
               placeholder="your@email.com"
+              autoComplete="email"
             />
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
           {errors.email && (
-            <p className="text-destructive text-sm">{errors.email}</p>
+            <ErrorMessage message={errors.email.message!} />
           )}
         </div>
 
@@ -161,12 +171,11 @@ export const RegisterForm = () => {
           <div className="relative">
             <Input
               id="password"
-              name="password"
               type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleChange}
+              {...register('password')}
               className={`eva-input pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
               placeholder="Минимум 6 символов"
+              autoComplete="new-password"
             />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <button
@@ -178,7 +187,7 @@ export const RegisterForm = () => {
             </button>
           </div>
           {errors.password && (
-            <p className="text-destructive text-sm">{errors.password}</p>
+            <ErrorMessage message={errors.password.message!} />
           )}
         </div>
 
@@ -187,12 +196,11 @@ export const RegisterForm = () => {
           <div className="relative">
             <Input
               id="confirmPassword"
-              name="confirmPassword"
               type={showConfirmPassword ? 'text' : 'password'}
-              value={formData.confirmPassword}
-              onChange={handleChange}
+              {...register('confirmPassword')}
               className={`eva-input pl-10 pr-10 ${errors.confirmPassword ? 'border-destructive' : ''}`}
               placeholder="Повторите пароль"
+              autoComplete="new-password"
             />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <button
@@ -204,40 +212,63 @@ export const RegisterForm = () => {
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-destructive text-sm">{errors.confirmPassword}</p>
+            <ErrorMessage message={errors.confirmPassword.message!} />
           )}
         </div>
 
-        <RoleSelector
-          selectedRole={formData.role}
-          onRoleChange={handleRoleChange}
-        />
-
-        <div className="flex items-start space-x-2">
-          <input
-            type="checkbox"
-            id="terms"
-            required
-            className="mt-1 rounded border-eva-rose-dark/30 text-primary focus:ring-primary/30"
+        <div className="space-y-2">
+          <RoleSelector
+            selectedRole={selectedRole}
+            onRoleChange={handleRoleChange}
           />
-          <label htmlFor="terms" className="text-sm text-muted-foreground">
-            Я согласен(а) с{' '}
-            <Link to="/terms" className="text-primary hover:underline">
-              условиями использования
-            </Link>{' '}
-            и{' '}
-            <Link to="/privacy" className="text-primary hover:underline">
-              политикой конфиденциальности
-            </Link>
-          </label>
+          {errors.role && (
+            <ErrorMessage message={errors.role.message!} />
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="agreeToTerms"
+              checked={agreeToTerms}
+              onCheckedChange={(checked) => setValue('agreeToTerms', !!checked)}
+            />
+            <label htmlFor="agreeToTerms" className="text-sm text-muted-foreground cursor-pointer">
+              Я согласен(а) с{' '}
+              <Link to="/terms" className="text-primary hover:underline">
+                условиями использования
+              </Link>
+            </label>
+          </div>
+          {errors.agreeToTerms && (
+            <ErrorMessage message={errors.agreeToTerms.message!} />
+          )}
+
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="agreeToPrivacy"
+              checked={agreeToPrivacy}
+              onCheckedChange={(checked) => setValue('agreeToPrivacy', !!checked)}
+            />
+            <label htmlFor="agreeToPrivacy" className="text-sm text-muted-foreground cursor-pointer">
+              Я согласен(а) с{' '}
+              <Link to="/privacy" className="text-primary hover:underline">
+                политикой конфиденциальности
+              </Link>
+            </label>
+          </div>
+          {errors.agreeToPrivacy && (
+            <ErrorMessage message={errors.agreeToPrivacy.message!} />
+          )}
         </div>
 
         <Button
           type="submit"
           disabled={isLoading}
-          className="eva-button w-full"
+          className="eva-button w-full flex items-center justify-center space-x-2"
         >
-          {isLoading ? 'Создаём аккаунт...' : 'Создать аккаунт'}
+          {isLoading && <LoadingSpinner size="sm" />}
+          <span>{isLoading ? 'Создаём аккаунт...' : 'Создать аккаунт'}</span>
         </Button>
       </form>
 

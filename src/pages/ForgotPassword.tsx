@@ -1,43 +1,58 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { useAuth } from '@/context/AuthContext';
+
+const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email обязателен')
+    .email('Введите корректный email'),
+});
+
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { forgotPassword, isLoading, error } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email) {
-      setError('Email обязателен');
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset,
+  } = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: '',
+    },
+  });
 
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Введите корректный email');
-      return;
-    }
+  const email = watch('email');
 
-    setIsLoading(true);
-    setError('');
-
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
-      // Here you would implement actual password reset logic
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await forgotPassword(data.email);
       setIsSubmitted(true);
     } catch (error) {
-      setError('Произошла ошибка. Попробуйте еще раз.');
-      console.error('Password reset error:', error);
-    } finally {
-      setIsLoading(false);
+      // Error handling is done in AuthContext
+      console.error('Forgot password error:', error);
     }
+  };
+
+  const handleTryAgain = () => {
+    setIsSubmitted(false);
+    reset();
   };
 
   if (isSubmitted) {
@@ -59,7 +74,7 @@ const ForgotPassword = () => {
           </p>
           <div className="space-y-4">
             <Button
-              onClick={() => setIsSubmitted(false)}
+              onClick={handleTryAgain}
               variant="outline"
               className="w-full"
             >
@@ -88,35 +103,38 @@ const ForgotPassword = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="mb-6">
+            <ErrorMessage message={error} />
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <Input
                 id="email"
-                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError('');
-                }}
-                className={`eva-input pl-10 ${error ? 'border-destructive' : ''}`}
+                {...register('email')}
+                className={`eva-input pl-10 ${errors.email ? 'border-destructive' : ''}`}
                 placeholder="your@email.com"
+                autoComplete="email"
               />
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            {error && (
-              <p className="text-destructive text-sm">{error}</p>
+            {errors.email && (
+              <ErrorMessage message={errors.email.message!} />
             )}
           </div>
 
           <Button
             type="submit"
             disabled={isLoading}
-            className="eva-button w-full"
+            className="eva-button w-full flex items-center justify-center space-x-2"
           >
-            {isLoading ? 'Отправляем...' : 'Отправить инструкции'}
+            {isLoading && <LoadingSpinner size="sm" />}
+            <span>{isLoading ? 'Отправляем...' : 'Отправить инструкции'}</span>
           </Button>
         </form>
 

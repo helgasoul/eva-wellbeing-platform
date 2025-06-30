@@ -1,60 +1,58 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { useAuth } from '@/context/AuthContext';
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email обязателен')
+    .email('Введите корректный email'),
+  password: z
+    .string()
+    .min(6, 'Пароль должен содержать минимум 6 символов'),
+  rememberMe: z.boolean().default(false),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading, error } = useAuth();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const rememberMe = watch('rememberMe');
 
-    if (!formData.email) {
-      newErrors.email = 'Email обязателен';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Введите корректный email';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Пароль обязателен';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-
-    setIsLoading(true);
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      // Here you would implement actual login logic
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      console.log('Login attempt:', formData);
+      await login(data);
     } catch (error) {
+      // Error handling is done in AuthContext
       console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -69,23 +67,28 @@ export const LoginForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="mb-6">
+          <ErrorMessage message={error} />
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Input
               id="email"
-              name="email"
               type="email"
-              value={formData.email}
-              onChange={handleChange}
+              {...register('email')}
               className={`eva-input pl-10 ${errors.email ? 'border-destructive' : ''}`}
               placeholder="your@email.com"
+              autoComplete="email"
             />
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
           {errors.email && (
-            <p className="text-destructive text-sm">{errors.email}</p>
+            <ErrorMessage message={errors.email.message!} />
           )}
         </div>
 
@@ -94,12 +97,11 @@ export const LoginForm = () => {
           <div className="relative">
             <Input
               id="password"
-              name="password"
               type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleChange}
+              {...register('password')}
               className={`eva-input pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
               placeholder="Введите пароль"
+              autoComplete="current-password"
             />
             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <button
@@ -111,18 +113,21 @@ export const LoginForm = () => {
             </button>
           </div>
           {errors.password && (
-            <p className="text-destructive text-sm">{errors.password}</p>
+            <ErrorMessage message={errors.password.message!} />
           )}
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              className="rounded border-eva-rose-dark/30 text-primary focus:ring-primary/30"
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="rememberMe"
+              checked={rememberMe}
+              onCheckedChange={(checked) => setValue('rememberMe', !!checked)}
             />
-            <span className="text-sm text-muted-foreground">Запомнить меня</span>
-          </label>
+            <Label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer">
+              Запомнить меня
+            </Label>
+          </div>
           <Link
             to="/forgot-password"
             className="text-sm text-primary hover:underline"
@@ -134,9 +139,10 @@ export const LoginForm = () => {
         <Button
           type="submit"
           disabled={isLoading}
-          className="eva-button w-full"
+          className="eva-button w-full flex items-center justify-center space-x-2"
         >
-          {isLoading ? 'Входим...' : 'Войти'}
+          {isLoading && <LoadingSpinner size="sm" />}
+          <span>{isLoading ? 'Входим...' : 'Войти'}</span>
         </Button>
       </form>
 
