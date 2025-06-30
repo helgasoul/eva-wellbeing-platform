@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,19 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useAuth } from '@/context/AuthContext';
-
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email обязателен')
-    .email('Введите корректный email'),
-  password: z
-    .string()
-    .min(6, 'Пароль должен содержать минимум 6 символов'),
-  rememberMe: z.boolean().default(false),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { LoginFormData, loginSchema } from '@/types/auth';
 
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -49,7 +36,11 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data);
+      await login({
+        email: data.email,
+        password: data.password,
+        rememberMe: data.rememberMe,
+      });
     } catch (error) {
       // Error handling is done in AuthContext
       console.error('Login error:', error);

@@ -1,4 +1,6 @@
 
+import { z } from 'zod';
+
 export type UserRole = 'patient' | 'doctor' | 'admin';
 
 export interface User {
@@ -32,6 +34,56 @@ export interface ForgotPasswordData {
   email: string;
 }
 
+// Схемы валидации Zod
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email обязателен')
+    .email('Введите корректный email'),
+  password: z
+    .string()
+    .min(6, 'Пароль должен содержать минимум 6 символов'),
+  rememberMe: z.boolean().default(false),
+});
+
+export const registerSchema = z.object({
+  firstName: z
+    .string()
+    .min(1, 'Имя обязательно')
+    .min(2, 'Имя должно содержать минимум 2 символа'),
+  lastName: z
+    .string()
+    .min(1, 'Фамилия обязательна')
+    .min(2, 'Фамилия должна содержать минимум 2 символа'),
+  email: z
+    .string()
+    .min(1, 'Email обязателен')
+    .email('Введите корректный email'),
+  password: z
+    .string()
+    .min(6, 'Пароль должен содержать минимум 6 символов'),
+  confirmPassword: z
+    .string()
+    .min(1, 'Подтвердите пароль'),
+  role: z.enum(['patient', 'doctor', 'admin'], {
+    required_error: 'Выберите роль',
+  }),
+  agreeToTerms: z
+    .boolean()
+    .refine(val => val === true, 'Необходимо согласиться с условиями использования'),
+  agreeToPrivacy: z
+    .boolean()
+    .refine(val => val === true, 'Необходимо согласиться с политикой конфиденциальности'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Пароли не совпадают',
+  path: ['confirmPassword'],
+});
+
+// Выведенные типы из схем Zod
+export type LoginFormData = z.infer<typeof loginSchema>;
+export type RegisterFormData = z.infer<typeof registerSchema>;
+
+// Устаревшие интерфейсы для совместимости
 export interface LoginForm {
   email: string;
   password: string;

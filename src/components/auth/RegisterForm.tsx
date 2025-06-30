@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,41 +13,7 @@ import { ErrorMessage } from '@/components/ui/error-message';
 import { RoleSelector } from './RoleSelector';
 import { UserRole } from '@/types/auth';
 import { useAuth } from '@/context/AuthContext';
-
-const registerSchema = z.object({
-  firstName: z
-    .string()
-    .min(1, 'Имя обязательно')
-    .min(2, 'Имя должно содержать минимум 2 символа'),
-  lastName: z
-    .string()
-    .min(1, 'Фамилия обязательна')
-    .min(2, 'Фамилия должна содержать минимум 2 символа'),
-  email: z
-    .string()
-    .min(1, 'Email обязателен')
-    .email('Введите корректный email'),
-  password: z
-    .string()
-    .min(6, 'Пароль должен содержать минимум 6 символов'),
-  confirmPassword: z
-    .string()
-    .min(1, 'Подтвердите пароль'),
-  role: z.enum(['patient', 'doctor', 'admin'], {
-    required_error: 'Выберите роль',
-  }),
-  agreeToTerms: z
-    .boolean()
-    .refine(val => val === true, 'Необходимо согласиться с условиями использования'),
-  agreeToPrivacy: z
-    .boolean()
-    .refine(val => val === true, 'Необходимо согласиться с политикой конфиденциальности'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Пароли не совпадают',
-  path: ['confirmPassword'],
-});
-
-type RegisterFormData = z.infer<typeof registerSchema>;
+import { RegisterFormData, registerSchema } from '@/types/auth';
 
 export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -81,7 +46,16 @@ export const RegisterForm = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await registerUser(data);
+      await registerUser({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        role: data.role,
+        agreeToTerms: data.agreeToTerms,
+        agreeToPrivacy: data.agreeToPrivacy,
+      });
     } catch (error) {
       // Error handling is done in AuthContext
       console.error('Registration error:', error);
