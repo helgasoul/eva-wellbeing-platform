@@ -32,7 +32,7 @@ export const RegisterForm = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      role: 'patient',
+      role: UserRole.PATIENT,
       agreeToTerms: false,
       agreeToPrivacy: false,
     },

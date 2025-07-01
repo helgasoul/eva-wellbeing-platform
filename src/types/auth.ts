@@ -1,6 +1,11 @@
 
 import { z } from 'zod';
-import { UserRole } from './roles';
+
+export enum UserRole {
+  PATIENT = 'patient',
+  DOCTOR = 'doctor',
+  ADMIN = 'admin'
+}
 
 export interface User {
   id: string;

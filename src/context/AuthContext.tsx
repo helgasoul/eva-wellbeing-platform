@@ -1,8 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, AuthContextType, LoginCredentials, RegisterData } from '@/types/auth';
-import { UserRole, getRoleDashboardPath } from '@/types/roles';
+import { User, AuthContextType, LoginCredentials, RegisterData, UserRole } from '@/types/auth';
+import { getRoleDashboardPath } from '@/types/roles';
 import { toast } from '@/hooks/use-toast';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
