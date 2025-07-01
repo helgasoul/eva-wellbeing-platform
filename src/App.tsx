@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import PatientDashboard from "./pages/PatientDashboard";
+import PatientOnboarding from "./pages/patient/PatientOnboarding";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,13 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardRedirect />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient onboarding route */}
+            <Route path="/patient/onboarding" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <PatientOnboarding />
               </ProtectedRoute>
             } />
             

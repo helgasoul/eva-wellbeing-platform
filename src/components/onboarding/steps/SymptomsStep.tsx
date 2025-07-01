@@ -1,0 +1,217 @@
+
+import React from 'react';
+import { SymptomFrequencySelector } from '@/components/onboarding/SymptomFrequencySelector';
+import { SeverityScale } from '@/components/onboarding/SeverityScale';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { MenopauseSymptoms } from '@/types/onboarding';
+
+interface SymptomsStepProps {
+  data?: MenopauseSymptoms;
+  onChange: (data: MenopauseSymptoms) => void;
+}
+
+const defaultSymptoms: MenopauseSymptoms = {
+  hotFlashes: { frequency: 'never', severity: 1 },
+  nightSweats: { frequency: 'never', severity: 1 },
+  sleepProblems: { frequency: 'never', types: [] },
+  moodChanges: { frequency: 'never', types: [] },
+  physicalSymptoms: [],
+  cognitiveSymptoms: []
+};
+
+export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSymptoms, onChange }) => {
+  const updateField = (field: keyof MenopauseSymptoms, value: any) => {
+    onChange({
+      ...data,
+      [field]: value
+    });
+  };
+
+  const updateSymptomFrequency = (symptom: 'hotFlashes' | 'nightSweats', frequency: any) => {
+    updateField(symptom, { ...data[symptom], frequency });
+  };
+
+  const updateSymptomSeverity = (symptom: 'hotFlashes' | 'nightSweats', severity: number) => {
+    updateField(symptom, { ...data[symptom], severity });
+  };
+
+  const updateComplexSymptom = (symptom: 'sleepProblems' | 'moodChanges', field: string, value: any) => {
+    updateField(symptom, { ...data[symptom], [field]: value });
+  };
+
+  const toggleArrayItem = (array: string[], item: string) => {
+    return array.includes(item) 
+      ? array.filter(i => i !== item)
+      : [...array, item];
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Hot Flashes */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-foreground">Приливы</h3>
+        <SymptomFrequencySelector
+          label="Как часто вы испытываете приливы?"
+          value={data.hotFlashes.frequency}
+          onChange={(frequency) => updateSymptomFrequency('hotFlashes', frequency)}
+        />
+        {data.hotFlashes.frequency !== 'never' && (
+          <SeverityScale
+            label="Насколько сильные приливы?"
+            value={data.hotFlashes.severity}
+            onChange={(severity) => updateSymptomSeverity('hotFlashes', severity)}
+          />
+        )}
+      </div>
+
+      {/* Night Sweats */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-foreground">Ночная потливость</h3>
+        <SymptomFrequencySelector
+          label="Как часто вы просыпаетесь от потливости?"
+          value={data.nightSweats.frequency}
+          onChange={(frequency) => updateSymptomFrequency('nightSweats', frequency)}
+        />
+        {data.nightSweats.frequency !== 'never' && (
+          <SeverityScale
+            label="Насколько сильная ночная потливость?"
+            value={data.nightSweats.severity}
+            onChange={(severity) => updateSymptomSeverity('nightSweats', severity)}
+          />
+        )}
+      </div>
+
+      {/* Sleep Problems */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-foreground">Проблемы со сном</h3>
+        <SymptomFrequencySelector
+          label="Как часто у вас проблемы со сном?"
+          value={data.sleepProblems.frequency}
+          onChange={(frequency) => updateComplexSymptom('sleepProblems', 'frequency', frequency)}
+        />
+        {data.sleepProblems.frequency !== 'never' && (
+          <div className="space-y-3">
+            <Label>Какие именно проблемы? (можно выбрать несколько)</Label>
+            <div className="space-y-2">
+              {[
+                { value: 'difficulty_falling_asleep', label: 'Трудно заснуть' },
+                { value: 'frequent_waking', label: 'Частые пробуждения' },
+                { value: 'early_waking', label: 'Раннее пробуждение' }
+              ].map((option) => (
+                <div key={option.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={option.value}
+                    checked={data.sleepProblems.types.includes(option.value)}
+                    onCheckedChange={(checked) => {
+                      const newTypes = checked
+                        ? [...data.sleepProblems.types, option.value]
+                        : data.sleepProblems.types.filter(t => t !== option.value);
+                      updateComplexSymptom('sleepProblems', 'types', newTypes);
+                    }}
+                  />
+                  <Label htmlFor={option.value}>{option.label}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mood Changes */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-foreground">Изменения настроения</h3>
+        <SymptomFrequencySelector
+          label="Как часто вы замечаете перепады настроения?"
+          value={data.moodChanges.frequency}
+          onChange={(frequency) => updateComplexSymptom('moodChanges', 'frequency', frequency)}
+        />
+        {data.moodChanges.frequency !== 'never' && (
+          <div className="space-y-3">
+            <Label>Какие изменения настроения? (можно выбрать несколько)</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { value: 'irritability', label: 'Раздражительность' },
+                { value: 'anxiety', label: 'Тревожность' },
+                { value: 'depression', label: 'Подавленность' },
+                { value: 'mood_swings', label: 'Резкие перепады' }
+              ].map((option) => (
+                <div key={option.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={option.value}
+                    checked={data.moodChanges.types.includes(option.value)}
+                    onCheckedChange={(checked) => {
+                      const newTypes = checked
+                        ? [...data.moodChanges.types, option.value]
+                        : data.moodChanges.types.filter(t => t !== option.value);
+                      updateComplexSymptom('moodChanges', 'types', newTypes);
+                    }}
+                  />
+                  <Label htmlFor={option.value}>{option.label}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Physical Symptoms */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-foreground">Физические симптомы</h3>
+        <Label>Какие физические симптомы вы испытываете? (можно выбрать несколько)</Label>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { value: 'joint_pain', label: 'Боли в суставах' },
+            { value: 'headaches', label: 'Головные боли' },
+            { value: 'fatigue', label: 'Усталость' },
+            { value: 'weight_gain', label: 'Набор веса' }
+          ].map((option) => (
+            <div key={option.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={option.value}
+                checked={data.physicalSymptoms.includes(option.value)}
+                onCheckedChange={(checked) => {
+                  const newSymptoms = toggleArrayItem(data.physicalSymptoms, option.value);
+                  updateField('physicalSymptoms', newSymptoms);
+                }}
+              />
+              <Label htmlFor={option.value}>{option.label}</Label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Cognitive Symptoms */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-foreground">Когнитивные симптомы</h3>
+        <Label>Замечаете ли вы изменения в мышлении? (можно выбрать несколько)</Label>
+        <div className="space-y-2">
+          {[
+            { value: 'memory_issues', label: 'Проблемы с памятью' },
+            { value: 'concentration_problems', label: 'Трудности с концентрацией' },
+            { value: 'brain_fog', label: 'Туман в голове' }
+          ].map((option) => (
+            <div key={option.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={option.value}
+                checked={data.cognitiveSymptoms.includes(option.value)}
+                onCheckedChange={(checked) => {
+                  const newSymptoms = toggleArrayItem(data.cognitiveSymptoms, option.value);
+                  updateField('cognitiveSymptoms', newSymptoms);
+                }}
+              />
+              <Label htmlFor={option.value}>{option.label}</Label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="text-sm text-muted-foreground bg-eva-soft-pink/20 rounded-lg p-3">
+        <p>
+          💡 <strong>Помните:</strong> Если вы не испытываете какой-то симптом, это тоже важная информация. 
+          Отвечайте честно - это поможет нам лучше понять ваше состояние.
+        </p>
+      </div>
+    </div>
+  );
+};
