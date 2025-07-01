@@ -16,8 +16,12 @@ import {
 } from 'lucide-react';
 
 const PatientDashboard = () => {
+  const breadcrumbs = [
+    { label: 'Главная' }
+  ];
+
   return (
-    <PatientLayout>
+    <PatientLayout breadcrumbs={breadcrumbs}>
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-eva-dusty-rose to-eva-mauve p-6 rounded-2xl text-white">

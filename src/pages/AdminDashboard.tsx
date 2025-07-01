@@ -19,8 +19,12 @@ import {
 } from 'lucide-react';
 
 const AdminDashboard = () => {
+  const breadcrumbs = [
+    { label: 'Панель управления' }
+  ];
+
   return (
-    <AdminLayout>
+    <AdminLayout breadcrumbs={breadcrumbs}>
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-gray-600 to-blue-600 p-6 rounded-2xl text-white">
