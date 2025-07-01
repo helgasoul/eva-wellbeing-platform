@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserRole } from '@/types/auth';
+import { UserRole, ROLE_LABELS, ROLE_DESCRIPTIONS } from '@/types/roles';
 import { Heart, Briefcase, Shield } from 'lucide-react';
 
 interface RoleSelectorProps {
@@ -14,25 +14,25 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
 }) => {
   const roles = [
     {
-      value: 'patient' as UserRole,
-      label: 'Пациентка',
-      description: 'Я хочу получать поддержку и консультации',
+      value: UserRole.PATIENT,
+      label: ROLE_LABELS[UserRole.PATIENT],
+      description: ROLE_DESCRIPTIONS[UserRole.PATIENT],
       icon: Heart,
-      color: 'from-eva-coral to-primary'
+      color: 'from-eva-dusty-rose to-primary'
     },
     {
-      value: 'doctor' as UserRole,
-      label: 'Врач',
-      description: 'Я хочу консультировать пациенток',
+      value: UserRole.DOCTOR,
+      label: ROLE_LABELS[UserRole.DOCTOR],
+      description: ROLE_DESCRIPTIONS[UserRole.DOCTOR],
       icon: Briefcase,
-      color: 'from-eva-sage to-eva-sage-dark'
+      color: 'from-eva-mauve to-eva-taupe'
     },
     {
-      value: 'admin' as UserRole,
-      label: 'Администратор',
-      description: 'Управление платформой',
+      value: UserRole.ADMIN,
+      label: ROLE_LABELS[UserRole.ADMIN],
+      description: ROLE_DESCRIPTIONS[UserRole.ADMIN],
       icon: Shield,
-      color: 'from-eva-lavender to-eva-lavender-dark'
+      color: 'from-eva-taupe to-eva-mauve'
     }
   ];
 
@@ -52,7 +52,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
               relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200
               ${isSelected 
                 ? 'border-primary bg-primary/5 shadow-md' 
-                : 'border-eva-rose-dark/30 bg-white/70 hover:border-primary/50 hover:bg-primary/5'
+                : 'border-eva-dusty-rose/30 bg-white/70 hover:border-primary/50 hover:bg-primary/5'
               }
             `}
             onClick={() => onRoleChange(role.value)}

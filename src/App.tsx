@@ -3,14 +3,19 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { Layout } from "./components/layout/Layout";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { UserRole } from "./types/roles";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
+import PatientDashboard from "./pages/PatientDashboard";
+import DoctorDashboard from "./pages/DoctorDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +32,32 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            
+            {/* Legacy dashboard route - redirect to role-specific dashboard */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Role-specific protected dashboards */}
+            <Route path="/patient/dashboard" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <PatientDashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/doctor/dashboard" element={
+              <ProtectedRoute requiredRole={UserRole.DOCTOR}>
+                <DoctorDashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/dashboard" element={
+              <ProtectedRoute requiredRole={UserRole.ADMIN}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
             
             {/* Main routes with layout */}
             <Route path="/" element={

@@ -1,7 +1,6 @@
 
 import { z } from 'zod';
-
-export type UserRole = 'patient' | 'doctor' | 'admin';
+import { UserRole } from './roles';
 
 export interface User {
   id: string;
@@ -65,7 +64,7 @@ export const registerSchema = z.object({
   confirmPassword: z
     .string()
     .min(1, 'Подтвердите пароль'),
-  role: z.enum(['patient', 'doctor', 'admin'], {
+  role: z.nativeEnum(UserRole, {
     required_error: 'Выберите роль',
   }),
   agreeToTerms: z
