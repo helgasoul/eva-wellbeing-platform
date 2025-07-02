@@ -56,6 +56,13 @@ const App = () => (
               </ProtectedRoute>
             } />
             
+            {/* Patient AI chat route */}
+            <Route path="/patient/ai-chat" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <AIChat />
+              </ProtectedRoute>
+            } />
+            
             {/* Role-specific protected dashboards */}
             <Route path="/patient/dashboard" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>

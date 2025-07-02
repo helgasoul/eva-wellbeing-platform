@@ -29,8 +29,7 @@ const PatientDashboard = () => {
         navigate('/patient/symptoms');
         break;
       case 'ai-chat':
-        // TODO: Implement AI chat
-        console.log('AI Chat coming soon');
+        navigate('/patient/ai-chat');
         break;
       case 'community':
         // TODO: Implement community
