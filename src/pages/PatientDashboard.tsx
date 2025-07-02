@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,21 +17,43 @@ import {
 } from 'lucide-react';
 
 const PatientDashboard = () => {
+  const navigate = useNavigate();
+  
   const breadcrumbs = [
     { label: 'Главная' }
   ];
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'symptoms':
+        navigate('/patient/symptoms');
+        break;
+      case 'ai-chat':
+        // TODO: Implement AI chat
+        console.log('AI Chat coming soon');
+        break;
+      case 'community':
+        // TODO: Implement community
+        console.log('Community coming soon');
+        break;
+      case 'documents':
+        // TODO: Implement documents
+        console.log('Documents coming soon');
+        break;
+    }
+  };
 
   return (
     <PatientLayout breadcrumbs={breadcrumbs}>
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-eva-dusty-rose to-eva-mauve p-6 rounded-2xl text-white">
+        <div className="bg-gradient-to-r from-primary to-secondary p-6 rounded-2xl text-white">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-white/20 rounded-full">
               <Heart className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-playfair font-bold">Добро пожаловать в Eva!</h1>
+              <h1 className="text-2xl font-playfair font-bold">Добро пожаловать в bloom!</h1>
               <p className="text-white/90 mt-1">
                 Ваш персональный помощник для поддержки здоровья и благополучия
               </p>
@@ -40,12 +63,12 @@ const PatientDashboard = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-gradient-to-br from-white to-eva-soft-pink border-eva-dusty-rose/20">
+          <Card className="bloom-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-eva-dusty-rose">
+              <CardTitle className="text-sm font-medium text-primary">
                 Записи симптомов
               </CardTitle>
-              <Activity className="h-4 w-4 text-eva-dusty-rose" />
+              <Activity className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">15</div>
@@ -55,12 +78,12 @@ const PatientDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-white to-eva-soft-pink border-eva-dusty-rose/20">
+          <Card className="bloom-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-eva-dusty-rose">
+              <CardTitle className="text-sm font-medium text-primary">
                 Дней отслеживания
               </CardTitle>
-              <Calendar className="h-4 w-4 text-eva-dusty-rose" />
+              <Calendar className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">28</div>
@@ -70,12 +93,12 @@ const PatientDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-white to-eva-soft-pink border-eva-dusty-rose/20">
+          <Card className="bloom-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-eva-dusty-rose">
+              <CardTitle className="text-sm font-medium text-primary">
                 ИИ-консультации
               </CardTitle>
-              <MessageSquare className="h-4 w-4 text-eva-dusty-rose" />
+              <MessageSquare className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">8</div>
@@ -89,10 +112,10 @@ const PatientDashboard = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Activity */}
-          <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+          <Card className="bloom-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5 text-eva-dusty-rose" />
+                <TrendingUp className="h-5 w-5 text-primary" />
                 <span>Недавняя активность</span>
               </CardTitle>
               <CardDescription>
@@ -101,22 +124,22 @@ const PatientDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center space-x-3 p-3 bg-eva-soft-pink/30 rounded-lg">
-                  <div className="w-2 h-2 bg-eva-dusty-rose rounded-full"></div>
+                <div className="flex items-center space-x-3 p-3 bg-primary/10 rounded-lg">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Записан симптом: Приливы</p>
                     <p className="text-xs text-muted-foreground">2 часа назад</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 p-3 bg-eva-soft-pink/30 rounded-lg">
-                  <div className="w-2 h-2 bg-eva-dusty-rose rounded-full"></div>
+                <div className="flex items-center space-x-3 p-3 bg-primary/10 rounded-lg">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Консультация с ИИ-помощником</p>
                     <p className="text-xs text-muted-foreground">Вчера в 14:30</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 p-3 bg-eva-soft-pink/30 rounded-lg">
-                  <div className="w-2 h-2 bg-eva-dusty-rose rounded-full"></div>
+                <div className="flex items-center space-x-3 p-3 bg-primary/10 rounded-lg">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Участие в обсуждении сообщества</p>
                     <p className="text-xs text-muted-foreground">3 дня назад</p>
@@ -127,10 +150,10 @@ const PatientDashboard = () => {
           </Card>
 
           {/* Health Progress */}
-          <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+          <Card className="bloom-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Heart className="h-5 w-5 text-eva-dusty-rose" />
+                <Heart className="h-5 w-5 text-primary" />
                 <span>Прогресс здоровья</span>
               </CardTitle>
               <CardDescription>
@@ -166,7 +189,7 @@ const PatientDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+        <Card className="bloom-card">
           <CardHeader>
             <CardTitle>Быстрые действия</CardTitle>
             <CardDescription>
@@ -177,30 +200,34 @@ const PatientDashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Button
                 variant="outline"
-                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-eva-dusty-rose/30 hover:bg-eva-soft-pink/50"
+                onClick={() => handleQuickAction('symptoms')}
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-primary/30 hover:bg-primary/10"
               >
-                <Plus className="h-6 w-6 text-eva-dusty-rose" />
+                <Plus className="h-6 w-6 text-primary" />
                 <span className="text-sm">Записать симптом</span>
               </Button>
               <Button
                 variant="outline"
-                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-eva-dusty-rose/30 hover:bg-eva-soft-pink/50"
+                onClick={() => handleQuickAction('ai-chat')}
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-primary/30 hover:bg-primary/10"
               >
-                <MessageSquare className="h-6 w-6 text-eva-dusty-rose" />
+                <MessageSquare className="h-6 w-6 text-primary" />
                 <span className="text-sm">Чат с ИИ</span>
               </Button>
               <Button
                 variant="outline"
-                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-eva-dusty-rose/30 hover:bg-eva-soft-pink/50"
+                onClick={() => handleQuickAction('community')}
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-primary/30 hover:bg-primary/10"
               >
-                <Users className="h-6 w-6 text-eva-dusty-rose" />
+                <Users className="h-6 w-6 text-primary" />
                 <span className="text-sm">Сообщество</span>
               </Button>
               <Button
                 variant="outline"
-                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-eva-dusty-rose/30 hover:bg-eva-soft-pink/50"
+                onClick={() => handleQuickAction('documents')}
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-primary/30 hover:bg-primary/10"
               >
-                <FileText className="h-6 w-6 text-eva-dusty-rose" />
+                <FileText className="h-6 w-6 text-primary" />
                 <span className="text-sm">Мои документы</span>
               </Button>
             </div>

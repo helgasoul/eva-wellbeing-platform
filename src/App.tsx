@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientOnboarding from "./pages/patient/PatientOnboarding";
+import SymptomTracker from "./pages/patient/SymptomTracker";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -48,6 +49,13 @@ const App = () => (
               </ProtectedRoute>
             } />
             
+            {/* Patient symptom tracker route */}
+            <Route path="/patient/symptoms" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <SymptomTracker />
+              </ProtectedRoute>
+            } />
+            
             {/* Role-specific protected dashboards */}
             <Route path="/patient/dashboard" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
@@ -77,8 +85,8 @@ const App = () => (
             {/* Add placeholder routes for footer links */}
             <Route path="/about" element={
               <Layout>
-                <div className="min-h-screen eva-gradient flex items-center justify-center">
-                  <div className="eva-card p-8 text-center">
+                <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                  <div className="bloom-card p-8 text-center">
                     <h1 className="text-2xl font-playfair font-bold mb-4">О платформе</h1>
                     <p className="text-muted-foreground">Эта страница в разработке</p>
                   </div>
@@ -88,8 +96,8 @@ const App = () => (
             
             <Route path="/services" element={
               <Layout>
-                <div className="min-h-screen eva-gradient flex items-center justify-center">
-                  <div className="eva-card p-8 text-center">
+                <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                  <div className="bloom-card p-8 text-center">
                     <h1 className="text-2xl font-playfair font-bold mb-4">Услуги</h1>
                     <p className="text-muted-foreground">Эта страница в разработке</p>
                   </div>
@@ -99,8 +107,8 @@ const App = () => (
             
             <Route path="/contact" element={
               <Layout>
-                <div className="min-h-screen eva-gradient flex items-center justify-center">
-                  <div className="eva-card p-8 text-center">
+                <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                  <div className="bloom-card p-8 text-center">
                     <h1 className="text-2xl font-playfair font-bold mb-4">Контакты</h1>
                     <p className="text-muted-foreground">Эта страница в разработке</p>
                   </div>
@@ -110,8 +118,8 @@ const App = () => (
             
             <Route path="/privacy" element={
               <Layout>
-                <div className="min-h-screen eva-gradient flex items-center justify-center">
-                  <div className="eva-card p-8 text-center">
+                <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                  <div className="bloom-card p-8 text-center">
                     <h1 className="text-2xl font-playfair font-bold mb-4">Политика конфиденциальности</h1>
                     <p className="text-muted-foreground">Эта страница в разработке</p>
                   </div>
@@ -121,8 +129,8 @@ const App = () => (
             
             <Route path="/terms" element={
               <Layout>
-                <div className="min-h-screen eva-gradient flex items-center justify-center">
-                  <div className="eva-card p-8 text-center">
+                <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                  <div className="bloom-card p-8 text-center">
                     <h1 className="text-2xl font-playfair font-bold mb-4">Условия использования</h1>
                     <p className="text-muted-foreground">Эта страница в разработке</p>
                   </div>
