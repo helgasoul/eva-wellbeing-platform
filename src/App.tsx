@@ -16,6 +16,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientOnboarding from "./pages/patient/PatientOnboarding";
 import SymptomTracker from "./pages/patient/SymptomTracker";
+import { AIChat } from "./pages/patient/AIChat";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
