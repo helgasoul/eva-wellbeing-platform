@@ -35,7 +35,7 @@ export const SymptomFrequencySelector: React.FC<SymptomFrequencySelectorProps> =
             className={cn(
               "px-3 py-2 rounded-lg text-xs font-medium border transition-all duration-200 hover:scale-105",
               value === option.value
-                ? option.color + ' ring-2 ring-eva-dusty-rose ring-offset-2'
+                ? option.color + ' ring-2 ring-bloom-dusty-rose ring-offset-2'
                 : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
             )}
           >

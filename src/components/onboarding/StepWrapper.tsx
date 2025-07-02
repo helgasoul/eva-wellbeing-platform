@@ -38,7 +38,7 @@ export const StepWrapper: React.FC<StepWrapperProps> = ({
       </div>
 
       {/* Step Content */}
-      <div className="bg-white/80 backdrop-blur-sm border border-eva-dusty-rose/20 rounded-2xl p-6 mb-8">
+      <div className="bg-white/80 backdrop-blur-sm border border-bloom-dusty-rose/20 rounded-2xl p-6 mb-8">
         {children}
       </div>
 
@@ -60,7 +60,7 @@ export const StepWrapper: React.FC<StepWrapperProps> = ({
         <Button
           onClick={onNext}
           disabled={!canGoNext}
-          className="flex items-center space-x-2 bg-eva-dusty-rose hover:bg-eva-mauve"
+          className="flex items-center space-x-2 bg-bloom-dusty-rose hover:bg-bloom-mauve"
         >
           <span>{isLastStep ? 'Завершить' : 'Далее'}</span>
           {!isLastStep && <ChevronRight className="h-4 w-4" />}

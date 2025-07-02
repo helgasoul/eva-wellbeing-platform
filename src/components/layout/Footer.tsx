@@ -5,17 +5,17 @@ import { Link } from 'react-router-dom';
 
 export const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-eva-rose to-eva-lavender border-t border-eva-rose-dark/20">
+    <footer className="bg-gradient-to-r from-bloom-soft-pink to-bloom-warm-beige border-t border-bloom-dusty-rose/20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="p-2 bg-gradient-to-br from-eva-coral to-primary rounded-full">
+              <div className="p-2 bg-gradient-to-br from-primary to-bloom-mauve rounded-full">
                 <Heart className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-playfair font-semibold text-foreground">
-                Eva
+              <span className="text-2xl font-poppins font-semibold text-foreground bloom-brand">
+                bloom
               </span>
             </div>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
@@ -70,7 +70,7 @@ export const Footer = () => {
                 <div className="p-2 bg-white/70 rounded-full">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-muted-foreground">info@eva-health.ru</span>
+                <span className="text-muted-foreground">info@bloom-health.ru</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-white/70 rounded-full">
@@ -83,9 +83,9 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-eva-rose-dark/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-bloom-dusty-rose/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 Eva. Все права защищены.
+            © 2024 bloom. Все права защищены.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link 

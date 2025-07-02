@@ -1,10 +1,10 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Eva Design System - Caring colors for women's health */
+/* bloom Design System - Caring colors for women's health */
 @layer base {
   :root {
     --background: #FEFEFE;
@@ -100,22 +100,26 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-playfair text-foreground;
   }
+
+  .bloom-brand {
+    @apply font-poppins;
+  }
 }
 
 @layer components {
-  .eva-gradient {
+  .bloom-gradient {
     background: linear-gradient(135deg, #F0E6E3 0%, #E8D5D1 50%, #F8F5F2 100%);
   }
   
-  .eva-card {
-    @apply bg-white/80 backdrop-blur-sm border border-eva-dusty-rose/20 rounded-2xl shadow-lg;
+  .bloom-card {
+    @apply bg-white/80 backdrop-blur-sm border border-bloom-dusty-rose/20 rounded-2xl shadow-lg;
   }
   
-  .eva-button {
+  .bloom-button {
     @apply bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg;
   }
   
-  .eva-input {
-    @apply bg-white/70 border border-eva-dusty-rose/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+  .bloom-input {
+    @apply bg-white/70 border border-bloom-dusty-rose/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
   }
 }

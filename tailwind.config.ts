@@ -63,8 +63,8 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Eva brand colors - updated with softer tones from the image
-				eva: {
+				// bloom brand colors - updated with softer tones
+				bloom: {
 					'dusty-rose': '#C49A96',
 					'soft-pink': '#E8D5D1',
 					'warm-beige': '#F0E6E3',
@@ -126,7 +126,8 @@ export default {
 			},
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif'],
-				'playfair': ['Playfair Display', 'serif']
+				'playfair': ['Playfair Display', 'serif'],
+				'poppins': ['Poppins', 'sans-serif']
 			}
 		}
 	},

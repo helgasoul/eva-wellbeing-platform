@@ -19,7 +19,7 @@ import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
 
 const TOTAL_STEPS = 7;
-const STORAGE_KEY = 'eva-onboarding-data';
+const STORAGE_KEY = 'bloom-onboarding-data';
 
 const stepTitles = [
   'Добро пожаловать',
@@ -215,7 +215,7 @@ const PatientOnboarding = () => {
   };
 
   return (
-    <PatientLayout title="Онбординг Eva">
+    <PatientLayout title="Онбординг bloom">
       <div className="min-h-screen">
         <OnboardingProgress
           currentStep={currentStep}
@@ -242,7 +242,7 @@ const PatientOnboarding = () => {
         {isLoading && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eva-dusty-rose mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bloom-dusty-rose mx-auto mb-4"></div>
               <p className="text-foreground">Анализируем ваши данные...</p>
             </div>
           </div>

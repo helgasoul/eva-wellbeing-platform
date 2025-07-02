@@ -9,11 +9,11 @@ export const WelcomeStep: React.FC = () => {
     <div className="max-w-2xl mx-auto text-center space-y-8">
       {/* Welcome Header */}
       <div>
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-eva-dusty-rose to-eva-mauve rounded-full mb-6">
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-bloom-dusty-rose to-bloom-mauve rounded-full mb-6">
           <Heart className="h-10 w-10 text-white" />
         </div>
         <h1 className="text-3xl font-playfair font-bold text-foreground mb-4">
-          Добро пожаловать в Eva!
+          Добро пожаловать в bloom!
         </h1>
         <p className="text-lg text-muted-foreground">
           Давайте создадим персональный план поддержки вашего здоровья и благополучия
@@ -21,9 +21,9 @@ export const WelcomeStep: React.FC = () => {
       </div>
 
       {/* Process Overview */}
-      <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+      <Card className="bg-white/80 backdrop-blur-sm border-bloom-dusty-rose/20">
         <CardHeader>
-          <CardTitle className="flex items-center justify-center space-x-2 text-eva-dusty-rose">
+          <CardTitle className="flex items-center justify-center space-x-2 text-bloom-dusty-rose">
             <Clock className="h-5 w-5" />
             <span>Что вас ждет</span>
           </CardTitle>
@@ -56,8 +56,8 @@ export const WelcomeStep: React.FC = () => {
       </Card>
 
       {/* Time Estimate */}
-      <div className="bg-eva-soft-pink/30 rounded-lg p-4">
-        <p className="text-eva-dusty-rose font-medium">
+      <div className="bg-bloom-soft-pink/30 rounded-lg p-4">
+        <p className="text-bloom-dusty-rose font-medium">
           ⏱️ Это займет всего 5-7 минут
         </p>
         <p className="text-sm text-muted-foreground mt-1">
@@ -69,7 +69,7 @@ export const WelcomeStep: React.FC = () => {
       <div className="text-sm text-muted-foreground bg-gray-50 rounded-lg p-4">
         <p>
           🔒 <strong>Конфиденциальность:</strong> Вся информация надежно защищена и используется 
-          только для персонализации вашего опыта в Eva
+          только для персонализации вашего опыта в bloom
         </p>
       </div>
     </div>

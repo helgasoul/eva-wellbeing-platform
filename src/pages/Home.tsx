@@ -35,7 +35,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="eva-gradient py-20 px-4">
+      <section className="bloom-gradient py-20 px-4">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-playfair font-bold text-foreground mb-6">
@@ -43,12 +43,12 @@ const Home = () => {
               <span className="text-primary">менопаузы</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-              Eva — это современная платформа поддержки женщин, которая поможет 
+              bloom — это современная платформа поддержки женщин, которая поможет 
               вам пройти через изменения в организме с уверенностью и заботой о себе.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register">
-                <Button className="eva-button text-lg px-8 py-4">
+                <Button className="bloom-button text-lg px-8 py-4">
                   Начать заботу о себе
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -64,13 +64,13 @@ const Home = () => {
       </section>
 
       {/* Community Image Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-eva-gradient to-eva-pearl">
+      <section className="py-16 px-4 bg-gradient-to-b from-bloom-gradient to-bloom-pearl">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <div className="relative overflow-hidden rounded-3xl shadow-2xl animate-fade-in">
               <img 
                 src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
-                alt="Сообщество женщин Eva - поддержка и взаимопонимание"
+                alt="Сообщество женщин bloom - поддержка и взаимопонимание"
                 className="w-full h-auto object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"></div>
@@ -89,11 +89,11 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-eva-warm">
+      <section className="py-20 px-4 bg-bloom-warm">
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-playfair font-bold text-foreground mb-4">
-              Почему выбирают Eva?
+              Почему выбирают bloom?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Мы создали платформу, которая объединяет медицинскую экспертизу, 
@@ -107,10 +107,10 @@ const Home = () => {
               return (
                 <div
                   key={index}
-                  className="eva-card p-8 text-center group hover:shadow-xl transition-all duration-300 animate-slide-in"
+                  className="bloom-card p-8 text-center group hover:shadow-xl transition-all duration-300 animate-slide-in"
                   style={{ animationDelay: `${index * 0.2}s` }}
                 >
-                  <div className="inline-flex p-4 bg-gradient-to-br from-eva-dusty-rose to-primary rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <div className="inline-flex p-4 bg-gradient-to-br from-bloom-dusty-rose to-primary rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
                     <IconComponent className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="text-xl font-playfair font-semibold text-foreground mb-4">
@@ -136,7 +136,7 @@ const Home = () => {
               </h2>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                 Период менопаузы — это естественный этап в жизни женщины, который 
-                не должен пугать. С Eva вы получите всю необходимую поддержку и 
+                не должен пугать. С bloom вы получите всю необходимую поддержку и 
                 информацию для комфортного перехода.
               </p>
               <div className="space-y-4">
@@ -148,9 +148,9 @@ const Home = () => {
                 ))}
               </div>
             </div>
-            <div className="eva-card p-8">
+            <div className="bloom-card p-8">
               <div className="text-center">
-                <div className="inline-flex p-6 bg-gradient-to-br from-eva-soft-pink to-eva-warm-beige rounded-full mb-6">
+                <div className="inline-flex p-6 bg-gradient-to-br from-bloom-soft-pink to-bloom-warm-beige rounded-full mb-6">
                   <Heart className="h-12 w-12 text-primary" />
                 </div>
                 <h3 className="text-2xl font-playfair font-semibold text-foreground mb-4">
@@ -158,10 +158,10 @@ const Home = () => {
                 </h3>
                 <p className="text-muted-foreground mb-6">
                   Присоединяйтесь к тысячам женщин, которые уже доверили 
-                  свое здоровье платформе Eva
+                  свое здоровье платформе bloom
                 </p>
                 <Link to="/register">
-                  <Button className="eva-button w-full">
+                  <Button className="bloom-button w-full">
                     Зарегистрироваться бесплатно
                   </Button>
                 </Link>
@@ -172,19 +172,19 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="eva-gradient py-20 px-4">
+      <section className="bloom-gradient py-20 px-4">
         <div className="container mx-auto text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-playfair font-bold text-foreground mb-6">
               Начните заботу о себе уже сегодня
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Не откладывайте заботу о своем здоровье. Присоединяйтесь к Eva 
+              Не откладывайте заботу о своем здоровье. Присоединяйтесь к bloom 
               и получите доступ к профессиональной поддержке
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register">
-                <Button className="eva-button text-lg px-8 py-4">
+                <Button className="bloom-button text-lg px-8 py-4">
                   Создать аккаунт
                 </Button>
               </Link>

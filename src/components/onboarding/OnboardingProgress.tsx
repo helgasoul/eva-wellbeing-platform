@@ -18,9 +18,9 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
   return (
     <div className="w-full mb-8">
       {/* Progress Bar */}
-      <div className="w-full bg-eva-cream rounded-full h-2 mb-4">
+      <div className="w-full bg-bloom-cream rounded-full h-2 mb-4">
         <div
-          className="bg-gradient-to-r from-eva-dusty-rose to-eva-mauve h-2 rounded-full transition-all duration-500 ease-out"
+          className="bg-gradient-to-r from-bloom-dusty-rose to-bloom-mauve h-2 rounded-full transition-all duration-500 ease-out"
           style={{ width: `${progressPercentage}%` }}
         />
       </div>
@@ -37,9 +37,9 @@ export const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
               key={stepNumber}
               className={cn(
                 "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-all duration-300",
-                isCompleted && "bg-eva-dusty-rose text-white",
-                isCurrent && "bg-eva-mauve text-white ring-4 ring-eva-soft-pink",
-                !isCompleted && !isCurrent && "bg-eva-cream text-eva-dusty-rose"
+                isCompleted && "bg-bloom-dusty-rose text-white",
+                isCurrent && "bg-bloom-mauve text-white ring-4 ring-bloom-soft-pink",
+                !isCompleted && !isCurrent && "bg-bloom-cream text-bloom-dusty-rose"
               )}
             >
               {stepNumber}

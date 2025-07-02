@@ -18,16 +18,16 @@ export const Header = () => {
   ];
 
   return (
-    <header className="bg-white/90 backdrop-blur-md border-b border-eva-rose-dark/20 sticky top-0 z-50">
+    <header className="bg-white/90 backdrop-blur-md border-b border-bloom-dusty-rose/20 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="p-2 bg-gradient-to-br from-eva-coral to-primary rounded-full group-hover:scale-110 transition-transform duration-300">
+            <div className="p-2 bg-gradient-to-br from-primary to-bloom-mauve rounded-full group-hover:scale-110 transition-transform duration-300">
               <Heart className="h-6 w-6 text-white" />
             </div>
-            <span className="text-2xl font-playfair font-semibold text-foreground group-hover:text-primary transition-colors">
-              Eva
+            <span className="text-2xl font-poppins font-semibold text-foreground group-hover:text-primary transition-colors bloom-brand">
+              bloom
             </span>
           </Link>
 
@@ -56,7 +56,7 @@ export const Header = () => {
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="eva-button">
+              <Button className="bloom-button">
                 Регистрация
               </Button>
             </Link>
@@ -64,7 +64,7 @@ export const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-eva-rose transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-bloom-soft-pink transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -73,7 +73,7 @@ export const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-eva-rose-dark/20 animate-fade-in">
+          <div className="md:hidden py-4 border-t border-bloom-dusty-rose/20 animate-fade-in">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <Link
@@ -81,7 +81,7 @@ export const Header = () => {
                   to={item.path}
                   className={`text-sm font-medium transition-colors px-2 py-1 rounded ${
                     isActive(item.path) 
-                      ? 'text-primary bg-eva-rose' 
+                      ? 'text-primary bg-bloom-soft-pink' 
                       : 'text-muted-foreground hover:text-primary'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
@@ -89,14 +89,14 @@ export const Header = () => {
                   {item.label}
                 </Link>
               ))}
-              <div className="flex flex-col space-y-2 pt-4 border-t border-eva-rose-dark/20">
+              <div className="flex flex-col space-y-2 pt-4 border-t border-bloom-dusty-rose/20">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start">
                     Войти
                   </Button>
                 </Link>
                 <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="eva-button w-full">
+                  <Button className="bloom-button w-full">
                     Регистрация
                   </Button>
                 </Link>
