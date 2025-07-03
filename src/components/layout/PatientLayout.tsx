@@ -27,7 +27,7 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
       breadcrumbs={breadcrumbs}
       quickActions={true}
     >
-      <div className="flex min-h-screen bg-gradient-to-br from-eva-cream via-eva-warm-beige to-eva-soft-pink">
+      <div className="flex min-h-screen bg-gradient-to-br from-bloom-cream via-bloom-vanilla to-bloom-warm-cream">
         {/* Sidebar */}
         <div className="flex">
           <Sidebar 
@@ -38,9 +38,9 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
           
           {/* Emergency Contact Card - внутри sidebar области */}
           <div className="hidden md:block absolute bottom-4 left-4 right-4 max-w-56">
-            <Card className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
+            <Card className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200/50 shadow-gentle">
               <CardHeader className="pb-3">
-                <CardTitle className="text-red-700 text-sm flex items-center">
+                <CardTitle className="text-red-600 text-sm flex items-center">
                   <Phone className="h-4 w-4 mr-2" />
                   Экстренная помощь
                 </CardTitle>
@@ -48,12 +48,12 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
               <CardContent className="pt-0">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-red-600">Скорая помощь:</span>
-                    <span className="font-medium">103</span>
+                    <span className="text-red-500">Скорая помощь:</span>
+                    <span className="font-medium text-red-700">103</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-red-600">Психологическая поддержка:</span>
-                    <span className="font-medium">8-800-2000-122</span>
+                    <span className="text-red-500">Психологическая поддержка:</span>
+                    <span className="font-medium text-red-700">8-800-2000-122</span>
                   </div>
                 </div>
               </CardContent>

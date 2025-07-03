@@ -64,7 +64,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const userRole = role || user.role;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-bloom-cream">
       {/* Top Navigation */}
       {showNavigation && (
         <TopNavbar 
@@ -94,25 +94,25 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       </main>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-eva-warm-beige to-eva-cream border-t border-border">
+      <footer className="bg-gradient-to-r from-bloom-warm-cream to-bloom-soft-peach border-t border-primary/20">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-6 h-6 bg-gradient-to-br from-eva-dusty-rose to-primary rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 bg-gradient-to-br from-primary to-bloom-caramel rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xs">E</span>
               </div>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm soft-text">
                 © 2024 Eva. Платформа поддержки женщин.
               </span>
             </div>
-            <div className="flex space-x-4 text-sm text-muted-foreground">
-              <a href="/privacy" className="hover:text-primary transition-colors">
+            <div className="flex space-x-4 text-sm soft-text">
+              <a href="/privacy" className="hover:text-primary transition-colors interactive-hover">
                 Конфиденциальность
               </a>
-              <a href="/terms" className="hover:text-primary transition-colors">
+              <a href="/terms" className="hover:text-primary transition-colors interactive-hover">
                 Условия использования
               </a>
-              <a href="/contact" className="hover:text-primary transition-colors">
+              <a href="/contact" className="hover:text-primary transition-colors interactive-hover">
                 Контакты
               </a>
             </div>

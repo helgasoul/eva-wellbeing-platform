@@ -25,8 +25,8 @@ export const RecentEntries: React.FC<RecentEntriesProps> = ({
   };
 
   return (
-    <div className="bloom-card p-6">
-      <h3 className="text-lg font-semibold text-foreground mb-4">
+    <div className="bloom-card p-6 bg-white/90 backdrop-blur-sm">
+      <h3 className="text-lg font-semibold gentle-text mb-4">
         Недавние записи
       </h3>
       
@@ -35,22 +35,22 @@ export const RecentEntries: React.FC<RecentEntriesProps> = ({
           <button
             key={entry.id}
             onClick={() => onDateSelect(entry.date)}
-            className="w-full text-left p-3 rounded-lg hover:bg-muted/50 transition-colors border border-border"
+            className="w-full text-left p-3 rounded-lg interactive-hover gentle-border border bg-gradient-to-r from-white to-bloom-vanilla transition-all duration-300"
           >
             <div className="flex justify-between items-center">
               <div>
-                <div className="font-medium text-foreground">
+                <div className="font-medium gentle-text">
                   {new Date(entry.date + 'T00:00:00').toLocaleDateString('ru-RU', {
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long'
                   })}
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
+                <div className="text-sm soft-text mt-1">
                   {getSymptomSummary(entry)}
                 </div>
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm soft-text">
                 {new Date(entry.createdAt).toLocaleDateString('ru-RU')}
               </div>
             </div>
