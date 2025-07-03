@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,7 +15,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientOnboarding from "./pages/patient/PatientOnboarding";
 import SymptomTracker from "./pages/patient/SymptomTracker";
-import { AIChat } from "./pages/patient/AIChat";
+import AIChat from "./pages/patient/AIChat";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
