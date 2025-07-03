@@ -7,83 +7,83 @@
 /* bloom Design System - Caring colors for women's health */
 @layer base {
   :root {
-    --background: #FFFEF7;
-    --foreground: #6B5B58;
+    --background: 252 252 247;
+    --foreground: 107 91 88;
 
-    --card: #FFFFFF;
-    --card-foreground: #6B5B58;
+    --card: 255 255 255;
+    --card-foreground: 107 91 88;
 
-    --popover: #FFFFFF;
-    --popover-foreground: #6B5B58;
+    --popover: 255 255 255;
+    --popover-foreground: 107 91 88;
 
-    --primary: #D4A574;
-    --primary-foreground: #FFFFFF;
+    --primary: 212 165 116;
+    --primary-foreground: 255 255 255;
 
-    --secondary: #F4E6D7;
-    --secondary-foreground: #8A7B78;
+    --secondary: 244 230 215;
+    --secondary-foreground: 138 123 120;
 
-    --muted: #FAF5F0;
-    --muted-foreground: #9A8B88;
+    --muted: 250 245 240;
+    --muted-foreground: 154 139 136;
 
-    --accent: #EED5C7;
-    --accent-foreground: #8A7B78;
+    --accent: 238 213 199;
+    --accent-foreground: 138 123 120;
 
-    --destructive: #E85D75;
-    --destructive-foreground: #FFFFFF;
+    --destructive: 232 93 117;
+    --destructive-foreground: 255 255 255;
 
-    --border: #E8D5CF;
-    --input: #F8F0E7;
-    --ring: #D4A574;
+    --border: 232 213 207;
+    --input: 248 240 231;
+    --ring: 212 165 116;
 
     --radius: 16px;
 
-    --sidebar-background: #FFFEF7;
-    --sidebar-foreground: #6B5B58;
-    --sidebar-primary: #D4A574;
-    --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #F4E6D7;
-    --sidebar-accent-foreground: #8A7B78;
-    --sidebar-border: #E8D5CF;
-    --sidebar-ring: #D4A574;
+    --sidebar-background: 252 252 247;
+    --sidebar-foreground: 107 91 88;
+    --sidebar-primary: 212 165 116;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 244 230 215;
+    --sidebar-accent-foreground: 138 123 120;
+    --sidebar-border: 232 213 207;
+    --sidebar-ring: 212 165 116;
   }
 
   .dark {
-    --background: #1F1A17;
-    --foreground: #F5F1ED;
+    --background: 31 26 23;
+    --foreground: 245 241 237;
 
-    --card: #2A2520;
-    --card-foreground: #F5F1ED;
+    --card: 42 37 32;
+    --card-foreground: 245 241 237;
 
-    --popover: #2A2520;
-    --popover-foreground: #F5F1ED;
+    --popover: 42 37 32;
+    --popover-foreground: 245 241 237;
 
-    --primary: #D4A574;
-    --primary-foreground: #FFFFFF;
+    --primary: 212 165 116;
+    --primary-foreground: 255 255 255;
 
-    --secondary: #3A332E;
-    --secondary-foreground: #D0C5C0;
+    --secondary: 58 51 46;
+    --secondary-foreground: 208 197 192;
 
-    --muted: #2F2A25;
-    --muted-foreground: #A0958F;
+    --muted: 47 42 37;
+    --muted-foreground: 160 149 143;
 
-    --accent: #4A3F3A;
-    --accent-foreground: #D4C5C0;
+    --accent: 74 63 58;
+    --accent-foreground: 212 197 192;
 
-    --destructive: #E85D75;
-    --destructive-foreground: #FFFFFF;
+    --destructive: 232 93 117;
+    --destructive-foreground: 255 255 255;
 
-    --border: #3A332E;
-    --input: #2F2A25;
-    --ring: #D4A574;
+    --border: 58 51 46;
+    --input: 47 42 37;
+    --ring: 212 165 116;
 
-    --sidebar-background: #1F1A17;
-    --sidebar-foreground: #F5F1ED;
-    --sidebar-primary: #D4A574;
-    --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #2A2520;
-    --sidebar-accent-foreground: #D0C5C0;
-    --sidebar-border: #3A332E;
-    --sidebar-ring: #D4A574;
+    --sidebar-background: 31 26 23;
+    --sidebar-foreground: 245 241 237;
+    --sidebar-primary: 212 165 116;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 42 37 32;
+    --sidebar-accent-foreground: 208 197 192;
+    --sidebar-border: 58 51 46;
+    --sidebar-ring: 212 165 116;
   }
 }
 
@@ -118,7 +118,7 @@
   }
   
   .bloom-card {
-    @apply bg-white/90 backdrop-blur-sm border border-primary/20 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply bg-white/90 backdrop-blur-sm border border-primary/20 rounded-2xl shadow-gentle hover:shadow-warm transition-all duration-300;
   }
   
   .bloom-card-interactive {
@@ -126,11 +126,11 @@
   }
   
   .bloom-button {
-    @apply bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95;
+    @apply bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-gentle hover:shadow-warm hover:scale-105 active:scale-95;
   }
   
   .bloom-button-secondary {
-    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95;
+    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-gentle hover:shadow-warm hover:scale-105 active:scale-95;
   }
   
   .bloom-input {
@@ -150,7 +150,7 @@
   }
 
   .interactive-hover {
-    @apply hover:scale-105 hover:shadow-lg transition-all duration-300 ease-out;
+    @apply hover:scale-105 hover:shadow-warm transition-all duration-300 ease-out;
   }
 
   .gentle-border {
