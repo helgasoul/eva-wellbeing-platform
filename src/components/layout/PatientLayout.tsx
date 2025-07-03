@@ -13,7 +13,7 @@ interface PatientLayoutProps {
 
 export const PatientLayout: React.FC<PatientLayoutProps> = ({ 
   children, 
-  title = 'Eva - Ваш персональный помощник',
+  title = 'bloom - Ваш персональный помощник',
   breadcrumbs = []
 }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

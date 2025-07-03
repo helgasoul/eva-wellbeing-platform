@@ -2,402 +2,322 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { PatientLayout } from '@/components/layout/PatientLayout';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { MessageSquare, Send, Bot, User, Heart, Zap, Moon, Activity } from 'lucide-react';
 
 interface ChatMessage {
   id: string;
   type: 'user' | 'ai';
   content: string;
-  timestamp: string;
-  isTyping?: boolean;
-}
-
-interface QuickAction {
-  id: string;
-  text: string;
-  prompt: string;
-  icon: string;
+  timestamp: Date;
 }
 
 const AIChat: React.FC = () => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const breadcrumbs = [
     { label: 'Главная', href: '/patient/dashboard' },
-    { label: 'ИИ-помощник' }
+    { label: 'ИИ-консультант Eva' }
   ];
 
-  // Быстрые действия на основе данных пользователя
-  const quickActions: QuickAction[] = [
-    {
-      id: 'symptoms_today',
-      text: 'Симптомы сегодня',
-      prompt: 'Расскажи о моих симптомах за сегодня и дай рекомендации',
-      icon: '📊'
-    },
-    {
-      id: 'sleep_advice',
-      text: 'Улучшить сон',
-      prompt: 'Как улучшить качество сна во время менопаузы?',
-      icon: '😴'
-    },
-    {
-      id: 'hot_flashes',
-      text: 'Справиться с приливами',
-      prompt: 'Как справиться с приливами? Дай практические советы',
-      icon: '🔥'
-    },
-    {
-      id: 'mood_support',
-      text: 'Поддержка настроения',
-      prompt: 'Чувствую упадок настроения, что можно сделать?',
-      icon: '💝'
-    },
-    {
-      id: 'nutrition',
-      text: 'Питание при менопаузе',
-      prompt: 'Какое питание поможет при менопаузе?',
-      icon: '🥗'
-    },
-    {
-      id: 'exercise',
-      text: 'Физическая активность',
-      prompt: 'Какие упражнения подходят во время менопаузы?',
-      icon: '🏃‍♀️'
+  // Быстрые действия для пациенток
+  const quickActions = [
+    { icon: Heart, text: 'Как справиться с приливами?', category: 'symptoms' },
+    { icon: Moon, text: 'Проблемы со сном', category: 'sleep' },
+    { icon: Activity, text: 'Рекомендации по физической активности', category: 'exercise' },
+    { icon: Zap, text: 'Упадок сил и энергии', category: 'energy' }
+  ];
+
+  // Загрузка истории чата
+  useEffect(() => {
+    const savedMessages = localStorage.getItem(`ai_chat_${user?.id}`);
+    if (savedMessages) {
+      try {
+        const parsed = JSON.parse(savedMessages);
+        setMessages(parsed.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        })));
+      } catch (error) {
+        console.error('Ошибка загрузки истории чата:', error);
+      }
+    } else {
+      // Приветственное сообщение
+      const welcomeMessage: ChatMessage = {
+        id: 'welcome',
+        type: 'ai',
+        content: 'Привет! Я Eva, ваш персональный ИИ-помощник по женскому здоровью. Я здесь, чтобы поддержать вас в период менопаузы. Расскажите, что вас беспокоит?',
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
     }
-  ];
+  }, [user?.id]);
 
+  // Сохранение истории чата
   useEffect(() => {
-    loadChatHistory();
-    scrollToBottom();
-  }, []);
+    if (messages.length > 0 && user?.id) {
+      localStorage.setItem(`ai_chat_${user.id}`, JSON.stringify(messages));
+    }
+  }, [messages, user?.id]);
 
+  // Автоскролл к последнему сообщению
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  useEffect(() => {
-    if (messages.length === 0 && !isInitialized) {
-      initializeChat();
-    }
-  }, [messages, isInitialized]);
-
-  const loadChatHistory = () => {
-    const saved = localStorage.getItem(`ai_chat_${user?.id}`);
-    if (saved) {
-      setMessages(JSON.parse(saved));
-    }
-    setIsInitialized(true);
-  };
-
-  const saveChatHistory = (newMessages: ChatMessage[]) => {
-    localStorage.setItem(`ai_chat_${user?.id}`, JSON.stringify(newMessages));
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const initializeChat = () => {
-    const welcomeMessage: ChatMessage = {
-      id: Date.now().toString(),
-      type: 'ai',
-      content: `Привет, ${user?.firstName}! 👋 Я Eva AI - ваш персональный помощник по вопросам менопаузы и женского здоровья.\n\nЯ знаю о ваших симптомах и готова помочь с советами, поддержкой и ответами на любые вопросы. Чем могу быть полезна?`,
-      timestamp: new Date().toISOString()
-    };
-
-    setMessages([welcomeMessage]);
-    saveChatHistory([welcomeMessage]);
-  };
-
-  const getUserContext = () => {
-    // Получаем данные онбординга
-    const onboardingData = (user as any)?.onboardingData || {};
-    
-    // Получаем последние записи симптомов
-    const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${user?.id}`) || '[]');
-    const recentEntries = symptomEntries.slice(0, 7); // Последние 7 дней
-
-    return {
-      age: onboardingData.basicInfo?.age,
-      hasStoppedPeriods: onboardingData.basicInfo?.hasStoppedPeriods,
-      currentSymptoms: onboardingData.symptoms || {},
-      goals: onboardingData.goals || [],
-      recentSymptoms: recentEntries
-    };
-  };
-
-  const generateAIResponse = async (userMessage: string): Promise<string> => {
-    const context = getUserContext();
-    
-    // Имитация API вызова с учетом контекста пользователя
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let response = '';
-
-        // Простая логика ответов на основе ключевых слов и контекста
-        const lowerMessage = userMessage.toLowerCase();
-
-        if (lowerMessage.includes('привет') || lowerMessage.includes('здравствуй')) {
-          response = `Привет! Рада вас видеть снова. Как дела? Если хотите, могу проанализировать ваши недавние симптомы или ответить на любые вопросы о менопаузе.`;
-        }
-        else if (lowerMessage.includes('симптом') && lowerMessage.includes('сегодня')) {
-          const today = new Date().toISOString().split('T')[0];
-          const todayEntry = context.recentSymptoms.find((entry: any) => entry.date === today);
-          
-          if (todayEntry) {
-            response = `Я вижу, что сегодня вы отметили:\n\n`;
-            if (todayEntry.hotFlashes?.count > 0) {
-              response += `🔥 Приливы: ${todayEntry.hotFlashes.count} раз\n`;
-            }
-            if (todayEntry.nightSweats?.occurred) {
-              response += `💦 Ночная потливость\n`;
-            }
-            if (todayEntry.sleep?.quality <= 2) {
-              response += `😴 Проблемы со сном\n`;
-            }
-            if (todayEntry.mood?.overall <= 2) {
-              response += `😔 Сниженное настроение\n`;
-            }
-            response += `\nРекомендую сегодня:\n- Больше отдыхать\n- Пить достаточно воды\n- Избегать триггеров приливов\n- Практиковать дыхательные упражнения`;
-          } else {
-            response = `Я не вижу записей о симптомах за сегодня. Рекомендую заполнить трекер симптомов, чтобы я могла дать более персонализированные советы. Как вы себя чувствуете?`;
-          }
-        }
-        else if (lowerMessage.includes('прилив')) {
-          response = `Приливы - один из самых частых симптомов менопаузы. Вот что поможет:\n\n🌡️ **Немедленная помощь:**\n- Глубокое медленное дыхание\n- Прохладное питье\n- Легкая одежда слоями\n- Вентилятор или прохладное место\n\n🍃 **Профилактика:**\n- Избегайте триггеров (острое, алкоголь, стресс)\n- Регулярные упражнения\n- Здоровый сон\n- Техники релаксации\n\nЕсли приливы сильно беспокоят, обязательно обсудите с врачом возможности лечения.`;
-        }
-        else if (lowerMessage.includes('сон') || lowerMessage.includes('спать')) {
-          response = `Проблемы со сном во время менопаузы очень распространены. Попробуйте:\n\n🌙 **Гигиена сна:**\n- Ложитесь и вставайте в одно время\n- Прохладная спальня (16-19°C)\n- Темные шторы или маска для сна\n- Убрать гаджеты за час до сна\n\n🧘‍♀️ **Расслабление:**\n- Медитация перед сном\n- Теплая ванна с лавандой\n- Чтение книги\n- Дыхательные упражнения\n\n☕ **Избегать:**\n- Кофеин после 14:00\n- Большие порции еды на ночь\n- Алкоголь\n- Интенсивные тренировки вечером`;
-        }
-        else if (lowerMessage.includes('настроение') || lowerMessage.includes('депресс') || lowerMessage.includes('тревог')) {
-          response = `Изменения настроения во время менопаузы - это нормально и вы не одиноки 💜\n\n🤗 **Что поможет:**\n- Регулярная физическая активность\n- Общение с близкими людьми\n- Хобби и творчество\n- Достаточный сон\n- Здоровое питание\n\n🆘 **Когда обратиться к врачу:**\n- Депрессия длится более 2 недель\n- Мысли о самоповреждении\n- Невозможность выполнять обычные дела\n- Панические атаки\n\nПомните: просить помощи - это признак силы, а не слабости.`;
-        }
-        else if (lowerMessage.includes('питание') || lowerMessage.includes('диета') || lowerMessage.includes('еда')) {
-          response = `Правильное питание может значительно облегчить симптомы менопаузы:\n\n🥗 **Включить в рацион:**\n- Фитоэстрогены (соя, семена льна)\n- Кальций и витамин D (молочные продукты, зелень)\n- Омега-3 (рыба, орехи, авокадо)\n- Цельные зерна и клетчатка\n- Антиоксиданты (ягоды, овощи)\n\n❌ **Ограничить:**\n- Рафинированный сахар\n- Обработанные продукты\n- Избыток кофеина\n- Острую и жирную пищу\n- Алкоголь\n\n💡 **Совет:** Ведите пищевой дневник, чтобы выявить триггеры симптомов.`;
-        }
-        else if (lowerMessage.includes('упражнения') || lowerMessage.includes('спорт') || lowerMessage.includes('тренировк')) {
-          response = `Физическая активность - ваш лучший друг во время менопаузы! 💪\n\n🏃‍♀️ **Рекомендуемые виды:**\n- Кардио 150 мин/неделю (ходьба, плавание)\n- Силовые тренировки 2-3 раза/неделю\n- Йога или пилатес для гибкости\n- Танцы для настроения\n\n✅ **Польза:**\n- Укрепление костей\n- Улучшение сна\n- Стабилизация настроения\n- Контроль веса\n- Снижение приливов\n\n⚠️ **Важно:** Начинайте постепенно, консультируйтесь с врачом при хронических заболеваниях.`;
-        }
-        else if (lowerMessage.includes('врач') || lowerMessage.includes('доктор')) {
-          response = `Когда стоит обратиться к врачу:\n\n🚨 **Обязательно:**\n- Кровотечения после года без месячных\n- Очень болезненные симптомы\n- Депрессия или тревога\n- Проблемы с памятью\n- Боли в груди или костях\n\n👩‍⚕️ **Подготовка к визиту:**\n- Записывайте симптомы в дневнике\n- Список принимаемых препаратов\n- Семейный анамнез\n- Вопросы о ЗГТ и альтернативах\n\nНе стесняйтесь обсуждать любые вопросы - врач поможет найти лучший план лечения.`;
-        }
-        else if (lowerMessage.includes('вес') || lowerMessage.includes('похуд')) {
-          response = `Изменения веса во время менопаузы - частая проблема. Как справиться:\n\n⚖️ **Причины набора веса:**\n- Снижение эстрогена\n- Замедление метаболизма\n- Потеря мышечной массы\n- Изменения в распределении жира\n\n🎯 **Стратегии:**\n- Силовые тренировки для мышц\n- Белок в каждом приеме пищи\n- Контроль порций\n- Достаточный сон\n- Управление стрессом\n\n🚫 **Избегать:**\n- Жестких диет\n- Пропуска приемов пищи\n- Экстремальных ограничений\n\nТерпение и постепенность - ключ к успеху!`;
-        }
-        else {
-          response = `Спасибо за ваш вопрос! Я специализируюсь на вопросах менопаузы и женского здоровья.\n\nМогу помочь с:\n🔥 Приливами и ночной потливостью\n😴 Проблемами сна\n😊 Настроением и эмоциями\n🥗 Питанием и весом\n🏃‍♀️ Физической активностью\n💊 Информацией о лечении\n\nВыберите интересующую тему или задайте конкретный вопрос!`;
-        }
-
-        resolve(response);
-      }, 1000 + Math.random() * 2000); // 1-3 секунды задержки
-    });
-  };
-
-  const handleSendMessage = async (message: string = inputMessage) => {
-    if (!message.trim()) return;
+  const handleSendMessage = async (content?: string) => {
+    const messageText = content || inputMessage.trim();
+    if (!messageText) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
-      content: message,
-      timestamp: new Date().toISOString()
+      content: messageText,
+      timestamp: new Date()
     };
 
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
-    setIsLoading(true);
+    setIsTyping(true);
 
-    // Добавляем индикатор печати
-    const typingMessage: ChatMessage = {
-      id: 'typing',
-      type: 'ai',
-      content: '',
-      timestamp: new Date().toISOString(),
-      isTyping: true
-    };
-
-    setMessages([...updatedMessages, typingMessage]);
-
-    try {
-      const aiResponse = await generateAIResponse(message);
-      
+    // Симуляция ответа ИИ
+    setTimeout(() => {
+      const aiResponse = generateAIResponse(messageText);
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
         content: aiResponse,
-        timestamp: new Date().toISOString()
+        timestamp: new Date()
       };
-
-      const finalMessages = [...updatedMessages, aiMessage];
-      setMessages(finalMessages);
-      saveChatHistory(finalMessages);
-    } catch (error) {
-      console.error('Ошибка ИИ:', error);
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        type: 'ai',
-        content: 'Извините, произошла ошибка. Попробуйте еще раз через несколько секунд.',
-        timestamp: new Date().toISOString()
-      };
-
-      const finalMessages = [...updatedMessages, errorMessage];
-      setMessages(finalMessages);
-      saveChatHistory(finalMessages);
-    } finally {
-      setIsLoading(false);
-    }
+      
+      setMessages(prev => [...prev, aiMessage]);
+      setIsTyping(false);
+    }, 1500 + Math.random() * 1000);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  const generateAIResponse = (userMessage: string): string => {
+    const lowerMessage = userMessage.toLowerCase();
+    
+    // Загрузка данных пользователя для персонализации
+    const onboardingData = localStorage.getItem(`bloom-onboarding-data`);
+    const symptomsData = localStorage.getItem(`symptom_entries_${user?.id}`);
+    
+    if (lowerMessage.includes('прилив') || lowerMessage.includes('жар')) {
+      return `Приливы - это один из самых распространенных симптомов менопаузы. Вот несколько рекомендаций:
+
+🌡️ **Немедленные способы:**
+• Глубокое дыхание: вдох на 4 счета, задержка на 4, выдох на 8
+• Прохладный компресс на шею и запястья
+• Легкая одежда из натуральных тканей
+
+🥗 **Долгосрочные стратегии:**
+• Избегайте триггеров: острая пища, кофеин, алкоголь
+• Регулярные физические упражнения
+• Техники релаксации и медитация
+
+Если приливы сильно влияют на качество жизни, рекомендую обратиться к гинекологу-эндокринологу для обсуждения гормональной терапии.`;
     }
+
+    if (lowerMessage.includes('сон') || lowerMessage.includes('бессонница')) {
+      return `Проблемы со сном в период менопаузы очень распространены. Давайте поработаем над улучшением качества сна:
+
+🌙 **Гигиена сна:**
+• Ложитесь и вставайте в одно время каждый день
+• Комната должна быть прохладной (18-20°C)
+• Отключите экраны за час до сна
+
+🍃 **Естественные помощники:**
+• Ромашковый чай перед сном
+• Техники прогрессивной мышечной релаксации
+• Ароматерапия с лавандой
+
+🏃‍♀️ **Физическая активность:**
+• Регулярные упражнения, но не позднее чем за 4 часа до сна
+• Йога или стретчинг вечером
+
+Если проблемы со сном продолжаются более 2 недель, обратитесь к врачу.`;
+    }
+
+    if (lowerMessage.includes('настроение') || lowerMessage.includes('депрессия') || lowerMessage.includes('тревога')) {
+      return `Изменения настроения в период менопаузы - это нормальная реакция на гормональные изменения. Вы не одиноки в этом:
+
+💙 **Эмоциональная поддержка:**
+• Общайтесь с близкими о своих переживаниях
+• Присоединяйтесь к группам поддержки женщин
+• Ведите дневник эмоций
+
+🧘‍♀️ **Практики для стабилизации:**
+• Медитация осознанности 10-15 минут в день
+• Регулярная физическая активность
+• Достаточный сон (7-9 часов)
+
+🌱 **Профессиональная помощь:**
+• Психотерапия (КПТ особенно эффективна)
+• При необходимости - консультация с психиатром
+• Рассмотрите гормональную терапию с врачом
+
+Помните: обращение за помощью - это признак силы, а не слабости.`;
+    }
+
+    // Общий ответ
+    return `Спасибо за ваш вопрос! Я понимаю, что период менопаузы может быть непростым. 
+
+Каждая женщина проходит через это по-своему, и ваш опыт уникален. Я здесь, чтобы поддержать вас персонализированными рекомендациями.
+
+Можете рассказать подробнее о том, что именно вас беспокоит? Это поможет мне дать более точные советы, учитывая ваши индивидуальные потребности.
+
+💝 Помните: вы делаете важный шаг, заботясь о своем здоровье!`;
+  };
+
+  const handleQuickAction = (action: any) => {
+    handleSendMessage(action.text);
   };
 
   const clearChat = () => {
-    setMessages([]);
-    localStorage.removeItem(`ai_chat_${user?.id}`);
-    initializeChat();
+    const welcomeMessage: ChatMessage = {
+      id: 'welcome-new',
+      type: 'ai',
+      content: 'Привет! Я Eva, ваш персональный ИИ-помощник. Чем могу помочь?',
+      timestamp: new Date()
+    };
+    setMessages([welcomeMessage]);
   };
 
   return (
-    <PatientLayout title="bloom - ИИ-помощник" breadcrumbs={breadcrumbs}>
-      <div className="h-[calc(100vh-200px)] bloom-card flex flex-col">
+    <PatientLayout title="bloom - ИИ-консультант Eva" breadcrumbs={breadcrumbs}>
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Заголовок */}
-        <div className="flex-shrink-0 p-6 border-b border-border">
-          <div className="flex justify-between items-center">
+        <div className="bloom-card p-6">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-gradient-to-br from-bloom-golden to-bloom-caramel rounded-full animate-gentle-float">
+              <MessageSquare className="h-8 w-8 text-white" />
+            </div>
             <div>
-              <h1 className="text-2xl font-playfair font-bold text-foreground flex items-center">
-                🤖 Eva AI
-                <span className="ml-2 text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                  онлайн
-                </span>
+              <h1 className="text-3xl font-playfair font-bold text-foreground">
+                ИИ-консультант Eva 🤖
               </h1>
-              <p className="text-muted-foreground text-sm">
-                Персональный помощник по вопросам менопаузы
+              <p className="text-muted-foreground">
+                Персональный помощник для поддержки в период менопаузы
               </p>
             </div>
-            
-            <button
-              onClick={clearChat}
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-            >
-              Очистить чат
-            </button>
           </div>
         </div>
 
         {/* Быстрые действия */}
-        {messages.length <= 1 && (
-          <div className="flex-shrink-0 p-4 border-b border-border bg-muted/30">
-            <p className="text-sm text-muted-foreground mb-3">Быстрые вопросы:</p>
-            <div className="flex flex-wrap gap-2">
-              {quickActions.map(action => (
-                <button
-                  key={action.id}
-                  onClick={() => handleSendMessage(action.prompt)}
-                  className="flex items-center bg-primary/10 hover:bg-primary/20 text-primary px-3 py-2 rounded-lg text-sm transition-colors"
+        <Card className="bloom-card">
+          <CardHeader>
+            <CardTitle className="text-foreground">Частые вопросы</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {quickActions.map((action, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  onClick={() => handleQuickAction(action)}
+                  className="h-auto p-4 text-left justify-start gentle-border interactive-hover bg-gradient-to-r from-white to-bloom-vanilla"
                 >
-                  <span className="mr-2">{action.icon}</span>
-                  {action.text}
-                </button>
+                  <action.icon className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
+                  <span className="text-foreground">{action.text}</span>
+                </Button>
               ))}
             </div>
-          </div>
-        )}
+          </CardContent>
+        </Card>
 
-        {/* Область сообщений */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-4">
-            {messages.map(message => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex",
-                  message.type === 'user' ? 'justify-end' : 'justify-start'
-                )}
-              >
+        {/* Чат */}
+        <Card className="bloom-card h-96">
+          <CardHeader className="border-b border-primary/20">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-foreground flex items-center space-x-2">
+                <Bot className="h-5 w-5 text-primary" />
+                <span>Чат с Eva</span>
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={clearChat}>
+                Очистить чат
+              </Button>
+            </div>
+          </CardHeader>
+          
+          <CardContent className="p-0 h-64 overflow-y-auto">
+            <div className="p-4 space-y-4">
+              {messages.map((message) => (
                 <div
-                  className={cn(
-                    "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
-                    message.type === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground'
-                  )}
+                  key={message.id}
+                  className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.isTyping ? (
-                    <div className="flex items-center space-x-1">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      </div>
-                      <span className="text-sm text-muted-foreground ml-2">Eva печатает...</span>
-                    </div>
-                  ) : (
-                    <div className="whitespace-pre-wrap">{message.content}</div>
-                  )}
-                  
                   <div
-                    className={cn(
-                      "text-xs mt-1",
-                      message.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                    )}
+                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      message.type === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-foreground'
+                    }`}
                   >
-                    {new Date(message.timestamp).toLocaleTimeString('ru-RU', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                    <div className="flex items-start space-x-2">
+                      {message.type === 'ai' && (
+                        <Bot className="h-4 w-4 mt-1 flex-shrink-0" />
+                      )}
+                      {message.type === 'user' && (
+                        <User className="h-4 w-4 mt-1 flex-shrink-0" />
+                      )}
+                      <div className="flex-1">
+                        <div className="whitespace-pre-wrap text-sm">
+                          {message.content}
+                        </div>
+                        <div className="text-xs opacity-70 mt-1">
+                          {message.timestamp.toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-
-        {/* Поле ввода */}
-        <div className="flex-shrink-0 p-4 border-t border-border">
-          <div className="flex space-x-4">
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Напишите ваш вопрос о менопаузе..."
-              disabled={isLoading}
-              className="flex-1 p-3 border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent disabled:opacity-50 bg-background"
-            />
-            <button
-              onClick={() => handleSendMessage()}
-              disabled={isLoading || !inputMessage.trim()}
-              className={cn(
-                "px-6 py-3 rounded-lg font-medium transition-colors",
-                isLoading || !inputMessage.trim()
-                  ? "bg-muted text-muted-foreground cursor-not-allowed"
-                  : "bg-primary text-primary-foreground hover:bg-primary/90"
+              ))}
+              
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-muted text-foreground">
+                    <div className="flex items-center space-x-2">
+                      <Bot className="h-4 w-4" />
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
-            >
-              {isLoading ? '...' : 'Отправить'}
-            </button>
-          </div>
+              
+              <div ref={messagesEndRef} />
+            </div>
+          </CardContent>
           
-          <div className="mt-2">
-            <p className="text-xs text-muted-foreground text-center">
-              Eva AI может допускать ошибки. Важные медицинские вопросы обсуждайте с врачом.
-            </p>
+          <div className="border-t border-primary/20 p-4">
+            <div className="flex space-x-2">
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Напишите ваш вопрос..."
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                className="flex-1"
+                disabled={isTyping}
+              />
+              <Button
+                onClick={() => handleSendMessage()}
+                disabled={!inputMessage.trim() || isTyping}
+                className="px-6"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
+        </Card>
       </div>
     </PatientLayout>
   );

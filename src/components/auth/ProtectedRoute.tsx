@@ -23,8 +23,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Показываем загрузку пока проверяем аутентификацию
   if (isLoading) {
     return (
-      <div className="min-h-screen eva-gradient flex items-center justify-center">
-        <div className="eva-card p-8 text-center">
+      <div className="min-h-screen bloom-gradient flex items-center justify-center">
+        <div className="bloom-card p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Проверяем доступ...</p>
         </div>
@@ -40,8 +40,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Проверяем роль, если она требуется
   if (requiredRole && user.role !== requiredRole) {
     return (
-      <div className="min-h-screen eva-gradient flex items-center justify-center py-12 px-4">
-        <div className="eva-card p-8 text-center max-w-md">
+      <div className="min-h-screen bloom-gradient flex items-center justify-center py-12 px-4">
+        <div className="bloom-card p-8 text-center max-w-md">
           <div className="inline-flex p-4 bg-destructive/10 rounded-full mb-6">
             <Shield className="h-8 w-8 text-destructive" />
           </div>
@@ -57,7 +57,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           </p>
           <button 
             onClick={() => window.history.back()}
-            className="eva-button"
+            className="bloom-button"
           >
             Вернуться назад
           </button>
@@ -69,8 +69,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Проверяем массив разрешенных ролей
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (
-      <div className="min-h-screen eva-gradient flex items-center justify-center py-12 px-4">
-        <div className="eva-card p-8 text-center max-w-md">
+      <div className="min-h-screen bloom-gradient flex items-center justify-center py-12 px-4">
+        <div className="bloom-card p-8 text-center max-w-md">
           <div className="inline-flex p-4 bg-destructive/10 rounded-full mb-6">
             <Shield className="h-8 w-8 text-destructive" />
           </div>
@@ -86,7 +86,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           </p>
           <button 
             onClick={() => window.history.back()}
-            className="eva-button"
+            className="bloom-button"
           >
             Вернуться назад
           </button>

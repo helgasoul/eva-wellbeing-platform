@@ -17,8 +17,8 @@ export const DashboardRedirect: React.FC = () => {
   }, [user, isLoading, navigate]);
 
   return (
-    <div className="min-h-screen eva-gradient flex items-center justify-center">
-      <div className="eva-card p-8 text-center">
+    <div className="min-h-screen bloom-gradient flex items-center justify-center">
+      <div className="bloom-card p-8 text-center">
         <LoadingSpinner size="lg" className="mx-auto mb-4" />
         <h2 className="text-xl font-playfair font-semibold text-foreground mb-2">
           Перенаправляем вас...

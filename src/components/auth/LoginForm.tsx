@@ -48,10 +48,10 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="eva-card p-8 w-full max-w-md mx-auto">
+    <div className="bloom-card p-8 w-full max-w-md mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-playfair font-semibold text-foreground mb-2">
-          Добро пожаловать в Eva
+          Добро пожаловать в bloom
         </h2>
         <p className="text-muted-foreground">
           Войдите в свой аккаунт
@@ -72,7 +72,7 @@ export const LoginForm = () => {
               id="email"
               type="email"
               {...register('email')}
-              className={`eva-input pl-10 ${errors.email ? 'border-destructive' : ''}`}
+              className={`bloom-input pl-10 ${errors.email ? 'border-destructive' : ''}`}
               placeholder="your@email.com"
               autoComplete="email"
             />
@@ -90,7 +90,7 @@ export const LoginForm = () => {
               id="password"
               type={showPassword ? 'text' : 'password'}
               {...register('password')}
-              className={`eva-input pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
+              className={`bloom-input pl-10 pr-10 ${errors.password ? 'border-destructive' : ''}`}
               placeholder="Введите пароль"
               autoComplete="current-password"
             />
@@ -130,7 +130,7 @@ export const LoginForm = () => {
         <Button
           type="submit"
           disabled={isLoading}
-          className="eva-button w-full flex items-center justify-center space-x-2"
+          className="bloom-button w-full flex items-center justify-center space-x-2"
         >
           {isLoading && <LoadingSpinner size="sm" />}
           <span>{isLoading ? 'Входим...' : 'Войти'}</span>

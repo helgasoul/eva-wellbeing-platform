@@ -63,7 +63,7 @@ export const RegisterForm = () => {
   };
 
   return (
-    <div className="eva-card p-8 w-full max-w-lg mx-auto">
+    <div className="bloom-card p-8 w-full max-w-lg mx-auto">
       <RegisterFormHeader />
 
       {error && (
@@ -92,7 +92,7 @@ export const RegisterForm = () => {
         <Button
           type="submit"
           disabled={isLoading}
-          className="eva-button w-full flex items-center justify-center space-x-2"
+          className="bloom-button w-full flex items-center justify-center space-x-2"
         >
           {isLoading && <LoadingSpinner size="sm" />}
           <span>{isLoading ? 'Создаём аккаунт...' : 'Создать аккаунт'}</span>
