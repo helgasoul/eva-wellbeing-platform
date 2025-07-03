@@ -4,47 +4,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* bloom Design System - Caring colors for women's health */
+/* bloom Design System - Enhanced for women's health and menopause support */
 @layer base {
   :root {
-    --background: 252 252 247;
-    --foreground: 107 91 88;
+    --background: 252 250 247;
+    --foreground: 78 56 52;
 
     --card: 255 255 255;
-    --card-foreground: 107 91 88;
+    --card-foreground: 78 56 52;
 
     --popover: 255 255 255;
-    --popover-foreground: 107 91 88;
+    --popover-foreground: 78 56 52;
 
-    --primary: 212 165 116;
+    --primary: 200 154 106;
     --primary-foreground: 255 255 255;
 
     --secondary: 244 230 215;
-    --secondary-foreground: 138 123 120;
+    --secondary-foreground: 120 89 85;
 
-    --muted: 250 245 240;
-    --muted-foreground: 154 139 136;
+    --muted: 248 243 238;
+    --muted-foreground: 134 119 116;
 
     --accent: 238 213 199;
-    --accent-foreground: 138 123 120;
+    --accent-foreground: 120 89 85;
 
     --destructive: 232 93 117;
     --destructive-foreground: 255 255 255;
 
-    --border: 232 213 207;
-    --input: 248 240 231;
-    --ring: 212 165 116;
+    --border: 224 208 196;
+    --input: 246 238 229;
+    --ring: 200 154 106;
 
-    --radius: 16px;
+    --radius: 20px;
 
-    --sidebar-background: 252 252 247;
-    --sidebar-foreground: 107 91 88;
-    --sidebar-primary: 212 165 116;
+    --sidebar-background: 252 250 247;
+    --sidebar-foreground: 78 56 52;
+    --sidebar-primary: 200 154 106;
     --sidebar-primary-foreground: 255 255 255;
     --sidebar-accent: 244 230 215;
-    --sidebar-accent-foreground: 138 123 120;
-    --sidebar-border: 232 213 207;
-    --sidebar-ring: 212 165 116;
+    --sidebar-accent-foreground: 120 89 85;
+    --sidebar-border: 224 208 196;
+    --sidebar-ring: 200 154 106;
   }
 
   .dark {
@@ -57,7 +57,7 @@
     --popover: 42 37 32;
     --popover-foreground: 245 241 237;
 
-    --primary: 212 165 116;
+    --primary: 200 154 106;
     --primary-foreground: 255 255 255;
 
     --secondary: 58 51 46;
@@ -74,16 +74,16 @@
 
     --border: 58 51 46;
     --input: 47 42 37;
-    --ring: 212 165 116;
+    --ring: 200 154 106;
 
     --sidebar-background: 31 26 23;
     --sidebar-foreground: 245 241 237;
-    --sidebar-primary: 212 165 116;
+    --sidebar-primary: 200 154 106;
     --sidebar-primary-foreground: 255 255 255;
     --sidebar-accent: 42 37 32;
     --sidebar-accent-foreground: 208 197 192;
     --sidebar-border: 58 51 46;
-    --sidebar-ring: 212 165 116;
+    --sidebar-ring: 200 154 106;
   }
 }
 
@@ -95,16 +95,34 @@
   body {
     @apply bg-background text-foreground font-inter;
     font-feature-settings: "rlig" 1, "calt" 1;
-    line-height: 1.6;
+    line-height: 1.7;
+    font-size: 18px; /* Increased base font size for better readability */
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-playfair text-foreground;
     line-height: 1.3;
+    color: hsl(var(--foreground));
   }
 
   .bloom-brand {
     @apply font-poppins;
+  }
+
+  /* Enhanced readability for target demographic */
+  p, span, div {
+    line-height: 1.8;
+  }
+
+  button {
+    min-height: 48px; /* Larger click areas */
+    font-size: 18px;
+  }
+
+  a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 }
 
@@ -114,27 +132,33 @@
   }
   
   .bloom-warm-gradient {
-    background: linear-gradient(135deg, #D4A574 0%, #E8C4A0 50%, #F4E6D7 100%);
+    background: linear-gradient(135deg, #C89A6A 0%, #E8C4A0 50%, #F4E6D7 100%);
   }
   
   .bloom-card {
-    @apply bg-white/90 backdrop-blur-sm border border-primary/20 rounded-2xl shadow-gentle hover:shadow-warm transition-all duration-300;
+    @apply bg-white/95 backdrop-blur-sm border border-primary/20 rounded-2xl shadow-gentle hover:shadow-warm transition-all duration-300;
   }
   
   .bloom-card-interactive {
-    @apply bloom-card hover:scale-105 hover:border-primary/40 cursor-pointer transform transition-all duration-300 ease-out;
+    @apply bloom-card hover:scale-[1.02] hover:border-primary/40 cursor-pointer transform transition-all duration-300 ease-out;
   }
   
   .bloom-button {
-    @apply bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-gentle hover:shadow-warm hover:scale-105 active:scale-95;
+    @apply bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 rounded-full transition-all duration-300 shadow-gentle hover:shadow-warm hover:scale-105 active:scale-95;
+    min-height: 52px;
+    font-size: 18px;
   }
   
   .bloom-button-secondary {
-    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-gentle hover:shadow-warm hover:scale-105 active:scale-95;
+    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold px-8 py-4 rounded-full transition-all duration-300 shadow-gentle hover:shadow-warm hover:scale-105 active:scale-95;
+    min-height: 52px;
+    font-size: 18px;
   }
   
   .bloom-input {
-    @apply bg-white/80 border border-primary/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 text-foreground placeholder:text-muted-foreground;
+    @apply bg-white/90 border-2 border-primary/30 rounded-xl px-6 py-4 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 text-foreground placeholder:text-muted-foreground;
+    min-height: 52px;
+    font-size: 18px;
   }
 
   .gentle-text {
@@ -150,10 +174,19 @@
   }
 
   .interactive-hover {
-    @apply hover:scale-105 hover:shadow-warm transition-all duration-300 ease-out;
+    @apply hover:scale-[1.02] hover:shadow-warm transition-all duration-300 ease-out;
   }
 
   .gentle-border {
     @apply border-primary/20 hover:border-primary/40 transition-colors duration-300;
+  }
+
+  /* Enhanced contrast for better readability */
+  .high-contrast {
+    color: hsl(78 56 52); /* Deep warm brown for maximum readability */
+  }
+
+  .medium-contrast {
+    color: hsl(120 89 85); /* Medium tone for secondary text */
   }
 }

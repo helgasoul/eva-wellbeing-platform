@@ -63,19 +63,35 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// bloom brand colors - updated with warmer, gentler tones
+				// Enhanced bloom brand colors - optimized for women 45-65
 				bloom: {
-					'golden': '#D4A574',
-					'warm-cream': '#F4E6D7',
-					'soft-peach': '#EED5C7',
-					'vanilla': '#FAF5F0',
-					'cream': '#FFFEF7',
-					'caramel': '#C8956A',
-					'blush': '#E8C4A0',
-					'pearl': '#F8F0E7',
-					'taupe': '#9A8B88',
-					'warm-brown': '#8A7B78'
+					'golden': '#C89A6A', // Primary warm golden tone
+					'warm-cream': '#F4E6D7', // Soft background
+					'soft-peach': '#EED5C7', // Gentle accent
+					'vanilla': '#FAF5F0', // Light neutral
+					'cream': '#FFFEF7', // Lightest background
+					'caramel': '#B8855C', // Deeper golden tone
+					'blush': '#E8C4A0', // Warm blush
+					'pearl': '#F8F0E7', // Pearl white
+					'taupe': '#877168', // Medium contrast text
+					'warm-brown': '#4E3834', // High contrast text - deep warm brown
+					'soft-coral': '#E6B8A2', // Soft coral accent
+					'dusty-rose': '#D4A89B', // Muted rose
+					'sage-green': '#A8B5A0' // Calming sage (optional accent)
 				}
+			},
+			fontSize: {
+				'xs': ['14px', { lineHeight: '1.6' }],
+				'sm': ['16px', { lineHeight: '1.7' }],
+				'base': ['18px', { lineHeight: '1.8' }], // Increased from 16px
+				'lg': ['20px', { lineHeight: '1.8' }], // Increased from 18px
+				'xl': ['22px', { lineHeight: '1.8' }], // Increased from 20px
+				'2xl': ['28px', { lineHeight: '1.6' }], // Increased from 24px
+				'3xl': ['32px', { lineHeight: '1.5' }], // Increased from 30px
+				'4xl': ['40px', { lineHeight: '1.4' }], // Increased from 36px
+				'5xl': ['52px', { lineHeight: '1.3' }], // Increased from 48px
+				'6xl': ['64px', { lineHeight: '1.2' }], // Increased from 60px
+				'7xl': ['80px', { lineHeight: '1.1' }], // Increased from 72px
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -102,7 +118,7 @@ export default {
 				'fade-in': {
 					'0%': {
 						opacity: '0',
-						transform: 'translateY(10px)'
+						transform: 'translateY(20px)'
 					},
 					'100%': {
 						opacity: '1',
@@ -112,7 +128,7 @@ export default {
 				'slide-in': {
 					'0%': {
 						opacity: '0',
-						transform: 'translateX(-20px)'
+						transform: 'translateX(-30px)'
 					},
 					'100%': {
 						opacity: '1',
@@ -124,25 +140,27 @@ export default {
 						transform: 'translateY(0px)'
 					},
 					'50%': {
-						transform: 'translateY(-10px)'
+						transform: 'translateY(-15px)'
 					}
 				},
 				'warm-pulse': {
 					'0%, 100%': {
-						opacity: '1'
+						opacity: '1',
+						transform: 'scale(1)'
 					},
 					'50%': {
-						opacity: '0.7'
+						opacity: '0.8',
+						transform: 'scale(1.05)'
 					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.5s ease-out',
-				'slide-in': 'slide-in 0.3s ease-out',
-				'gentle-float': 'gentle-float 3s ease-in-out infinite',
-				'warm-pulse': 'warm-pulse 2s ease-in-out infinite'
+				'fade-in': 'fade-in 0.6s ease-out',
+				'slide-in': 'slide-in 0.4s ease-out',
+				'gentle-float': 'gentle-float 4s ease-in-out infinite',
+				'warm-pulse': 'warm-pulse 3s ease-in-out infinite'
 			},
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif'],
@@ -150,9 +168,9 @@ export default {
 				'poppins': ['Poppins', 'sans-serif']
 			},
 			boxShadow: {
-				'gentle': '0 4px 6px -1px rgba(212, 165, 116, 0.1), 0 2px 4px -1px rgba(212, 165, 116, 0.06)',
-				'warm': '0 10px 15px -3px rgba(212, 165, 116, 0.1), 0 4px 6px -2px rgba(212, 165, 116, 0.05)',
-				'cozy': '0 20px 25px -5px rgba(212, 165, 116, 0.1), 0 10px 10px -5px rgba(212, 165, 116, 0.04)'
+				'gentle': '0 4px 8px -2px rgba(200, 154, 106, 0.12), 0 2px 4px -1px rgba(200, 154, 106, 0.08)',
+				'warm': '0 12px 20px -4px rgba(200, 154, 106, 0.15), 0 4px 8px -2px rgba(200, 154, 106, 0.08)',
+				'cozy': '0 24px 32px -8px rgba(200, 154, 106, 0.18), 0 8px 16px -4px rgba(200, 154, 106, 0.1)'
 			}
 		}
 	},
