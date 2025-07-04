@@ -1,0 +1,213 @@
+/**
+ * Eva Platform - Color System
+ * Inspired by Ema design
+ * Modern gradients and colors for women's health platform
+ */
+
+:root {
+  /* ========================================
+     PRIMARY GRADIENTS
+     ======================================== */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-tertiary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-soft: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  --gradient-success: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  --gradient-warning: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+
+  /* ========================================
+     SOLID COLORS
+     ======================================== */
+  
+  /* Primary Colors */
+  --color-primary: #667eea;
+  --color-primary-light: #8a9bef;
+  --color-primary-dark: #4a5bb8;
+  
+  --color-secondary: #f5576c;
+  --color-secondary-light: #f77a8a;
+  --color-secondary-dark: #e33849;
+  
+  --color-tertiary: #4facfe;
+  --color-tertiary-light: #6bb8fe;
+  --color-tertiary-dark: #2b8cdc;
+
+  /* Accent Colors */
+  --color-purple: #667eea;
+  --color-pink: #f5576c;
+  --color-blue: #4facfe;
+  --color-peach: #fcb69f;
+  --color-mint: #a8edea;
+
+  /* ========================================
+     NEUTRAL COLORS
+     ======================================== */
+  --color-dark: #1a1a1a;
+  --color-dark-light: #2d2d2d;
+  --color-medium: #666666;
+  --color-medium-light: #888888;
+  --color-light: #f8f9fb;
+  --color-light-dark: #e1e5e9;
+  --color-white: #ffffff;
+
+  /* ========================================
+     SEMANTIC COLORS
+     ======================================== */
+  --color-success: #28a745;
+  --color-success-light: #d4edda;
+  --color-error: #dc3545;
+  --color-error-light: #f8d7da;
+  --color-warning: #ffc107;
+  --color-warning-light: #fff3cd;
+  --color-info: #17a2b8;
+  --color-info-light: #d1ecf1;
+
+  /* ========================================
+     TEXT COLORS
+     ======================================== */
+  --text-primary: var(--color-dark);
+  --text-secondary: var(--color-medium);
+  --text-muted: var(--color-medium-light);
+  --text-inverse: var(--color-white);
+  --text-link: var(--color-primary);
+  --text-link-hover: var(--color-primary-dark);
+
+  /* ========================================
+     BACKGROUND COLORS
+     ======================================== */
+  --bg-primary: var(--color-white);
+  --bg-secondary: var(--color-light);
+  --bg-dark: var(--color-dark);
+  --bg-gradient-primary: var(--gradient-primary);
+  --bg-gradient-secondary: var(--gradient-secondary);
+  --bg-gradient-soft: var(--gradient-soft);
+
+  /* ========================================
+     BORDER COLORS
+     ======================================== */
+  --border-light: rgba(0, 0, 0, 0.05);
+  --border-medium: rgba(0, 0, 0, 0.1);
+  --border-dark: rgba(0, 0, 0, 0.2);
+  --border-primary: var(--color-primary);
+  --border-secondary: var(--color-secondary);
+
+  /* ========================================
+     SHADOW COLORS
+     ======================================== */
+  --shadow-light: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-heavy: 0 16px 48px rgba(0, 0, 0, 0.16);
+  --shadow-primary: 0 8px 32px rgba(102, 126, 234, 0.15);
+  --shadow-secondary: 0 8px 32px rgba(245, 87, 108, 0.15);
+
+  /* ========================================
+     OPACITY LEVELS
+     ======================================== */
+  --opacity-light: 0.1;
+  --opacity-medium: 0.3;
+  --opacity-heavy: 0.6;
+  --opacity-overlay: 0.8;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Background Utilities */
+.bg-gradient-primary { background: var(--gradient-primary); }
+.bg-gradient-secondary { background: var(--gradient-secondary); }
+.bg-gradient-tertiary { background: var(--gradient-tertiary); }
+.bg-gradient-soft { background: var(--gradient-soft); }
+.bg-primary { background: var(--color-primary); }
+.bg-secondary { background: var(--color-secondary); }
+.bg-white { background: var(--color-white); }
+.bg-light { background: var(--color-light); }
+.bg-dark { background: var(--color-dark); }
+
+/* Text Color Utilities */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-white { color: var(--color-white); }
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-gradient-secondary {
+  background: var(--gradient-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Border Utilities */
+.border-light { border: 1px solid var(--border-light); }
+.border-medium { border: 1px solid var(--border-medium); }
+.border-primary { border: 1px solid var(--color-primary); }
+.border-secondary { border: 1px solid var(--color-secondary); }
+
+/* Shadow Utilities */
+.shadow-light { box-shadow: var(--shadow-light); }
+.shadow-medium { box-shadow: var(--shadow-medium); }
+.shadow-heavy { box-shadow: var(--shadow-heavy); }
+.shadow-primary { box-shadow: var(--shadow-primary); }
+.shadow-secondary { box-shadow: var(--shadow-secondary); }
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+
+.hover-glow-primary:hover {
+  box-shadow: var(--shadow-primary);
+}
+
+.hover-glow-secondary:hover {
+  box-shadow: var(--shadow-secondary);
+}
+
+/* ========================================
+   DARK MODE SUPPORT
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-dark: #ffffff;
+    --color-white: #1a1a1a;
+    --color-light: #2d2d2d;
+    --color-medium: #cccccc;
+    --text-primary: var(--color-dark);
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-medium: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift {
+    transition: none;
+  }
+  
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #4a5bb8;
+    --color-secondary: #e33849;
+    --border-light: rgba(0, 0, 0, 0.3);
+    --border-medium: rgba(0, 0, 0, 0.5);
+  }
+}
