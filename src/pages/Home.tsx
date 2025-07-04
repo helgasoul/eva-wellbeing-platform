@@ -38,19 +38,19 @@ const Home = () => {
       <section className="py-24 px-6">
         <div className="container mx-auto text-center">
           <div className="max-w-5xl mx-auto animate-fade-in">
-            <div className="inline-flex p-6 bg-gradient-to-br from-bloom-blush/20 to-bloom-soft-peach/30 rounded-full mb-8 animate-gentle-float backdrop-blur-sm">
-              <Heart className="h-16 w-16 text-bloom-golden" />
+            <div className="inline-flex p-6 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full mb-8 animate-gentle-float backdrop-blur-sm">
+              <Heart className="h-16 w-16 text-primary" />
             </div>
             
             {/* Empathetic main message */}
-            <h1 className="text-5xl md:text-7xl font-playfair font-bold text-bloom-warm-brown mb-8 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-playfair font-bold text-foreground mb-8 leading-tight">
               Мы поддерживаем женщин{' '}
-              <span className="text-bloom-golden bg-gradient-to-r from-bloom-golden to-bloom-caramel bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary to-primary-600 bg-clip-text text-transparent">
                 во всём мире
               </span>
             </h1>
             
-            <div className="text-2xl md:text-3xl text-bloom-taupe mb-10 leading-relaxed max-w-4xl mx-auto font-medium">
+            <div className="text-2xl md:text-3xl text-muted-foreground mb-10 leading-relaxed max-w-4xl mx-auto font-medium">
               в заботе о своём здоровье, предоставляя персонализированные, 
               научно обоснованные рекомендации для поддержки женщин в период менопаузы
             </div>
@@ -73,25 +73,25 @@ const Home = () => {
       </section>
 
       {/* Trust and Community Section */}
-      <section className="py-20 px-6 bg-gradient-to-b from-bloom-vanilla to-bloom-cream">
+      <section className="py-20 px-6 bg-gradient-to-b from-card to-background">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-bloom-warm-brown mb-8">
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-8">
               Вы не одни в этом важном жизненном периоде
             </h2>
-            <p className="text-xl text-bloom-taupe leading-relaxed max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
               Период менопаузы — это естественная и важная часть жизни каждой женщины. 
               Мы здесь, чтобы поддержать вас на этом пути с пониманием, заботой и профессиональной помощью.
             </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl shadow-cozy animate-fade-in group cursor-pointer">
+          <div className="relative overflow-hidden rounded-3xl shadow-floating animate-fade-in group cursor-pointer">
             <img 
               src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
               alt="Глобальное сообщество женщин bloom — поддержка и взаимопонимание"
               className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-bloom-golden/20 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"></div>
             <div className="absolute bottom-8 left-8 right-8 text-white">
               <h3 className="text-2xl font-playfair font-semibold mb-2">
                 Тысячи женщин уже с нами
@@ -105,13 +105,13 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-6 bg-bloom-pearl">
+      <section className="py-24 px-6 bg-accent">
         <div className="container mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-bloom-warm-brown mb-6">
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-6">
               Почему женщины выбирают bloom?
             </h2>
-            <p className="text-xl text-bloom-taupe max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Мы объединили медицинскую экспертизу, передовые технологии 
               и глубокое понимание потребностей женщин
             </p>
@@ -126,13 +126,13 @@ const Home = () => {
                   className="bg-white/90 backdrop-blur-sm p-10 text-center group hover:scale-105 transition-all duration-300 rounded-2xl shadow-gentle hover:shadow-warm cursor-pointer"
                   style={{ animationDelay: `${index * 0.2}s` }}
                 >
-                  <div className="inline-flex p-6 bg-gradient-to-br from-bloom-golden to-bloom-caramel rounded-full mb-8 group-hover:scale-110 transition-transform duration-300 animate-warm-pulse">
+                  <div className="inline-flex p-6 bg-gradient-to-br from-primary to-secondary rounded-full mb-8 group-hover:scale-110 transition-transform duration-300 animate-warm-pulse">
                     <IconComponent className="h-10 w-10 text-white" />
                   </div>
-                  <h3 className="text-2xl font-playfair font-semibold text-bloom-warm-brown mb-6">
+                  <h3 className="text-2xl font-playfair font-semibold text-foreground mb-6">
                     {feature.title}
                   </h3>
-                  <p className="text-lg text-bloom-taupe leading-relaxed">
+                  <p className="text-lg text-muted-foreground leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -143,14 +143,14 @@ const Home = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-bloom-warm-cream to-bloom-vanilla">
+      <section className="py-24 px-6 bg-gradient-to-br from-muted to-background">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="animate-slide-in">
-              <h2 className="text-4xl md:text-5xl font-playfair font-bold text-bloom-warm-brown mb-8">
+              <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-8">
                 Комплексная поддержка на каждом этапе
               </h2>
-              <p className="text-xl text-bloom-taupe mb-10 leading-relaxed">
+              <p className="text-xl text-muted-foreground mb-10 leading-relaxed">
                 Каждая женщина уникальна, и её путь через менопаузу тоже особенный. 
                 С bloom вы получите индивидуальную поддержку, основанную на последних 
                 научных исследованиях и многолетнем опыте специалистов.
@@ -158,27 +158,27 @@ const Home = () => {
               <div className="space-y-6">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center space-x-4 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
-                    <CheckCircle className="h-6 w-6 text-bloom-golden flex-shrink-0" />
-                    <span className="text-lg text-bloom-taupe">{benefit}</span>
+                    <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                    <span className="text-lg text-muted-foreground">{benefit}</span>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="bg-white/90 backdrop-blur-sm p-12 rounded-2xl shadow-cozy hover:shadow-warm transition-all duration-300 hover:scale-105">
+            <div className="bg-white/90 backdrop-blur-sm p-12 rounded-2xl shadow-floating hover:shadow-modal transition-all duration-300 hover:scale-105">
               <div className="text-center">
-                <div className="inline-flex p-8 bg-gradient-to-br from-bloom-soft-peach to-bloom-blush rounded-full mb-8 animate-gentle-float">
-                  <Heart className="h-16 w-16 text-bloom-golden" />
+                <div className="inline-flex p-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mb-8 animate-gentle-float">
+                  <Heart className="h-16 w-16 text-primary" />
                 </div>
-                <h3 className="text-3xl font-playfair font-semibold text-bloom-warm-brown mb-6">
+                <h3 className="text-3xl font-playfair font-semibold text-foreground mb-6">
                   Готовы присоединиться?
                 </h3>
-                <p className="text-lg text-bloom-taupe mb-8 leading-relaxed">
+                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                   Тысячи женщин во всём мире уже доверили своё здоровье 
                   и благополучие платформе bloom
                 </p>
                 <Link to="/register">
-                  <Button className="w-full text-xl py-4 bg-bloom-golden hover:bg-bloom-caramel text-white font-semibold rounded-full transition-all duration-300 hover:scale-105">
+                  <Button className="w-full text-xl py-4 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105">
                     Присоединиться бесплатно
                   </Button>
                 </Link>
@@ -189,7 +189,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-gradient-to-r from-bloom-golden via-bloom-caramel to-bloom-golden">
+      <section className="py-24 px-6 bg-gradient-to-r from-primary via-secondary to-primary">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-8">
@@ -202,7 +202,7 @@ const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link to="/register">
-                <Button className="bg-white text-bloom-golden hover:bg-white/90 text-xl px-10 py-6 font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-cozy">
+                <Button className="bg-white text-primary hover:bg-white/90 text-xl px-10 py-6 font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-floating">
                   Создать аккаунт бесплатно
                 </Button>
               </Link>
