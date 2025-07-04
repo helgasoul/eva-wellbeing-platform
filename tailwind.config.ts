@@ -168,9 +168,16 @@ export default {
 				'poppins': ['Poppins', 'sans-serif']
 			},
 			boxShadow: {
-				'gentle': '0 4px 8px -2px rgba(200, 154, 106, 0.12), 0 2px 4px -1px rgba(200, 154, 106, 0.08)',
-				'warm': '0 12px 20px -4px rgba(200, 154, 106, 0.15), 0 4px 8px -2px rgba(200, 154, 106, 0.08)',
-				'cozy': '0 24px 32px -8px rgba(200, 154, 106, 0.18), 0 8px 16px -4px rgba(200, 154, 106, 0.1)'
+				// Google Material Design shadows
+				'soft': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+				'elevated': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+				'floating': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+				'modal': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+				
+				// Legacy shadows (keeping for compatibility)
+				'gentle': '0 4px 8px -2px rgba(203, 140, 79, 0.12), 0 2px 4px -1px rgba(203, 140, 79, 0.08)',
+				'warm': '0 12px 20px -4px rgba(203, 140, 79, 0.15), 0 4px 8px -2px rgba(203, 140, 79, 0.08)',
+				'cozy': '0 24px 32px -8px rgba(203, 140, 79, 0.18), 0 8px 16px -4px rgba(203, 140, 79, 0.1)'
 			}
 		}
 	},

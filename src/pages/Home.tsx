@@ -33,7 +33,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bloom-pearl via-bloom-vanilla to-bloom-warm-cream">
+    <div className="min-h-screen bloom-gradient">
       {/* Hero Section */}
       <section className="py-24 px-6">
         <div className="container mx-auto text-center">
@@ -57,13 +57,13 @@ const Home = () => {
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
               <Link to="/register">
-                <Button className="text-xl px-10 py-6 bg-bloom-golden hover:bg-bloom-caramel text-white font-semibold rounded-full shadow-cozy hover:shadow-warm transition-all duration-300 hover:scale-105">
+                <Button variant="premium" size="xl" className="group">
                   Начать заботу о себе
-                  <ArrowRight className="ml-3 h-6 w-6" />
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
               <Link to="/about">
-                <Button variant="outline" className="text-xl px-10 py-6 border-2 border-bloom-golden/40 text-bloom-warm-brown hover:bg-bloom-golden/10 font-semibold rounded-full transition-all duration-300 hover:scale-105 bg-white/80 backdrop-blur-sm">
+                <Button variant="outline" size="xl" className="bg-white/90 backdrop-blur-sm border-primary/30 text-foreground hover:bg-white">
                   Узнать больше о платформе
                 </Button>
               </Link>
