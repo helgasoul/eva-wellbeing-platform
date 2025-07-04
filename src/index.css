@@ -7,36 +7,36 @@
 /* bloom Design System - Google-inspired Material Design for women's health */
 @layer base {
   :root {
-    /* Core colors - Warm, approachable, premium */
-    --background: 253 252 251;
-    --foreground: 32 32 32;
+    /* Core colors - Calm, sophisticated */
+    --background: 248 250 252;
+    --foreground: 55 65 81;
 
     --card: 255 255 255;
-    --card-foreground: 46 41 37;
+    --card-foreground: 55 65 81;
 
     --popover: 255 255 255;
-    --popover-foreground: 46 41 37;
+    --popover-foreground: 55 65 81;
 
-    /* Primary - Sophisticated warmth */
-    --primary: 203 140 79;
+    /* Primary - Calm sage green */
+    --primary: 139 168 160;
     --primary-foreground: 255 255 255;
-    --primary-50: 254 249 246;
-    --primary-100: 252 236 226;
-    --primary-500: 203 140 79;
-    --primary-600: 183 118 63;
-    --primary-900: 92 51 25;
+    --primary-50: 246 250 249;
+    --primary-100: 230 240 237;
+    --primary-500: 139 168 160;
+    --primary-600: 115 142 135;
+    --primary-900: 68 85 81;
 
-    /* Secondary - Soft elegance */
-    --secondary: 240 234 227;
-    --secondary-foreground: 74 65 59;
+    /* Secondary - Soft neutral */
+    --secondary: 241 245 249;
+    --secondary-foreground: 55 65 81;
 
     /* Muted - Gentle backgrounds */
-    --muted: 247 245 242;
-    --muted-foreground: 120 113 108;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
 
     /* Accent - Subtle highlights */
-    --accent: 235 220 207;
-    --accent-foreground: 74 65 59;
+    --accent: 241 245 249;
+    --accent-foreground: 55 65 81;
 
     /* Semantic colors */
     --destructive: 239 68 68;
@@ -49,9 +49,9 @@
     --success-foreground: 255 255 255;
 
     /* Interactive elements */
-    --border: 229 221 213;
-    --input: 247 245 242;
-    --ring: 203 140 79;
+    --border: 226 232 240;
+    --input: 248 250 252;
+    --ring: 139 168 160;
 
     /* Modern radius system */
     --radius: 16px;
@@ -60,14 +60,14 @@
     --radius-lg: 20px;
     --radius-xl: 24px;
 
-    --sidebar-background: 252 250 247;
-    --sidebar-foreground: 78 56 52;
-    --sidebar-primary: 200 154 106;
+    --sidebar-background: 248 250 252;
+    --sidebar-foreground: 55 65 81;
+    --sidebar-primary: 139 168 160;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 244 230 215;
-    --sidebar-accent-foreground: 120 89 85;
-    --sidebar-border: 224 208 196;
-    --sidebar-ring: 200 154 106;
+    --sidebar-accent: 241 245 249;
+    --sidebar-accent-foreground: 55 65 81;
+    --sidebar-border: 226 232 240;
+    --sidebar-ring: 139 168 160;
   }
 
   .dark {
