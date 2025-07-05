@@ -45,7 +45,7 @@ const Home = () => {
             {/* Empathetic main message */}
             <h1 className="text-5xl md:text-7xl font-playfair font-bold text-foreground mb-8 leading-tight">
               Мы поддерживаем женщин{' '}
-              <span className="bg-gradient-to-r from-primary to-primary-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 во всём мире
               </span>
             </h1>
@@ -178,7 +178,7 @@ const Home = () => {
                   и благополучие платформе bloom
                 </p>
                 <Link to="/register">
-                  <Button className="w-full text-xl py-4 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105">
+                 <Button className="w-full text-xl py-4 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105">
                     Присоединиться бесплатно
                   </Button>
                 </Link>
@@ -189,7 +189,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-gradient-to-r from-primary via-secondary to-primary">
+      <section className="py-24 px-6 bloom-hero-gradient">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-8">
@@ -202,7 +202,7 @@ const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link to="/register">
-                <Button className="bg-white text-primary hover:bg-white/90 text-xl px-10 py-6 font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-floating">
+                <Button className="bg-white text-primary-foreground hover:bg-white/90 text-xl px-10 py-6 font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-floating">
                   Создать аккаунт бесплатно
                 </Button>
               </Link>

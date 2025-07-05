@@ -63,15 +63,15 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Enhanced bloom brand colors - optimized for women 45-65
+				// Enhanced bloom brand colors - warm cream tones for women 45-65
 				bloom: {
 					'golden': '#C89A6A', // Primary warm golden tone
-					'warm-cream': '#F4E6D7', // Soft background
+					'warm-cream': '#F8F5F0', // Soft background
 					'soft-peach': '#EED5C7', // Gentle accent
 					'vanilla': '#FAF5F0', // Light neutral
 					'cream': '#FFFEF7', // Lightest background
 					'caramel': '#B8855C', // Deeper golden tone
-					'blush': '#E8C4A0', // Warm blush
+					'blush': '#E6A888', // Warm blush
 					'pearl': '#F8F0E7', // Pearl white
 					'taupe': '#877168', // Medium contrast text
 					'warm-brown': '#4E3834', // High contrast text - deep warm brown
