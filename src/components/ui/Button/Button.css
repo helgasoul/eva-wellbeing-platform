@@ -3,8 +3,7 @@
  * Inspired by Ema design
  */
 
-/* Import color variables */
-@import '../../styles/colors.css';
+/* Using design system from index.css instead of separate colors.css */
 
 /* ========================================
    BASE BUTTON STYLES
@@ -27,7 +26,7 @@
 }
 
 .eva-button:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
 }
 
@@ -107,11 +106,11 @@
    BUTTON VARIANTS
    ======================================== */
 
-/* Primary Button - Основной градиент Ema */
+/* Primary Button - Warm cream gradient */
 .eva-button--primary {
-  background: var(--gradient-primary);
-  color: var(--color-white);
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-600)) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .eva-button--primary::before {
@@ -133,18 +132,18 @@
 
 .eva-button--primary:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-primary);
+  box-shadow: 0 8px 32px hsl(var(--primary) / 0.15);
 }
 
 .eva-button--primary:active {
   transform: translateY(0);
 }
 
-/* Secondary Button - Розово-красный градиент */
+/* Secondary Button - Warm peach gradient */
 .eva-button--secondary {
-  background: var(--gradient-secondary);
-  color: var(--color-white);
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--secondary)) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .eva-button--secondary::before {
@@ -166,58 +165,58 @@
 
 .eva-button--secondary:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-secondary);
+  box-shadow: 0 8px 32px hsl(var(--secondary) / 0.15);
 }
 
-/* Tertiary Button - Голубой градиент */
+/* Tertiary Button - Light accent */
 .eva-button--tertiary {
-  background: var(--gradient-tertiary);
-  color: var(--color-white);
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--muted)) 100%);
+  color: hsl(var(--foreground));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .eva-button--tertiary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(79, 172, 254, 0.15);
+  box-shadow: 0 8px 32px hsl(var(--accent) / 0.15);
 }
 
 /* Outline Button */
 .eva-button--outline {
   background: transparent;
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
+  color: hsl(var(--primary));
+  border: 2px solid hsl(var(--primary));
   box-shadow: none;
 }
 
 .eva-button--outline:hover {
-  background: var(--color-primary);
-  color: var(--color-white);
+  background: hsl(var(--primary));
+  color: white;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-primary);
+  box-shadow: 0 8px 32px hsl(var(--primary) / 0.15);
 }
 
 /* Ghost Button */
 .eva-button--ghost {
   background: transparent;
-  color: var(--color-primary);
+  color: hsl(var(--primary));
   box-shadow: none;
 }
 
 .eva-button--ghost:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: hsl(var(--primary) / 0.1);
   transform: translateY(-1px);
 }
 
-/* Soft Button - Мягкий градиент */
+/* Soft Button - Warm light gradient */
 .eva-button--soft {
-  background: var(--gradient-soft);
-  color: #8b4513;
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--accent)) 100%);
+  color: hsl(var(--foreground));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .eva-button--soft:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(252, 182, 159, 0.15);
+  box-shadow: 0 8px 32px hsl(var(--muted) / 0.15);
 }
 
 /* ========================================
@@ -233,7 +232,7 @@
 
 .eva-button--disabled:hover {
   transform: none;
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 /* Loading State */
@@ -257,7 +256,7 @@
   display: inline-flex;
   border-radius: 22px;
   overflow: hidden;
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .eva-button-group .eva-button {
@@ -306,11 +305,11 @@
 /* High contrast mode */
 @media (prefers-contrast: high) {
   .eva-button--primary {
-    background: var(--color-primary-dark);
+    background: linear-gradient(135deg, hsl(var(--primary-600)) 0%, hsl(var(--primary-900)) 100%);
   }
   
   .eva-button--secondary {
-    background: var(--color-secondary-dark);
+    background: hsl(var(--secondary));
   }
   
   .eva-button--outline {
@@ -339,49 +338,49 @@
 
 /* Medical Action Button */
 .eva-button--medical {
-  background: linear-gradient(135deg, #667eea 0%, #4facfe 100%);
-  color: var(--color-white);
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-600)) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .eva-button--medical:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 8px 32px hsl(var(--primary) / 0.2);
 }
 
 /* Emergency Button */
 .eva-button--emergency {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-  color: var(--color-white);
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, hsl(var(--destructive)) 0%, hsl(var(--destructive)) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   animation: eva-pulse 2s infinite;
 }
 
 @keyframes eva-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(238, 90, 36, 0.4);
+    box-shadow: 0 0 0 0 hsl(var(--destructive) / 0.4);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(238, 90, 36, 0);
+    box-shadow: 0 0 0 10px hsl(var(--destructive) / 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(238, 90, 36, 0);
+    box-shadow: 0 0 0 0 hsl(var(--destructive) / 0);
   }
 }
 
 .eva-button--emergency:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(238, 90, 36, 0.3);
+  box-shadow: 0 8px 32px hsl(var(--destructive) / 0.3);
 }
 
 /* Success Button */
 .eva-button--success {
-  background: var(--gradient-success);
-  color: #2d5016;
-  box-shadow: var(--shadow-light);
+  background: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(var(--success)) 100%);
+  color: hsl(var(--success-foreground));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .eva-button--success:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(168, 237, 234, 0.2);
+  box-shadow: 0 8px 32px hsl(var(--success) / 0.2);
 }
