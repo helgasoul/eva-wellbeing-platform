@@ -7,8 +7,8 @@
 /* Marie Claire Design System - Sophisticated femininity meets modern elegance */
 @layer base {
   :root {
-    /* Core colors - Sophisticated Marie Claire palette */
-    --background: 255 252 250;
+    /* Core colors - Clean white background */
+    --background: 255 255 255;
     --foreground: 45 41 38;
 
     --card: 255 255 255;
@@ -150,18 +150,7 @@
 }
 
 @layer components {
-  /* Marie Claire gradient system - Sophisticated elegance */
-  .bloom-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary-50)) 0%, hsl(var(--card)) 30%, hsl(var(--background)) 70%, hsl(var(--muted)) 100%);
-  }
-  
-  .bloom-warm-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--primary-100)) 100%);
-  }
-
-  .bloom-hero-gradient {
-    background: linear-gradient(120deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 40%, hsl(var(--primary-600)) 100%);
-  }
+  /* Clean background utilities */
 
   .bloom-glass-gradient {
     background: linear-gradient(135deg, hsl(var(--card) / 0.95) 0%, hsl(var(--card) / 0.85) 100%);

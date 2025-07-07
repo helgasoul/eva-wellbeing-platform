@@ -33,7 +33,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bloom-gradient">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="py-24 px-6">
         <div className="container mx-auto text-center">
@@ -178,7 +178,7 @@ const Home = () => {
                   и благополучие платформе bloom
                 </p>
                 <Link to="/register">
-                 <Button className="w-full text-xl py-4 bloom-hero-gradient text-white font-semibold rounded-full transition-all duration-300 hover:scale-105">
+                 <Button className="w-full text-xl py-4 bg-primary text-white font-semibold rounded-full transition-all duration-300 hover:scale-105">
                     Присоединиться бесплатно
                   </Button>
                 </Link>
@@ -189,7 +189,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bloom-hero-gradient">
+      <section className="py-24 px-6 bg-primary">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-8">
