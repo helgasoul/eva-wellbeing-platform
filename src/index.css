@@ -7,36 +7,36 @@
 /* bloom Design System - Google-inspired Material Design for women's health */
 @layer base {
   :root {
-    /* Core colors - Warm, sophisticated cream tones */
-    --background: 252 249 246;
-    --foreground: 78 56 52;
+    /* Core colors - Clean, modern tones */
+    --background: 255 255 255;
+    --foreground: 51 65 85;
 
-    --card: 255 254 247;
-    --card-foreground: 78 56 52;
+    --card: 255 255 255;
+    --card-foreground: 51 65 85;
 
-    --popover: 255 254 247;
-    --popover-foreground: 78 56 52;
+    --popover: 255 255 255;
+    --popover-foreground: 51 65 85;
 
-    /* Primary - Warm golden tones */
-    --primary: 200 154 106;
+    /* Primary - Blue-violet gradient */
+    --primary: 102 126 234;
     --primary-foreground: 255 255 255;
-    --primary-50: 250 245 240;
-    --primary-100: 244 230 215;
-    --primary-500: 200 154 106;
-    --primary-600: 184 133 92;
-    --primary-900: 135 113 104;
+    --primary-50: 238 242 255;
+    --primary-100: 224 231 255;
+    --primary-500: 102 126 234;
+    --primary-600: 79 70 229;
+    --primary-900: 67 56 202;
 
-    /* Secondary - Warm peach accent */
-    --secondary: 230 168 139;
+    /* Secondary - Pink accent */
+    --secondary: 245 87 108;
     --secondary-foreground: 255 255 255;
 
-    /* Muted - Gentle cream backgrounds */
-    --muted: 248 245 240;
-    --muted-foreground: 135 113 104;
+    /* Muted - Light gray backgrounds */
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
 
-    /* Accent - Soft cream highlights */
-    --accent: 250 245 240;
-    --accent-foreground: 78 56 52;
+    /* Accent - Soft highlights */
+    --accent: 241 245 249;
+    --accent-foreground: 51 65 85;
 
     /* Semantic colors */
     --destructive: 220 38 38;
@@ -49,9 +49,9 @@
     --success-foreground: 45 80 22;
 
     /* Interactive elements */
-    --border: 238 230 220;
-    --input: 248 245 240;
-    --ring: 200 154 106;
+    --border: 226 232 240;
+    --input: 248 250 252;
+    --ring: 102 126 234;
 
     /* Modern radius system */
     --radius: 16px;
@@ -60,14 +60,14 @@
     --radius-lg: 20px;
     --radius-xl: 24px;
 
-    --sidebar-background: 248 245 240;
-    --sidebar-foreground: 78 56 52;
-    --sidebar-primary: 200 154 106;
+    --sidebar-background: 248 250 252;
+    --sidebar-foreground: 51 65 85;
+    --sidebar-primary: 102 126 234;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 250 245 240;
-    --sidebar-accent-foreground: 78 56 52;
-    --sidebar-border: 238 230 220;
-    --sidebar-ring: 200 154 106;
+    --sidebar-accent: 241 245 249;
+    --sidebar-accent-foreground: 51 65 85;
+    --sidebar-border: 226 232 240;
+    --sidebar-ring: 102 126 234;
   }
 
   .dark {
@@ -80,7 +80,7 @@
     --popover: 42 37 32;
     --popover-foreground: 245 241 237;
 
-    --primary: 200 154 106;
+    --primary: 102 126 234;
     --primary-foreground: 255 255 255;
 
     --secondary: 58 51 46;
@@ -97,16 +97,16 @@
 
     --border: 58 51 46;
     --input: 47 42 37;
-    --ring: 200 154 106;
+    --ring: 102 126 234;
 
     --sidebar-background: 31 26 23;
     --sidebar-foreground: 245 241 237;
-    --sidebar-primary: 200 154 106;
+    --sidebar-primary: 102 126 234;
     --sidebar-primary-foreground: 255 255 255;
     --sidebar-accent: 42 37 32;
     --sidebar-accent-foreground: 208 197 192;
     --sidebar-border: 58 51 46;
-    --sidebar-ring: 200 154 106;
+    --sidebar-ring: 102 126 234;
   }
 }
 
@@ -150,17 +150,17 @@
 }
 
 @layer components {
-  /* Modern gradient system - Warm cream inspired */
+  /* Modern gradient system - Clean blue-violet inspired */
   .bloom-gradient {
     background: linear-gradient(135deg, hsl(var(--primary-50)) 0%, hsl(var(--card)) 30%, hsl(var(--background)) 70%, hsl(var(--muted)) 100%);
   }
   
   .bloom-warm-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary-500)) 0%, hsl(var(--primary-600)) 50%, hsl(var(--primary-100)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary-500)) 0%, hsl(var(--secondary)) 50%, hsl(var(--primary-100)) 100%);
   }
 
   .bloom-hero-gradient {
-    background: linear-gradient(120deg, hsl(var(--primary-500)) 0%, hsl(var(--primary-600)) 60%, hsl(var(--primary-900)) 100%);
+    background: linear-gradient(120deg, hsl(var(--primary-500)) 0%, hsl(var(--secondary)) 40%, hsl(var(--primary-600)) 100%);
   }
 
   .bloom-glass-gradient {
