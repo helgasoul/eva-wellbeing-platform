@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Heart, Menu, X, Sparkles, UserPlus, LogIn } from 'lucide-react';
+import { Heart, Menu, X, Sparkles, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const Header = () => {
@@ -19,35 +19,35 @@ export const Header = () => {
 
   return (
     <header className="bg-background/98 backdrop-blur-md border-b border-border/60 sticky top-0 z-50 shadow-elegant">
-      <div className="container mx-auto px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo Section */}
+      <div className="container mx-auto px-6 lg:px-8">
+        <div className="flex items-center justify-between h-18">
+          {/* Логотип */}
           <Link to="/" className="flex items-center group">
             <div className="logo-hover">
               <img 
                 src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
                 alt="BLOOM - Платформа поддержки женщин" 
-                className="h-16 w-auto"
+                className="h-12 w-auto"
               />
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-12">
+          {/* Навигация для десктопа */}
+          <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <div key={item.path} className="relative">
                 <Link
                   to={item.path}
-                  className={`nav-link text-base font-medium tracking-wide ${
+                  className={`nav-link text-sm font-medium tracking-wide transition-all duration-200 ${
                     isActive(item.path) 
                       ? 'text-primary active' 
-                      : 'text-foreground/80'
+                      : 'text-foreground/80 hover:text-primary'
                   }`}
                 >
                   {item.label}
                 </Link>
                 {item.badge && (
-                  <span className="absolute -top-2 -right-8 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs px-2 py-1 rounded-full font-medium shadow-sm">
+                  <span className="absolute -top-1 -right-6 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
                     {item.badge}
                   </span>
                 )}
@@ -55,50 +55,50 @@ export const Header = () => {
             ))}
           </nav>
 
-          {/* CTA Section */}
-          <div className="hidden lg:flex items-center space-x-4">
+          {/* Кнопки действий */}
+          <div className="hidden md:flex items-center space-x-3">
             <Link to="/login">
               <Button 
                 variant="ghost"
-                className="cta-secondary text-foreground/80 font-medium px-6 py-3 rounded-xl h-auto group"
+                className="cta-secondary text-foreground/80 hover:text-foreground font-medium px-5 py-2 rounded-lg h-auto"
               >
-                <LogIn className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                <LogIn className="mr-2 h-4 w-4" />
                 Войти
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="cta-primary text-primary-foreground font-semibold px-8 py-3 rounded-xl h-auto group">
-                <Sparkles className="mr-2 h-4 w-4 transition-all group-hover:rotate-12" />
-                Начать заботу о себе
+              <Button className="cta-primary text-primary-foreground font-semibold px-6 py-2 rounded-lg h-auto">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Начать сейчас
               </Button>
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Мобильное меню */}
           <button
-            className="lg:hidden p-3 rounded-xl hover:bg-muted/50 transition-all duration-200"
+            className="md:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Открыть меню"
           >
             {isMenuOpen ? (
-              <X className="h-6 w-6 text-foreground" /> 
+              <X className="h-5 w-5 text-foreground" /> 
             ) : (
-              <Menu className="h-6 w-6 text-foreground" />
+              <Menu className="h-5 w-5 text-foreground" />
             )}
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Мобильная навигация */}
         {isMenuOpen && (
-          <div className="lg:hidden py-8 border-t border-border/30 animate-fade-in bg-card/95 backdrop-blur-sm rounded-b-2xl shadow-soft">
-            <nav className="flex flex-col space-y-6">
+          <div className="md:hidden py-6 border-t border-border/30 animate-fade-in bg-card/95 backdrop-blur-sm rounded-b-xl">
+            <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <div key={item.path} className="relative">
                   <Link
                     to={item.path}
-                    className={`block text-lg font-medium px-6 py-4 rounded-xl transition-all duration-200 ${
+                    className={`block text-base font-medium px-4 py-3 rounded-lg transition-all duration-200 ${
                       isActive(item.path) 
-                        ? 'text-primary bg-primary/10 border-l-4 border-primary' 
+                        ? 'text-primary bg-primary/10' 
                         : 'text-foreground hover:text-primary hover:bg-primary/5'
                     }`}
                     onClick={() => setIsMenuOpen(false)}
@@ -113,20 +113,20 @@ export const Header = () => {
                 </div>
               ))}
               
-              <div className="flex flex-col space-y-4 pt-8 border-t border-border/30 px-6">
+              <div className="flex flex-col space-y-3 pt-4 border-t border-border/30">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button 
                     variant="ghost" 
-                    className="w-full cta-secondary justify-center py-4 text-lg font-medium rounded-xl group"
+                    className="w-full justify-center py-3 font-medium"
                   >
-                    <LogIn className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
+                    <LogIn className="mr-2 h-4 w-4" />
                     Войти
                   </Button>
                 </Link>
                 <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full cta-primary text-primary-foreground py-4 text-lg font-semibold rounded-xl group">
-                    <Sparkles className="mr-2 h-5 w-5 transition-all group-hover:rotate-12" />
-                    Начать заботу о себе
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 font-semibold">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Начать сейчас
                   </Button>
                 </Link>
               </div>
