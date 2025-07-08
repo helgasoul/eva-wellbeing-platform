@@ -14,7 +14,8 @@ import {
   FileText,
   Users,
   Plus,
-  Brain
+  Brain,
+  Stethoscope
 } from 'lucide-react';
 
 const PatientDashboard = () => {
@@ -34,6 +35,9 @@ const PatientDashboard = () => {
         break;
       case 'ai-chat':
         navigate('/patient/ai-chat');
+        break;
+      case 'doctors':
+        navigate('/patient/doctors');
         break;
       case 'community':
         // TODO: Implement community
@@ -200,7 +204,7 @@ const PatientDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('symptoms')}
@@ -232,6 +236,14 @@ const PatientDashboard = () => {
               >
                 <Users className="h-6 w-6 text-primary" />
                 <span className="text-sm gentle-text">Сообщество</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleQuickAction('doctors')}
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 gentle-border interactive-hover bg-gradient-to-b from-white to-green-50"
+              >
+                <Stethoscope className="h-6 w-6 text-green-600" />
+                <span className="text-sm gentle-text">Запись к врачу</span>
               </Button>
               <Button
                 variant="outline"
