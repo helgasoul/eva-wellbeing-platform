@@ -18,32 +18,34 @@ export const Header = () => {
   ];
 
   return (
-    <header className="bg-white/90 backdrop-blur-md border-b border-bloom-dusty-rose/20 sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <header className="bg-white/95 backdrop-blur-md border-b border-primary/10 sticky top-0 z-50 shadow-soft">
+      <div className="container mx-auto px-6">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="p-2 bg-gradient-to-br from-primary to-bloom-mauve rounded-full group-hover:scale-110 transition-transform duration-300">
-              <Heart className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-poppins font-semibold text-foreground group-hover:text-primary transition-colors bloom-brand">
-              bloom
-            </span>
+          <Link to="/" className="flex items-center group">
+            <img 
+              src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
+              alt="BLOOM" 
+              className="h-10 w-auto group-hover:scale-105 transition-transform duration-300"
+            />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-10">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-sm font-medium transition-colors duration-200 hover:text-primary ${
+                className={`text-base font-medium transition-all duration-200 hover:text-primary relative ${
                   isActive(item.path) 
-                    ? 'text-primary border-b-2 border-primary' 
-                    : 'text-muted-foreground'
+                    ? 'text-primary' 
+                    : 'text-foreground hover:scale-105'
                 }`}
               >
                 {item.label}
+                {isActive(item.path) && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"></div>
+                )}
               </Link>
             ))}
           </nav>
@@ -51,12 +53,15 @@ export const Header = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login">
-              <Button variant="ghost" className="text-muted-foreground hover:text-primary">
+              <Button 
+                variant="ghost" 
+                className="text-foreground hover:text-primary hover:bg-primary/5 px-6 py-2 rounded-full font-medium transition-all duration-300"
+              >
                 Войти
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="bloom-button">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full font-medium transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-gentle">
                 Регистрация
               </Button>
             </Link>
@@ -64,39 +69,39 @@ export const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-bloom-soft-pink transition-colors"
+            className="md:hidden p-2 rounded-full hover:bg-primary/5 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isMenuOpen ? <X className="h-6 w-6 text-foreground" /> : <Menu className="h-6 w-6 text-foreground" />}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-bloom-dusty-rose/20 animate-fade-in">
+          <div className="md:hidden py-6 border-t border-primary/10 animate-fade-in bg-white/95 backdrop-blur-sm">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`text-sm font-medium transition-colors px-2 py-1 rounded ${
+                  className={`text-base font-medium transition-colors px-4 py-3 rounded-lg ${
                     isActive(item.path) 
-                      ? 'text-primary bg-bloom-soft-pink' 
-                      : 'text-muted-foreground hover:text-primary'
+                      ? 'text-primary bg-primary/5' 
+                      : 'text-foreground hover:text-primary hover:bg-primary/5'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
                 </Link>
               ))}
-              <div className="flex flex-col space-y-2 pt-4 border-t border-bloom-dusty-rose/20">
+              <div className="flex flex-col space-y-3 pt-6 border-t border-primary/10">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-start">
+                  <Button variant="ghost" className="w-full justify-center py-3 hover:bg-primary/5">
                     Войти
                   </Button>
                 </Link>
                 <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="bloom-button w-full">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-full font-medium">
                     Регистрация
                   </Button>
                 </Link>

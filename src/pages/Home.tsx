@@ -35,19 +35,14 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="py-24 px-6">
+      <section className="py-20 px-6 bg-gradient-to-br from-background via-accent to-secondary/5">
         <div className="container mx-auto text-center">
           <div className="max-w-5xl mx-auto animate-fade-in">
-            <div className="inline-flex p-6 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full mb-8 animate-gentle-float backdrop-blur-sm">
-              <Heart className="h-16 w-16 text-primary" />
-            </div>
-            
-            {/* BLOOM Logo */}
-            <div className="mb-8">
+            <div className="inline-flex p-4 bg-primary/5 rounded-full mb-8 animate-gentle-float backdrop-blur-sm border border-primary/10">
               <img 
-                src="/lovable-uploads/575c56ef-7422-45a9-8025-ff7e8011e21b.png" 
+                src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
                 alt="BLOOM" 
-                className="h-16 md:h-20 mx-auto"
+                className="h-12 w-auto"
               />
             </div>
             
@@ -82,7 +77,7 @@ const Home = () => {
       </section>
 
       {/* Trust and Community Section */}
-      <section className="py-20 px-6 bg-gradient-to-b from-card to-background">
+      <section className="py-16 px-6 bg-gradient-to-b from-accent/30 to-background">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-playfair font-bold text-foreground mb-6">
@@ -94,18 +89,18 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl shadow-floating animate-fade-in group cursor-pointer">
+          <div className="relative overflow-hidden rounded-2xl shadow-bloom animate-fade-in group cursor-pointer bg-white">
             <img 
               src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
-              alt="Глобальное сообщество женщин bloom — поддержка и взаимопонимание"
+              alt="Глобальное сообщество женщин BLOOM — поддержка и взаимопонимание"
               className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"></div>
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <h3 className="text-2xl font-playfair font-semibold mb-2">
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent"></div>
+            <div className="absolute bottom-6 left-6 right-6 text-white">
+              <h3 className="text-xl font-playfair font-semibold mb-2">
                 Тысячи женщин уже с нами
               </h3>
-              <p className="text-lg opacity-90">
+              <p className="text-base opacity-95">
                 Присоединяйтесь к глобальному сообществу поддержки
               </p>
             </div>
@@ -114,7 +109,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-6 bg-accent">
+      <section className="py-20 px-6 bg-gradient-to-br from-background to-accent/20">
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-playfair font-bold text-foreground mb-6">
@@ -152,7 +147,7 @@ const Home = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-muted to-background">
+      <section className="py-20 px-6 bg-gradient-to-br from-accent/10 to-background">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="animate-slide-in">
@@ -198,7 +193,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-primary">
+      <section className="py-20 px-6 bg-gradient-to-r from-primary via-primary/95 to-primary">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-playfair font-bold text-white mb-6">
