@@ -4,30 +4,84 @@
 
 @layer base {
   :root {
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* BLOOM Feminine Color Palette */
+    --border: 310 15% 90%;
+    --input: 310 15% 95%;
+    --ring: 325 84% 62%;
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --foreground: 220 13% 18%;
+    
+    /* Primary - BLOOM Pink from logo */
+    --primary: 325 84% 62%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary - Soft blush */
+    --secondary: 340 30% 95%;
+    --secondary-foreground: 220 13% 18%;
+    
+    /* Muted - Gentle cream */
+    --muted: 20 20% 97%;
+    --muted-foreground: 220 9% 46%;
+    
+    /* Accent - Light pink */
+    --accent: 330 40% 96%;
+    --accent-foreground: 220 13% 18%;
+    
+    /* Semantic colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 13% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --popover-foreground: 220 13% 18%;
+    --radius: 0.75rem;
   }
 }
 
 body {
   background: white !important;
-  color: #1f2937 !important;
+  color: hsl(var(--foreground)) !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* BLOOM Feminine Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+
+/* Soft animations for feminine touch */
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.02); }
+}
+
+.animate-gentle-float {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+.animate-soft-pulse {
+  animation: soft-pulse 3s ease-in-out infinite;
+}
+
+/* Soft shadows for feminine design */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(220, 38, 127, 0.08);
+}
+
+.shadow-gentle {
+  box-shadow: 0 4px 16px rgba(220, 38, 127, 0.12);
+}
+
+.shadow-bloom {
+  box-shadow: 0 8px 24px rgba(220, 38, 127, 0.15);
 }

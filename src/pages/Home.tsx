@@ -42,28 +42,37 @@ const Home = () => {
               <Heart className="h-16 w-16 text-primary" />
             </div>
             
+            {/* BLOOM Logo */}
+            <div className="mb-8">
+              <img 
+                src="/lovable-uploads/575c56ef-7422-45a9-8025-ff7e8011e21b.png" 
+                alt="BLOOM" 
+                className="h-16 md:h-20 mx-auto"
+              />
+            </div>
+            
             {/* Empathetic main message */}
-            <h1 className="text-5xl md:text-7xl font-playfair font-bold text-foreground mb-8 leading-tight">
+            <h1 className="text-3xl md:text-5xl font-playfair font-bold text-foreground mb-6 leading-tight">
               Мы поддерживаем женщин{' '}
               <span className="text-primary">
                 во всём мире
               </span>
             </h1>
             
-            <div className="text-2xl md:text-3xl text-muted-foreground mb-10 leading-relaxed max-w-4xl mx-auto font-medium">
+            <div className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
               в заботе о своём здоровье, предоставляя персонализированные, 
               научно обоснованные рекомендации для поддержки женщин в период менопаузы
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
               <Link to="/register">
-                <Button variant="premium" size="xl" className="group">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-gentle group">
                   Начать заботу о себе
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
               <Link to="/about">
-                <Button variant="outline" size="xl" className="bg-white/90 backdrop-blur-sm border-primary/30 text-foreground hover:bg-white">
+                <Button variant="outline" className="border-primary/30 text-foreground hover:bg-accent px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105">
                   Узнать больше о платформе
                 </Button>
               </Link>
@@ -75,11 +84,11 @@ const Home = () => {
       {/* Trust and Community Section */}
       <section className="py-20 px-6 bg-gradient-to-b from-card to-background">
         <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-8">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-playfair font-bold text-foreground mb-6">
               Вы не одни в этом важном жизненном периоде
             </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
               Период менопаузы — это естественная и важная часть жизни каждой женщины. 
               Мы здесь, чтобы поддержать вас на этом пути с пониманием, заботой и профессиональной помощью.
             </p>
@@ -107,11 +116,11 @@ const Home = () => {
       {/* Features Section */}
       <section className="py-24 px-6 bg-accent">
         <div className="container mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-6">
-              Почему женщины выбирают bloom?
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-playfair font-bold text-foreground mb-6">
+              Почему женщины выбирают BLOOM?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Мы объединили медицинскую экспертизу, передовые технологии 
               и глубокое понимание потребностей женщин
             </p>
@@ -123,16 +132,16 @@ const Home = () => {
               return (
                 <div
                   key={index}
-                  className="bg-white/90 backdrop-blur-sm p-10 text-center group hover:scale-105 transition-all duration-300 rounded-2xl shadow-gentle hover:shadow-warm cursor-pointer"
+                  className="bg-white p-8 text-center group hover:scale-105 transition-all duration-300 rounded-xl shadow-soft hover:shadow-gentle cursor-pointer"
                   style={{ animationDelay: `${index * 0.2}s` }}
                 >
-                  <div className="inline-flex p-6 bg-gradient-to-br from-primary to-secondary rounded-full mb-8 group-hover:scale-110 transition-transform duration-300 animate-warm-pulse">
-                    <IconComponent className="h-10 w-10 text-white" />
+                  <div className="inline-flex p-4 bg-primary/10 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300 animate-soft-pulse">
+                    <IconComponent className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-playfair font-semibold text-foreground mb-6">
+                  <h3 className="text-xl font-playfair font-semibold text-foreground mb-4">
                     {feature.title}
                   </h3>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
+                  <p className="text-base text-muted-foreground leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -147,38 +156,38 @@ const Home = () => {
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="animate-slide-in">
-              <h2 className="text-4xl md:text-5xl font-playfair font-bold text-foreground mb-8">
+              <h2 className="text-3xl md:text-4xl font-playfair font-bold text-foreground mb-6">
                 Комплексная поддержка на каждом этапе
               </h2>
-              <p className="text-xl text-muted-foreground mb-10 leading-relaxed">
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                 Каждая женщина уникальна, и её путь через менопаузу тоже особенный. 
-                С bloom вы получите индивидуальную поддержку, основанную на последних 
+                С BLOOM вы получите индивидуальную поддержку, основанную на последних 
                 научных исследованиях и многолетнем опыте специалистов.
               </p>
               <div className="space-y-6">
                 {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center space-x-4 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
-                    <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
-                    <span className="text-lg text-muted-foreground">{benefit}</span>
+                  <div key={index} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent transition-all duration-200">
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span className="text-base text-muted-foreground">{benefit}</span>
                   </div>
                 ))}
               </div>
             </div>
             
-            <div className="bg-white/90 backdrop-blur-sm p-12 rounded-2xl shadow-floating hover:shadow-modal transition-all duration-300 hover:scale-105">
+            <div className="bg-white p-8 rounded-xl shadow-soft hover:shadow-gentle transition-all duration-300 hover:scale-105">
               <div className="text-center">
-                <div className="inline-flex p-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mb-8 animate-gentle-float">
-                  <Heart className="h-16 w-16 text-primary" />
+                <div className="inline-flex p-6 bg-primary/10 rounded-full mb-6 animate-gentle-float">
+                  <Heart className="h-12 w-12 text-primary" />
                 </div>
-                <h3 className="text-3xl font-playfair font-semibold text-foreground mb-6">
+                <h3 className="text-2xl font-playfair font-semibold text-foreground mb-4">
                   Готовы присоединиться?
                 </h3>
-                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                <p className="text-base text-muted-foreground mb-6 leading-relaxed">
                   Тысячи женщин во всём мире уже доверили своё здоровье 
-                  и благополучие платформе bloom
+                  и благополучие платформе BLOOM
                 </p>
                 <Link to="/register">
-                 <Button className="w-full text-xl py-4 bg-primary text-white font-semibold rounded-full transition-all duration-300 hover:scale-105">
+                 <Button className="w-full text-lg py-3 bg-primary text-primary-foreground font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-soft">
                     Присоединиться бесплатно
                   </Button>
                 </Link>
@@ -192,22 +201,22 @@ const Home = () => {
       <section className="py-24 px-6 bg-primary">
         <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-8">
+            <h2 className="text-3xl md:text-4xl font-playfair font-bold text-white mb-6">
               Начните заботу о себе уже сегодня
             </h2>
-            <p className="text-xl text-white/95 mb-12 leading-relaxed">
+            <p className="text-lg text-white/95 mb-10 leading-relaxed">
               Не откладывайте заботу о своём здоровье и благополучии. 
-              Присоединяйтесь к bloom и получите доступ к персонализированной 
+              Присоединяйтесь к BLOOM и получите доступ к персонализированной 
               поддержке уже сегодня
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register">
-                <Button className="bg-white text-primary hover:bg-white/90 text-xl px-10 py-6 font-semibold rounded-full transition-all duration-300 hover:scale-105 shadow-floating">
+                <Button className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-3 font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-soft">
                   Создать аккаунт бесплатно
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" className="text-xl px-10 py-6 border-2 border-white/40 text-white hover:bg-white/10 font-semibold rounded-full transition-all duration-300 hover:scale-105">
+                <Button variant="outline" className="text-lg px-8 py-3 border-2 border-white/40 text-white hover:bg-white/10 font-medium rounded-full transition-all duration-300 hover:scale-105">
                   Уже есть аккаунт?
                 </Button>
               </Link>
