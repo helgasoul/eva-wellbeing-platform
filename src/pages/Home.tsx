@@ -35,94 +35,111 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-background via-accent/30 to-secondary/10 relative overflow-hidden">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-20 w-32 h-32 rounded-full bg-primary/20 blur-xl"></div>
-          <div className="absolute bottom-32 right-16 w-40 h-40 rounded-full bg-primary/15 blur-2xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl"></div>
+      <section className="min-h-screen bg-hero-gradient relative overflow-hidden flex items-center">
+        {/* Subtle decorative elements */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-gradient-to-br from-primary/10 to-accent/20 blur-3xl animate-gentle-float"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full bg-gradient-to-br from-accent/15 to-secondary/20 blur-3xl" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-2/3 left-1/6 w-48 h-48 rounded-full bg-gradient-to-br from-secondary/20 to-primary/10 blur-2xl animate-gentle-float" style={{ animationDelay: '4s' }}></div>
         </div>
         
-        <div className="container mx-auto relative z-10">
-          <div className="max-w-4xl mx-auto text-center animate-fade-in">
-            {/* Logo with gentle animation */}
-            <div className="inline-flex items-center justify-center p-3 bg-white/80 backdrop-blur-sm rounded-2xl mb-6 shadow-soft border border-primary/10 animate-gentle-float">
-              <img 
-                src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
-                alt="BLOOM - Платформа поддержки женщин в период менопаузы" 
-                className="h-10 w-auto"
-              />
-              <Heart className="ml-2 h-5 w-5 text-primary animate-soft-pulse" />
-            </div>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-5xl mx-auto text-center">
             
-            {/* Trust badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full mb-8 text-sm text-muted-foreground border border-primary/10">
-              <div className="w-2 h-2 bg-primary rounded-full animate-soft-pulse"></div>
-              Основано на рекомендациях ВОЗ • Одобрено врачами
-            </div>
-            
-            {/* Main heading with improved hierarchy */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-inter font-bold text-foreground mb-6 leading-[1.1] tracking-tight">
-              Мы поддерживаем{' '}
-              <span className="text-primary bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                женщин
-              </span>
-              <br className="hidden sm:block" />
-              <span className="text-2xl md:text-3xl lg:text-4xl font-normal text-muted-foreground block mt-2">
-                во всём мире
-              </span>
-            </h1>
-            
-            {/* Subtitle with better spacing */}
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto font-inter">
-              в заботе о своём здоровье, предоставляя персонализированные, 
-              научно обоснованные рекомендации для поддержки в период менопаузы
-            </p>
-            
-            {/* Asymmetric CTA buttons with icons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/register" className="group">
-                <Button 
-                  size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-bloom group-hover:shadow-xl border-0"
-                >
-                  <Heart className="mr-3 h-5 w-5 transition-transform group-hover:scale-110" />
-                  Начать заботу о себе
-                  <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
+            {/* Enhanced Logo Section */}
+            <div className="mb-12 animate-fade-in">
+              <div className="inline-flex items-center justify-center p-6 bg-white/80 backdrop-blur-sm rounded-3xl shadow-bloom border border-primary/20 mb-8 animate-gentle-float">
+                <img 
+                  src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
+                  alt="BLOOM - Платформа поддержки женщин в период менопаузы" 
+                  className="h-16 w-auto"
+                />
+                <div className="ml-4 flex items-center gap-1">
+                  <Heart className="h-6 w-6 text-primary animate-soft-pulse" />
+                  <Heart className="h-4 w-4 text-accent animate-soft-pulse" style={{ animationDelay: '0.5s' }} />
+                </div>
+              </div>
               
-              <span className="hidden sm:block text-muted-foreground/40 font-light">или</span>
-              
-              <Link to="/about" className="group">
-                <Button 
-                  variant="ghost" 
-                  size="lg"
-                  className="border-2 border-primary/20 text-foreground hover:bg-primary/5 hover:border-primary/40 px-8 py-4 rounded-2xl font-medium text-lg transition-all duration-300 hover:scale-105 bg-white/40 backdrop-blur-sm"
-                >
-                  <Book className="mr-2 h-5 w-5" />
-                  Узнать больше
-                </Button>
-              </Link>
+              {/* Trust Badge */}
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/70 backdrop-blur-sm rounded-full shadow-soft border border-primary/15">
+                <div className="w-3 h-3 bg-primary rounded-full animate-soft-pulse"></div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  Основано на рекомендациях ВОЗ • Одобрено врачами
+                </span>
+                <div className="w-3 h-3 bg-accent rounded-full animate-soft-pulse" style={{ animationDelay: '1s' }}></div>
+              </div>
             </div>
             
-            {/* Additional trust elements */}
-            <div className="mt-12 pt-8 border-t border-primary/10">
-              <p className="text-sm text-muted-foreground/80 mb-4">
-                Уже доверились здоровью с BLOOM
+            {/* Main Heading */}
+            <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-inter font-light text-foreground mb-6 leading-[1.1] tracking-tight">
+                Мы поддерживаем{' '}
+                <span className="font-bold text-gradient">
+                  женщин
+                </span>
+                <br />
+                <span className="text-3xl md:text-4xl lg:text-5xl font-normal text-muted-foreground block mt-4">
+                  во всём мире
+                </span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-4xl mx-auto font-light">
+                в заботе о своём здоровье, предоставляя персонализированные, 
+                научно обоснованные рекомендации для поддержки в период менопаузы
               </p>
-              <div className="flex items-center justify-center gap-8 text-xs text-muted-foreground/60">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-primary/20 rounded-full"></div>
-                  <span>15,000+ женщин</span>
+            </div>
+            
+            {/* Enhanced CTA Section */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+                <Link to="/register" className="group">
+                  <Button 
+                    size="xl" 
+                    className="bg-gradient-to-r from-primary via-primary to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary text-primary-foreground px-12 py-6 rounded-2xl font-semibold text-xl transition-all duration-500 hover:scale-105 hover:shadow-bloom group-hover:shadow-2xl border-0 relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                    <Heart className="mr-3 h-6 w-6 transition-transform group-hover:scale-110 relative z-10" />
+                    <span className="relative z-10">Начать заботу о себе</span>
+                    <ArrowRight className="ml-3 h-6 w-6 transition-transform group-hover:translate-x-2 relative z-10" />
+                  </Button>
+                </Link>
+                
+                <div className="flex items-center gap-4 text-muted-foreground/60">
+                  <div className="w-8 h-0.5 bg-gradient-to-r from-transparent to-muted-foreground/30"></div>
+                  <span className="font-light">или</span>
+                  <div className="w-8 h-0.5 bg-gradient-to-l from-transparent to-muted-foreground/30"></div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-primary/20 rounded-full"></div>
-                  <span>50+ стран</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-primary/20 rounded-full"></div>
-                  <span>Рейтинг 4.9/5</span>
+                
+                <Link to="/about" className="group">
+                  <Button 
+                    variant="outline" 
+                    size="xl"
+                    className="border-2 border-primary/30 text-foreground hover:bg-white/80 hover:border-primary/50 px-10 py-6 rounded-2xl font-medium text-xl transition-all duration-300 hover:scale-105 bg-white/50 backdrop-blur-sm hover:shadow-gentle"
+                  >
+                    <Book className="mr-3 h-5 w-5" />
+                    Узнать больше
+                  </Button>
+                </Link>
+              </div>
+              
+              {/* Trust Statistics */}
+              <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-gentle border border-primary/10 max-w-2xl mx-auto">
+                <p className="text-lg font-medium text-foreground mb-6">
+                  Уже доверились здоровью с BLOOM
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary mb-1">15,000+</div>
+                    <div className="text-sm text-muted-foreground">женщин</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary mb-1">50+</div>
+                    <div className="text-sm text-muted-foreground">стран</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary mb-1">4.9/5</div>
+                    <div className="text-sm text-muted-foreground">рейтинг</div>
+                  </div>
                 </div>
               </div>
             </div>
