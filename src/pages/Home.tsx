@@ -46,17 +46,6 @@ const Home = () => {
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
             
-            {/* Logo Section - типографическое решение */}
-            <div className="mb-20 animate-fade-in">
-              <div className="inline-flex items-center justify-center p-6 bg-card/80 backdrop-blur-sm rounded-3xl shadow-soft mb-12 animate-gentle-float">
-                <div className="flex items-center">
-                  <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
-                    BLOOM
-                  </h1>
-                  <Heart className="ml-4 h-8 w-8 text-primary" />
-                </div>
-              </div>
-            </div>
             
             {/* Main Heading */}
             <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
