@@ -26,6 +26,7 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import MedicalCalculators from "./pages/doctor/MedicalCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import AboutPlatform from "./pages/AboutPlatform";
 
 const queryClient = new QueryClient();
 
@@ -162,16 +163,7 @@ const App = () => (
             } />
             
             {/* Add placeholder routes for footer links */}
-            <Route path="/about" element={
-              <Layout>
-                <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                  <div className="bloom-card p-8 text-center">
-                    <h1 className="text-2xl font-playfair font-bold mb-4">О платформе</h1>
-                    <p className="text-muted-foreground">Эта страница в разработке</p>
-                  </div>
-                </div>
-              </Layout>
-            } />
+            <Route path="/about" element={<AboutPlatform />} />
             
             <Route path="/services" element={
               <Layout>
