@@ -34,63 +34,75 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Clean Hero Section */}
-      <section className="min-h-screen bg-background flex items-center">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center">
+      {/* Enhanced Hero Section */}
+      <section className="min-h-screen warm-bg flex items-center relative overflow-hidden">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-primary/10 blur-3xl"></div>
+          <div className="absolute bottom-32 right-16 w-40 h-40 rounded-full bg-secondary/30 blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full bg-trust/20 blur-2xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-5xl mx-auto text-center">
             
             {/* Logo Section */}
-            <div className="mb-16 animate-fade-in">
-              <div className="inline-flex items-center justify-center p-4 bg-card rounded-2xl shadow-clean mb-8 animate-gentle-float">
+            <div className="mb-20 animate-fade-in">
+              <div className="inline-flex items-center justify-center p-6 bg-card/80 backdrop-blur-sm rounded-3xl shadow-soft mb-12 animate-gentle-float">
                 <img 
                   src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
                   alt="BLOOM - Платформа поддержки женщин в период менопаузы" 
-                  className="h-12 w-auto"
+                  className="h-16 w-auto"
                 />
-                <Heart className="ml-3 h-6 w-6 text-primary" />
-              </div>
-              
-              {/* Trust Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted rounded-full text-sm text-muted-foreground">
-                Основано на рекомендациях ВОЗ • Одобрено врачами
+                <Heart className="ml-4 h-8 w-8 text-primary" />
               </div>
             </div>
             
             {/* Main Heading */}
-            <div className="mb-12 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <h1 className="mb-4 leading-tight">
+            <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <h1 className="mb-8 leading-tight text-foreground">
                 Мы поддерживаем{' '}
-                <span className="text-primary">женщин</span>
+                <span className="text-primary relative">
+                  женщин
+                  <div className="absolute -bottom-2 left-0 right-0 h-1 bg-primary/30 rounded-full"></div>
+                </span>
                 <br />
                 во всём мире
               </h1>
               
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-medium mb-12">
                 в заботе о своём здоровье, предоставляя персонализированные, 
                 научно обоснованные рекомендации для поддержки в период менопаузы
               </p>
+              
+              {/* Trust Badge */}
+              <div className="inline-flex items-center gap-3 px-6 py-3 trust-badge rounded-full text-sm font-medium shadow-sm">
+                <Shield className="h-5 w-5" />
+                Основано на рекомендациях ВОЗ • Одобрено врачами
+              </div>
             </div>
             
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <Link to="/register">
                 <Button 
                   size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-xl font-medium text-base btn-hover shadow-clean"
+                  className="btn-primary-enhanced text-primary-foreground px-10 py-5 rounded-2xl font-semibold text-lg group"
                 >
-                  Начать заботу о себе
+                  <Heart className="mr-3 h-6 w-6 group-hover:animate-pulse" />
+                  Хочу заботиться о себе
                 </Button>
               </Link>
               
-              <span className="text-muted-foreground text-sm">или</span>
+              <span className="text-muted-foreground text-base font-medium">или</span>
               
               <Link to="/about">
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="border border-border text-foreground hover:bg-accent px-8 py-4 rounded-xl font-medium text-base btn-hover"
+                  className="border-2 border-primary/30 text-foreground hover:bg-primary/5 hover:border-primary/50 px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-300"
                 >
-                  Узнать больше
+                  Познакомиться с платформой
                 </Button>
               </Link>
             </div>
