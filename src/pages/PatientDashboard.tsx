@@ -30,6 +30,9 @@ const PatientDashboard = () => {
       case 'symptoms':
         navigate('/patient/symptoms');
         break;
+      case 'cycle':
+        navigate('/patient/cycle');
+        break;
       case 'insights':
         navigate('/patient/insights');
         break;
@@ -212,6 +215,14 @@ const PatientDashboard = () => {
               >
                 <Plus className="h-6 w-6 text-primary" />
                 <span className="text-sm gentle-text">Записать симптом</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleQuickAction('cycle')}
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 gentle-border interactive-hover bg-gradient-to-b from-white to-pink-50"
+              >
+                <Calendar className="h-6 w-6 text-pink-600" />
+                <span className="text-sm gentle-text">Трекер цикла</span>
               </Button>
               <Button
                 variant="outline"
