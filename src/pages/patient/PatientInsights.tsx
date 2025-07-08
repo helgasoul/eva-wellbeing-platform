@@ -186,6 +186,11 @@ export default function PatientInsights() {
     });
   };
 
+  const getLastLabDate = () => {
+    const labResults = JSON.parse(localStorage.getItem(`lab_results_${user?.id}`) || '[]');
+    return labResults.length > 0 ? labResults[0].date : undefined;
+  };
+
   const handleLocationError = (error: string) => {
     toast({
       title: "Ошибка местоположения",
@@ -282,6 +287,18 @@ export default function PatientInsights() {
 
             {/* Health Score Dashboard */}
             <HealthScoreDashboard score={healthScore} />
+            
+            {/* Lab Recommendation Widget */}
+            {(() => {
+              const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${user?.id}`) || '[]');
+              const recentSymptoms = symptomEntries.slice(-7); // Последние 7 записей
+              return symptomEntries.length > 5 ? (
+                <LabRecommendationWidget 
+                  symptoms={recentSymptoms}
+                  lastLabDate={getLastLabDate()}
+                />
+              ) : null;
+            })()}
             
             {/* Экологические факторы */}
             {userLocation && (
