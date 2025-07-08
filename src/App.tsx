@@ -16,6 +16,7 @@ import PatientDashboard from "./pages/PatientDashboard";
 import PatientOnboarding from "./pages/patient/PatientOnboarding";
 import SymptomTracker from "./pages/patient/SymptomTracker";
 import AIChat from "./pages/patient/AIChat";
+import PatientInsights from "./pages/patient/PatientInsights";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -60,6 +61,13 @@ const App = () => (
             <Route path="/patient/ai-chat" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
                 <AIChat />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient insights route */}
+            <Route path="/patient/insights" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <PatientInsights />
               </ProtectedRoute>
             } />
             

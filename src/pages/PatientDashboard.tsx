@@ -13,7 +13,8 @@ import {
   Heart,
   FileText,
   Users,
-  Plus
+  Plus,
+  Brain
 } from 'lucide-react';
 
 const PatientDashboard = () => {
@@ -27,6 +28,9 @@ const PatientDashboard = () => {
     switch (action) {
       case 'symptoms':
         navigate('/patient/symptoms');
+        break;
+      case 'insights':
+        navigate('/patient/insights');
         break;
       case 'ai-chat':
         navigate('/patient/ai-chat');
@@ -196,7 +200,7 @@ const PatientDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('symptoms')}
@@ -204,6 +208,14 @@ const PatientDashboard = () => {
               >
                 <Plus className="h-6 w-6 text-primary" />
                 <span className="text-sm gentle-text">Записать симптом</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleQuickAction('insights')}
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 gentle-border interactive-hover bg-gradient-to-b from-white to-purple-50"
+              >
+                <Brain className="h-6 w-6 text-purple-600" />
+                <span className="text-sm gentle-text">Мои инсайты</span>
               </Button>
               <Button
                 variant="outline"

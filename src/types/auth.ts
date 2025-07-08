@@ -15,6 +15,7 @@ export interface User {
   lastName: string;
   avatar?: string;
   createdAt: Date;
+  onboardingData?: any;
 }
 
 export interface LoginCredentials {

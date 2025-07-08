@@ -19,7 +19,8 @@ import {
   Shield,
   AlertTriangle,
   Database,
-  FileX
+  FileX,
+  Brain
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,8 +45,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
         return [
           { name: 'Главная', href: '/patient/dashboard', icon: Home },
           { name: 'Мои симптомы', href: '/patient/symptoms', icon: Activity },
-          { name: 'Мои документы', href: '/patient/documents', icon: FileText },
+          { name: 'Мои инсайты', href: '/patient/insights', icon: Brain },
           { name: 'ИИ-помощник', href: '/patient/ai-chat', icon: MessageSquare, badge: 2 },
+          { name: 'Мои документы', href: '/patient/documents', icon: FileText },
           { name: 'Сообщество', href: '/patient/community', icon: Users },
           { name: 'Календарь здоровья', href: '/patient/calendar', icon: Calendar },
           { name: 'Настройки', href: '/patient/settings', icon: Settings },
