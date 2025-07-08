@@ -17,18 +17,16 @@ export const Header = () => {
   ];
 
   return (
-    <header className="bg-background/98 backdrop-blur-md border-b border-border/60 sticky top-0 z-50 shadow-elegant">
+    <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-50 shadow-elegant">
       <div className="container mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Логотип */}
-          <Link to="/" className="flex items-center group">
-            <div className="logo-hover">
-              <img 
-                src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
-                alt="BLOOM - Платформа поддержки женщин" 
-                className="h-12 w-auto"
-              />
-            </div>
+          <Link to="/" className="flex items-center group hover:scale-105 transition-transform duration-200">
+            <img 
+              src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
+              alt="BLOOM - Платформа поддержки женщин" 
+              className="h-12 w-auto"
+            />
           </Link>
 
           {/* Навигация для десктопа */}
@@ -37,9 +35,9 @@ export const Header = () => {
               <div key={item.path} className="relative flex items-center">
                 <Link
                   to={item.path}
-                  className={`nav-link text-sm font-medium tracking-wide transition-all duration-200 ${
+                  className={`text-sm font-medium tracking-wide transition-all duration-200 relative pb-2 ${
                     isActive(item.path) 
-                      ? 'text-primary active' 
+                      ? 'text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full' 
                       : 'text-foreground/80 hover:text-primary'
                   }`}
                 >

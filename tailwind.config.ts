@@ -53,6 +53,10 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				trust: {
+					DEFAULT: 'hsl(var(--trust))',
+					foreground: 'hsl(var(--trust-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -62,22 +66,6 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-				// Enhanced bloom brand colors - warm cream tones for women 45-65
-				bloom: {
-					'golden': '#C89A6A', // Primary warm golden tone
-					'warm-cream': '#F8F5F0', // Soft background
-					'soft-peach': '#EED5C7', // Gentle accent
-					'vanilla': '#FAF5F0', // Light neutral
-					'cream': '#FFFEF7', // Lightest background
-					'caramel': '#B8855C', // Deeper golden tone
-					'blush': '#E6A888', // Warm blush
-					'pearl': '#F8F0E7', // Pearl white
-					'taupe': '#877168', // Medium contrast text
-					'warm-brown': '#4E3834', // High contrast text - deep warm brown
-					'soft-coral': '#E6B8A2', // Soft coral accent
-					'dusty-rose': '#D4A89B', // Muted rose
-					'sage-green': '#A8B5A0' // Calming sage (optional accent)
 				}
 			},
 			fontSize: {
