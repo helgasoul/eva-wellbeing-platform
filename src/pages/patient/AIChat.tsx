@@ -87,6 +87,9 @@ const AIChat: React.FC = () => {
     setInputMessage('');
     setIsLoading(true);
 
+    console.log('Отправляем сообщение:', inputMessage);
+    console.log('User ID:', user.id);
+
     try {
       const response = await chatService.sendMessage(
         user.id, 
