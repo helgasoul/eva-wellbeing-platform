@@ -6,43 +6,43 @@
 
 @layer base {
   :root {
-    /* Warm, trustworthy palette for women's health */
-    --background: 0 0% 98%;
-    --foreground: 215 20% 15%;
+    /* Нежная палитра для женского здоровья */
+    --background: 0 0% 100%;
+    --foreground: 345 15% 25%;
     
-    /* Primary - Calming blue from reference */
-    --primary: 224 76% 68%;
+    /* Primary - нежный персиковый/розовый */
+    --primary: 15 80% 75%;
     --primary-foreground: 0 0% 100%;
     
-    /* Warm secondary colors */
-    --secondary: 30 100% 96%;
-    --secondary-foreground: 215 20% 15%;
+    /* Теплые вторичные цвета */
+    --secondary: 25 100% 97%;
+    --secondary-foreground: 345 15% 25%;
     
-    /* Muted warm tones */
-    --muted: 30 40% 95%;
-    --muted-foreground: 215 15% 55%;
+    /* Мягкие приглушенные тона */
+    --muted: 25 40% 96%;
+    --muted-foreground: 345 10% 55%;
     
-    /* UI elements */
-    --border: 30 25% 88%;
-    --input: 30 30% 95%;
-    --ring: 224 76% 68%;
+    /* UI элементы */
+    --border: 25 25% 90%;
+    --input: 25 30% 96%;
+    --ring: 15 80% 75%;
     
-    /* Cards and surfaces */
+    /* Карточки и поверхности */
     --card: 0 0% 100%;
-    --card-foreground: 215 20% 15%;
+    --card-foreground: 345 15% 25%;
     
-    /* Accent colors */
-    --accent: 30 60% 94%;
-    --accent-foreground: 215 20% 15%;
+    /* Акцентные цвета */
+    --accent: 25 60% 95%;
+    --accent-foreground: 345 15% 25%;
     
-    /* Trust badge */
-    --trust: 140 40% 88%;
-    --trust-foreground: 140 60% 25%;
+    /* Доверительный бадж */
+    --trust: 140 40% 90%;
+    --trust-foreground: 140 60% 30%;
     
-    /* Destructive */
-    --destructive: 0 75% 55%;
+    /* Деструктивный */
+    --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --radius: 1rem;
   }
 }
