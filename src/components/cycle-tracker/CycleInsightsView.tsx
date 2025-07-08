@@ -1,20 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Brain, 
-  Lightbulb, 
-  Target, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle,
-  Calendar,
-  Activity,
-  Apple
-} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
+// Types and interfaces
 interface CycleAnalysis {
   current_cycle: {
     start_date: string;
@@ -60,6 +49,48 @@ interface ActivityCorrelation {
   recommendations: string[];
 }
 
+interface CycleInsight {
+  id: string;
+  type: 'pattern' | 'correlation' | 'prediction' | 'warning' | 'recommendation';
+  priority: 'high' | 'medium' | 'low';
+  confidence: number;
+  title: string;
+  description: string;
+  icon: string;
+  based_on: string[];
+  actionable: boolean;
+  actions?: string[];
+}
+
+interface CyclePrediction {
+  id: string;
+  title: string;
+  description: string;
+  timeframe: 'next_cycle' | 'next_month' | 'next_quarter';
+  timeframe_label: string;
+  probability: number;
+  influencing_factors: {
+    name: string;
+    impact: number;
+  }[];
+}
+
+interface PersonalPattern {
+  id: string;
+  name: string;
+  description: string;
+  frequency: string;
+  icon: string;
+}
+
+interface OptimizationSuggestion {
+  category: string;
+  title: string;
+  icon: string;
+  suggestions: string[];
+  expected_impact?: string;
+}
+
 interface CycleInsightsViewProps {
   cycleAnalysis: CycleAnalysis | null;
   correlations: {
@@ -68,365 +99,486 @@ interface CycleInsightsViewProps {
   };
 }
 
+// Helper functions
+const analyzeCycleInsights = async (
+  cycleAnalysis: CycleAnalysis | null,
+  correlations: { nutrition: NutritionCorrelation[]; activity: ActivityCorrelation[] }
+): Promise<{ insights: CycleInsight[]; predictions: CyclePrediction[] }> => {
+  if (!cycleAnalysis) {
+    return { insights: [], predictions: [] };
+  }
+
+  const insights: CycleInsight[] = [];
+  const predictions: CyclePrediction[] = [];
+
+  // Generate insights based on cycle regularity
+  if (cycleAnalysis.cycle_history.irregularity_score > 30) {
+    insights.push({
+      id: 'irregularity_warning',
+      type: 'warning',
+      priority: 'high',
+      confidence: 85,
+      title: 'Высокая нерегулярность цикла',
+      description: 'Ваш цикл показывает значительные колебания в длительности, что может указывать на гормональный дисбаланс.',
+      icon: '⚠️',
+      based_on: ['История циклов', 'Анализ длительности'],
+      actionable: true,
+      actions: [
+        'Обратитесь к гинекологу-эндокринологу',
+        'Ведите более детальный дневник симптомов',
+        'Проанализируйте уровень стресса'
+      ]
+    });
+  }
+
+  // Generate insights based on nutrition correlations
+  correlations.nutrition.forEach(correlation => {
+    if (correlation.correlation_strength > 0.6) {
+      insights.push({
+        id: `nutrition_${correlation.nutrient}`,
+        type: 'correlation',
+        priority: 'medium',
+        confidence: Math.round(correlation.correlation_strength * 100),
+        title: `Влияние ${correlation.nutrient} на цикл`,
+        description: `${correlation.nutrient} показывает ${correlation.cycle_impact === 'positive' ? 'положительное' : 'отрицательное'} влияние на ваш менструальный цикл.`,
+        icon: correlation.cycle_impact === 'positive' ? '✅' : '⚠️',
+        based_on: ['Данные питания', 'Анализ симптомов'],
+        actionable: true,
+        actions: correlation.recommendations.slice(0, 2)
+      });
+    }
+  });
+
+  // Generate predictions
+  if (cycleAnalysis.current_cycle.confidence > 70) {
+    predictions.push({
+      id: 'next_cycle_prediction',
+      title: 'Следующая менструация',
+      description: 'На основе анализа ваших данных прогнозируем дату начала следующего цикла.',
+      timeframe: 'next_cycle',
+      timeframe_label: 'Следующий цикл',
+      probability: cycleAnalysis.current_cycle.confidence,
+      influencing_factors: [
+        { name: 'Регулярность', impact: 0.4 },
+        { name: 'Текущая фаза', impact: 0.3 },
+        { name: 'Стресс', impact: -0.2 }
+      ]
+    });
+  }
+
+  return { insights, predictions };
+};
+
+const identifyPersonalPatterns = (
+  cycleAnalysis: CycleAnalysis | null,
+  correlations: { nutrition: NutritionCorrelation[]; activity: ActivityCorrelation[] }
+): PersonalPattern[] => {
+  if (!cycleAnalysis) return [];
+
+  const patterns: PersonalPattern[] = [];
+
+  // Pattern based on cycle trend
+  if (cycleAnalysis.cycle_history.trend !== 'stable') {
+    patterns.push({
+      id: 'cycle_trend',
+      name: `Тенденция к ${cycleAnalysis.cycle_history.trend === 'lengthening' ? 'удлинению' : 'укорочению'} циклов`,
+      description: `Ваши циклы показывают устойчивую тенденцию к ${cycleAnalysis.cycle_history.trend === 'lengthening' ? 'увеличению' : 'уменьшению'} продолжительности.`,
+      frequency: 'Последние 3 месяца',
+      icon: cycleAnalysis.cycle_history.trend === 'lengthening' ? '📈' : '📉'
+    });
+  }
+
+  // Pattern based on perimenopause stage
+  if (cycleAnalysis.perimenopause_indicators.probable_stage !== 'premenopause') {
+    patterns.push({
+      id: 'perimenopause_pattern',
+      name: 'Перименопаузальные изменения',
+      description: 'Ваши данные указывают на характерные изменения, связанные с перименопаузой.',
+      frequency: 'Развивающийся паттерн',
+      icon: '🌸'
+    });
+  }
+
+  return patterns;
+};
+
+const generateOptimizationSuggestions = (
+  insights: CycleInsight[],
+  correlations: { nutrition: NutritionCorrelation[]; activity: ActivityCorrelation[] }
+): OptimizationSuggestion[] => {
+  const optimizations: OptimizationSuggestion[] = [];
+
+  // Nutrition optimization
+  const nutritionSuggestions = correlations.nutrition
+    .filter(n => n.cycle_impact === 'positive')
+    .flatMap(n => n.recommendations)
+    .slice(0, 3);
+
+  if (nutritionSuggestions.length > 0) {
+    optimizations.push({
+      category: 'nutrition',
+      title: 'Оптимизация питания',
+      icon: '🍎',
+      suggestions: nutritionSuggestions,
+      expected_impact: 'Улучшение регулярности цикла на 15-20%'
+    });
+  }
+
+  // Activity optimization
+  const activitySuggestions = correlations.activity
+    .flatMap(a => a.recommendations)
+    .slice(0, 3);
+
+  if (activitySuggestions.length > 0) {
+    optimizations.push({
+      category: 'activity',
+      title: 'Физическая активность',
+      icon: '🏃‍♀️',
+      suggestions: activitySuggestions,
+      expected_impact: 'Снижение симптомов на 25-30%'
+    });
+  }
+
+  // Lifestyle optimization
+  optimizations.push({
+    category: 'lifestyle',
+    title: 'Образ жизни',
+    icon: '🧘‍♀️',
+    suggestions: [
+      'Регулярный сон 7-8 часов',
+      'Практика управления стрессом',
+      'Ведение дневника симптомов'
+    ],
+    expected_impact: 'Общее улучшение самочувствия'
+  });
+
+  return optimizations;
+};
+
 export const CycleInsightsView: React.FC<CycleInsightsViewProps> = ({
   cycleAnalysis,
   correlations
 }) => {
-  const [activeTab, setActiveTab] = useState('personal');
+  const [insights, setInsights] = useState<CycleInsight[]>([]);
+  const [predictions, setPredictions] = useState<CyclePrediction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!cycleAnalysis) {
-    return (
-      <Card className="bg-white/90 backdrop-blur-sm">
-        <CardContent className="p-12 text-center">
-          <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-600 mb-2">ИИ-анализ недоступен</h3>
-          <p className="text-sm text-gray-500">Добавьте больше данных для получения персональных инсайтов</p>
-        </CardContent>
-      </Card>
-    );
+  useEffect(() => {
+    generateCycleInsights();
+  }, [cycleAnalysis, correlations]);
+
+  const generateCycleInsights = async () => {
+    setIsLoading(true);
+    try {
+      const generatedInsights = await analyzeCycleInsights(cycleAnalysis, correlations);
+      setInsights(generatedInsights.insights);
+      setPredictions(generatedInsights.predictions);
+    } catch (error) {
+      console.error('Ошибка генерации инсайтов:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <CycleInsightsLoading />;
   }
 
-  // Генерируем персональные инсайты
-  const personalInsights = generatePersonalInsights(cycleAnalysis, correlations);
-  const nutritionInsights = generateNutritionInsights(correlations.nutrition);
-  const activityInsights = generateActivityInsights(correlations.activity);
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Brain className="h-8 w-8 text-purple-600" />
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">ИИ-инсайты</h2>
-          <p className="text-gray-600">Персональные рекомендации на основе ваших данных</p>
-        </div>
-      </div>
+    <div className="space-y-8">
+      
+      {/* Заголовок */}
+      <Card className="bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+            🧠 ИИ-инсайты вашего цикла
+          </CardTitle>
+          <p className="text-gray-600">
+            Искусственный интеллект анализирует ваши данные и выявляет скрытые закономерности
+          </p>
+        </CardHeader>
+      </Card>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="personal" className="gap-2">
-            <Brain className="h-4 w-4" />
-            Персональные
-          </TabsTrigger>
-          <TabsTrigger value="nutrition" className="gap-2">
-            <Apple className="h-4 w-4" />
-            Питание
-          </TabsTrigger>
-          <TabsTrigger value="activity" className="gap-2">
-            <Activity className="h-4 w-4" />
-            Активность
-          </TabsTrigger>
-        </TabsList>
+      {/* Ключевые открытия */}
+      <Card className="bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+            🔍 Ключевые открытия
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {insights.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-6xl mb-4">🔬</div>
+              <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                Накапливаем данные для анализа
+              </h4>
+              <p className="text-gray-600">
+                Ведите дневник еще несколько недель для получения глубоких инсайтов
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {insights.slice(0, 4).map(insight => (
+                <InsightCard key={insight.id} insight={insight} />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        <TabsContent value="personal" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {personalInsights.map((insight, index) => (
-              <InsightCard key={index} insight={insight} />
-            ))}
-          </div>
-        </TabsContent>
+      {/* Предсказания */}
+      <Card className="bg-white/90 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+            🔮 Прогнозы и предсказания
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {predictions.length === 0 ? (
+            <div className="text-center py-6">
+              <div className="text-4xl mb-2">🔮</div>
+              <p className="text-gray-600">
+                Прогнозы появятся после накопления достаточного количества данных
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {predictions.map(prediction => (
+                <PredictionCard key={prediction.id} prediction={prediction} />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        <TabsContent value="nutrition" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {nutritionInsights.map((insight, index) => (
-              <InsightCard key={index} insight={insight} />
-            ))}
-          </div>
-        </TabsContent>
+      {/* Персональные паттерны */}
+      <PersonalPatterns cycleAnalysis={cycleAnalysis} correlations={correlations} />
 
-        <TabsContent value="activity" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {activityInsights.map((insight, index) => (
-              <InsightCard key={index} insight={insight} />
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+      {/* Рекомендации по оптимизации */}
+      <OptimizationRecommendations insights={insights} correlations={correlations} />
     </div>
   );
 };
 
-interface Insight {
-  type: 'success' | 'warning' | 'info' | 'tip';
-  title: string;
-  description: string;
-  actionable: boolean;
-  recommendations: string[];
-  priority: 'high' | 'medium' | 'low';
-}
-
-interface InsightCardProps {
-  insight: Insight;
-}
-
-const InsightCard: React.FC<InsightCardProps> = ({ insight }) => {
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'success': return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
-      case 'info': return <TrendingUp className="h-5 w-5 text-blue-600" />;
-      case 'tip': return <Lightbulb className="h-5 w-5 text-purple-600" />;
-    }
-  };
-
-  const getCardColor = (type: string) => {
-    switch (type) {
-      case 'success': return 'border-green-200 bg-green-50';
-      case 'warning': return 'border-yellow-200 bg-yellow-50';
-      case 'info': return 'border-blue-200 bg-blue-50';
-      case 'tip': return 'border-purple-200 bg-purple-50';
-    }
-  };
-
+// Карточка инсайта
+const InsightCard: React.FC<{ insight: CycleInsight }> = ({ insight }) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
+      case 'high': return 'border-red-300 bg-red-50';
+      case 'medium': return 'border-yellow-300 bg-yellow-50';
+      case 'low': return 'border-green-300 bg-green-50';
+      default: return 'border-gray-300 bg-gray-50';
+    }
+  };
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 80) return 'text-green-600';
+    if (confidence >= 60) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  return (
+    <div className={cn("border-2 rounded-xl p-4 hover:shadow-md transition-shadow", getPriorityColor(insight.priority))}>
+      
+      {/* Заголовок с уверенностью */}
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex items-center">
+          <span className="text-2xl mr-2">{insight.icon}</span>
+          <h4 className="font-semibold text-gray-800">{insight.title}</h4>
+        </div>
+        <div className="text-right">
+          <div className={cn("text-sm font-medium", getConfidenceColor(insight.confidence))}>
+            {insight.confidence}%
+          </div>
+          <div className="text-xs text-gray-500">уверенность</div>
+        </div>
+      </div>
+
+      {/* Описание */}
+      <p className="text-sm text-gray-700 mb-4">{insight.description}</p>
+
+      {/* Данные, на которых основан инсайт */}
+      <div className="bg-white rounded-lg p-3 mb-3">
+        <div className="text-xs text-gray-600 mb-1">Основано на:</div>
+        <div className="flex flex-wrap gap-1">
+          {insight.based_on.map(source => (
+            <span key={source} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+              {source}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Действия */}
+      {insight.actionable && insight.actions && (
+        <div className="space-y-1">
+          <div className="text-xs font-medium text-gray-700">Что делать:</div>
+          {insight.actions.slice(0, 2).map((action, index) => (
+            <div key={index} className="flex items-start text-xs text-gray-600">
+              <span className="text-purple-500 mr-1">•</span>
+              {action}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Карточка предсказания
+const PredictionCard: React.FC<{ prediction: CyclePrediction }> = ({ prediction }) => {
+  const getTimeframeColor = (timeframe: string) => {
+    switch (timeframe) {
+      case 'next_cycle': return 'bg-blue-50 border-blue-300';
+      case 'next_month': return 'bg-purple-50 border-purple-300';
+      case 'next_quarter': return 'bg-green-50 border-green-300';
+      default: return 'bg-gray-50 border-gray-300';
     }
   };
 
   return (
-    <Card className={`${getCardColor(insight.type)} transition-all hover:shadow-md`}>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            {getIcon(insight.type)}
-            <CardTitle className="text-lg">{insight.title}</CardTitle>
-          </div>
-          <Badge className={`text-xs ${getPriorityColor(insight.priority)}`}>
-            {insight.priority === 'high' ? 'Высокий' :
-             insight.priority === 'medium' ? 'Средний' : 'Низкий'}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-gray-700">{insight.description}</p>
-        
-        {insight.recommendations.length > 0 && (
+    <div className={cn("border-2 rounded-xl p-4", getTimeframeColor(prediction.timeframe))}>
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center">
+          <span className="text-2xl mr-3">🔮</span>
           <div>
-            <h4 className="font-medium text-gray-800 mb-2">Рекомендации:</h4>
-            <div className="space-y-1">
-              {insight.recommendations.map((rec, index) => (
-                <div key={index} className="flex items-start gap-2 text-sm">
-                  <Target className="h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">{rec}</span>
-                </div>
-              ))}
-            </div>
+            <h4 className="font-semibold text-gray-800">{prediction.title}</h4>
+            <div className="text-sm text-gray-600">{prediction.timeframe_label}</div>
           </div>
-        )}
-        
-        {insight.actionable && (
-          <Button size="sm" variant="outline" className="w-full">
-            Применить рекомендации
-          </Button>
+        </div>
+        <div className="text-right">
+          <div className="text-lg font-bold text-gray-800">{prediction.probability}%</div>
+          <div className="text-xs text-gray-500">вероятность</div>
+        </div>
+      </div>
+
+      <p className="text-sm text-gray-700 mb-3">{prediction.description}</p>
+
+      {/* Факторы влияния */}
+      <div className="bg-white rounded-lg p-3">
+        <div className="text-xs font-medium text-gray-700 mb-2">Влияющие факторы:</div>
+        <div className="space-y-1">
+          {prediction.influencing_factors.map((factor, index) => (
+            <div key={index} className="flex justify-between items-center text-xs">
+              <span className="text-gray-600">{factor.name}</span>
+              <span className={cn(
+                "font-medium",
+                factor.impact > 0 ? "text-red-600" : "text-green-600"
+              )}>
+                {factor.impact > 0 ? '+' : ''}{Math.round(factor.impact * 100)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Персональные паттерны
+const PersonalPatterns: React.FC<{
+  cycleAnalysis: CycleAnalysis | null;
+  correlations: { nutrition: NutritionCorrelation[]; activity: ActivityCorrelation[] };
+}> = ({ cycleAnalysis, correlations }) => {
+  const patterns = identifyPersonalPatterns(cycleAnalysis, correlations);
+
+  return (
+    <Card className="bg-white/90 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+          🎨 Ваши уникальные паттерны
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {patterns.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="text-4xl mb-2">🎨</div>
+            <p className="text-gray-600">Паттерны будут выявлены по мере накопления данных</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {patterns.map(pattern => (
+              <div key={pattern.id} className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+                <div className="flex items-center mb-2">
+                  <span className="text-lg mr-2">{pattern.icon}</span>
+                  <h4 className="font-medium text-gray-800">{pattern.name}</h4>
+                </div>
+                <p className="text-sm text-gray-700 mb-2">{pattern.description}</p>
+                <div className="text-xs text-purple-700">
+                  <strong>Частота:</strong> {pattern.frequency}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </CardContent>
     </Card>
   );
 };
 
-const generatePersonalInsights = (
-  analysis: CycleAnalysis,
-  correlations: { nutrition: NutritionCorrelation[]; activity: ActivityCorrelation[] }
-): Insight[] => {
-  const insights: Insight[] = [];
+// Рекомендации по оптимизации
+const OptimizationRecommendations: React.FC<{
+  insights: CycleInsight[];
+  correlations: { nutrition: NutritionCorrelation[]; activity: ActivityCorrelation[] };
+}> = ({ insights, correlations }) => {
+  const optimizations = generateOptimizationSuggestions(insights, correlations);
 
-  // Анализ регулярности цикла
-  if (analysis.cycle_history.irregularity_score < 15) {
-    insights.push({
-      type: 'success',
-      title: 'Отличная регулярность цикла',
-      description: `Ваш цикл очень стабильный с нерегулярностью всего ${analysis.cycle_history.irregularity_score}%. Это отличный показатель гормонального здоровья.`,
-      actionable: false,
-      recommendations: [
-        'Продолжайте вести здоровый образ жизни',
-        'Поддерживайте регулярное питание и сон',
-        'Регулярно отслеживайте изменения'
-      ],
-      priority: 'low'
-    });
-  } else if (analysis.cycle_history.irregularity_score > 30) {
-    insights.push({
-      type: 'warning',
-      title: 'Высокая нерегулярность цикла',
-      description: `Нерегулярность ${analysis.cycle_history.irregularity_score}% может указывать на гормональный дисбаланс или другие факторы.`,
-      actionable: true,
-      recommendations: [
-        'Обратитесь к гинекологу-эндокринологу',
-        'Проверьте уровень гормонов',
-        'Оцените уровень стресса и образ жизни',
-        'Рассмотрите влияние питания и веса'
-      ],
-      priority: 'high'
-    });
-  }
+  return (
+    <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200">
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+          ⚡ Как оптимизировать ваш цикл
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {optimizations.map(optimization => (
+            <div key={optimization.category} className="bg-white rounded-lg p-4">
+              <div className="flex items-center mb-3">
+                <span className="text-2xl mr-2">{optimization.icon}</span>
+                <h4 className="font-semibold text-gray-800">{optimization.title}</h4>
+              </div>
+              
+              <div className="space-y-2">
+                {optimization.suggestions.map((suggestion, index) => (
+                  <div key={index} className="flex items-start text-sm text-gray-700">
+                    <span className="text-blue-500 mr-2">•</span>
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
 
-  // Анализ фазы и точности
-  if (analysis.current_cycle.confidence < 60) {
-    insights.push({
-      type: 'info',
-      title: 'Низкая точность прогноза',
-      description: `Точность прогноза ${analysis.current_cycle.confidence}% из-за недостатка данных или нерегулярности.`,
-      actionable: true,
-      recommendations: [
-        'Ведите более подробные записи',
-        'Отмечайте дополнительные симптомы',
-        'Записывайте факторы стресса и изменения',
-        'Используйте базальную температуру для точности'
-      ],
-      priority: 'medium'
-    });
-  }
-
-  // Анализ перименопаузы
-  if (analysis.perimenopause_indicators.probable_stage.includes('perimenopause')) {
-    insights.push({
-      type: 'info',
-      title: 'Признаки перименопаузы',
-      description: 'Ваши данные указывают на возможное начало перименопаузального периода.',
-      actionable: true,
-      recommendations: [
-        'Консультация с гинекологом-эндокринологом',
-        'Анализы на гормональный статус',
-        'Рассмотрите поддерживающую терапию',
-        'Уделите внимание питанию и витаминам'
-      ],
-      priority: 'high'
-    });
-  }
-
-  // Анализ тренда
-  if (analysis.cycle_history.trend === 'lengthening') {
-    insights.push({
-      type: 'warning',
-      title: 'Удлинение циклов',
-      description: 'Ваши циклы становятся длиннее. Это может быть признаком гормональных изменений.',
-      actionable: true,
-      recommendations: [
-        'Проверьте функцию щитовидной железы',
-        'Оцените уровень стресса',
-        'Обратите внимание на изменения веса',
-        'Обсудите с врачом гормональную коррекцию'
-      ],
-      priority: 'medium'
-    });
-  }
-
-  return insights;
-};
-
-const generateNutritionInsights = (nutritionCorrelations: NutritionCorrelation[]): Insight[] => {
-  const insights: Insight[] = [];
-
-  // Находим лучшие корреляции
-  const strongPositive = nutritionCorrelations.filter(
-    c => c.cycle_impact === 'positive' && c.correlation_strength > 0.6
+              {optimization.expected_impact && (
+                <div className="mt-3 p-2 bg-blue-50 rounded">
+                  <div className="text-xs text-blue-700">
+                    <strong>Ожидаемый эффект:</strong> {optimization.expected_impact}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
-
-  if (strongPositive.length > 0) {
-    insights.push({
-      type: 'success',
-      title: 'Полезные питательные вещества',
-      description: `${strongPositive.map(c => c.nutrient).join(', ')} показывают сильное положительное влияние на ваш цикл.`,
-      actionable: true,
-      recommendations: strongPositive.flatMap(c => c.recommendations.slice(0, 2)),
-      priority: 'medium'
-    });
-  }
-
-  // Дефициты
-  const deficient = nutritionCorrelations.filter(
-    c => c.current_intake !== undefined && c.current_intake < parseFloat(c.optimal_range.split('-')[0])
-  );
-
-  if (deficient.length > 0) {
-    insights.push({
-      type: 'warning',
-      title: 'Недостаток питательных веществ',
-      description: `Недостаточное потребление: ${deficient.map(c => c.nutrient).join(', ')}.`,
-      actionable: true,
-      recommendations: [
-        'Увеличьте потребление указанных нутриентов',
-        'Рассмотрите прием добавок',
-        'Проконсультируйтесь с нутрициологом',
-        'Скорректируйте рацион питания'
-      ],
-      priority: 'high'
-    });
-  }
-
-  // Общие рекомендации
-  insights.push({
-    type: 'tip',
-    title: 'Оптимизация питания для цикла',
-    description: 'Сбалансированное питание может значительно улучшить регулярность и симптомы цикла.',
-    actionable: true,
-    recommendations: [
-      'Ешьте регулярно, избегайте длительных перерывов',
-      'Включайте полезные жиры (омега-3)',
-      'Ограничьте кофеин во второй половине цикла',
-      'Увеличьте потребление клетчатки'
-    ],
-    priority: 'medium'
-  });
-
-  return insights;
 };
 
-const generateActivityInsights = (activityCorrelations: ActivityCorrelation[]): Insight[] => {
-  const insights: Insight[] = [];
-
-  // Лучшие виды активности
-  const bestForMood = activityCorrelations.sort((a, b) => b.symptom_impact.mood - a.symptom_impact.mood)[0];
-  const bestForCramps = activityCorrelations.sort((a, b) => a.symptom_impact.cramps - b.symptom_impact.cramps)[0];
-
-  if (bestForMood) {
-    insights.push({
-      type: 'success',
-      title: 'Лучший вид активности для настроения',
-      description: `${bestForMood.activity_type === 'yoga' ? 'Йога' : 
-                    bestForMood.activity_type === 'cardio' ? 'Кардио' :
-                    bestForMood.activity_type === 'walking' ? 'Ходьба' : 
-                    bestForMood.activity_type} показывает наилучшее влияние на ваше настроение.`,
-      actionable: true,
-      recommendations: bestForMood.recommendations,
-      priority: 'medium'
-    });
-  }
-
-  if (bestForCramps && bestForCramps.symptom_impact.cramps < -0.3) {
-    insights.push({
-      type: 'tip',
-      title: 'Эффективно против спазмов',
-      description: `${bestForCramps.activity_type === 'yoga' ? 'Йога' : 
-                    bestForCramps.activity_type === 'walking' ? 'Ходьба' : 
-                    bestForCramps.activity_type} эффективно снижает менструальные боли.`,
-      actionable: true,
-      recommendations: [
-        'Используйте этот вид активности при болях',
-        'Начинайте с легкой интенсивности',
-        'Регулярность важнее интенсивности',
-        'Прислушивайтесь к своему телу'
-      ],
-      priority: 'medium'
-    });
-  }
-
-  // Рекомендации по циклическому планированию
-  insights.push({
-    type: 'info',
-    title: 'Циклическое планирование тренировок',
-    description: 'Адаптируйте интенсивность тренировок под фазы цикла для максимальной эффективности.',
-    actionable: true,
-    recommendations: [
-      'Интенсивные тренировки в фолликулярную фазу',
-      'Йога и растяжка во время менструации',
-      'Силовые тренировки после овуляции',
-      'Легкие кардио в лютеиновую фазу'
-    ],
-    priority: 'low'
-  });
-
-  return insights;
-};
+// Состояние загрузки
+const CycleInsightsLoading: React.FC = () => (
+  <div className="space-y-6">
+    {[1, 2, 3].map((i) => (
+      <Card key={i} className="bg-white/90 backdrop-blur-sm">
+        <CardContent className="p-6">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="space-y-3">
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+);
