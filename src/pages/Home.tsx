@@ -46,15 +46,15 @@ const Home = () => {
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
             
-            {/* Logo Section */}
+            {/* Logo Section - обновленный типографический логотип */}
             <div className="mb-20 animate-fade-in">
               <div className="inline-flex items-center justify-center p-6 bg-card/80 backdrop-blur-sm rounded-3xl shadow-soft mb-12 animate-gentle-float">
-                <img 
-                  src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
-                  alt="BLOOM - Платформа поддержки женщин в период менопаузы" 
-                  className="h-16 w-auto"
-                />
-                <Heart className="ml-4 h-8 w-8 text-primary" />
+                <div className="flex items-center">
+                  <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
+                    BLOOM
+                  </h1>
+                  <Heart className="ml-4 h-8 w-8 text-primary" />
+                </div>
               </div>
             </div>
             
