@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 interface MenstrualEntry {
   id: string;
@@ -36,6 +37,26 @@ interface CycleAnalysis {
   };
 }
 
+interface DayData {
+  cycle?: MenstrualEntry;
+  symptoms?: any;
+  nutrition?: any;
+  activity?: any;
+}
+
+interface CalendarDay {
+  date: string;
+  day: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  data: DayData;
+  status: {
+    phase: string;
+    color: string;
+    icon: string;
+  };
+}
+
 interface CycleCalendarViewProps {
   entries: MenstrualEntry[];
   selectedDate: string;
@@ -51,120 +72,170 @@ export const CycleCalendarView: React.FC<CycleCalendarViewProps> = ({
   onAddEntry,
   cycleAnalysis
 }) => {
+  const { user } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  const getEntryForDate = (date: Date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return entries.find(entry => entry.date === dateStr);
+  // Функция для расчета дня цикла
+  const calculateDayOfCycle = (date: string, entries: MenstrualEntry[]): number | null => {
+    if (!cycleAnalysis?.current_cycle.start_date) return null;
+    
+    const startDate = new Date(cycleAnalysis.current_cycle.start_date);
+    const targetDate = new Date(date);
+    const diffTime = targetDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays > 0 ? diffDays : null;
   };
 
-  const getDateStyle = (date: Date) => {
-    const entry = getEntryForDate(date);
-    const dateStr = format(date, 'yyyy-MM-dd');
-    const isSelected = dateStr === selectedDate;
+  // Функция для получения названия фазы на русском
+  const getPhaseName = (phase: string): string => {
+    switch (phase) {
+      case 'menstrual': return 'Менструальная';
+      case 'follicular': return 'Фолликулярная';
+      case 'ovulatory': return 'Овуляторная';
+      case 'luteal': return 'Лютеиновая';
+      default: return 'Неопределена';
+    }
+  };
+
+  // Интеграция данных с других трекеров
+  const getDateData = (date: string): DayData => {
+    const cycleEntry = entries.find(e => e.date === date);
     
-    let baseClasses = 'relative w-full h-12 flex items-center justify-center rounded-lg text-sm font-medium transition-colors cursor-pointer ';
+    // Данные из трекера симптомов
+    const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${user?.id}`) || '[]');
+    const symptomEntry = symptomEntries.find((s: any) => s.date === date);
     
-    if (isSelected) {
-      baseClasses += 'ring-2 ring-pink-500 ';
+    // Данные питания
+    const nutritionEntries = JSON.parse(localStorage.getItem(`nutrition_entries_${user?.id}`) || '[]');
+    const nutritionEntry = nutritionEntries.find((n: any) => n.date === date);
+    
+    // Данные активности
+    const activityEntries = JSON.parse(localStorage.getItem(`activity_entries_${user?.id}`) || '[]');
+    const activityEntry = activityEntries.find((a: any) => a.date === date);
+    
+    return {
+      cycle: cycleEntry,
+      symptoms: symptomEntry,
+      nutrition: nutritionEntry,
+      activity: activityEntry
+    };
+  };
+
+  const getDayStatus = (date: string) => {
+    const data = getDateData(date);
+    const dayOfCycle = calculateDayOfCycle(date, entries);
+    
+    // Определяем фазу цикла
+    if (data.cycle?.type === 'menstruation') {
+      return { phase: 'menstrual', color: 'bg-red-100 border-red-400', icon: '🔴' };
     }
     
-    if (entry) {
-      switch (entry.type) {
-        case 'menstruation':
-          baseClasses += entry.flow === 'heavy' || entry.flow === 'very_heavy' 
-            ? 'bg-red-500 text-white ' 
-            : 'bg-red-300 text-white ';
-          break;
-        case 'spotting':
-          baseClasses += 'bg-pink-200 text-pink-800 ';
-          break;
-        case 'ovulation_predicted':
-          baseClasses += 'bg-purple-200 text-purple-800 ';
-          break;
-        case 'missed_expected':
-          baseClasses += 'bg-gray-200 text-gray-600 border-2 border-dashed border-gray-400 ';
-          break;
-      }
-    } else {
-      // Проверяем, попадает ли дата в предсказанную фазу цикла
-      if (cycleAnalysis && cycleAnalysis.current_cycle.phase) {
-        const cycleStart = parseISO(cycleAnalysis.current_cycle.start_date);
-        const dayOfCycle = Math.floor((date.getTime() - cycleStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-        
-        if (dayOfCycle > 0 && dayOfCycle <= cycleAnalysis.current_cycle.estimated_length) {
-          if (dayOfCycle <= 5) {
-            baseClasses += 'bg-red-50 ';
-          } else if (dayOfCycle <= 14) {
-            baseClasses += 'bg-green-50 ';
-          } else if (dayOfCycle <= 16) {
-            baseClasses += 'bg-purple-50 ';
-          } else {
-            baseClasses += 'bg-yellow-50 ';
-          }
-        }
-      }
+    if (dayOfCycle && cycleAnalysis?.current_cycle.estimated_length) {
+      const cycleLength = cycleAnalysis.current_cycle.estimated_length;
       
-      baseClasses += 'hover:bg-gray-100 ';
+      if (dayOfCycle <= 5) {
+        return { phase: 'menstrual', color: 'bg-red-50 border-red-200', icon: '🌑' };
+      } else if (dayOfCycle <= cycleLength / 2 - 3) {
+        return { phase: 'follicular', color: 'bg-green-50 border-green-200', icon: '🌱' };
+      } else if (dayOfCycle <= cycleLength / 2 + 3) {
+        return { phase: 'ovulatory', color: 'bg-yellow-50 border-yellow-200', icon: '🌕' };
+      } else {
+        return { phase: 'luteal', color: 'bg-purple-50 border-purple-200', icon: '🌘' };
+      }
     }
     
-    return baseClasses;
+    return { phase: 'unknown', color: 'bg-gray-50 border-gray-200', icon: '⚪' };
   };
 
-  const renderCalendarDay = (date: Date) => {
-    const entry = getEntryForDate(date);
-    const dayNum = format(date, 'd');
+  const generateCalendarDays = (): CalendarDay[] => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
     
-    return (
-      <div
-        className={getDateStyle(date)}
-        onClick={() => onDateSelect(format(date, 'yyyy-MM-dd'))}
-      >
-        <span>{dayNum}</span>
-        {entry && (
-          <div className="absolute -top-1 -right-1">
-            {entry.type === 'menstruation' && (
-              <div className="w-2 h-2 bg-red-600 rounded-full"></div>
-            )}
-            {entry.type === 'spotting' && (
-              <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-            )}
-            {entry.type === 'ovulation_predicted' && (
-              <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
-            )}
-          </div>
-        )}
-      </div>
-    );
+    const days: CalendarDay[] = [];
+    const currentDate = new Date(startDate);
+    
+    for (let week = 0; week < 6; week++) {
+      for (let day = 0; day < 7; day++) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const data = getDateData(dateStr);
+        const status = getDayStatus(dateStr);
+        const isCurrentMonth = currentDate.getMonth() === month;
+        const isToday = dateStr === new Date().toISOString().split('T')[0];
+        
+        days.push({
+          date: dateStr,
+          day: currentDate.getDate(),
+          isCurrentMonth,
+          isToday,
+          data,
+          status
+        });
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    }
+    
+    return days;
   };
 
-  const monthDays = eachDayOfInterval({
-    start: startOfMonth(currentMonth),
-    end: endOfMonth(currentMonth)
-  });
-
-  // Получаем первый день недели для выравнивания календаря
-  const firstDayOfMonth = startOfMonth(currentMonth);
-  const startDate = new Date(firstDayOfMonth);
-  startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay());
-
-  const calendarDays = eachDayOfInterval({
-    start: startDate,
-    end: new Date(startDate.getTime() + 41 * 24 * 60 * 60 * 1000) // 6 недель
-  });
-
-  const selectedEntry = entries.find(entry => entry.date === selectedDate);
+  const calendarDays = generateCalendarDays();
 
   return (
     <div className="space-y-6">
+      
+      {/* Текущий цикл - краткая информация */}
+      {cycleAnalysis?.current_cycle && (
+        <Card className="bg-white/90 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              📊 Текущий цикл
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">
+                  {cycleAnalysis.current_cycle.day_of_cycle}
+                </div>
+                <div className="text-sm text-gray-600">День цикла</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {cycleAnalysis.current_cycle.estimated_length}
+                </div>
+                <div className="text-sm text-gray-600">Ожидаемая длина</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-600">
+                  {getPhaseName(cycleAnalysis.current_cycle.phase)}
+                </div>
+                <div className="text-sm text-gray-600">Фаза</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-orange-600">
+                  {cycleAnalysis.current_cycle.confidence}%
+                </div>
+                <div className="text-sm text-gray-600">Уверенность</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Календарь */}
       <Card className="bg-white/90 backdrop-blur-sm">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl text-gray-800">
-              Календарь цикла
+          {/* Заголовок календаря */}
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-xl font-bold text-gray-800">
+              {format(currentMonth, 'LLLL yyyy', { locale: ru })}
             </CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex space-x-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -172,9 +243,13 @@ export const CycleCalendarView: React.FC<CycleCalendarViewProps> = ({
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-lg font-medium min-w-[200px] text-center">
-                {format(currentMonth, 'LLLL yyyy', { locale: ru })}
-              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentMonth(new Date())}
+              >
+                Сегодня
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -185,121 +260,145 @@ export const CycleCalendarView: React.FC<CycleCalendarViewProps> = ({
             </div>
           </div>
         </CardHeader>
+        
         <CardContent>
-          {/* Заголовки дней недели */}
+          {/* Дни недели */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'].map(day => (
-              <div key={day} className="h-8 flex items-center justify-center text-sm font-medium text-gray-500">
+            {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
+              <div key={day} className="p-2 text-center text-sm font-medium text-gray-600">
                 {day}
               </div>
             ))}
           </div>
-          
+
           {/* Дни календаря */}
           <div className="grid grid-cols-7 gap-1">
-            {calendarDays.map((date, index) => (
-              <div key={index}>
-                {renderCalendarDay(date)}
-              </div>
+            {calendarDays.map((day, index) => (
+              <DayCell
+                key={index}
+                day={day}
+                isSelected={day.date === selectedDate}
+                onClick={() => onDateSelect(day.date)}
+              />
             ))}
           </div>
-          
+
           {/* Легенда */}
           <div className="mt-6 pt-4 border-t border-gray-200">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Легенда:</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-red-400 rounded"></div>
-                <span>Менструация</span>
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Фазы цикла:</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-red-100 border border-red-400 rounded mr-2"></div>
+                <span>🔴 Менструация</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-pink-200 rounded"></div>
-                <span>Кровянистые выделения</span>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-green-100 border border-green-400 rounded mr-2"></div>
+                <span>🌱 Фолликулярная</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-purple-200 rounded"></div>
-                <span>Овуляция</span>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-yellow-100 border border-yellow-400 rounded mr-2"></div>
+                <span>🌕 Овуляторная</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-200 border-2 border-dashed border-gray-400 rounded"></div>
-                <span>Пропущенная</span>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-purple-100 border border-purple-400 rounded mr-2"></div>
+                <span>🌘 Лютеиновая</span>
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Индикаторы данных:</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                  <span>Цикл</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
+                  <span>Симптомы</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span>Питание</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                  <span>Активность</span>
+                </div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Детали выбранного дня */}
-      {selectedDate && (
-        <Card className="bg-white/90 backdrop-blur-sm">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">
-                {format(parseISO(selectedDate), 'dd MMMM yyyy', { locale: ru })}
-              </CardTitle>
-              <Button onClick={onAddEntry} size="sm" className="gap-2">
-                <Plus className="h-4 w-4" />
-                Добавить запись
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {selectedEntry ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Badge variant={selectedEntry.type === 'menstruation' ? 'destructive' : 'secondary'}>
-                    {selectedEntry.type === 'menstruation' ? '🩸 Менструация' :
-                     selectedEntry.type === 'spotting' ? '💧 Кровянистые выделения' :
-                     selectedEntry.type === 'ovulation_predicted' ? '🥚 Овуляция' :
-                     '❌ Пропущенная'}
-                  </Badge>
-                  {selectedEntry.flow && (
-                    <Badge variant="outline">
-                      {selectedEntry.flow === 'light' ? 'Слабые' :
-                       selectedEntry.flow === 'normal' ? 'Обычные' :
-                       selectedEntry.flow === 'heavy' ? 'Обильные' :
-                       'Очень обильные'}
-                    </Badge>
-                  )}
-                </div>
-                
-                {/* Симптомы */}
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-2">Симптомы:</h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    {selectedEntry.symptoms.cramping > 0 && (
-                      <div>Спазмы: {selectedEntry.symptoms.cramping}/5</div>
-                    )}
-                    {selectedEntry.symptoms.breast_tenderness > 0 && (
-                      <div>Болезненность груди: {selectedEntry.symptoms.breast_tenderness}/5</div>
-                    )}
-                    {selectedEntry.symptoms.bloating > 0 && (
-                      <div>Вздутие: {selectedEntry.symptoms.bloating}/5</div>
-                    )}
-                    {selectedEntry.symptoms.mood_changes > 0 && (
-                      <div>Настроение: {selectedEntry.symptoms.mood_changes}/5</div>
-                    )}
-                    {selectedEntry.symptoms.headache && <div>✓ Головная боль</div>}
-                    {selectedEntry.symptoms.back_pain && <div>✓ Боль в спине</div>}
-                  </div>
-                </div>
-                
-                {selectedEntry.notes && (
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Заметки:</h4>
-                    <p className="text-sm text-gray-600">{selectedEntry.notes}</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>Нет записей на эту дату</p>
-                <p className="text-sm mt-1">Нажмите "Добавить запись", чтобы начать отслеживание</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      {/* Кнопка добавления записи */}
+      <div className="text-center">
+        <Button
+          onClick={onAddEntry}
+          className="bg-pink-500 text-white hover:bg-pink-600 gap-2"
+          size="lg"
+        >
+          <Plus className="h-5 w-5" />
+          Отметить день цикла
+        </Button>
+      </div>
     </div>
+  );
+};
+
+// Компонент ячейки дня
+interface DayCellProps {
+  day: CalendarDay;
+  isSelected: boolean;
+  onClick: () => void;
+}
+
+const DayCell: React.FC<DayCellProps> = ({ day, isSelected, onClick }) => {
+  const hasSymptoms = day.data.symptoms?.hotFlashes?.count > 0 || 
+                     day.data.symptoms?.mood?.overall <= 2 ||
+                     day.data.symptoms?.severity > 3;
+  const hasNutrition = day.data.nutrition?.meals?.length > 0 ||
+                      day.data.nutrition?.totalCalories > 0;
+  const hasActivity = day.data.activity?.exercises?.length > 0 ||
+                     day.data.activity?.totalMinutes > 0;
+  
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "p-2 h-20 border-2 rounded-lg transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-pink-400",
+        day.status.color,
+        !day.isCurrentMonth && "opacity-50",
+        day.isToday && "ring-2 ring-blue-400",
+        isSelected && "ring-2 ring-purple-500"
+      )}
+    >
+      <div className="flex flex-col h-full">
+        {/* Номер дня */}
+        <div className="text-sm font-medium text-gray-800 mb-1">
+          {day.day}
+        </div>
+        
+        {/* Индикатор фазы */}
+        <div className="flex justify-center mb-1">
+          <span className="text-lg">{day.status.icon}</span>
+        </div>
+        
+        {/* Индикаторы данных */}
+        <div className="flex justify-center space-x-1 mt-auto">
+          {day.data.cycle && (
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+          )}
+          {hasSymptoms && (
+            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+          )}
+          {hasNutrition && (
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          )}
+          {hasActivity && (
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          )}
+        </div>
+      </div>
+    </button>
   );
 };
