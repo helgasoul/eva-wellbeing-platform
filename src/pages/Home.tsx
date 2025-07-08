@@ -76,9 +76,9 @@ const Home = () => {
               </p>
               
               {/* Trust Badge */}
-              <div className="inline-flex items-center gap-3 px-6 py-3 trust-badge rounded-full text-sm font-medium shadow-sm">
-                <Shield className="h-5 w-5" />
-                Основано на рекомендациях ВОЗ • Одобрено врачами
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-background border border-border rounded-full text-sm font-medium shadow-sm">
+                <Shield className="h-5 w-5 text-primary" />
+                <span className="text-primary font-semibold">Основано на рекомендациях ВОЗ • Одобрено врачами</span>
               </div>
             </div>
             
