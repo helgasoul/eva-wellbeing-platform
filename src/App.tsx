@@ -18,7 +18,7 @@ import SymptomTracker from "./pages/patient/SymptomTracker";
 import AIChat from "./pages/patient/AIChat";
 import PatientInsights from "./pages/patient/PatientInsights";
 import WearableDevices from "./pages/patient/WearableDevices";
-import DoctorBooking from "./pages/patient/DoctorBooking";
+
 import NutritionTracker from "./pages/patient/NutritionTracker";
 import Community from "./pages/patient/Community";
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -82,17 +82,27 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            {/* Patient doctor booking route */}
+            {/* Patient doctors route - placeholder */}
             <Route path="/patient/doctors" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <DoctorBooking />
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <h1 className="text-2xl font-bold mb-4">Врачи</h1>
+                    <p className="text-muted-foreground">Этот раздел будет доступен в следующих версиях</p>
+                  </div>
+                </div>
               </ProtectedRoute>
             } />
             
-            {/* Patient lab tests route */}
+            {/* Patient lab tests route - placeholder */}
             <Route path="/patient/lab-tests" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <LabTests />
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <h1 className="text-2xl font-bold mb-4">Лабораторные анализы</h1>
+                    <p className="text-muted-foreground">Этот раздел будет доступен в следующих версиях</p>
+                  </div>
+                </div>
               </ProtectedRoute>
             } />
             
