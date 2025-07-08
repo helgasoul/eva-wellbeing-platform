@@ -20,6 +20,7 @@ import PatientInsights from "./pages/patient/PatientInsights";
 import WearableDevices from "./pages/patient/WearableDevices";
 
 import NutritionTracker from "./pages/patient/NutritionTracker";
+import CycleTracker from "./pages/patient/CycleTracker";
 import Community from "./pages/patient/Community";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import MedicalCalculators from "./pages/doctor/MedicalCalculators";
@@ -111,6 +112,13 @@ const App = () => (
             <Route path="/patient/nutrition" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
                 <NutritionTracker />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient cycle tracker route */}
+            <Route path="/patient/cycle" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <CycleTracker />
               </ProtectedRoute>
             } />
             
