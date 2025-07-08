@@ -50,7 +50,7 @@ const Home = () => {
             {/* Main Heading */}
             <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               {/* Decorative Icon */}
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center mb-6 mt-12">
                 <div className="inline-flex p-4 bg-primary/10 rounded-full">
                   <Sparkles className="h-8 w-8 text-primary" />
                 </div>
