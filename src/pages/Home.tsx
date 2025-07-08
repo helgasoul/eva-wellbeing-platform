@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Users, Shield, CheckCircle, Book } from 'lucide-react';
+import { ArrowRight, Heart, Users, Shield, CheckCircle, Book, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Home = () => {
@@ -49,6 +49,12 @@ const Home = () => {
             
             {/* Main Heading */}
             <div className="mb-16 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              {/* Decorative Icon */}
+              <div className="flex justify-center mb-6">
+                <div className="inline-flex p-4 bg-primary/10 rounded-full">
+                  <Sparkles className="h-8 w-8 text-primary" />
+                </div>
+              </div>
               <h1 className="mb-8 leading-tight text-foreground">
                 Мы поддерживаем{' '}
                 <span className="text-primary relative">
