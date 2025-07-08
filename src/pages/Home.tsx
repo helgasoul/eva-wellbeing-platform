@@ -33,9 +33,9 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       {/* Enhanced Hero Section */}
-      <section className="min-h-screen warm-bg flex items-center relative overflow-hidden">
+      <section className="min-h-[calc(100vh-5rem)] warm-bg flex items-center relative overflow-hidden">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-primary/10 blur-3xl"></div>
