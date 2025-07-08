@@ -31,7 +31,7 @@ const AboutPlatform = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen hero-gradient">
+      <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           {/* Header с кнопкой редактирования для админов */}
           {isAdmin && (
@@ -39,7 +39,7 @@ const AboutPlatform = () => {
               <Button
                 onClick={() => setIsEditing(!isEditing)}
                 variant={isEditing ? "default" : "outline"}
-                className="glass-effect backdrop-blur-sm border-white/20 text-white hover:bg-white/20"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {isEditing ? (
                   <>

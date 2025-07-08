@@ -18,7 +18,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
   onUpdate
 }) => {
   return (
-    <section className="py-20 text-center text-white">
+    <section className="py-20 text-center warm-bg">
       <div className="max-w-4xl mx-auto">
         <AdminEditableSection
           title="Заголовок миссии"
@@ -26,7 +26,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
           isEditing={isEditing}
           onUpdate={(value) => onUpdate('title', value)}
           placeholder="Заголовок миссии платформы"
-          className="text-5xl font-bold mb-8"
+          className="text-5xl font-bold mb-8 text-foreground"
         />
         
         <AdminEditableSection
@@ -36,7 +36,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
           onUpdate={(value) => onUpdate('description', value)}
           placeholder="Описание миссии и ценностей платформы"
           multiline
-          className="text-xl leading-relaxed mb-12 max-w-3xl mx-auto"
+          className="text-xl leading-relaxed mb-12 max-w-3xl mx-auto text-muted-foreground"
         />
 
         <div className="flex justify-center mb-8">
