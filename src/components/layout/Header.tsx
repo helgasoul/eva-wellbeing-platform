@@ -18,34 +18,31 @@ export const Header = () => {
   ];
 
   return (
-    <header className="bg-white/95 backdrop-blur-md border-b border-primary/10 sticky top-0 z-50 shadow-soft">
+    <header className="bg-background/95 backdrop-blur-md border-b border-border sticky top-0 z-50 shadow-clean">
       <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <img 
               src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
               alt="BLOOM" 
-              className="h-10 w-auto group-hover:scale-105 transition-transform duration-300"
+              className="h-8 w-auto group-hover:scale-105 transition-transform duration-200"
             />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-10">
+          <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-base font-medium transition-all duration-200 hover:text-primary relative ${
+                className={`text-sm font-medium transition-all duration-200 hover:text-primary ${
                   isActive(item.path) 
                     ? 'text-primary' 
-                    : 'text-foreground hover:scale-105'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {item.label}
-                {isActive(item.path) && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"></div>
-                )}
               </Link>
             ))}
           </nav>
@@ -55,13 +52,13 @@ export const Header = () => {
             <Link to="/login">
               <Button 
                 variant="ghost" 
-                className="text-foreground hover:text-primary hover:bg-primary/8 px-6 py-2.5 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted px-4 py-2 rounded-lg font-medium transition-all duration-200"
               >
                 Войти
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground px-7 py-2.5 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-gentle border-0">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 btn-hover shadow-clean">
                 Начать сейчас
               </Button>
             </Link>
@@ -69,10 +66,10 @@ export const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-full hover:bg-primary/5 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="h-6 w-6 text-foreground" /> : <Menu className="h-6 w-6 text-foreground" />}
+            {isMenuOpen ? <X className="h-5 w-5 text-foreground" /> : <Menu className="h-5 w-5 text-foreground" />}
           </button>
         </div>
 

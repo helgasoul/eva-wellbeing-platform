@@ -4,125 +4,113 @@
 
 @layer base {
   :root {
-    /* BLOOM Warm Feminine Color Palette */
-    --border: 20 15% 90%;
-    --input: 20 15% 95%;
-    --ring: 325 70% 65%;
-    --background: 20 40% 98%;
-    --foreground: 25 25% 25%;
+    /* Clean minimal palette based on the reference design */
+    --background: 35 25% 97%;
+    --foreground: 25 15% 15%;
     
-    /* Primary - Warm Rose Gold */
-    --primary: 325 70% 65%;
+    /* Primary - Soft rose for accents */
+    --primary: 325 35% 55%;
     --primary-foreground: 0 0% 100%;
     
-    /* Secondary - Soft Cream */
-    --secondary: 35 30% 95%;
-    --secondary-foreground: 25 25% 25%;
+    /* Muted colors */
+    --muted: 35 15% 93%;
+    --muted-foreground: 25 10% 45%;
     
-    /* Muted - Warm Beige */
-    --muted: 30 20% 94%;
-    --muted-foreground: 25 15% 55%;
+    /* UI elements */
+    --border: 35 15% 88%;
+    --input: 35 15% 95%;
+    --ring: 325 35% 55%;
     
-    /* Accent - Soft Peach */
-    --accent: 15 40% 94%;
-    --accent-foreground: 25 25% 25%;
+    /* Cards and surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 25 15% 15%;
     
-    /* Semantic colors */
-    --destructive: 0 84% 60%;
+    /* Secondary elements */
+    --secondary: 35 20% 95%;
+    --secondary-foreground: 25 15% 15%;
+    
+    /* Accent */
+    --accent: 35 25% 96%;
+    --accent-foreground: 25 15% 15%;
+    
+    /* Destructive */
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 25 25% 25%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 25 25% 25%;
-    --radius: 1rem;
-    
-    /* Custom BLOOM colors */
-    --bloom-cream: 30 35% 96%;
-    --bloom-peach: 15 45% 88%;
-    --bloom-rose: 325 70% 65%;
-    --bloom-gold: 40 60% 75%;
+    --radius: 0.75rem;
   }
+}
+
+/* Base styles */
+* {
+  border-color: hsl(var(--border));
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: 'Inter', sans-serif;
-  font-size: 18px;
-  line-height: 1.7;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
 }
 
-/* BLOOM Feminine Typography */
+/* Typography */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
   color: hsl(var(--foreground));
   font-weight: 600;
+  line-height: 1.2;
 }
 
-/* Soft animations for feminine touch */
-@keyframes gentle-float {
+h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+p {
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+}
+
+/* Clean animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gentleFloat {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes soft-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.02); }
-}
-
-@keyframes fade-in {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slide-in {
-  0% { opacity: 0; transform: translateX(-30px); }
-  100% { opacity: 1; transform: translateX(0); }
-}
-
-.animate-gentle-float {
-  animation: gentle-float 4s ease-in-out infinite;
-}
-
-.animate-soft-pulse {
-  animation: soft-pulse 3s ease-in-out infinite;
+  50% { transform: translateY(-5px); }
 }
 
 .animate-fade-in {
-  animation: fade-in 0.8s ease-out;
+  animation: fadeIn 0.6s ease-out;
 }
 
-.animate-slide-in {
-  animation: slide-in 0.6s ease-out;
+.animate-gentle-float {
+  animation: gentleFloat 3s ease-in-out infinite;
 }
 
-/* Warm shadows for feminine design */
+/* Button hover effects */
+.btn-hover {
+  transition: all 0.2s ease;
+}
+
+.btn-hover:hover {
+  transform: translateY(-1px);
+}
+
+/* Clean shadows */
+.shadow-clean {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
 .shadow-soft {
-  box-shadow: 0 2px 12px hsla(325, 70%, 65%, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.shadow-gentle {
-  box-shadow: 0 6px 20px hsla(325, 70%, 65%, 0.15);
-}
-
-.shadow-bloom {
-  box-shadow: 0 12px 32px hsla(325, 70%, 65%, 0.2), 0 4px 12px hsla(15, 45%, 88%, 0.3);
-}
-
-/* Warm gradients for feminine design */
-.bg-hero-gradient {
-  background: linear-gradient(135deg, 
-    hsl(30, 35%, 96%) 0%, 
-    hsl(15, 45%, 88%) 25%,
-    hsl(30, 35%, 96%) 50%,
-    hsl(35, 30%, 95%) 75%,
-    hsl(30, 35%, 96%) 100%);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, hsl(325, 70%, 65%), hsl(40, 60%, 75%));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+/* Remove all old conflicting styles */
