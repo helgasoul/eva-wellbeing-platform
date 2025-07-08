@@ -19,17 +19,17 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
   onComplete
 }) => {
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return 'bg-green-100 text-green-800';
-    if (confidence >= 60) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-orange-100 text-orange-800';
+    if (confidence >= 80) return 'bg-success/10 text-success';
+    if (confidence >= 60) return 'bg-warning/10 text-warning';
+    return 'bg-destructive/10 text-destructive';
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Congratulations Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-          <CheckCircle className="h-8 w-8 text-green-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-success/10 rounded-full mb-4">
+          <CheckCircle className="h-8 w-8 text-success" />
         </div>
         <h2 className="text-2xl font-playfair font-bold text-foreground mb-2">
           Поздравляем! Онбординг завершен
@@ -40,11 +40,11 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
       </div>
 
       {/* Phase Result */}
-      <Card className="bg-gradient-to-br from-eva-soft-pink to-eva-cream border-eva-dusty-rose/20">
+      <Card className="bg-gradient-to-br from-secondary to-muted border-primary/20">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
-              <Heart className="h-5 w-5 text-eva-dusty-rose" />
+              <Heart className="h-5 w-5 text-primary" />
               <span>Ваша фаза менопаузы</span>
             </CardTitle>
             <Badge className={getConfidenceColor(phaseResult.confidence)}>
@@ -54,7 +54,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
         </CardHeader>
         <CardContent>
           <div className="mb-4">
-            <h3 className="text-xl font-semibold text-eva-dusty-rose mb-2">
+            <h3 className="text-xl font-semibold text-primary mb-2">
               {getPhaseName(phaseResult.phase)}
             </h3>
             <p className="text-muted-foreground mb-4">
@@ -67,7 +67,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
             <ul className="space-y-1">
               {phaseResult.reasoning.map((reason, index) => (
                 <li key={index} className="text-sm text-muted-foreground flex items-start">
-                  <span className="w-2 h-2 bg-eva-dusty-rose rounded-full mt-2 mr-2 flex-shrink-0" />
+                  <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-2 flex-shrink-0" />
                   {reason}
                 </li>
               ))}
@@ -79,9 +79,9 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
       {/* Recommendations Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Immediate Actions */}
-        <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+        <Card className="bg-card/80 backdrop-blur-sm border-border">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-eva-dusty-rose">
+            <CardTitle className="flex items-center space-x-2 text-primary">
               <Calendar className="h-5 w-5" />
               <span>Немедленные действия</span>
             </CardTitle>
@@ -90,7 +90,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
             <ul className="space-y-2">
               {recommendations.immediateActions.map((action, index) => (
                 <li key={index} className="text-sm flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-success mr-2 mt-0.5 flex-shrink-0" />
                   {action}
                 </li>
               ))}
@@ -99,9 +99,9 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
         </Card>
 
         {/* Medical Consultations */}
-        <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+        <Card className="bg-card/80 backdrop-blur-sm border-border">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-eva-dusty-rose">
+            <CardTitle className="flex items-center space-x-2 text-primary">
               <Stethoscope className="h-5 w-5" />
               <span>Медицинские консультации</span>
             </CardTitle>
@@ -110,7 +110,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
             <ul className="space-y-2">
               {recommendations.medicalConsultations.map((consultation, index) => (
                 <li key={index} className="text-sm flex items-start">
-                  <CheckCircle className="h-4 w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
                   {consultation}
                 </li>
               ))}
@@ -119,9 +119,9 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
         </Card>
 
         {/* Lifestyle Changes */}
-        <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+        <Card className="bg-card/80 backdrop-blur-sm border-border">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-eva-dusty-rose">
+            <CardTitle className="flex items-center space-x-2 text-primary">
               <Heart className="h-5 w-5" />
               <span>Изменения образа жизни</span>
             </CardTitle>
@@ -130,7 +130,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
             <ul className="space-y-2">
               {recommendations.lifestyleChanges.map((change, index) => (
                 <li key={index} className="text-sm flex items-start">
-                  <CheckCircle className="h-4 w-4 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
                   {change}
                 </li>
               ))}
@@ -139,9 +139,9 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
         </Card>
 
         {/* Educational Resources */}
-        <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+        <Card className="bg-card/80 backdrop-blur-sm border-border">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-eva-dusty-rose">
+            <CardTitle className="flex items-center space-x-2 text-primary">
               <BookOpen className="h-5 w-5" />
               <span>Образовательные ресурсы</span>
             </CardTitle>
@@ -150,7 +150,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
             <ul className="space-y-2">
               {recommendations.educationalResources.map((resource, index) => (
                 <li key={index} className="text-sm flex items-start">
-                  <CheckCircle className="h-4 w-4 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
                   {resource}
                 </li>
               ))}
@@ -160,9 +160,9 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
       </div>
 
       {/* Tracking Priorities */}
-      <Card className="bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20">
+      <Card className="bg-card/80 backdrop-blur-sm border-border">
         <CardHeader>
-          <CardTitle className="text-eva-dusty-rose">Приоритеты отслеживания</CardTitle>
+          <CardTitle className="text-primary">Приоритеты отслеживания</CardTitle>
           <CardDescription>
             Мы рекомендуем сосредоточиться на этих аспектах здоровья
           </CardDescription>
@@ -170,7 +170,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
         <CardContent>
           <div className="flex flex-wrap gap-2">
             {recommendations.trackingPriorities.map((priority, index) => (
-              <Badge key={index} variant="secondary" className="bg-eva-soft-pink text-eva-dusty-rose">
+              <Badge key={index} variant="secondary" className="bg-secondary text-secondary-foreground">
                 {priority}
               </Badge>
             ))}
@@ -183,7 +183,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
         <Button
           onClick={onComplete}
           size="lg"
-          className="bg-eva-dusty-rose hover:bg-eva-mauve text-white px-8 py-3"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3"
         >
           Перейти в приложение
         </Button>

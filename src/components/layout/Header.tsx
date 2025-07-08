@@ -23,7 +23,7 @@ export const Header = () => {
           {/* Логотип */}
           <Link to="/" className="flex items-center group hover:scale-105 transition-transform duration-200">
             <div className="flex items-center">
-              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
                 BLOOM
               </h1>
               <span className="ml-2 text-xs font-medium text-muted-foreground tracking-wider uppercase">

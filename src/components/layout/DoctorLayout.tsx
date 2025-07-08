@@ -28,7 +28,7 @@ export const DoctorLayout: React.FC<DoctorLayoutProps> = ({
       breadcrumbs={breadcrumbs}
       quickActions={true}
     >
-      <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      <div className="flex min-h-screen bg-background">
         {/* Sidebar */}
         <div className="flex">
           <Sidebar 
