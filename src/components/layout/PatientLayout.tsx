@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { AppLayout } from './AppLayout';
 import { Sidebar } from './Sidebar';
+import { TestModeIndicator } from './TestModeIndicator';
 import { UserRole } from '@/types/auth';
 import { BreadcrumbItem } from './Breadcrumbs';
 
@@ -19,12 +20,14 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   return (
-    <AppLayout 
-      title={title} 
-      role={UserRole.PATIENT}
-      breadcrumbs={breadcrumbs}
-      quickActions={true}
-    >
+    <>
+      <TestModeIndicator />
+      <AppLayout 
+        title={title} 
+        role={UserRole.PATIENT}
+        breadcrumbs={breadcrumbs}
+        quickActions={true}
+      >
       <div className="flex min-h-screen bg-gradient-to-br from-bloom-cream via-bloom-vanilla to-bloom-warm-cream">
         {/* Sidebar */}
         <div className="flex">
@@ -44,6 +47,7 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
           </main>
         </div>
       </div>
-    </AppLayout>
+      </AppLayout>
+    </>
   );
 };

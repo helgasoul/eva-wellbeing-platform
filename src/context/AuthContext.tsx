@@ -5,6 +5,12 @@ import { User, AuthContextType, LoginCredentials, RegisterData, UserRole } from 
 import { getRoleDashboardPath } from '@/types/roles';
 import { toast } from '@/hooks/use-toast';
 
+// Предустановленные админские credentials
+const ADMIN_CREDENTIALS = {
+  email: 'admin@eva-platform.com',
+  password: 'EvaAdmin2025!'
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -21,6 +27,8 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [originalUser, setOriginalUser] = useState<User | null>(null); // Для сохранения оригинальной роли админа
+  const [isTestingRole, setIsTestingRole] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -47,16 +55,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Mock successful login with role-based user data
-      const mockUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: credentials.email,
-        firstName: credentials.email.includes('doctor') ? 'Доктор' : 'Анна',
-        lastName: credentials.email.includes('doctor') ? 'Петрова' : 'Иванова',
-        role: credentials.email.includes('doctor') ? UserRole.DOCTOR : 
-              credentials.email.includes('admin') ? UserRole.ADMIN : UserRole.PATIENT,
-        createdAt: new Date()
-      };
+      let mockUser: User;
+
+      // Проверяем админские credentials
+      if (credentials.email === ADMIN_CREDENTIALS.email && 
+          credentials.password === ADMIN_CREDENTIALS.password) {
+        mockUser = {
+          id: 'admin-001',
+          email: ADMIN_CREDENTIALS.email,
+          firstName: 'Администратор',
+          lastName: 'Eva Platform',
+          role: UserRole.ADMIN,
+          createdAt: new Date()
+        };
+      } else {
+        // Mock обычный login
+        mockUser = {
+          id: Math.random().toString(36).substr(2, 9),
+          email: credentials.email,
+          firstName: credentials.email.includes('doctor') ? 'Доктор' : 'Анна',
+          lastName: credentials.email.includes('doctor') ? 'Петрова' : 'Иванова',
+          role: credentials.email.includes('doctor') ? UserRole.DOCTOR : UserRole.PATIENT,
+          createdAt: new Date()
+        };
+      }
 
       setUser(mockUser);
       
@@ -67,7 +89,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       toast({
         title: 'Добро пожаловать!',
-        description: 'Вы успешно вошли в систему',
+        description: mockUser.role === UserRole.ADMIN ? 
+          'Добро пожаловать в админ-панель Eva!' : 
+          'Вы успешно вошли в систему',
       });
 
       // Redirect to role-specific dashboard
@@ -166,6 +190,63 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
   };
 
+  // Функция переключения роли (только для администраторов)
+  const switchRole = (newRole: UserRole) => {
+    if (!user || user.role !== UserRole.ADMIN) {
+      toast({
+        title: 'Ошибка',
+        description: 'Только администраторы могут переключать роли',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Сохраняем оригинального админа при первом переключении
+    if (!isTestingRole) {
+      setOriginalUser(user);
+      setIsTestingRole(true);
+    }
+
+    // Создаем тестового пользователя с новой ролью
+    const testUser: User = {
+      ...user,
+      role: newRole,
+      firstName: newRole === UserRole.PATIENT ? 'Тест Пациентка' : 
+                newRole === UserRole.DOCTOR ? 'Тест Врач' : user.firstName,
+      lastName: newRole === UserRole.PATIENT ? 'Админ Режим' : 
+               newRole === UserRole.DOCTOR ? 'Админ Режим' : user.lastName,
+    };
+
+    setUser(testUser);
+
+    toast({
+      title: `Переключение на роль: ${newRole === UserRole.PATIENT ? 'Пациентка' : 'Врач'}`,
+      description: 'Вы находитесь в режиме тестирования',
+    });
+
+    // Перенаправляем на соответствующую панель
+    const dashboardPath = getRoleDashboardPath(newRole);
+    navigate(dashboardPath);
+  };
+
+  // Функция возврата к оригинальной роли администратора
+  const returnToOriginalRole = () => {
+    if (!originalUser || !isTestingRole) {
+      return;
+    }
+
+    setUser(originalUser);
+    setIsTestingRole(false);
+    setOriginalUser(null);
+
+    toast({
+      title: 'Возврат к роли администратора',
+      description: 'Режим тестирования завершен',
+    });
+
+    navigate('/admin/dashboard');
+  };
+
   const value: AuthContextType = {
     user,
     login,
@@ -174,6 +255,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     forgotPassword,
     isLoading,
     error,
+    switchRole,
+    returnToOriginalRole,
+    isTestingRole,
   };
 
   return (

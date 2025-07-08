@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { AppLayout } from './AppLayout';
 import { Sidebar } from './Sidebar';
+import { RoleSwitcher } from './RoleSwitcher';
 import { UserRole } from '@/types/auth';
 import { BreadcrumbItem } from './Breadcrumbs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

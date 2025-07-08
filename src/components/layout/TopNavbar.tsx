@@ -5,6 +5,7 @@ import { UserRole } from '@/types/auth';
 import { Bell, Search, User as UserIcon, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { RoleSwitcher } from './RoleSwitcher';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -89,6 +90,9 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 </div>
               </div>
             )}
+
+            {/* Role Switcher - только для администраторов */}
+            <RoleSwitcher />
 
             {/* Notifications */}
             <Button variant="ghost" size="sm" className="relative">

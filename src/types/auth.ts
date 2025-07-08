@@ -114,4 +114,7 @@ export interface AuthContextType {
   forgotPassword: (email: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
+  switchRole: (role: UserRole) => void;
+  returnToOriginalRole: () => void;
+  isTestingRole: boolean;
 }

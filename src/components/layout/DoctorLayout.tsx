@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { AppLayout } from './AppLayout';
 import { Sidebar } from './Sidebar';
+import { TestModeIndicator } from './TestModeIndicator';
 import { UserRole } from '@/types/auth';
 import { BreadcrumbItem } from './Breadcrumbs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,12 +23,14 @@ export const DoctorLayout: React.FC<DoctorLayoutProps> = ({
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   return (
-    <AppLayout 
-      title={title} 
-      role={UserRole.DOCTOR}
-      breadcrumbs={breadcrumbs}
-      quickActions={true}
-    >
+    <>
+      <TestModeIndicator />
+      <AppLayout 
+        title={title} 
+        role={UserRole.DOCTOR}
+        breadcrumbs={breadcrumbs}
+        quickActions={true}
+      >
       <div className="flex min-h-screen bg-background">
         {/* Sidebar */}
         <Sidebar 
@@ -45,6 +48,7 @@ export const DoctorLayout: React.FC<DoctorLayoutProps> = ({
           </main>
         </div>
       </div>
-    </AppLayout>
+      </AppLayout>
+    </>
   );
 };

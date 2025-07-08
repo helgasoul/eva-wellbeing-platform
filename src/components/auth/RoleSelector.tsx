@@ -26,14 +26,8 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
       description: ROLE_DESCRIPTIONS[UserRole.DOCTOR],
       icon: Briefcase,
       color: 'from-eva-mauve to-eva-taupe'
-    },
-    {
-      value: UserRole.ADMIN,
-      label: ROLE_LABELS[UserRole.ADMIN],
-      description: ROLE_DESCRIPTIONS[UserRole.ADMIN],
-      icon: Shield,
-      color: 'from-eva-taupe to-eva-mauve'
     }
+    // Роль администратора убрана из публичной регистрации
   ];
 
   return (
