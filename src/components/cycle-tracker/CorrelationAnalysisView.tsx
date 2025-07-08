@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, TrendingDown, Minus, Activity, Apple, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Activity, Apple, Brain } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface NutritionCorrelation {
   nutrient: string;
   cycle_impact: 'positive' | 'negative' | 'neutral';
-  correlation_strength: number;
+  correlation_strength: number; // 0-1
   recommendations: string[];
   optimal_range: string;
   current_intake?: number;
@@ -18,7 +18,7 @@ interface NutritionCorrelation {
 interface ActivityCorrelation {
   activity_type: 'cardio' | 'strength' | 'yoga' | 'walking' | 'high_intensity';
   symptom_impact: {
-    cramps: number;
+    cramps: number; // -1 to 1 (negative = reduces, positive = increases)
     mood: number;
     energy: number;
     hot_flashes: number;
@@ -38,327 +38,382 @@ export const CorrelationAnalysisView: React.FC<CorrelationAnalysisViewProps> = (
   activityCorrelations,
   onUpdateLifestyle
 }) => {
-  const [selectedNutrient, setSelectedNutrient] = useState<string | null>(null);
-  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'nutrition' | 'activity'>('all');
+
+  return (
+    <div className="space-y-8">
+      
+      {/* Заголовок */}
+      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+            🔗 Анализ корреляций
+          </CardTitle>
+          <p className="text-gray-600">
+            ИИ-анализ влияния питания и физической активности на ваш цикл и симптомы
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Button
+              variant={selectedCategory === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory('all')}
+              className="gap-2"
+            >
+              <Brain className="h-4 w-4" />
+              Все корреляции
+            </Button>
+            <Button
+              variant={selectedCategory === 'nutrition' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory('nutrition')}
+              className="gap-2"
+            >
+              <Apple className="h-4 w-4" />
+              Питание
+            </Button>
+            <Button
+              variant={selectedCategory === 'activity' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory('activity')}
+              className="gap-2"
+            >
+              <Activity className="h-4 w-4" />
+              Активность
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Корреляции питания */}
+      {(selectedCategory === 'all' || selectedCategory === 'nutrition') && (
+        <Card className="bg-white/90 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+              🍎 Влияние питания на цикл
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {nutritionCorrelations.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">📊</div>
+                <p className="text-gray-600 mb-4">
+                  Ведите дневник питания минимум 2 недели для анализа корреляций
+                </p>
+                <Button onClick={onUpdateLifestyle} variant="outline">
+                  Обновить анализ
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {nutritionCorrelations.map(correlation => (
+                  <NutritionCorrelationCard 
+                    key={correlation.nutrient}
+                    correlation={correlation}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Корреляции активности */}
+      {(selectedCategory === 'all' || selectedCategory === 'activity') && (
+        <Card className="bg-white/90 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+              🏃‍♀️ Влияние физической активности
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {activityCorrelations.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">🏃‍♀️</div>
+                <p className="text-gray-600 mb-4">
+                  Отслеживайте физическую активность для анализа влияния на симптомы
+                </p>
+                <Button onClick={onUpdateLifestyle} variant="outline">
+                  Обновить анализ
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {activityCorrelations.map(correlation => (
+                  <ActivityCorrelationCard 
+                    key={correlation.activity_type}
+                    correlation={correlation}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Комплексные рекомендации */}
+      {(nutritionCorrelations.length > 0 || activityCorrelations.length > 0) && (
+        <ComplexRecommendations 
+          nutritionCorrelations={nutritionCorrelations}
+          activityCorrelations={activityCorrelations}
+        />
+      )}
+    </div>
+  );
+};
+
+// Карточка корреляции питания
+const NutritionCorrelationCard: React.FC<{ correlation: NutritionCorrelation }> = ({ correlation }) => {
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'positive': return 'border-green-300 bg-green-50';
+      case 'negative': return 'border-red-300 bg-red-50';
+      default: return 'border-gray-300 bg-gray-50';
+    }
+  };
+
+  const getCorrelationStrength = (strength: number) => {
+    if (strength >= 0.7) return { label: 'Сильная', color: 'text-red-600' };
+    if (strength >= 0.4) return { label: 'Умеренная', color: 'text-yellow-600' };
+    return { label: 'Слабая', color: 'text-green-600' };
+  };
 
   const getImpactIcon = (impact: string) => {
     switch (impact) {
-      case 'positive': return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'negative': return <TrendingDown className="h-4 w-4 text-red-600" />;
-      default: return <Minus className="h-4 w-4 text-gray-600" />;
+      case 'positive': return <TrendingUp className="h-4 w-4 text-green-500" />;
+      case 'negative': return <TrendingDown className="h-4 w-4 text-red-500" />;
+      default: return <Minus className="h-4 w-4 text-gray-500" />;
     }
   };
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'positive': return 'border-green-200 bg-green-50';
-      case 'negative': return 'border-red-200 bg-red-50';
-      default: return 'border-gray-200 bg-gray-50';
-    }
+  const strengthInfo = getCorrelationStrength(correlation.correlation_strength);
+
+  return (
+    <Card className={cn("border-2", getImpactColor(correlation.cycle_impact))}>
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex items-center gap-2">
+            {getImpactIcon(correlation.cycle_impact)}
+            <h4 className="font-semibold text-gray-800">{correlation.nutrient}</h4>
+          </div>
+          <div className="text-right">
+            <div className={cn("text-sm font-medium", strengthInfo.color)}>
+              {strengthInfo.label} связь
+            </div>
+            <div className="text-xs text-gray-500">
+              {Math.round(correlation.correlation_strength * 100)}%
+            </div>
+          </div>
+        </div>
+
+        {/* Визуализация корреляции */}
+        <div className="mb-4">
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <span>Влияние на цикл</span>
+            <span>{correlation.cycle_impact === 'positive' ? 'Положительное' : 
+                   correlation.cycle_impact === 'negative' ? 'Отрицательное' : 'Нейтральное'}</span>
+          </div>
+          <Progress 
+            value={correlation.correlation_strength * 100} 
+            className="h-2"
+          />
+        </div>
+
+        {/* Текущее потребление vs оптимальное */}
+        {correlation.current_intake && (
+          <div className="mb-3 p-3 bg-white rounded-lg border">
+            <div className="text-sm text-gray-600">Текущее потребление:</div>
+            <div className="font-medium">{correlation.current_intake} / {correlation.optimal_range}</div>
+          </div>
+        )}
+
+        {/* Рекомендации */}
+        <div className="space-y-1">
+          <div className="text-sm font-medium text-gray-700">Рекомендации:</div>
+          {correlation.recommendations.slice(0, 2).map((rec, index) => (
+            <div key={index} className="flex items-start text-sm text-gray-600">
+              <span className="text-purple-500 mr-2">•</span>
+              <span>{rec}</span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Карточка корреляции активности
+const ActivityCorrelationCard: React.FC<{ correlation: ActivityCorrelation }> = ({ correlation }) => {
+  const getImpactIcon = (impact: number) => {
+    if (impact > 0.3) return { icon: <TrendingUp className="h-4 w-4" />, color: 'text-red-500', label: 'Ухудшает' };
+    if (impact < -0.3) return { icon: <TrendingDown className="h-4 w-4" />, color: 'text-green-500', label: 'Улучшает' };
+    return { icon: <Minus className="h-4 w-4" />, color: 'text-gray-500', label: 'Нейтрально' };
   };
 
-  const getActivityName = (type: string) => {
-    switch (type) {
-      case 'cardio': return 'Кардио';
-      case 'strength': return 'Силовые';
-      case 'yoga': return 'Йога';
-      case 'walking': return 'Ходьба';
-      case 'high_intensity': return 'ВИИТ';
-      default: return type;
-    }
+  const getActivityTypeLabel = (type: string) => {
+    const labels = {
+      cardio: 'Кардио',
+      strength: 'Силовые тренировки',
+      yoga: 'Йога',
+      walking: 'Ходьба',
+      high_intensity: 'Высокоинтенсивные'
+    };
+    return labels[type as keyof typeof labels] || type;
   };
 
-  const getSymptomImpactColor = (value: number) => {
-    if (value > 0.3) return 'text-green-600';
-    if (value < -0.3) return 'text-red-600';
-    return 'text-gray-600';
-  };
-
-  const formatImpactValue = (value: number, isPositive = true) => {
-    const absValue = Math.abs(value);
-    if (absValue < 0.2) return 'Слабое';
-    if (absValue < 0.5) return 'Умеренное';
-    if (absValue < 0.7) return 'Сильное';
-    return 'Очень сильное';
+  const getSymptomLabel = (symptom: string) => {
+    const labels = {
+      cramps: 'Спазмы',
+      mood: 'Настроение',
+      energy: 'Энергия',
+      hot_flashes: 'Приливы'
+    };
+    return labels[symptom as keyof typeof labels] || symptom;
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">Анализ корреляций</h2>
-          <p className="text-gray-600">Как питание и активность влияют на ваш цикл</p>
+    <Card className="border-2 border-blue-200 bg-blue-50">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Activity className="h-5 w-5 text-blue-600" />
+          <h4 className="font-semibold text-gray-800">
+            {getActivityTypeLabel(correlation.activity_type)}
+          </h4>
         </div>
-        <Button onClick={onUpdateLifestyle} variant="outline" className="gap-2">
-          <Target className="h-4 w-4" />
-          Обновить анализ
-        </Button>
-      </div>
 
-      <Tabs defaultValue="nutrition" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="nutrition" className="gap-2">
-            <Apple className="h-4 w-4" />
-            Питание
-          </TabsTrigger>
-          <TabsTrigger value="activity" className="gap-2">
-            <Activity className="h-4 w-4" />
-            Активность
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="nutrition" className="space-y-6">
-          {/* Обзор питания */}
-          <Card className="bg-white/90 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                🥗 Влияние питательных веществ
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {nutritionCorrelations.map((correlation, index) => (
-                  <Card 
-                    key={index} 
-                    className={`cursor-pointer transition-all hover:shadow-md ${getImpactColor(correlation.cycle_impact)} ${
-                      selectedNutrient === correlation.nutrient ? 'ring-2 ring-pink-500' : ''
-                    }`}
-                    onClick={() => setSelectedNutrient(
-                      selectedNutrient === correlation.nutrient ? null : correlation.nutrient
-                    )}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-sm">{correlation.nutrient}</h3>
-                        {getImpactIcon(correlation.cycle_impact)}
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span>Корреляция</span>
-                            <span>{Math.round(correlation.correlation_strength * 100)}%</span>
-                          </div>
-                          <Progress 
-                            value={correlation.correlation_strength * 100} 
-                            className="h-2"
-                          />
-                        </div>
-                        
-                        {correlation.current_intake !== undefined && (
-                          <div className="text-xs text-gray-600">
-                            Текущий прием: {correlation.current_intake} 
-                            {correlation.optimal_range.includes('мг') ? ' мг' : ' г'}/день
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+        {/* Влияние на симптомы */}
+        <div className="space-y-3 mb-4">
+          <h5 className="text-sm font-medium text-gray-700">Влияние на симптомы:</h5>
+          {Object.entries(correlation.symptom_impact).map(([symptom, impact]) => {
+            const impactInfo = getImpactIcon(impact);
+            return (
+              <div key={symptom} className="flex justify-between items-center p-2 bg-white rounded">
+                <span className="text-sm text-gray-700">
+                  {getSymptomLabel(symptom)}
+                </span>
+                <div className="flex items-center gap-1">
+                  <span className={cn(impactInfo.color)}>
+                    {impactInfo.icon}
+                  </span>
+                  <span className={cn("text-sm font-medium", impactInfo.color)}>
+                    {impactInfo.label}
+                  </span>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            );
+          })}
+        </div>
 
-          {/* Детали выбранного питательного вещества */}
-          {selectedNutrient && (
-            <Card className="bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  📊 Подробности: {selectedNutrient}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {(() => {
-                  const correlation = nutritionCorrelations.find(c => c.nutrient === selectedNutrient);
-                  if (!correlation) return null;
+        {/* Оптимальное время */}
+        <div className="mb-4">
+          <div className="text-sm font-medium text-gray-700 mb-2">Лучше всего:</div>
+          <div className="flex flex-wrap gap-1">
+            {correlation.optimal_timing.map(time => (
+              <Badge key={time} variant="secondary" className="bg-blue-200 text-blue-800">
+                {time}
+              </Badge>
+            ))}
+          </div>
+        </div>
 
-                  return (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-pink-600">
-                            {Math.round(correlation.correlation_strength * 100)}%
-                          </div>
-                          <div className="text-sm text-gray-600">Сила корреляции</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">
-                            {correlation.optimal_range}
-                          </div>
-                          <div className="text-sm text-gray-600">Оптимальная доза</div>
-                        </div>
-                        <div className="text-center">
-                          <div className={`text-2xl font-bold ${
-                            correlation.cycle_impact === 'positive' ? 'text-green-600' :
-                            correlation.cycle_impact === 'negative' ? 'text-red-600' : 'text-gray-600'
-                          }`}>
-                            {correlation.cycle_impact === 'positive' ? '👍' :
-                             correlation.cycle_impact === 'negative' ? '👎' : '➖'}
-                          </div>
-                          <div className="text-sm text-gray-600">Влияние на цикл</div>
-                        </div>
-                      </div>
+        {/* Рекомендации */}
+        <div className="space-y-1">
+          <div className="text-sm font-medium text-gray-700">Советы:</div>
+          {correlation.recommendations.slice(0, 2).map((rec, index) => (
+            <div key={index} className="flex items-start text-sm text-gray-600">
+              <span className="text-blue-500 mr-2">•</span>
+              <span>{rec}</span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
-                      <div>
-                        <h4 className="font-medium text-gray-700 mb-3">Рекомендации:</h4>
-                        <div className="space-y-2">
-                          {correlation.recommendations.map((rec, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-sm">
-                              <span className="text-pink-500 mt-0.5">•</span>
-                              <span className="text-gray-700">{rec}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+// Комплексные рекомендации
+const ComplexRecommendations: React.FC<{
+  nutritionCorrelations: NutritionCorrelation[];
+  activityCorrelations: ActivityCorrelation[];
+}> = ({ nutritionCorrelations, activityCorrelations }) => {
+  const generateComplexRecommendations = () => {
+    const recommendations = [];
+    
+    // Анализ питания
+    const negativeNutrition = nutritionCorrelations.filter(n => n.cycle_impact === 'negative');
+    const positiveNutrition = nutritionCorrelations.filter(n => n.cycle_impact === 'positive');
+    
+    if (negativeNutrition.length > 0) {
+      recommendations.push({
+        type: 'warning',
+        title: 'Ограничить в рационе',
+        items: negativeNutrition.map(n => `${n.nutrient} - ${n.recommendations[0]}`).slice(0, 3)
+      });
+    }
+    
+    if (positiveNutrition.length > 0) {
+      recommendations.push({
+        type: 'success',
+        title: 'Увеличить потребление',
+        items: positiveNutrition.map(n => `${n.nutrient} - ${n.recommendations[0]}`).slice(0, 3)
+      });
+    }
+    
+    // Анализ активности
+    const beneficialActivities = activityCorrelations.filter(a => 
+      Object.values(a.symptom_impact).some(impact => impact < -0.2)
+    );
+    
+    if (beneficialActivities.length > 0) {
+      recommendations.push({
+        type: 'info',
+        title: 'Рекомендуемые виды активности',
+        items: beneficialActivities.map(a => `${a.activity_type} - ${a.recommendations[0]}`).slice(0, 3)
+      });
+    }
+    
+    return recommendations;
+  };
 
-                      {correlation.current_intake !== undefined && (
-                        <div className="p-4 bg-blue-50 rounded-lg">
-                          <h4 className="font-medium text-blue-800 mb-2">
-                            Ваш текущий прием vs рекомендуемый
-                          </h4>
-                          <div className="text-sm text-blue-700">
-                            Вы принимаете: {correlation.current_intake} 
-                            {correlation.optimal_range.includes('мг') ? ' мг' : ' г'}/день
-                          </div>
-                          <div className="text-sm text-blue-700">
-                            Рекомендуется: {correlation.optimal_range}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+  const recommendations = generateComplexRecommendations();
 
-        <TabsContent value="activity" className="space-y-6">
-          {/* Обзор активности */}
-          <Card className="bg-white/90 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                🏃‍♀️ Влияние физической активности
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {activityCorrelations.map((correlation, index) => (
-                  <Card 
-                    key={index} 
-                    className={`cursor-pointer transition-all hover:shadow-md border-purple-200 bg-purple-50 ${
-                      selectedActivity === correlation.activity_type ? 'ring-2 ring-pink-500' : ''
-                    }`}
-                    onClick={() => setSelectedActivity(
-                      selectedActivity === correlation.activity_type ? null : correlation.activity_type
-                    )}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium">{getActivityName(correlation.activity_type)}</h3>
-                        <Activity className="h-4 w-4 text-purple-600" />
-                      </div>
-                      
-                      <div className="space-y-2 text-xs">
-                        <div className="flex justify-between">
-                          <span>Спазмы:</span>
-                          <span className={getSymptomImpactColor(correlation.symptom_impact.cramps)}>
-                            {formatImpactValue(correlation.symptom_impact.cramps)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Настроение:</span>
-                          <span className={getSymptomImpactColor(correlation.symptom_impact.mood)}>
-                            {formatImpactValue(correlation.symptom_impact.mood)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Энергия:</span>
-                          <span className={getSymptomImpactColor(correlation.symptom_impact.energy)}>
-                            {formatImpactValue(correlation.symptom_impact.energy)}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-3 pt-2 border-t border-purple-200">
-                        <div className="text-xs text-gray-600">
-                          Лучшее время: {correlation.optimal_timing.join(', ')}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+  if (recommendations.length === 0) return null;
+
+  return (
+    <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+          🧠 Персональные рекомендации
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {recommendations.map((rec, index) => (
+            <div key={index} className={cn(
+              "p-4 rounded-lg border-2",
+              rec.type === 'warning' && "bg-red-50 border-red-200",
+              rec.type === 'success' && "bg-green-50 border-green-200",
+              rec.type === 'info' && "bg-blue-50 border-blue-200"
+            )}>
+              <h4 className="font-medium text-gray-800 mb-2">{rec.title}</h4>
+              <ul className="space-y-1">
+                {rec.items.map((item, itemIndex) => (
+                  <li key={itemIndex} className="text-sm text-gray-600 flex items-start">
+                    <span className={cn(
+                      "mr-2",
+                      rec.type === 'warning' && "text-red-500",
+                      rec.type === 'success' && "text-green-500",
+                      rec.type === 'info' && "text-blue-500"
+                    )}>•</span>
+                    <span>{item}</span>
+                  </li>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Детали выбранной активности */}
-          {selectedActivity && (
-            <Card className="bg-white/90 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  📊 Подробности: {getActivityName(selectedActivity)}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {(() => {
-                  const correlation = activityCorrelations.find(c => c.activity_type === selectedActivity);
-                  if (!correlation) return null;
-
-                  return (
-                    <div className="space-y-6">
-                      {/* Влияние на симптомы */}
-                      <div>
-                        <h4 className="font-medium text-gray-700 mb-3">Влияние на симптомы:</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {Object.entries(correlation.symptom_impact).map(([symptom, impact]) => (
-                            <div key={symptom} className="text-center p-3 rounded-lg bg-gray-50">
-                              <div className={`text-2xl font-bold ${getSymptomImpactColor(impact)}`}>
-                                {impact > 0 ? '+' : ''}{Math.round(impact * 100)}%
-                              </div>
-                              <div className="text-sm text-gray-600 mt-1">
-                                {symptom === 'cramps' ? 'Спазмы' :
-                                 symptom === 'mood' ? 'Настроение' :
-                                 symptom === 'energy' ? 'Энергия' :
-                                 'Приливы'}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Оптимальное время */}
-                      <div>
-                        <h4 className="font-medium text-gray-700 mb-3">Оптимальное время для занятий:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {correlation.optimal_timing.map((timing, idx) => (
-                            <Badge key={idx} variant="outline" className="bg-purple-50">
-                              {timing}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Рекомендации */}
-                      <div>
-                        <h4 className="font-medium text-gray-700 mb-3">Рекомендации:</h4>
-                        <div className="space-y-2">
-                          {correlation.recommendations.map((rec, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-sm">
-                              <span className="text-purple-500 mt-0.5">•</span>
-                              <span className="text-gray-700">{rec}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
+              </ul>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
