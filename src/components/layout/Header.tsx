@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Heart, Menu, X, Sparkles, LogIn } from 'lucide-react';
+import { Menu, X, Sparkles, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const Header = () => {
@@ -20,7 +20,7 @@ export const Header = () => {
   return (
     <header className="bg-background/98 backdrop-blur-md border-b border-border/60 sticky top-0 z-50 shadow-elegant">
       <div className="container mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18">
+        <div className="flex items-center justify-between h-20">
           {/* Логотип */}
           <Link to="/" className="flex items-center group">
             <div className="logo-hover">
@@ -33,9 +33,9 @@ export const Header = () => {
           </Link>
 
           {/* Навигация для десктопа */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-10">
             {navItems.map((item) => (
-              <div key={item.path} className="relative">
+              <div key={item.path} className="relative flex items-center">
                 <Link
                   to={item.path}
                   className={`nav-link text-sm font-medium tracking-wide transition-all duration-200 ${
@@ -47,7 +47,7 @@ export const Header = () => {
                   {item.label}
                 </Link>
                 {item.badge && (
-                  <span className="absolute -top-1 -right-6 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
+                  <span className="ml-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs px-2 py-1 rounded-full font-medium shadow-sm whitespace-nowrap">
                     {item.badge}
                   </span>
                 )}
@@ -60,14 +60,15 @@ export const Header = () => {
             <Link to="/login">
               <Button 
                 variant="ghost"
-                className="cta-secondary text-foreground/80 hover:text-foreground font-medium px-5 py-2 rounded-lg h-auto"
+                className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-lg transition-all duration-200"
               >
-                <LogIn className="mr-2 h-4 w-4" />
                 Войти
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="cta-primary text-primary-foreground font-semibold px-6 py-2 rounded-lg h-auto">
+              <Button 
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              >
                 <Sparkles className="mr-2 h-4 w-4" />
                 Начать сейчас
               </Button>
@@ -96,7 +97,7 @@ export const Header = () => {
                 <div key={item.path} className="relative">
                   <Link
                     to={item.path}
-                    className={`block text-base font-medium px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-center text-base font-medium px-4 py-3 rounded-lg transition-all duration-200 ${
                       isActive(item.path) 
                         ? 'text-primary bg-primary/10' 
                         : 'text-foreground hover:text-primary hover:bg-primary/5'
@@ -119,7 +120,6 @@ export const Header = () => {
                     variant="ghost" 
                     className="w-full justify-center py-3 font-medium"
                   >
-                    <LogIn className="mr-2 h-4 w-4" />
                     Войти
                   </Button>
                 </Link>
