@@ -114,6 +114,9 @@ export const NutritionTrendsContent: React.FC<NutritionTrendsContentProps> = ({ 
   );
 };
 
+// Строгий тип для направления тренда
+type TrendDirection = 'up' | 'down' | 'stable';
+
 // Компонент карточки тренда
 const TrendCard = ({ 
   title, 
@@ -124,7 +127,7 @@ const TrendCard = ({
 }: {
   title: string;
   value: string;
-  trend: 'up' | 'down' | 'stable';
+  trend: TrendDirection;
   change: string;
   description: string;
 }) => {
@@ -248,8 +251,8 @@ const NutritionDetailedAnalysis = ({ entries }: { entries: FoodEntry[] }) => {
 };
 
 // Вспомогательные функции
-const calculateTrend = (values: number[]) => {
-  if (values.length < 2) return { direction: 'stable' as const, change: 0, average: 0 };
+const calculateTrend = (values: number[]): { direction: TrendDirection; change: number; average: number } => {
+  if (values.length < 2) return { direction: 'stable', change: 0, average: 0 };
   
   const average = values.reduce((sum, val) => sum + val, 0) / values.length;
   const firstHalf = values.slice(0, Math.ceil(values.length / 2));
@@ -259,7 +262,7 @@ const calculateTrend = (values: number[]) => {
   const secondAvg = secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
   
   const change = secondAvg - firstAvg;
-  const direction = Math.abs(change) < 0.1 ? 'stable' : change > 0 ? 'up' : 'down';
+  const direction: TrendDirection = Math.abs(change) < 0.1 ? 'stable' : change > 0 ? 'up' : 'down';
   
   return { direction, change, average };
 };
