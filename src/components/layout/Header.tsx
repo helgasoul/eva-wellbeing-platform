@@ -12,7 +12,7 @@ export const Header = () => {
   const navItems = [
     { path: '/', label: 'Главная' },
     { path: '/about', label: 'О платформе' },
-    { path: '/services', label: 'Услуги', badge: 'НОВОЕ' },
+    { path: '/services', label: 'Услуги' },
     { path: '/contact', label: 'Контакты' }
   ];
 
@@ -26,9 +26,6 @@ export const Header = () => {
               <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
                 BLOOM
               </h1>
-              <span className="ml-2 text-xs font-medium text-muted-foreground tracking-wider uppercase">
-                Платформа поддержки
-              </span>
             </div>
           </Link>
 
@@ -46,11 +43,6 @@ export const Header = () => {
                 >
                   {item.label}
                 </Link>
-                {item.badge && (
-                  <span className="ml-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs px-2 py-1 rounded-full font-medium shadow-sm whitespace-nowrap">
-                    {item.badge}
-                  </span>
-                )}
               </div>
             ))}
           </nav>
@@ -105,11 +97,6 @@ export const Header = () => {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.label}
-                    {item.badge && (
-                      <span className="ml-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs px-2 py-1 rounded-full font-medium">
-                        {item.badge}
-                      </span>
-                    )}
                   </Link>
                 </div>
               ))}
