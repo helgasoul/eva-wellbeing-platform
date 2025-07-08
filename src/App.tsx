@@ -19,7 +19,7 @@ import AIChat from "./pages/patient/AIChat";
 import PatientInsights from "./pages/patient/PatientInsights";
 import WearableDevices from "./pages/patient/WearableDevices";
 import DoctorBooking from "./pages/patient/DoctorBooking";
-import LabTests from "./pages/patient/LabTests";
+import NutritionTracker from "./pages/patient/NutritionTracker";
 import Community from "./pages/patient/Community";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -93,6 +93,13 @@ const App = () => (
             <Route path="/patient/lab-tests" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
                 <LabTests />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient nutrition tracker route */}
+            <Route path="/patient/nutrition" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <NutritionTracker />
               </ProtectedRoute>
             } />
             
