@@ -59,7 +59,7 @@ export const Header = () => {
             </Link>
             <Link to="/register">
               <Button 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group"
+                className="btn-gradient-soft text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group"
               >
                 <Heart className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                 Начать сейчас
@@ -111,7 +111,7 @@ export const Header = () => {
                   </Button>
                 </Link>
                 <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 font-semibold group">
+                  <Button className="w-full btn-gradient-soft text-primary-foreground py-3 font-semibold group">
                     <Heart className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                     Начать сейчас
                   </Button>
