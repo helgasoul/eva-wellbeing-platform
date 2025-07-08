@@ -8,6 +8,7 @@ import { analyzeEnvironmentalCorrelations, predictSymptomsByWeather, generateWea
 import EnvironmentalInsightsSection from '../../components/insights/EnvironmentalInsightsSection';
 import SymptomForecastSection from '../../components/insights/SymptomForecastSection';
 import LocationSettings from '../../components/insights/LocationSettings';
+import { LabRecommendationWidget } from '../../components/lab/LabRecommendationWidget';
 import { useToast } from '../../hooks/use-toast';
 
 interface HealthInsight {

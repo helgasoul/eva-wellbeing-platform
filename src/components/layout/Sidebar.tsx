@@ -48,6 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           { name: 'Питание', href: '/patient/nutrition', icon: Calculator },
           { name: 'Устройства', href: '/patient/wearables', icon: Brain },
           { name: 'Запись к врачу', href: '/patient/doctors', icon: Stethoscope },
+          { name: 'Анализы', href: '/patient/lab-tests', icon: FileText },
           { name: 'Мои инсайты', href: '/patient/insights', icon: BarChart3 },
           { name: 'ИИ-помощник', href: '/patient/ai-chat', icon: MessageSquare, badge: 2 },
           { name: 'Мои документы', href: '/patient/documents', icon: FileText },

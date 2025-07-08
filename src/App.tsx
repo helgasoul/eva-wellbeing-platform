@@ -19,6 +19,7 @@ import AIChat from "./pages/patient/AIChat";
 import PatientInsights from "./pages/patient/PatientInsights";
 import WearableDevices from "./pages/patient/WearableDevices";
 import DoctorBooking from "./pages/patient/DoctorBooking";
+import LabTests from "./pages/patient/LabTests";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -84,6 +85,13 @@ const App = () => (
             <Route path="/patient/doctors" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
                 <DoctorBooking />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient lab tests route */}
+            <Route path="/patient/lab-tests" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <LabTests />
               </ProtectedRoute>
             } />
             
