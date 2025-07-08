@@ -8,8 +8,8 @@
     --background: 35 25% 97%;
     --foreground: 25 15% 15%;
     
-    /* Primary - Soft rose for accents */
-    --primary: 325 35% 55%;
+    /* Primary - Blue from reference (синий как в изображении) */
+    --primary: 224 76% 68%;
     --primary-foreground: 0 0% 100%;
     
     /* Muted colors */
@@ -19,7 +19,7 @@
     /* UI elements */
     --border: 35 15% 88%;
     --input: 35 15% 95%;
-    --ring: 325 35% 55%;
+    --ring: 224 76% 68%;
     
     /* Cards and surfaces */
     --card: 0 0% 100%;

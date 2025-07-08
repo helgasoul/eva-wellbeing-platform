@@ -26,7 +26,7 @@ export const Header = () => {
             <img 
               src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
               alt="BLOOM" 
-              className="h-8 w-auto group-hover:scale-105 transition-transform duration-200"
+              className="h-12 w-auto group-hover:scale-105 transition-transform duration-200"
             />
           </Link>
 
