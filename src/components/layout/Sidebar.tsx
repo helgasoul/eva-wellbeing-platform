@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           { name: 'Панель врача', href: '/doctor/dashboard', icon: LayoutDashboard },
           { name: 'Мои пациентки', href: '/doctor/patients', icon: Users, badge: 5 },
           { name: 'Поиск пациенток', href: '/doctor/search', icon: Search },
-          { name: 'Калькуляторы', href: '/doctor/calculators', icon: Calculator },
+          { name: 'Мед. калькуляторы', href: '/doctor/calculators', icon: Calculator },
           { name: 'Аналитика', href: '/doctor/analytics', icon: BarChart3 },
           { name: 'База знаний', href: '/doctor/knowledge', icon: BookOpen },
           { name: 'Консультации', href: '/doctor/consultations', icon: Stethoscope },

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DoctorLayout } from '@/components/layout/DoctorLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 
 const DoctorDashboard = () => {
+  const navigate = useNavigate();
   const breadcrumbs = [
     { label: 'Панель врача' }
   ];
@@ -193,13 +195,15 @@ const DoctorDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Button
                 variant="outline"
+                onClick={() => navigate('/doctor/calculators')}
                 className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-blue-300 hover:bg-blue-50"
               >
                 <Calculator className="h-6 w-6 text-blue-600" />
-                <span className="text-sm">Калькулятор рисков</span>
+                <span className="text-sm">Мед. калькуляторы</span>
+                <span className="text-xs text-blue-500">MDCalc</span>
               </Button>
               <Button
                 variant="outline"
@@ -221,6 +225,13 @@ const DoctorDashboard = () => {
               >
                 <Activity className="h-6 w-6 text-orange-600" />
                 <span className="text-sm">Мониторинг</span>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-pink-300 hover:bg-pink-50"
+              >
+                <Users className="h-6 w-6 text-pink-600" />
+                <span className="text-sm">Пациентки</span>
               </Button>
             </div>
           </CardContent>

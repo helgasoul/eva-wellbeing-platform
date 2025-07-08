@@ -22,6 +22,7 @@ import WearableDevices from "./pages/patient/WearableDevices";
 import NutritionTracker from "./pages/patient/NutritionTracker";
 import Community from "./pages/patient/Community";
 import DoctorDashboard from "./pages/DoctorDashboard";
+import MedicalCalculators from "./pages/doctor/MedicalCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -130,6 +131,12 @@ const App = () => (
             <Route path="/doctor/dashboard" element={
               <ProtectedRoute requiredRole={UserRole.DOCTOR}>
                 <DoctorDashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/doctor/calculators" element={
+              <ProtectedRoute requiredRole={UserRole.DOCTOR}>
+                <MedicalCalculators />
               </ProtectedRoute>
             } />
             
