@@ -17,6 +17,7 @@ import PatientOnboarding from "./pages/patient/PatientOnboarding";
 import SymptomTracker from "./pages/patient/SymptomTracker";
 import AIChat from "./pages/patient/AIChat";
 import PatientInsights from "./pages/patient/PatientInsights";
+import WearableDevices from "./pages/patient/WearableDevices";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -68,6 +69,13 @@ const App = () => (
             <Route path="/patient/insights" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
                 <PatientInsights />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient wearable devices route */}
+            <Route path="/patient/wearables" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <WearableDevices />
               </ProtectedRoute>
             } />
             

@@ -45,7 +45,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
         return [
           { name: 'Главная', href: '/patient/dashboard', icon: Home },
           { name: 'Мои симптомы', href: '/patient/symptoms', icon: Activity },
-          { name: 'Мои инсайты', href: '/patient/insights', icon: Brain },
+          { name: 'Питание', href: '/patient/nutrition', icon: Calculator },
+          { name: 'Устройства', href: '/patient/wearables', icon: Brain },
+          { name: 'Мои инсайты', href: '/patient/insights', icon: BarChart3 },
           { name: 'ИИ-помощник', href: '/patient/ai-chat', icon: MessageSquare, badge: 2 },
           { name: 'Мои документы', href: '/patient/documents', icon: FileText },
           { name: 'Сообщество', href: '/patient/community', icon: Users },
