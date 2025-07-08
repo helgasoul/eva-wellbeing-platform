@@ -81,6 +81,176 @@ export const performAIAnalysis = (
   };
 };
 
+// Экологический анализ для интеграции с погодными данными
+export const performEnvironmentalAnalysis = async (
+  symptoms: any[],
+  environmentalHistory: any[]
+): Promise<any[]> => {
+  const insights: any[] = [];
+
+  if (symptoms.length < 5 || environmentalHistory.length < 5) {
+    return insights;
+  }
+
+  // Анализ корреляции с атмосферным давлением
+  const pressureCorrelation = analyzePressureCorrelation(symptoms, environmentalHistory);
+  if (Math.abs(pressureCorrelation.correlation) > 0.3) {
+    insights.push({
+      type: 'pressure_correlation',
+      severity: Math.abs(pressureCorrelation.correlation) > 0.6 ? 'high' : 'medium',
+      title: 'Влияние атмосферного давления',
+      description: `Обнаружена ${pressureCorrelation.correlation > 0 ? 'положительная' : 'отрицательная'} связь между изменениями давления и вашими симптомами (корреляция: ${Math.round(pressureCorrelation.correlation * 100)}%)`,
+      correlation: pressureCorrelation.correlation,
+      confidence: Math.round(Math.abs(pressureCorrelation.correlation) * 100),
+      recommendations: pressureCorrelation.recommendations,
+      forecast: await predictByPressure(pressureCorrelation)
+    });
+  }
+
+  // Анализ влияния влажности
+  const humidityImpact = analyzeHumidityImpact(symptoms, environmentalHistory);
+  if (humidityImpact.significance > 0.4) {
+    insights.push({
+      type: 'humidity_impact',
+      severity: humidityImpact.severity,
+      title: 'Влияние влажности воздуха',
+      description: humidityImpact.description,
+      correlation: humidityImpact.correlation,
+      confidence: Math.round(humidityImpact.significance * 100),
+      recommendations: humidityImpact.recommendations,
+      forecast: humidityImpact.forecast
+    });
+  }
+
+  // Анализ качества воздуха
+  const airQualityImpact = analyzeAirQualityImpact(symptoms, environmentalHistory);
+  if (airQualityImpact.hasImpact) {
+    insights.push({
+      type: 'air_quality_alert',
+      severity: airQualityImpact.severity,
+      title: 'Влияние качества воздуха',
+      description: airQualityImpact.description,
+      correlation: airQualityImpact.correlation,
+      confidence: airQualityImpact.confidence,
+      recommendations: airQualityImpact.recommendations,
+      forecast: airQualityImpact.forecast
+    });
+  }
+
+  return insights;
+};
+
+const analyzePressureCorrelation = (symptoms: any[], environmentalHistory: any[]) => {
+  // Корреляция между изменениями давления и приливами
+  const pressureChanges = environmentalHistory.map((env, index) => {
+    if (index === 0) return 0;
+    return env.weather.current.pressure - environmentalHistory[index - 1].weather.current.pressure;
+  }).slice(1);
+
+  const hotFlashCounts = symptoms.slice(1).map(s => s.hotFlashes?.count || 0);
+
+  const correlation = calculateCorrelation(pressureChanges, hotFlashCounts);
+
+  return {
+    correlation,
+    recommendations: correlation < -0.3 ? [
+      'Отслеживайте прогноз давления в приложении погоды',
+      'При падении давления >5 hPa подготовьтесь к возможным приливам',
+      'Носите многослойную одежду в дни с резкими перепадами давления',
+      'Практикуйте дыхательные упражнения при метеочувствительности'
+    ] : [
+      'Ведите дневник давления и симптомов для выявления паттернов',
+      'Обратитесь к врачу, если метеозависимость сильно влияет на качество жизни'
+    ]
+  };
+};
+
+const analyzeHumidityImpact = (symptoms: any[], environmentalHistory: any[]) => {
+  const humidityLevels = environmentalHistory.map(env => env.weather.current.humidity);
+  const sleepQuality = symptoms.map(s => s.sleep?.quality || 3);
+
+  const correlation = calculateCorrelation(humidityLevels, sleepQuality);
+  const significance = Math.abs(correlation);
+
+  return {
+    correlation,
+    significance,
+    severity: significance > 0.6 ? 'high' : significance > 0.4 ? 'medium' : 'low',
+    description: `Влажность воздуха ${significance > 0.5 ? 'значительно влияет' : 'влияет'} на качество вашего сна. Корреляция: ${Math.round(correlation * 100)}%`,
+    recommendations: correlation < -0.3 ? [
+      'Используйте осушитель воздуха в спальне',
+      'Проветривайте помещение перед сном',
+      'Выбирайте дышащие ткани для постельного белья',
+      'Избегайте горячего душа перед сном в влажные дни'
+    ] : [
+      'Поддерживайте комфортную влажность в доме (40-60%)',
+      'Следите за прогнозом влажности'
+    ],
+    forecast: {
+      tomorrow: correlation < -0.3 ? 'worse' : 'same',
+      reason: correlation < -0.3 ? 'Высокая влажность может ухудшить сон' : 'Влажность не окажет значительного влияния',
+      suggestions: correlation < -0.3 ? [
+        'Подготовьте осушитель воздуха',
+        'Выберите легкую одежду для сна',
+        'Планируйте более раннее время отхода ко сну'
+      ] : [
+        'Обычный режим сна',
+        'Поддерживайте комфортную температуру'
+      ]
+    }
+  };
+};
+
+const analyzeAirQualityImpact = (symptoms: any[], environmentalHistory: any[]) => {
+  const pm25Levels = environmentalHistory.map(env => env.airQuality.current.pm2_5);
+  const moodScores = symptoms.map(s => s.mood?.overall || 3);
+
+  const correlation = calculateCorrelation(pm25Levels, moodScores);
+  const avgPM25 = pm25Levels.reduce((sum, pm) => sum + pm, 0) / pm25Levels.length;
+
+  const hasImpact = Math.abs(correlation) > 0.2 || avgPM25 > 25;
+
+  return {
+    hasImpact,
+    correlation,
+    severity: avgPM25 > 35 ? 'high' : avgPM25 > 25 ? 'medium' : 'low',
+    description: `Качество воздуха (PM2.5: ${Math.round(avgPM25)} μg/m³) ${hasImpact ? 'влияет на' : 'не влияет значительно на'} ваше настроение`,
+    confidence: Math.round(Math.abs(correlation) * 100),
+    recommendations: avgPM25 > 35 ? [
+      'Используйте очиститель воздуха дома',
+      'Ограничьте время на улице в дни с плохим воздухом',
+      'Носите защитную маску при выходе на улицу',
+      'Планируйте прогулки в утренние часы'
+    ] : [
+      'Следите за индексом качества воздуха',
+      'Проветривайте дом в утренние часы'
+    ],
+    forecast: {
+      tomorrow: avgPM25 > 35 ? 'worse' : 'same',
+      reason: avgPM25 > 35 ? 'Ожидается плохое качество воздуха' : 'Качество воздуха удовлетворительное',
+      suggestions: avgPM25 > 35 ? [
+        'Минимизируйте время на улице',
+        'Используйте очиститель воздуха'
+      ] : [
+        'Планируйте активности на свежем воздухе'
+      ]
+    }
+  };
+};
+
+const predictByPressure = async (pressureData: any) => {
+  return {
+    tomorrow: pressureData.correlation < -0.3 ? 'worse' : 'same',
+    reason: pressureData.correlation < -0.3 ? 'Ожидается падение атмосферного давления' : 'Давление стабильное',
+    suggestions: pressureData.correlation < -0.3 ? [
+      'Подготовьте сменную одежду',
+      'Избегайте горячих напитков'
+    ] : [
+      'Обычный режим дня'
+    ]
+  };
+};
+
 const calculateHealthScore = (symptoms: any[], onboarding: any): HealthScore => {
   if (symptoms.length === 0) {
     return {

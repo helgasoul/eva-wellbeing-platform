@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/utils';
-import { performAIAnalysis } from '../../utils/aiAnalyzer';
+import { performAIAnalysis, performEnvironmentalAnalysis } from '../../utils/aiAnalyzer';
+import { environmentalService, EnvironmentalFactors } from '../../services/environmentalService';
+import { analyzeEnvironmentalCorrelations, predictSymptomsByWeather, generateWeatherAlerts, EnvironmentalInsight, PredictionResult, WeatherAlert } from '../../utils/environmentalAnalyzer';
+import EnvironmentalInsightsSection from '../../components/insights/EnvironmentalInsightsSection';
+import SymptomForecastSection from '../../components/insights/SymptomForecastSection';
+import LocationSettings from '../../components/insights/LocationSettings';
+import { useToast } from '../../hooks/use-toast';
 
 interface HealthInsight {
   id: string;
@@ -41,15 +47,40 @@ interface SymptomTrend {
 export default function PatientInsights() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [healthScore, setHealthScore] = useState<HealthScore | null>(null);
   const [insights, setInsights] = useState<HealthInsight[]>([]);
   const [symptomTrends, setSymptomTrends] = useState<SymptomTrend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter'>('week');
+  
+  // Новые состояния для экологических данных
+  const [environmentalData, setEnvironmentalData] = useState<EnvironmentalFactors | null>(null);
+  const [environmentalInsights, setEnvironmentalInsights] = useState<EnvironmentalInsight[]>([]);
+  const [symptomForecast, setSymptomForecast] = useState<PredictionResult | null>(null);
+  const [weatherAlerts, setWeatherAlerts] = useState<WeatherAlert[]>([]);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number; city: string } | null>(null);
+  const [isLoadingEnvironmental, setIsLoadingEnvironmental] = useState(false);
 
   useEffect(() => {
     generateInsights();
   }, [user, selectedPeriod]);
+
+  useEffect(() => {
+    // Загружаем сохраненное местоположение
+    const savedLocation = localStorage.getItem(`user_location_${user?.id}`);
+    if (savedLocation) {
+      const location = JSON.parse(savedLocation);
+      setUserLocation(location);
+      loadEnvironmentalData(location.lat, location.lon, location.city);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (userLocation) {
+      loadEnvironmentalData(userLocation.lat, userLocation.lon, userLocation.city);
+    }
+  }, [userLocation, selectedPeriod]);
 
   const generateInsights = async () => {
     setIsLoading(true);
@@ -66,11 +97,100 @@ export default function PatientInsights() {
       setHealthScore(analysisResults.healthScore);
       setInsights(analysisResults.insights);
       setSymptomTrends(analysisResults.trends);
+
+      // Если есть экологические данные и местоположение, анализируем их
+      if (userLocation && environmentalData) {
+        await analyzeEnvironmentalData(symptomEntries);
+      }
     } catch (error) {
       console.error('Ошибка генерации инсайтов:', error);
+      toast({
+        title: "Ошибка анализа",
+        description: "Не удалось проанализировать данные. Попробуйте позже.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const loadEnvironmentalData = async (lat: number, lon: number, city: string) => {
+    setIsLoadingEnvironmental(true);
+    try {
+      // Получаем текущие данные и прогноз
+      const [currentData, forecast] = await Promise.all([
+        environmentalService.getCurrentEnvironmentalData(lat, lon, city),
+        environmentalService.getWeatherForecast(lat, lon, 7)
+      ]);
+
+      setEnvironmentalData(currentData);
+
+      // Анализируем экологические корреляции
+      const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${user?.id}`) || '[]');
+      await analyzeEnvironmentalData(symptomEntries, [currentData]);
+
+      // Создаем прогноз симптомов на основе погоды
+      if (symptomEntries.length > 0) {
+        const prediction = predictSymptomsByWeather(
+          symptomEntries,
+          [], // personalTriggers - можно добавить позже
+          forecast.daily
+        );
+        setSymptomForecast(prediction);
+
+        // Генерируем предупреждения
+        const alerts = generateWeatherAlerts(
+          currentData.weather.current,
+          forecast.daily,
+          [] // personalSensitivity - можно добавить позже
+        );
+        setWeatherAlerts(alerts);
+      }
+
+    } catch (error) {
+      console.error('Ошибка загрузки экологических данных:', error);
+      toast({
+        title: "Ошибка погодных данных",
+        description: "Не удалось загрузить данные о погоде. Проверьте подключение к интернету.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingEnvironmental(false);
+    }
+  };
+
+  const analyzeEnvironmentalData = async (symptoms: any[], envHistory: EnvironmentalFactors[] = []) => {
+    try {
+      // Получаем сохраненную историю экологических данных
+      const savedHistory = localStorage.getItem(`environmental_history_${user?.id}`);
+      const environmentalHistory = savedHistory ? JSON.parse(savedHistory) : envHistory;
+
+      if (environmentalHistory.length > 0 && symptoms.length > 0) {
+        const envInsights = analyzeEnvironmentalCorrelations(symptoms, environmentalHistory);
+        setEnvironmentalInsights(envInsights);
+      }
+    } catch (error) {
+      console.error('Ошибка анализа экологических данных:', error);
+    }
+  };
+
+  const handleLocationUpdate = (location: { lat: number; lon: number; city: string }) => {
+    setUserLocation(location);
+    // Сохраняем местоположение
+    localStorage.setItem(`user_location_${user?.id}`, JSON.stringify(location));
+    
+    toast({
+      title: "Местоположение обновлено",
+      description: `Установлен город: ${location.city}`,
+    });
+  };
+
+  const handleLocationError = (error: string) => {
+    toast({
+      title: "Ошибка местоположения",
+      description: error,
+      variant: "destructive"
+    });
   };
 
   const analyzeUserData = async (onboarding: any, symptoms: any[], chat: any[]): Promise<any> => {
@@ -144,8 +264,44 @@ export default function PatientInsights() {
           <LoadingState />
         ) : (
           <div className="space-y-8">
+            {/* Настройки местоположения */}
+            {!userLocation && (
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                <h2 className="text-xl font-bold text-blue-800 mb-4">🌍 Настройка экологического анализа</h2>
+                <p className="text-blue-700 mb-4">
+                  Укажите ваше местоположение для получения персональных инсайтов на основе погодных условий и качества воздуха.
+                </p>
+                <LocationSettings
+                  currentLocation={userLocation}
+                  onLocationUpdate={handleLocationUpdate}
+                  onError={handleLocationError}
+                />
+              </div>
+            )}
+
             {/* Health Score Dashboard */}
             <HealthScoreDashboard score={healthScore} />
+            
+            {/* Экологические факторы */}
+            {userLocation && (
+              <EnvironmentalInsightsSection
+                environmentalData={environmentalData}
+                insights={environmentalInsights}
+                location={userLocation}
+                isLoading={isLoadingEnvironmental}
+              />
+            )}
+
+            {/* Прогноз симптомов */}
+            {userLocation && (
+              <SymptomForecastSection
+                forecast={symptomForecast}
+                weatherForecast={null} // Можно добавить позже
+                alerts={weatherAlerts}
+                onLocationUpdate={handleLocationUpdate}
+                isLoading={isLoadingEnvironmental}
+              />
+            )}
             
             {/* Ключевые инсайты */}
             <KeyInsightsSection insights={insights} />
@@ -155,6 +311,18 @@ export default function PatientInsights() {
             
             {/* Персональные рекомендации */}
             <PersonalizedRecommendations insights={insights} />
+
+            {/* Настройки местоположения для существующих пользователей */}
+            {userLocation && (
+              <div className="bg-gray-50 rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">⚙️ Настройки анализа</h3>
+                <LocationSettings
+                  currentLocation={userLocation}
+                  onLocationUpdate={handleLocationUpdate}
+                  onError={handleLocationError}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
