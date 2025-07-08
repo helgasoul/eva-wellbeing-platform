@@ -54,8 +54,8 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
     <section className="py-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">Наши достижения</h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-foreground mb-4">Наши достижения</h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Цифры и факты, которые говорят о нашем успехе
           </p>
         </div>
@@ -76,7 +76,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                   isEditing={isEditing}
                   onUpdate={(value) => updateStat(index, 'number', value)}
                   placeholder="Число"
-                  className="text-4xl font-bold text-white mb-2"
+                  className="text-4xl font-bold text-foreground mb-2"
                 />
                 
                 <AdminEditableSection
@@ -85,7 +85,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                   isEditing={isEditing}
                   onUpdate={(value) => updateStat(index, 'description', value)}
                   placeholder="Описание достижения"
-                  className="text-white/90"
+                  className="text-muted-foreground"
                 />
                 
                 {isEditing && (
@@ -105,7 +105,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               onClick={addStat}
               className="bg-white/10 backdrop-blur-sm rounded-xl border-2 border-dashed border-white/30 hover:border-white/50 transition-colors cursor-pointer flex items-center justify-center min-h-[150px]"
             >
-              <div className="text-center text-white/70">
+              <div className="text-center text-muted-foreground">
                 <div className="text-2xl mb-2">+</div>
                 <p>Добавить статистику</p>
               </div>
@@ -116,7 +116,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
         {/* Партнерства и награды */}
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6">
-            <h3 className="text-2xl font-bold text-white mb-4">Партнерства</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-4">Партнерства</h3>
             <div className="space-y-2">
               {data.partnerships.map((partnership, index) => (
                 <div key={index} className="flex items-center justify-between">
@@ -130,7 +130,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                       updatePartnerships(newPartnerships);
                     }}
                     placeholder="Название партнера"
-                    className="text-white/90 flex-1"
+                    className="text-muted-foreground flex-1"
                   />
                   {isEditing && (
                     <button
@@ -148,7 +148,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {isEditing && (
                 <button
                   onClick={() => updatePartnerships([...data.partnerships, ''])}
-                  className="text-white/70 hover:text-white text-sm mt-2"
+                  className="text-muted-foreground hover:text-foreground text-sm mt-2"
                 >
                   + Добавить партнера
                 </button>
@@ -157,7 +157,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
           </div>
 
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6">
-            <h3 className="text-2xl font-bold text-white mb-4">Награды</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-4">Награды</h3>
             <div className="space-y-2">
               {data.awards.map((award, index) => (
                 <div key={index} className="flex items-center justify-between">
@@ -171,7 +171,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                       updateAwards(newAwards);
                     }}
                     placeholder="Название награды"
-                    className="text-white/90 flex-1"
+                    className="text-muted-foreground flex-1"
                   />
                   {isEditing && (
                     <button
@@ -189,7 +189,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {isEditing && (
                 <button
                   onClick={() => updateAwards([...data.awards, ''])}
-                  className="text-white/70 hover:text-white text-sm mt-2"
+                  className="text-muted-foreground hover:text-foreground text-sm mt-2"
                 >
                   + Добавить награду
                 </button>

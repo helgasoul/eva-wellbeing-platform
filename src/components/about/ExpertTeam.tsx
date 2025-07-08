@@ -54,10 +54,10 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
     <section className="py-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl font-bold text-foreground mb-4">
             Команда врачей-экспертов
           </h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Медицинский совет платформы bloom объединяет ведущих специалистов в области женского здоровья
           </p>
         </div>
@@ -81,7 +81,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
                     isEditing={isEditing}
                     onUpdate={(value) => updateExpert(expert.id, 'name', value)}
                     placeholder="Имя эксперта"
-                    className="text-xl font-bold text-white mb-2"
+                    className="text-xl font-bold text-foreground mb-2"
                   />
 
                   <AdminEditableSection
@@ -90,13 +90,13 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
                     isEditing={isEditing}
                     onUpdate={(value) => updateExpert(expert.id, 'role', value)}
                     placeholder="Роль в команде"
-                    className="text-sm text-white/70 mb-3"
+                    className="text-sm text-muted-foreground mb-3"
                   />
                 </div>
 
                 <div className="space-y-3">
                   <div>
-                    <h4 className="text-sm font-semibold text-white mb-1">Специализация</h4>
+                    <h4 className="text-sm font-semibold text-foreground mb-1">Специализация</h4>
                     <AdminEditableSection
                       title="Специализация"
                       content={expert.specialization}
@@ -104,12 +104,12 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
                       onUpdate={(value) => updateExpert(expert.id, 'specialization', value)}
                       placeholder="Специализация врача"
                       multiline
-                      className="text-sm text-white/90"
+                      className="text-sm text-muted-foreground"
                     />
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-white mb-1">Достижения</h4>
+                    <h4 className="text-sm font-semibold text-foreground mb-1">Достижения</h4>
                     <AdminEditableSection
                       title="Достижения"
                       content={expert.achievements}
@@ -117,12 +117,12 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
                       onUpdate={(value) => updateExpert(expert.id, 'achievements', value)}
                       placeholder="Ключевые достижения"
                       multiline
-                      className="text-sm text-white/90"
+                      className="text-sm text-muted-foreground"
                     />
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-white mb-1">Интересы</h4>
+                    <h4 className="text-sm font-semibold text-foreground mb-1">Интересы</h4>
                     <AdminEditableSection
                       title="Интересы"
                       content={expert.interests}
@@ -130,7 +130,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
                       onUpdate={(value) => updateExpert(expert.id, 'interests', value)}
                       placeholder="Научные интересы"
                       multiline
-                      className="text-sm text-white/90"
+                      className="text-sm text-muted-foreground"
                     />
                   </div>
                 </div>
@@ -155,7 +155,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
               onClick={addNewExpert}
               className="bg-white/10 backdrop-blur-sm rounded-xl border-2 border-dashed border-white/30 hover:border-white/50 transition-colors cursor-pointer flex items-center justify-center min-h-[400px]"
             >
-              <div className="text-center text-white/70">
+              <div className="text-center text-muted-foreground">
                 <Plus className="w-12 h-12 mx-auto mb-2" />
                 <p>Добавить эксперта</p>
               </div>

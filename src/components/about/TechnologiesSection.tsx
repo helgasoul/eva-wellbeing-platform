@@ -49,7 +49,7 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({
             isEditing={isEditing}
             onUpdate={(value) => onUpdate('title', value)}
             placeholder="Заголовок раздела технологий"
-            className="text-4xl font-bold text-white mb-4"
+            className="text-4xl font-bold text-foreground mb-4"
           />
           
           <AdminEditableSection
@@ -59,7 +59,7 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({
             onUpdate={(value) => onUpdate('description', value)}
             placeholder="Описание технологического подхода"
             multiline
-            className="text-xl text-white/90 max-w-3xl mx-auto"
+            className="text-xl text-muted-foreground max-w-3xl mx-auto"
           />
         </div>
 
@@ -81,7 +81,7 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({
                           isEditing={isEditing}
                           onUpdate={(value) => updateFeature(index, value)}
                           placeholder="Название технологии"
-                          className="text-white font-medium"
+                          className="text-foreground font-medium"
                         />
                         <button
                           onClick={() => removeFeature(index)}
@@ -91,7 +91,7 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <span className="text-white font-medium">{feature}</span>
+                      <span className="text-foreground font-medium">{feature}</span>
                     )}
                   </div>
                 </div>
@@ -104,7 +104,7 @@ export const TechnologiesSection: React.FC<TechnologiesSectionProps> = ({
               onClick={addFeature}
               className="bg-white/10 backdrop-blur-sm rounded-xl border-2 border-dashed border-white/30 hover:border-white/50 transition-colors cursor-pointer flex items-center justify-center min-h-[120px]"
             >
-              <div className="text-center text-white/70">
+              <div className="text-center text-muted-foreground">
                 <div className="text-2xl mb-2">+</div>
                 <p>Добавить технологию</p>
               </div>
