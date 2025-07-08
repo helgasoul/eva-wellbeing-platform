@@ -64,6 +64,15 @@ const Home = () => {
                 научно обоснованные рекомендации для поддержки в период менопаузы
               </p>
               
+              {/* Community Image */}
+              <div className="bg-card rounded-2xl overflow-hidden shadow-soft max-w-2xl mx-auto mb-8">
+                <img 
+                  src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
+                  alt="Глобальное сообщество женщин BLOOM — поддержка и взаимопонимание"
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+              
               {/* Trust Badge */}
               <div className="inline-flex items-center gap-3 px-6 py-3 bg-background border border-border rounded-full text-sm font-medium shadow-sm">
                 <Shield className="h-5 w-5 text-primary" />
@@ -133,12 +142,8 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="bg-card rounded-2xl overflow-hidden shadow-soft">
-            <img 
-              src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
-              alt="Глобальное сообщество женщин BLOOM — поддержка и взаимопонимание"
-              className="w-full h-auto object-cover"
-            />
+          <div className="text-center text-muted-foreground">
+            <p className="text-lg">Здесь будет дополнительный контент о сообществе</p>
           </div>
         </div>
       </section>
