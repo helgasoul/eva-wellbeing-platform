@@ -24,7 +24,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
     <section className="py-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">О создателе</h2>
+          <h2 className="text-4xl font-bold text-foreground mb-4">О создателе</h2>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
@@ -43,7 +43,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
               isEditing={isEditing}
               onUpdate={(value) => onUpdate('name', value)}
               placeholder="Имя и фамилия основателя"
-              className="text-2xl font-bold text-white mb-4"
+              className="text-2xl font-bold text-foreground mb-4"
             />
             
             <AdminEditableSection
@@ -52,13 +52,13 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
               isEditing={isEditing}
               onUpdate={(value) => onUpdate('bio', value)}
               placeholder="Краткое описание основателя"
-              className="text-lg text-white/90"
+              className="text-lg text-muted-foreground"
             />
           </div>
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold text-white mb-3">История создания</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-3">История создания</h3>
               <AdminEditableSection
                 title="История"
                 content={data.story}
@@ -66,12 +66,12 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
                 onUpdate={(value) => onUpdate('story', value)}
                 placeholder="История создания платформы"
                 multiline
-                className="text-white/90 leading-relaxed"
+                className="text-muted-foreground leading-relaxed"
               />
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold text-white mb-3">Опыт</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Опыт</h3>
               <AdminEditableSection
                 title="Опыт"
                 content={data.experience}
@@ -79,12 +79,12 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
                 onUpdate={(value) => onUpdate('experience', value)}
                 placeholder="Профессиональный опыт"
                 multiline
-                className="text-white/90 leading-relaxed"
+                className="text-muted-foreground leading-relaxed"
               />
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold text-white mb-3">Видение</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Видение</h3>
               <AdminEditableSection
                 title="Видение"
                 content={data.vision}
@@ -92,7 +92,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
                 onUpdate={(value) => onUpdate('vision', value)}
                 placeholder="Видение будущего платформы"
                 multiline
-                className="text-white/90 leading-relaxed"
+                className="text-muted-foreground leading-relaxed"
               />
             </div>
           </div>

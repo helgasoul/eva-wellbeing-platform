@@ -42,8 +42,8 @@ export const ContactsSection: React.FC<ContactsSectionProps> = ({
     <section className="py-16 bg-white/10 backdrop-blur-sm rounded-2xl">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">Контакты</h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-foreground mb-4">Контакты</h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Свяжитесь с нами любым удобным способом
           </p>
         </div>
@@ -57,8 +57,8 @@ export const ContactsSection: React.FC<ContactsSectionProps> = ({
                   <Icon className="w-8 h-8 text-white" />
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-2">{contact.title}</h3>
-                <p className="text-white/70 text-sm mb-4">{contact.description}</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">{contact.title}</h3>
+                <p className="text-muted-foreground text-sm mb-4">{contact.description}</p>
 
                 <AdminEditableSection
                   title={`Контакт: ${contact.title}`}
@@ -66,15 +66,15 @@ export const ContactsSection: React.FC<ContactsSectionProps> = ({
                   isEditing={isEditing}
                   onUpdate={(value) => onUpdate(contact.key, value)}
                   placeholder={`Контактная информация для ${contact.title.toLowerCase()}`}
-                  className="text-white font-medium"
+                  className="text-foreground font-medium"
                 />
               </div>
             );
           })}
         </div>
 
-        <div className="text-center mt-12 pt-8 border-t border-white/20">
-          <p className="text-white/70">
+        <div className="text-center mt-12 pt-8 border-t border-border">
+          <p className="text-muted-foreground">
             bloom — персональный помощник для женского здоровья и благополучия
           </p>
         </div>

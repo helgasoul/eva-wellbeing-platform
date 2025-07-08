@@ -65,8 +65,8 @@ export const PrinciplesSection: React.FC<PrinciplesSectionProps> = ({
     <section className="py-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">Наши принципы</h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-foreground mb-4">Наши принципы</h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Четыре основополагающих принципа, которые определяют подход bloom к заботе о женском здоровье
           </p>
         </div>
@@ -89,7 +89,7 @@ export const PrinciplesSection: React.FC<PrinciplesSectionProps> = ({
                   isEditing={isEditing}
                   onUpdate={(value) => onUpdate(`${principle.key}.title`, value)}
                   placeholder="Название принципа"
-                  className="text-xl font-bold text-white mb-3"
+                  className="text-xl font-bold text-foreground mb-3"
                 />
 
                 <AdminEditableSection
@@ -99,7 +99,7 @@ export const PrinciplesSection: React.FC<PrinciplesSectionProps> = ({
                   onUpdate={(value) => onUpdate(`${principle.key}.description`, value)}
                   placeholder="Описание принципа"
                   multiline
-                  className="text-white/90 leading-relaxed"
+                  className="text-muted-foreground leading-relaxed"
                 />
               </div>
             );
