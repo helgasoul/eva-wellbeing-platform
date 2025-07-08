@@ -41,6 +41,75 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* System Status Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <Card className="bg-gradient-to-br from-gray-50 to-blue-50 border-gray-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-gray-700 text-sm flex items-center">
+                <Activity className="h-4 w-4 mr-2" />
+                Статус системы
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-green-600">
+                  Все системы
+                </span>
+                <Badge className="bg-green-100 text-green-800 border-green-300">Работает</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-blue-700 text-sm flex items-center">
+                <Database className="h-4 w-4 mr-2" />
+                Система
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-blue-600">Пользователи:</span>
+                  <span className="font-medium">1,234</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-blue-600">Активность:</span>
+                  <span className="font-medium">98.5%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-blue-600">Нагрузка:</span>
+                  <span className="font-medium">Low</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200 relative">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-yellow-700 text-sm flex items-center justify-between">
+                <div className="flex items-center">
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  Уведомления
+                </div>
+                <Badge className="bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs">12</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-yellow-600">Требуют модерации</span>
+                  <Badge variant="outline" className="text-xs">12</Badge>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-orange-600">Системные алерты</span>
+                  <Badge variant="outline" className="text-xs">3</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* System Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card className="bg-gradient-to-br from-white to-blue-50 border-blue-200">
