@@ -101,5 +101,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .shadow-bloom {
-  box-shadow: 0 8px 24px rgba(220, 38, 127, 0.15);
+  box-shadow: 0 8px 24px rgba(220, 38, 127, 0.15), 0 2px 8px rgba(220, 38, 127, 0.1);
+}
+
+/* Enhanced gradients for modern look */
+.bg-hero-pattern {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(220, 38, 127, 0.05) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(220, 38, 127, 0.03) 75%,
+    rgba(255, 255, 255, 0.1) 100%);
 }

@@ -51,18 +51,18 @@ export const Header = () => {
           </nav>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
             <Link to="/login">
               <Button 
                 variant="ghost" 
-                className="text-foreground hover:text-primary hover:bg-primary/5 px-6 py-2 rounded-full font-medium transition-all duration-300"
+                className="text-foreground hover:text-primary hover:bg-primary/8 px-6 py-2.5 rounded-xl font-medium transition-all duration-300 hover:scale-105"
               >
                 Войти
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full font-medium transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-gentle">
-                Регистрация
+              <Button className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground px-7 py-2.5 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-gentle border-0">
+                Начать сейчас
               </Button>
             </Link>
           </div>

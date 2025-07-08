@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Users, Shield, CheckCircle } from 'lucide-react';
+import { ArrowRight, Heart, Users, Shield, CheckCircle, Book } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Home = () => {
@@ -35,42 +35,96 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-background via-accent to-secondary/5">
-        <div className="container mx-auto text-center">
-          <div className="max-w-5xl mx-auto animate-fade-in">
-            <div className="inline-flex p-4 bg-primary/5 rounded-full mb-8 animate-gentle-float backdrop-blur-sm border border-primary/10">
+      <section className="py-24 px-6 bg-gradient-to-br from-background via-accent/30 to-secondary/10 relative overflow-hidden">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-20 w-32 h-32 rounded-full bg-primary/20 blur-xl"></div>
+          <div className="absolute bottom-32 right-16 w-40 h-40 rounded-full bg-primary/15 blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-4xl mx-auto text-center animate-fade-in">
+            {/* Logo with gentle animation */}
+            <div className="inline-flex items-center justify-center p-3 bg-white/80 backdrop-blur-sm rounded-2xl mb-6 shadow-soft border border-primary/10 animate-gentle-float">
               <img 
                 src="/lovable-uploads/7a0ec4e6-a4a7-4b76-b29d-c8ce93cce8c9.png" 
-                alt="BLOOM" 
-                className="h-12 w-auto"
+                alt="BLOOM - Платформа поддержки женщин в период менопаузы" 
+                className="h-10 w-auto"
               />
+              <Heart className="ml-2 h-5 w-5 text-primary animate-soft-pulse" />
             </div>
             
-            {/* Empathetic main message */}
-            <h1 className="text-3xl md:text-5xl font-playfair font-bold text-foreground mb-6 leading-tight">
-              Мы поддерживаем женщин{' '}
-              <span className="text-primary">
+            {/* Trust badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full mb-8 text-sm text-muted-foreground border border-primary/10">
+              <div className="w-2 h-2 bg-primary rounded-full animate-soft-pulse"></div>
+              Основано на рекомендациях ВОЗ • Одобрено врачами
+            </div>
+            
+            {/* Main heading with improved hierarchy */}
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-inter font-bold text-foreground mb-6 leading-[1.1] tracking-tight">
+              Мы поддерживаем{' '}
+              <span className="text-primary bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                женщин
+              </span>
+              <br className="hidden sm:block" />
+              <span className="text-2xl md:text-3xl lg:text-4xl font-normal text-muted-foreground block mt-2">
                 во всём мире
               </span>
             </h1>
             
-            <div className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
+            {/* Subtitle with better spacing */}
+            <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto font-inter">
               в заботе о своём здоровье, предоставляя персонализированные, 
-              научно обоснованные рекомендации для поддержки женщин в период менопаузы
+              научно обоснованные рекомендации для поддержки в период менопаузы
+            </p>
+            
+            {/* Asymmetric CTA buttons with icons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link to="/register" className="group">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-bloom group-hover:shadow-xl border-0"
+                >
+                  <Heart className="mr-3 h-5 w-5 transition-transform group-hover:scale-110" />
+                  Начать заботу о себе
+                  <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </Link>
+              
+              <span className="hidden sm:block text-muted-foreground/40 font-light">или</span>
+              
+              <Link to="/about" className="group">
+                <Button 
+                  variant="ghost" 
+                  size="lg"
+                  className="border-2 border-primary/20 text-foreground hover:bg-primary/5 hover:border-primary/40 px-8 py-4 rounded-2xl font-medium text-lg transition-all duration-300 hover:scale-105 bg-white/40 backdrop-blur-sm"
+                >
+                  <Book className="mr-2 h-5 w-5" />
+                  Узнать больше
+                </Button>
+              </Link>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-              <Link to="/register">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 shadow-soft hover:shadow-gentle group">
-                  Начать заботу о себе
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-              <Link to="/about">
-                <Button variant="outline" className="border-primary/30 text-foreground hover:bg-accent px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105">
-                  Узнать больше о платформе
-                </Button>
-              </Link>
+            {/* Additional trust elements */}
+            <div className="mt-12 pt-8 border-t border-primary/10">
+              <p className="text-sm text-muted-foreground/80 mb-4">
+                Уже доверились здоровью с BLOOM
+              </p>
+              <div className="flex items-center justify-center gap-8 text-xs text-muted-foreground/60">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-primary/20 rounded-full"></div>
+                  <span>15,000+ женщин</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-primary/20 rounded-full"></div>
+                  <span>50+ стран</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-primary/20 rounded-full"></div>
+                  <span>Рейтинг 4.9/5</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
