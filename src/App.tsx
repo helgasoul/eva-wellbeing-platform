@@ -20,6 +20,9 @@ import PatientInsights from "./pages/patient/PatientInsights";
 import WearableDevices from "./pages/patient/WearableDevices";
 
 import NutritionTracker from "./pages/patient/NutritionTracker";
+import NutritionPlan from "./pages/patient/NutritionPlan";
+import NutritionAnalysis from "./pages/patient/NutritionAnalysis";
+import FoodDiary from "./pages/patient/FoodDiary";
 import CycleTracker from "./pages/patient/CycleTracker";
 import Community from "./pages/patient/Community";
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -29,6 +32,7 @@ import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
 import HowWeHelp from "./pages/HowWeHelp";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
+import { FoodDiaryProvider } from "./contexts/FoodDiaryContext";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +44,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <SubscriptionProvider>
+            <FoodDiaryProvider>
           <Routes>
             {/* Auth routes without layout */}
             <Route path="/login" element={<Login />} />
@@ -116,6 +121,27 @@ const App = () => (
             <Route path="/patient/nutrition" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
                 <NutritionTracker />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient nutrition plan route */}
+            <Route path="/patient/nutrition-plan" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <NutritionPlan />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient nutrition analysis route */}
+            <Route path="/patient/nutrition-analysis" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <NutritionAnalysis />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient food diary route */}
+            <Route path="/patient/food-diary" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <FoodDiary />
               </ProtectedRoute>
             } />
             
@@ -217,6 +243,7 @@ const App = () => (
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+            </FoodDiaryProvider>
           </SubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>

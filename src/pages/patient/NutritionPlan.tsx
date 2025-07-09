@@ -6,8 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { MealFilters } from '@/components/nutrition/MealFilters';
 import { MealCard } from '@/components/nutrition/MealCard';
 import { PremiumTeaser } from '@/components/nutrition/PremiumTeaser';
+import { AddToDiaryModal } from '@/components/nutrition/AddToDiaryModal';
 import { baseMealPlans, BasicMealPlan } from '@/data/baseMealPlans';
 import { useSubscription } from '@/context/SubscriptionContext';
+import { useFoodDiary } from '@/contexts/FoodDiaryContext';
+import { useToast } from '@/hooks/use-toast';
 import { Utensils, ChefHat, Calendar, TrendingUp, Crown } from 'lucide-react';
 
 interface UserProfile {
@@ -26,10 +29,14 @@ interface UserProfile {
 
 const NutritionPlan: React.FC = () => {
   const { currentPlan } = useSubscription();
+  const { addDiaryEntry } = useFoodDiary();
+  const { toast } = useToast();
   const [selectedPhase, setSelectedPhase] = useState<string>('all');
   const [selectedMealType, setSelectedMealType] = useState<string>('all');
   const [selectedTimeframe, setSelectedTimeframe] = useState<'daily' | 'weekly'>('daily');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedMealForDiary, setSelectedMealForDiary] = useState<BasicMealPlan | null>(null);
+  const [showAddToDiary, setShowAddToDiary] = useState(false);
 
   // Mock user profile - в реальном приложении это будет из контекста или API
   const userProfile: UserProfile = {
@@ -85,6 +92,19 @@ const NutritionPlan: React.FC = () => {
   const handleViewRecipe = (meal: BasicMealPlan) => {
     // Здесь будет логика открытия детального рецепта
     console.log('Viewing recipe for:', meal.name);
+  };
+
+  const handleAddToDiary = (meal: BasicMealPlan) => {
+    setSelectedMealForDiary(meal);
+    setShowAddToDiary(true);
+  };
+
+  const handleConfirmAddToDiary = (diaryEntry: any) => {
+    addDiaryEntry(diaryEntry);
+    toast({
+      title: "Успешно добавлено!",
+      description: `${diaryEntry.name} добавлен в дневник питания`,
+    });
   };
 
   const handleUpgrade = () => {
@@ -248,6 +268,7 @@ const NutritionPlan: React.FC = () => {
                       userSubscription={userProfile.subscriptionTier}
                       onViewRecipe={() => handleViewRecipe(meal)}
                       onUpgrade={handleUpgrade}
+                      onAddToDiary={handleAddToDiary}
                     />
                   ))}
                 </div>
@@ -255,6 +276,14 @@ const NutritionPlan: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Модальное окно добавления */}
+        <AddToDiaryModal
+          isOpen={showAddToDiary}
+          meal={selectedMealForDiary}
+          onClose={() => setShowAddToDiary(false)}
+          onConfirm={handleConfirmAddToDiary}
+        />
       </div>
     </PatientLayout>
   );

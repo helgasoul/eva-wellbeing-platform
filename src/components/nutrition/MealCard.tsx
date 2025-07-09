@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, ChefHat, Users, Zap, Lock, Crown, Star } from 'lucide-react';
+import { Clock, ChefHat, Users, Zap, Lock, Crown, Star, Plus } from 'lucide-react';
 import { BasicMealPlan } from '@/data/baseMealPlans';
 
 interface MealCardProps {
@@ -10,13 +10,15 @@ interface MealCardProps {
   userSubscription: 'essential' | 'plus' | 'optimum';
   onViewRecipe?: () => void;
   onUpgrade?: () => void;
+  onAddToDiary?: (meal: BasicMealPlan) => void; // НОВАЯ ФУНКЦИЯ
 }
 
 export const MealCard: React.FC<MealCardProps> = ({
   meal,
   userSubscription,
   onViewRecipe,
-  onUpgrade
+  onUpgrade,
+  onAddToDiary
 }) => {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -200,6 +202,16 @@ export const MealCard: React.FC<MealCardProps> = ({
 
         {/* Кнопки действий */}
         <div className="flex gap-2">
+          {onAddToDiary && (
+            <Button
+              onClick={() => onAddToDiary(meal)}
+              className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+              disabled={!canViewFullRecipe}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {canViewFullRecipe ? 'Добавить в дневник' : 'Дневник в Plus'}
+            </Button>
+          )}
           <Button
             onClick={onViewRecipe}
             variant="outline"
