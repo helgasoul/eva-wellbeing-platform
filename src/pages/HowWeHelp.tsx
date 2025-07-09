@@ -96,17 +96,23 @@ const HowWeHelp: React.FC = () => {
                   <div className="order-1">
                     <div className="text-center lg:text-left">
                       <div className="text-6xl mb-4">
-                        {plan.id === 'essential' ? '🌱' : plan.icon}
+                        {plan.id === 'essential' ? '🌱' : plan.id === 'plus' ? '🌺' : '✨'}
                       </div>
                       <h2 className="text-3xl font-bold text-foreground mb-4">
                         {plan.id === 'essential' ? '🌱 Essential — первый шаг к гармонии' : 
                          plan.id === 'plus' ? '🌺 Plus — Персональный путь к вашему балансу' :
-                         `${plan.icon} ${plan.name} — ${plan.description}`}
+                         '✨ Optimum — Ваше долголетие и забота на высшем уровне'}
                       </h2>
                       
                       {plan.id === 'plus' && (
                         <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                           Для тех, кто хочет не просто отслеживать изменения, но и понимать своё тело глубже, принимать заботу и поддержку экспертов, идти вперёд с уверенностью.
+                        </p>
+                      )}
+                      
+                      {plan.id === 'optimum' && (
+                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                          Инвестиция в здоровье — это вклад в новые счастливые годы жизни
                         </p>
                       )}
                       
@@ -168,20 +174,35 @@ const HowWeHelp: React.FC = () => {
                                 <span className="text-muted-foreground">Готовы вкладываться в здоровье, чтобы сохранить гармонию и радость жизни</span>
                               </li>
                             </>
-                          ) : (
-                            plan.target_audience.map((audience, i) => (
-                              <li key={i} className="flex items-start">
-                                <span className="text-success mr-2 mt-1">✓</span>
-                                <span className="text-muted-foreground">{audience}</span>
+                          ) : plan.id === 'optimum' ? (
+                            <>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🤍</span>
+                                <span className="text-muted-foreground">Заботиться о себе и близких с максимальным вниманием</span>
                               </li>
-                            ))
-                          )}
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🤍</span>
+                                <span className="text-muted-foreground">Получать экспертную поддержку и профилактику</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🤍</span>
+                                <span className="text-muted-foreground">Управлять семейными рисками и быть спокойной за будущее</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🤍</span>
+                                <span className="text-muted-foreground">Быть на связи с лучшими врачами и доступом к самым современным решениям</span>
+                              </li>
+                            </>
+                          ) : null}
                         </ul>
                         
-                        {plan.id === 'plus' && (
+                        {(plan.id === 'plus' || plan.id === 'optimum') && (
                           <div className="mt-4 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
                             <p className="text-sm text-muted-foreground italic text-center">
-                              Каждая женщина заслуживает поддержки на своём уникальном пути. Мы рядом, когда это важно.
+                              {plan.id === 'plus' ? 
+                                'Каждая женщина заслуживает поддержки на своём уникальном пути. Мы рядом, когда это важно.' :
+                                'С заботой о вашем здоровье — команда Bloom'
+                              }
                             </p>
                           </div>
                         )}
@@ -197,7 +218,8 @@ const HowWeHelp: React.FC = () => {
                         {isLoading ? 'Загрузка...' : (
                           plan.id === 'essential' ? 'Попробовать бесплатно' :
                           plan.id === 'plus' ? 'Выбрать Plus' :
-                          `Выбрать ${plan.name}`
+                           plan.id === 'optimum' ? 'Получить максимальную поддержку' :
+                           'Выбрать план'
                         )}
                       </button>
                       
@@ -391,23 +413,96 @@ const HowWeHelp: React.FC = () => {
                             </p>
                           </div>
                         </>
-                      ) : (
+                       ) : plan.id === 'optimum' ? (
                         <>
-                          <h3 className="text-xl font-semibold mb-6 text-center">
-                            Что включено:
-                          </h3>
-                          <ul className="space-y-3">
-                            {plan.features.map((feature, i) => (
-                              <li key={i} className="flex items-start">
-                                <span className={`mr-2 mt-1 ${plan.popular ? 'text-warning-foreground' : 'text-primary'}`}>•</span>
-                                <span className={`text-sm ${plan.popular ? 'text-warning-foreground/90' : 'text-muted-foreground'}`}>
-                                  {feature}
-                                </span>
-                              </li>
-                            ))}
+                          <div className="text-center mb-6">
+                            <div className="text-4xl mb-3">⭐</div>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">
+                              Что входит в план Optimum
+                            </h3>
+                            <p className="text-muted-foreground text-sm">
+                              Максимальная забота о вашем здоровье и долголетии с экспертной поддержкой.
+                            </p>
+                          </div>
+                          <ul className="space-y-4">
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧩</span>
+                              <div>
+                                <div className="font-medium text-foreground">Всё из базового и Plus пакетов</div>
+                                <div className="text-sm text-muted-foreground">Полный доступ ко всем функциям Essential и Plus</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧬</span>
+                              <div>
+                                <div className="font-medium text-foreground">Комплексное тестирование 100+ биомаркеров</div>
+                                <div className="text-sm text-muted-foreground">Глубокий анализ здоровья, включая токсичные металлы и омега-индекс</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧬</span>
+                              <div>
+                                <div className="font-medium text-foreground">Экзомное секвенирование</div>
+                                <div className="text-sm text-muted-foreground">Генетические тесты BRCA1/2, APOE, MTHFR для персональной медицины</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">👩‍⚕️</span>
+                              <div>
+                                <div className="font-medium text-foreground">4 консультации в год с мультидисциплинарной командой</div>
+                                <div className="text-sm text-muted-foreground">Гинеколог-эндокринолог, кардиолог, эндокринолог, нутрициолог</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🤝</span>
+                              <div>
+                                <div className="font-medium text-foreground">Личный координатор здоровья</div>
+                                <div className="text-sm text-muted-foreground">Персональное сопровождение на всём пути к здоровью</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🔬</span>
+                              <div>
+                                <div className="font-medium text-foreground">Программа longevity и биохакинг</div>
+                                <div className="text-sm text-muted-foreground">Мониторинг биологического возраста и оптимизация здоровья</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">💊</span>
+                              <div>
+                                <div className="font-medium text-foreground">Фармакогенетика</div>
+                                <div className="text-sm text-muted-foreground">Индивидуальная реакция на ЗГТ и персональные дозировки</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧪</span>
+                              <div>
+                                <div className="font-medium text-foreground">Микробиом кишечника и пищевые аллергены</div>
+                                <div className="text-sm text-muted-foreground">Анализ разнообразия микробиома и пищевых непереносимостей</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🔬</span>
+                              <div>
+                                <div className="font-medium text-foreground">Доступ к новейшим исследованиям</div>
+                                <div className="text-sm text-muted-foreground">Участие в клинических испытаниях и передовых методах</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">⚡</span>
+                              <div>
+                                <div className="font-medium text-foreground">Приоритетная запись к врачам</div>
+                                <div className="text-sm text-muted-foreground">Быстрый доступ к лучшим специалистам</div>
+                              </div>
+                            </li>
                           </ul>
+                          <div className="mt-6 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
+                            <p className="text-sm text-center text-muted-foreground italic">
+                              Максимальная забота о здоровье и долголетии — для тех, кто выбирает лучшее.
+                            </p>
+                          </div>
                         </>
-                      )}
+                       ) : null}
                     </div>
                   </div>
                 </div>
