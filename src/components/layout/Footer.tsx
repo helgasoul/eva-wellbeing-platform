@@ -2,7 +2,7 @@
 import React from 'react';
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import bloomLogo from '@/assets/bloom-logo-white-bg.png';
+import bloomLogo from '@/assets/bloom-logo.png';
 
 export const Footer = () => {
   return (
