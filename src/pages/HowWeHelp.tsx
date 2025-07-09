@@ -81,11 +81,12 @@ const HowWeHelp: React.FC = () => {
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-foreground mb-4">
-                Выберите свой путь к здоровью
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Начните заботу о себе с Bloom
               </h2>
-              <p className="text-xl text-muted-foreground">
-                Инвестиция в ваше здоровье окупается здоровыми годами жизни
+              <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                Маленькие шаги сегодня — уверенность и спокойствие завтра.<br />
+                Доверяйте себе. Мы рядом на каждом этапе.
               </p>
             </div>
 
@@ -94,39 +95,70 @@ const HowWeHelp: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                   <div className={index % 2 === 0 ? 'order-1' : 'order-2'}>
                     <div className="text-center lg:text-left">
-                      <div className="text-6xl mb-4">{plan.icon}</div>
+                      <div className="text-6xl mb-4">
+                        {plan.id === 'essential' ? '🌱' : plan.icon}
+                      </div>
                       <h2 className="text-3xl font-bold text-foreground mb-4">
-                        {plan.name} - {plan.description}
+                        {plan.id === 'essential' ? '🌱 Essential — первый шаг к гармонии' : `${plan.icon} ${plan.name} — ${plan.description}`}
                       </h2>
                       <div className="text-2xl font-bold text-primary mb-6">
                         ₽{plan.price.toLocaleString()} в год
                         <span className="text-lg text-muted-foreground block">
-                          ₽{plan.monthlyPrice}/месяц при оплате за год
+                          или всего ₽{plan.monthlyPrice}/месяц при оплате за год
                         </span>
                       </div>
                       
+                      {plan.id === 'essential' && (
+                        <div className="mb-6 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
+                          <p className="text-lg font-medium text-foreground italic">
+                            "Менопауза — новый этап, а не приговор. Вы не одна. Всё, что нужно — уже здесь."
+                          </p>
+                        </div>
+                      )}
+                      
                       <div className="space-y-4 mb-8">
                         <h3 className="text-xl font-semibold text-foreground">
-                          Для кого этот план:
+                          {plan.id === 'essential' ? 'Этот план для вас, если вы:' : 'Для кого этот план:'}
                         </h3>
                         <ul className="space-y-2">
-                          {plan.target_audience.map((audience, i) => (
-                            <li key={i} className="flex items-start">
-                              <span className="text-success mr-2 mt-1">✓</span>
-                              <span className="text-muted-foreground">{audience}</span>
-                            </li>
-                          ))}
+                          {plan.id === 'essential' ? (
+                            <>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">💜</span>
+                                <span className="text-muted-foreground">Заметили первые перемены в самочувствии и хотите разобраться без тревоги</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">💜</span>
+                                <span className="text-muted-foreground">Хотите отслеживать сигналы своего тела и понимать себя лучше</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">💜</span>
+                                <span className="text-muted-foreground">Ищете поддержку и честную информацию, а не пугающие диагнозы</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">💜</span>
+                                <span className="text-muted-foreground">Цените заботу, уважение и деликатность в отношении женского здоровья</span>
+                              </li>
+                            </>
+                          ) : (
+                            plan.target_audience.map((audience, i) => (
+                              <li key={i} className="flex items-start">
+                                <span className="text-success mr-2 mt-1">✓</span>
+                                <span className="text-muted-foreground">{audience}</span>
+                              </li>
+                            ))
+                          )}
                         </ul>
                       </div>
                       
                       <button
                         onClick={() => handleSelectPlan(plan.id)}
                         disabled={isLoading}
-                        className={`bg-gradient-to-r ${plan.color} text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity shadow-elegant ${
+                        className={`bg-gradient-to-r ${plan.color} text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-elegant hover:shadow-soft hover:-translate-y-1 ${
                           plan.popular ? 'ring-2 ring-accent ring-offset-2' : ''
                         }`}
                       >
-                        {isLoading ? 'Загрузка...' : `Выбрать ${plan.name}`}
+                        {isLoading ? 'Загрузка...' : (plan.id === 'essential' ? 'Попробовать бесплатно' : `Выбрать ${plan.name}`)}
                       </button>
                       
                       {plan.popular && (
