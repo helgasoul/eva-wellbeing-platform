@@ -151,4 +151,10 @@ export interface AuthContextType {
   switchRole: (role: UserRole) => void;
   returnToOriginalRole: () => void;
   isTestingRole: boolean;
+  
+  // Методы диагностики data flow
+  validateUserDataIntegrity: () => any;
+  getDataFlowStatus: () => any[];
+  repairDataFlow: () => Promise<boolean>;
+  exportUserDataDump: () => any;
 }

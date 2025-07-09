@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, AuthContextType, LoginCredentials, RegisterData, UserRole, MultiStepRegistrationData } from '@/types/auth';
 import { getRoleDashboardPath } from '@/types/roles';
 import { toast } from '@/hooks/use-toast';
+import { DataFlowValidator } from '@/services/dataFlowValidator';
 
 // Предустановленные админские credentials
 const ADMIN_CREDENTIALS = {
@@ -345,6 +346,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // ✅ НОВОЕ: Методы диагностики data flow
+  const dataFlowValidator = new DataFlowValidator();
+
+  const validateUserDataIntegrity = () => {
+    return dataFlowValidator.runFullDiagnostics();
+  };
+
+  const getDataFlowStatus = () => {
+    const diagnostics = dataFlowValidator.runFullDiagnostics();
+    return diagnostics.stages;
+  };
+
+  const repairDataFlow = async (): Promise<boolean> => {
+    return await dataFlowValidator.repairDataFlow();
+  };
+
+  const exportUserDataDump = () => {
+    return dataFlowValidator.exportUserDataDump();
+  };
+
   const value: AuthContextType = {
     user,
     login,
@@ -359,6 +380,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     switchRole,
     returnToOriginalRole,
     isTestingRole,
+    validateUserDataIntegrity,
+    getDataFlowStatus,
+    repairDataFlow,
+    exportUserDataDump,
   };
 
   return (
