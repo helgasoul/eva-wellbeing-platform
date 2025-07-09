@@ -127,7 +127,7 @@ export const MenstrualHistoryStep: React.FC<MenstrualHistoryStepProps> = ({ data
         )}
       </div>
 
-      <div className="text-sm text-muted-foreground bg-eva-soft-pink/20 rounded-lg p-3">
+      <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
         <p>
           💡 <strong>Конфиденциально:</strong> Информация о менструальном цикле критически важна 
           для определения вашей фазы менопаузы и создания персонализированных рекомендаций.

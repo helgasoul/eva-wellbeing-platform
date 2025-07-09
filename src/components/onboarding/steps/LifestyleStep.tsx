@@ -201,7 +201,7 @@ export const LifestyleStep: React.FC<LifestyleStepProps> = ({
         </div>
       </div>
 
-      <div className="text-sm text-muted-foreground bg-eva-soft-pink/20 rounded-lg p-3">
+      <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
         <p>
           💡 <strong>Образ жизни важен:</strong> Информация о ваших привычках поможет создать 
           реалистичные и персонализированные рекомендации по улучшению самочувствия.

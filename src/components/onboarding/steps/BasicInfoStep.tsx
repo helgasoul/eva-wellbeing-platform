@@ -113,7 +113,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ data, onChange }) 
         )}
       </div>
 
-      <div className="text-sm text-muted-foreground bg-eva-soft-pink/20 rounded-lg p-3">
+      <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
         <p>
           💡 <strong>Почему мы спрашиваем:</strong> Эти данные помогают нам лучше понять ваш профиль здоровья 
           и предоставить более точные рекомендации с учетом вашего образа жизни.

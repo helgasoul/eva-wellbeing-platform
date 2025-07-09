@@ -45,7 +45,7 @@ export const SeverityScale: React.FC<SeverityScaleProps> = ({
         <div className="text-4xl mb-2">
           {getEmojiForValue(value)}
         </div>
-        <div className="text-lg font-medium text-eva-dusty-rose mb-1">
+        <div className="text-lg font-medium text-primary mb-1">
           {value}
         </div>
         <div className="text-sm text-muted-foreground">
@@ -64,8 +64,8 @@ export const SeverityScale: React.FC<SeverityScaleProps> = ({
               className={cn(
                 "w-8 h-8 rounded-full text-sm font-medium transition-all duration-200 hover:scale-110",
                 value === scaleValue
-                  ? 'bg-eva-dusty-rose text-white ring-2 ring-eva-mauve ring-offset-2'
-                  : 'bg-eva-cream text-eva-dusty-rose hover:bg-eva-soft-pink'
+                  ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 ring-offset-2'
+                  : 'bg-muted text-primary hover:bg-accent'
               )}
             >
               {scaleValue}

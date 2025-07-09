@@ -24,6 +24,7 @@ export interface MenopauseSymptoms {
   hotFlashes: {
     frequency: 'never' | 'rarely' | 'sometimes' | 'often' | 'daily';
     severity: number; // 1-10
+    triggers?: string[]; // ['stress', 'heat', 'alcohol', 'caffeine', 'spicy_food']
   };
   nightSweats: {
     frequency: 'never' | 'rarely' | 'sometimes' | 'often' | 'daily';
@@ -32,12 +33,13 @@ export interface MenopauseSymptoms {
   sleepProblems: {
     frequency: 'never' | 'rarely' | 'sometimes' | 'often' | 'daily';
     types: string[]; // ['difficulty_falling_asleep', 'frequent_waking', 'early_waking']
+    sleepQuality?: number; // 1-10
   };
   moodChanges: {
     frequency: 'never' | 'rarely' | 'sometimes' | 'often' | 'daily';
     types: string[]; // ['irritability', 'anxiety', 'depression', 'mood_swings']
   };
-  physicalSymptoms: string[]; // ['joint_pain', 'headaches', 'fatigue', 'weight_gain']
+  physicalSymptoms: string[]; // ['joint_pain', 'headaches', 'fatigue', 'weight_gain', 'dry_skin']
   cognitiveSymptoms: string[]; // ['memory_issues', 'concentration_problems', 'brain_fog']
 }
 

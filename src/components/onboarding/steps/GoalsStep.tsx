@@ -155,8 +155,8 @@ export const GoalsStep: React.FC<GoalsStepProps> = ({
       </div>
 
       {/* Final Message */}
-      <div className="text-center bg-gradient-to-r from-eva-soft-pink to-eva-cream rounded-lg p-6">
-        <h4 className="font-medium text-eva-dusty-rose mb-2">Почти готово! 🎉</h4>
+      <div className="text-center bg-gradient-to-r from-accent/30 to-muted rounded-lg p-6">
+        <h4 className="font-medium text-primary mb-2">Почти готово! 🎉</h4>
         <p className="text-sm text-muted-foreground">
           Спасибо за терпение. Мы используем вашу информацию для создания персонального 
           плана поддержки вашего здоровья и благополучия.

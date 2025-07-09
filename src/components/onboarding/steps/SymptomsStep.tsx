@@ -12,9 +12,9 @@ interface SymptomsStepProps {
 }
 
 const defaultSymptoms: MenopauseSymptoms = {
-  hotFlashes: { frequency: 'never', severity: 1 },
+  hotFlashes: { frequency: 'never', severity: 1, triggers: [] },
   nightSweats: { frequency: 'never', severity: 1 },
-  sleepProblems: { frequency: 'never', types: [] },
+  sleepProblems: { frequency: 'never', types: [], sleepQuality: 7 },
   moodChanges: { frequency: 'never', types: [] },
   physicalSymptoms: [],
   cognitiveSymptoms: []
@@ -34,6 +34,10 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
 
   const updateSymptomSeverity = (symptom: 'hotFlashes' | 'nightSweats', severity: number) => {
     updateField(symptom, { ...data[symptom], severity });
+  };
+
+  const updateHotFlashTriggers = (triggers: string[]) => {
+    updateField('hotFlashes', { ...data.hotFlashes, triggers });
   };
 
   const updateComplexSymptom = (symptom: 'sleepProblems' | 'moodChanges', field: string, value: any) => {
@@ -57,11 +61,42 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
           onChange={(frequency) => updateSymptomFrequency('hotFlashes', frequency)}
         />
         {data.hotFlashes.frequency !== 'never' && (
-          <SeverityScale
-            label="Насколько сильные приливы?"
-            value={data.hotFlashes.severity}
-            onChange={(severity) => updateSymptomSeverity('hotFlashes', severity)}
-          />
+          <div className="space-y-4">
+            <SeverityScale
+              label="Насколько сильные приливы?"
+              value={data.hotFlashes.severity}
+              onChange={(severity) => updateSymptomSeverity('hotFlashes', severity)}
+            />
+            
+            {/* Hot Flash Triggers */}
+            <div className="space-y-3">
+              <Label>Что чаще всего провоцирует приливы? (можно выбрать несколько)</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: 'stress', label: 'Стресс' },
+                  { value: 'heat', label: 'Жара' },
+                  { value: 'alcohol', label: 'Алкоголь' },
+                  { value: 'caffeine', label: 'Кофеин' },
+                  { value: 'spicy_food', label: 'Острая пища' }
+                ].map((trigger) => (
+                  <div key={trigger.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={trigger.value}
+                      checked={data.hotFlashes.triggers?.includes(trigger.value) || false}
+                      onCheckedChange={(checked) => {
+                        const currentTriggers = data.hotFlashes.triggers || [];
+                        const newTriggers = checked
+                          ? [...currentTriggers, trigger.value]
+                          : currentTriggers.filter(t => t !== trigger.value);
+                        updateHotFlashTriggers(newTriggers);
+                      }}
+                    />
+                    <Label htmlFor={trigger.value}>{trigger.label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
@@ -91,29 +126,38 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
           onChange={(frequency) => updateComplexSymptom('sleepProblems', 'frequency', frequency)}
         />
         {data.sleepProblems.frequency !== 'never' && (
-          <div className="space-y-3">
-            <Label>Какие именно проблемы? (можно выбрать несколько)</Label>
-            <div className="space-y-2">
-              {[
-                { value: 'difficulty_falling_asleep', label: 'Трудно заснуть' },
-                { value: 'frequent_waking', label: 'Частые пробуждения' },
-                { value: 'early_waking', label: 'Раннее пробуждение' }
-              ].map((option) => (
-                <div key={option.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={option.value}
-                    checked={data.sleepProblems.types.includes(option.value)}
-                    onCheckedChange={(checked) => {
-                      const newTypes = checked
-                        ? [...data.sleepProblems.types, option.value]
-                        : data.sleepProblems.types.filter(t => t !== option.value);
-                      updateComplexSymptom('sleepProblems', 'types', newTypes);
-                    }}
-                  />
-                  <Label htmlFor={option.value}>{option.label}</Label>
-                </div>
-              ))}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label>Какие именно проблемы? (можно выбрать несколько)</Label>
+              <div className="space-y-2">
+                {[
+                  { value: 'difficulty_falling_asleep', label: 'Трудно заснуть' },
+                  { value: 'frequent_waking', label: 'Частые пробуждения' },
+                  { value: 'early_waking', label: 'Раннее пробуждение' }
+                ].map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={option.value}
+                      checked={data.sleepProblems.types.includes(option.value)}
+                      onCheckedChange={(checked) => {
+                        const newTypes = checked
+                          ? [...data.sleepProblems.types, option.value]
+                          : data.sleepProblems.types.filter(t => t !== option.value);
+                        updateComplexSymptom('sleepProblems', 'types', newTypes);
+                      }}
+                    />
+                    <Label htmlFor={option.value}>{option.label}</Label>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Sleep Quality Scale */}
+            <SeverityScale
+              label="Как бы вы оценили качество своего сна?"
+              value={data.sleepProblems.sleepQuality || 7}
+              onChange={(quality) => updateComplexSymptom('sleepProblems', 'sleepQuality', quality)}
+            />
           </div>
         )}
       </div>
@@ -164,7 +208,8 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
             { value: 'joint_pain', label: 'Боли в суставах' },
             { value: 'headaches', label: 'Головные боли' },
             { value: 'fatigue', label: 'Усталость' },
-            { value: 'weight_gain', label: 'Набор веса' }
+            { value: 'weight_gain', label: 'Набор веса' },
+            { value: 'dry_skin', label: 'Сухость кожи' }
           ].map((option) => (
             <div key={option.value} className="flex items-center space-x-2">
               <Checkbox
@@ -206,7 +251,7 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
         </div>
       </div>
 
-      <div className="text-sm text-muted-foreground bg-eva-soft-pink/20 rounded-lg p-3">
+      <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
         <p>
           💡 <strong>Помните:</strong> Если вы не испытываете какой-то симптом, это тоже важная информация. 
           Отвечайте честно - это поможет нам лучше понять ваше состояние.
