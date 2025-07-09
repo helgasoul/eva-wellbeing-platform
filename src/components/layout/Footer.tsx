@@ -2,6 +2,7 @@
 import React from 'react';
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import bloomLogo from '@/assets/bloom-logo.png';
 
 export const Footer = () => {
   return (
@@ -10,13 +11,14 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="p-2 bg-gradient-to-br from-primary to-purple-400 rounded-full animate-gentle-float">
-                <Heart className="h-6 w-6 text-white animate-pulse" />
-              </div>
-              <span className="text-2xl font-semibold text-foreground">
-                bloom
-              </span>
+            <div className="flex items-center space-x-3 mb-4 group">
+              <img 
+                src={bloomLogo} 
+                alt="Bloom"
+                className="h-8 w-auto object-contain animate-petal-dance group-hover:animate-bloom-glow transition-all duration-300"
+              />
+              {/* Декоративная аура при hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-lg scale-150"></div>
             </div>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed text-lg">
               bloom — пространство поддержки и заботы для женщин в период перемен. 

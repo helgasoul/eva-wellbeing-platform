@@ -179,12 +179,37 @@ p {
   50% { transform: translateY(-5px); }
 }
 
+@keyframes bloomGlow {
+  0%, 100% { 
+    filter: drop-shadow(0 0 0px rgba(169, 127, 178, 0.4));
+    transform: scale(1);
+  }
+  50% { 
+    filter: drop-shadow(0 0 8px rgba(169, 127, 178, 0.6));
+    transform: scale(1.02);
+  }
+}
+
+@keyframes petalDance {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(1deg) scale(1.01); }
+  75% { transform: rotate(-1deg) scale(1.01); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out;
 }
 
 .animate-gentle-float {
   animation: gentleFloat 3s ease-in-out infinite;
+}
+
+.animate-bloom-glow {
+  animation: bloomGlow 4s ease-in-out infinite;
+}
+
+.animate-petal-dance {
+  animation: petalDance 6s ease-in-out infinite;
 }
 
 /* Button hover effects */
