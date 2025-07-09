@@ -99,8 +99,17 @@ const HowWeHelp: React.FC = () => {
                         {plan.id === 'essential' ? '🌱' : plan.icon}
                       </div>
                       <h2 className="text-3xl font-bold text-foreground mb-4">
-                        {plan.id === 'essential' ? '🌱 Essential — первый шаг к гармонии' : `${plan.icon} ${plan.name} — ${plan.description}`}
+                        {plan.id === 'essential' ? '🌱 Essential — первый шаг к гармонии' : 
+                         plan.id === 'plus' ? '🌺 Plus — Персональный путь к вашему балансу' :
+                         `${plan.icon} ${plan.name} — ${plan.description}`}
                       </h2>
+                      
+                      {plan.id === 'plus' && (
+                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                          Для тех, кто хочет не просто отслеживать изменения, но и понимать своё тело глубже, принимать заботу и поддержку экспертов, идти вперёд с уверенностью.
+                        </p>
+                      )}
+                      
                       <div className="text-2xl font-bold text-primary mb-6">
                         ₽{plan.price.toLocaleString()} в год
                         <span className="text-lg text-muted-foreground block">
@@ -118,7 +127,7 @@ const HowWeHelp: React.FC = () => {
                       
                       <div className="space-y-4 mb-8">
                         <h3 className="text-xl font-semibold text-foreground">
-                          {plan.id === 'essential' ? 'Этот план для вас, если вы:' : 'Для кого этот план:'}
+                          {plan.id === 'essential' ? 'Этот план для вас, если вы:' : 'Этот план для вас, если вы:'}
                         </h3>
                         <ul className="space-y-2">
                           {plan.id === 'essential' ? (
@@ -140,6 +149,25 @@ const HowWeHelp: React.FC = () => {
                                 <span className="text-muted-foreground">Цените заботу, уважение и деликатность в отношении женского здоровья</span>
                               </li>
                             </>
+                          ) : plan.id === 'plus' ? (
+                            <>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🌸</span>
+                                <span className="text-muted-foreground">Чувствуете, что перемены стали более заметными и хотите пройти этот этап с поддержкой</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🌸</span>
+                                <span className="text-muted-foreground">Хотите получить точные ответы от специалистов и персональные рекомендации</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🌸</span>
+                                <span className="text-muted-foreground">Цените науку, честность и бережное отношение к себе</span>
+                              </li>
+                              <li className="flex items-start">
+                                <span className="text-success mr-2 mt-1">🌸</span>
+                                <span className="text-muted-foreground">Готовы вкладываться в здоровье, чтобы сохранить гармонию и радость жизни</span>
+                              </li>
+                            </>
                           ) : (
                             plan.target_audience.map((audience, i) => (
                               <li key={i} className="flex items-start">
@@ -149,6 +177,14 @@ const HowWeHelp: React.FC = () => {
                             ))
                           )}
                         </ul>
+                        
+                        {plan.id === 'plus' && (
+                          <div className="mt-4 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
+                            <p className="text-sm text-muted-foreground italic text-center">
+                              Каждая женщина заслуживает поддержки на своём уникальном пути. Мы рядом, когда это важно.
+                            </p>
+                          </div>
+                        )}
                       </div>
                       
                       <button
@@ -158,13 +194,17 @@ const HowWeHelp: React.FC = () => {
                           plan.popular ? 'ring-2 ring-accent ring-offset-2' : ''
                         }`}
                       >
-                        {isLoading ? 'Загрузка...' : (plan.id === 'essential' ? 'Попробовать бесплатно' : `Выбрать ${plan.name}`)}
+                        {isLoading ? 'Загрузка...' : (
+                          plan.id === 'essential' ? 'Попробовать бесплатно' :
+                          plan.id === 'plus' ? 'Выбрать Plus' :
+                          `Выбрать ${plan.name}`
+                        )}
                       </button>
                       
                       {plan.popular && (
                         <div className="mt-4">
-                          <span className="bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-bold">
-                            САМЫЙ ПОПУЛЯРНЫЙ
+                          <span className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center justify-center gap-1">
+                            🌸 Самый популярный выбор среди женщин Bloom
                           </span>
                         </div>
                       )}
