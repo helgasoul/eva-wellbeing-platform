@@ -236,9 +236,11 @@ const HowWeHelp: React.FC = () => {
                   <div className="order-2">
                     <div
                       id={plan.id}
-                      className={`rounded-2xl p-8 shadow-elegant transition-all duration-300 hover:shadow-soft ${
+                      className={`rounded-3xl p-8 shadow-elegant transition-all duration-300 hover:shadow-soft ${
                         plan.popular 
-                          ? 'bg-gradient-to-br from-warning via-warning/90 to-warning/80 text-warning-foreground transform scale-105' 
+                          ? 'bg-gradient-to-br from-warning/20 via-warning/10 to-warning/5 text-foreground border-2 border-warning/30 transform scale-105' 
+                          : plan.id === 'plus'
+                          ? 'bg-gradient-to-br from-primary/8 via-accent/8 to-primary/5 border-2 border-primary/20 hover:border-primary/40'
                           : 'bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 border-2 border-accent/20 hover:border-primary/30'
                       }`}
                     >
@@ -326,94 +328,94 @@ const HowWeHelp: React.FC = () => {
                         </>
                       ) : plan.id === 'plus' ? (
                         <>
-                          <div className="text-center mb-6">
-                            <div className="text-4xl mb-3">🌷</div>
-                            <h3 className="text-xl font-semibold text-foreground mb-2">
+                          <div className="text-center mb-8">
+                            <div className="text-5xl mb-4">🌷</div>
+                            <h3 className="text-2xl font-bold text-foreground mb-3">
                               Что входит в план Plus
                             </h3>
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-base text-foreground/80 leading-relaxed">
                               Всё для комплексной поддержки вашего здоровья, понимания себя и заботы о каждом дне.
                             </p>
                           </div>
-                          <ul className="space-y-4">
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">🧩</span>
+                          <ul className="space-y-5">
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">🧩</span>
                               <div>
-                                <div className="font-medium text-foreground">Всё из базового пакета — без ограничений</div>
-                                <div className="text-sm text-muted-foreground">Полный доступ ко всем функциям Essential</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Всё из базового пакета — без ограничений</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Полный доступ ко всем функциям Essential</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">🧬</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">🧬</span>
                               <div>
-                                <div className="font-medium text-foreground">Расширенные лабораторные анализы</div>
-                                <div className="text-sm text-muted-foreground">Понимаем ваши гормоны, метаболизм, витамины, здоровье костей и щитовидной железы</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Расширенные лабораторные анализы</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Понимаем ваши гормоны, метаболизм, витамины, здоровье костей и щитовидной железы</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">📒</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">📒</span>
                               <div>
-                                <div className="font-medium text-foreground">Трекеры и напоминания</div>
-                                <div className="text-sm text-muted-foreground">Цикл, симптомы, питание и движение всегда под контролем</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Трекеры и напоминания</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Цикл, симптомы, питание и движение всегда под контролем</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">🥗</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">🥗</span>
                               <div>
-                                <div className="font-medium text-foreground">Индивидуальный план питания и рекомендации</div>
-                                <div className="text-sm text-muted-foreground">С учётом ваших анализов и потребностей</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Индивидуальный план питания и рекомендации</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">С учётом ваших анализов и потребностей</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">👩‍⚕️</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">👩‍⚕️</span>
                               <div>
-                                <div className="font-medium text-foreground">Личные советы от врачей и нутрициологов</div>
-                                <div className="text-sm text-muted-foreground">2 консультации в год с профильными специалистами</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Личные советы от врачей и нутрициологов</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">2 консультации в год с профильными специалистами</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">💬</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">💬</span>
                               <div>
-                                <div className="font-medium text-foreground">Доступ к поддержке 24/7 и приоритетные ответы</div>
-                                <div className="text-sm text-muted-foreground">Приоритетная поддержка, когда она нужна</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Доступ к поддержке 24/7 и приоритетные ответы</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Приоритетная поддержка, когда она нужна</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">🏃‍♀️</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">🏃‍♀️</span>
                               <div>
-                                <div className="font-medium text-foreground">Персональные рекомендации по физической активности</div>
-                                <div className="text-sm text-muted-foreground">Поддержим тело и эмоции на каждом этапе</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Персональные рекомендации по физической активности</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Поддержим тело и эмоции на каждом этапе</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">📲</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">📲</span>
                               <div>
-                                <div className="font-medium text-foreground">Интеграция с носимыми устройствами</div>
-                                <div className="text-sm text-muted-foreground">Apple Health, Garmin, Oura и другие</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Интеграция с носимыми устройствами</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Apple Health, Garmin, Oura и другие</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">📝</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">📝</span>
                               <div>
-                                <div className="font-medium text-foreground">Разбор анализов с врачом</div>
-                                <div className="text-sm text-muted-foreground">Поддержка на каждом шаге</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Разбор анализов с врачом</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Поддержка на каждом шаге</div>
                               </div>
                             </li>
-                            <li className="flex items-start space-x-3">
-                              <span className="text-xl mt-1">🧑‍🤝‍🧑</span>
+                            <li className="flex items-start space-x-4">
+                              <span className="text-2xl mt-1 flex-shrink-0">🧑‍🤝‍🧑</span>
                               <div>
-                                <div className="font-medium text-foreground">Клуб поддержки, медитации и блог врачей</div>
-                                <div className="text-sm text-muted-foreground">Сообщество и экспертные материалы</div>
+                                <div className="font-semibold text-foreground text-base mb-1">Клуб поддержки, медитации и блог врачей</div>
+                                <div className="text-sm text-foreground/70 leading-relaxed">Сообщество и экспертные материалы</div>
                               </div>
                             </li>
                           </ul>
-                          <div className="mt-6 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
-                            <p className="text-sm text-center text-muted-foreground italic">
+                          <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 to-accent/15 rounded-2xl border border-primary/20 backdrop-blur-sm">
+                            <p className="text-sm text-center text-foreground font-medium leading-relaxed">
                               Всё, чтобы вы чувствовали себя уверенно и спокойно — каждый день.
                             </p>
                           </div>
                         </>
-                       ) : plan.id === 'optimum' ? (
+                      ) : plan.id === 'optimum' ? (
                         <>
                           <div className="text-center mb-6">
                             <div className="text-4xl mb-3">⭐</div>
