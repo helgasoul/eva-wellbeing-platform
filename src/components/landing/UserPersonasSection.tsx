@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sprout, Flame, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import beginningChangesImage from '@/assets/beginning-changes-card.jpg';
@@ -6,6 +7,12 @@ import activePhaseImage from '@/assets/active-phase-card.jpg';
 import afterTransitionImage from '@/assets/after-transition-card.jpg';
 
 const UserPersonasSection: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handlePersonaClick = (planId: string) => {
+    navigate(`/how-we-help#${planId}`);
+  };
+
   const personas = [
     {
       title: "Начало перемен",
@@ -136,9 +143,10 @@ const UserPersonasSection: React.FC = () => {
                   </ul>
                   
                   <Button 
+                    onClick={() => handlePersonaClick(index === 0 ? 'essential' : index === 1 ? 'plus' : 'optimum')}
                     className={`w-full bg-gradient-to-r ${persona.colorClass} text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
                   >
-                    {persona.ctaText}
+                    {index === 0 ? 'Выбрать план Essential' : index === 1 ? 'Выбрать план Plus' : 'Выбрать план Optimum'}
                   </Button>
                 </div>
               </div>

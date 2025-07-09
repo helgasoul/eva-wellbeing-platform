@@ -27,7 +27,8 @@ import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
-import Services from "./pages/Services";
+import HowWeHelp from "./pages/HowWeHelp";
+import { SubscriptionProvider } from "./context/SubscriptionContext";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <SubscriptionProvider>
           <Routes>
             {/* Auth routes without layout */}
             <Route path="/login" element={<Login />} />
@@ -165,10 +167,16 @@ const App = () => (
             
             {/* Add placeholder routes for footer links */}
             <Route path="/about" element={<AboutPlatform />} />
+            <Route path="/how-we-help" element={<HowWeHelp />} />
             
             <Route path="/services" element={
               <Layout>
-                <Services />
+                <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                  <div className="bloom-card p-8 text-center">
+                    <h1 className="text-2xl font-playfair font-bold mb-4">Услуги</h1>
+                    <p className="text-muted-foreground">Эта страница в разработке</p>
+                  </div>
+                </div>
               </Layout>
             } />
             
@@ -208,6 +216,7 @@ const App = () => (
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </SubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

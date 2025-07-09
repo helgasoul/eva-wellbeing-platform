@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Heart, Shield, Flower } from 'lucide-react';
+import { Sparkles, Heart, Shield, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import womenCommunityIllustration from '@/assets/women-community-illustration.png';
 
 const HeroSection: React.FC = () => {
   return (
@@ -18,7 +17,7 @@ const HeroSection: React.FC = () => {
           {/* Иконка */}
           <div className="flex justify-center mb-8 animate-fade-in">
             <div className="inline-flex p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full shadow-elegant animate-gentle-float">
-              <Flower className="h-8 w-8 text-primary" />
+              <Leaf className="h-8 w-8 text-primary" />
             </div>
           </div>
 
@@ -39,7 +38,7 @@ const HeroSection: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/15 to-primary/10 rounded-3xl blur-2xl transform scale-110"></div>
             <div className="relative bg-card rounded-3xl overflow-hidden shadow-elegant border border-primary/10">
               <img 
-                src={womenCommunityIllustration} 
+                src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
                 alt="Группа улыбающихся женщин разных возрастов — поддержка и радость вместе"
                 className="w-full h-auto object-cover"
               />
