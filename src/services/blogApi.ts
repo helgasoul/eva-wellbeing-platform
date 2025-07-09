@@ -161,10 +161,9 @@ export const blogApi = {
 
   // Увеличить счетчик просмотров
   async incrementViews(postId: string): Promise<void> {
-    const { error } = await supabase
-      .from('expert_blog_posts')
-      .update({ views_count: supabase.rpc('increment', { amount: 1 }) })
-      .eq('id', postId);
+    const { error } = await supabase.rpc('increment_post_views', {
+      post_id: postId
+    });
 
     if (error) console.error('Ошибка обновления просмотров:', error);
   },

@@ -5941,6 +5941,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_post_views: {
+        Args: { post_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "patient" | "doctor" | "clinic" | "laboratory" | "admin"
