@@ -36,6 +36,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 
+// Dev pages for testing
+import DataFlowTestPage from "./pages/dev/DataFlowTestPage";
+
 // Providers
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { FoodDiaryProvider } from "./contexts/FoodDiaryContext";
@@ -224,6 +227,9 @@ function App() {
                         <AdminDashboard />
                       </ProtectedRoute>
                     } />
+
+                    {/* DEV ROUTES - для тестирования */}
+                    <Route path="/dev/data-flow-test" element={<DataFlowTestPage />} />
 
                     {/* FALLBACK */}
                     <Route path="*" element={<NotFound />} />
