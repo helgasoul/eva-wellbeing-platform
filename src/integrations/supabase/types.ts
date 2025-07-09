@@ -358,6 +358,95 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_comments: {
+        Row: {
+          author_avatar: string | null
+          author_id: string | null
+          author_name: string
+          author_role: string | null
+          content: string
+          created_at: string | null
+          id: string
+          is_expert_reply: boolean | null
+          likes_count: number | null
+          parent_comment_id: string | null
+          post_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_id?: string | null
+          author_name: string
+          author_role?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_expert_reply?: boolean | null
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          post_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          author_avatar?: string | null
+          author_id?: string | null
+          author_name?: string
+          author_role?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_expert_reply?: boolean | null
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          post_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "blog_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "expert_blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_post_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "expert_blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calculator_results: {
         Row: {
           calculated_at: string
@@ -1238,6 +1327,102 @@ export type Database = {
           verification_date?: string | null
           verification_status?: string
           verified_by?: string | null
+        }
+        Relationships: []
+      }
+      expert_blog_posts: {
+        Row: {
+          author_avatar: string | null
+          author_id: string | null
+          author_name: string
+          author_title: string | null
+          category: string
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          likes_count: number | null
+          meta_description: string | null
+          meta_keywords: string[] | null
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_notes: string | null
+          moderation_status: string | null
+          published_at: string | null
+          reading_time: number | null
+          shares_count: number | null
+          status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          views_count: number | null
+          visibility: string | null
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_id?: string | null
+          author_name: string
+          author_title?: string | null
+          category: string
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          likes_count?: number | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_notes?: string | null
+          moderation_status?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          shares_count?: number | null
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          views_count?: number | null
+          visibility?: string | null
+        }
+        Update: {
+          author_avatar?: string | null
+          author_id?: string | null
+          author_name?: string
+          author_title?: string | null
+          category?: string
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          likes_count?: number | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_notes?: string | null
+          moderation_status?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          shares_count?: number | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          views_count?: number | null
+          visibility?: string | null
         }
         Relationships: []
       }

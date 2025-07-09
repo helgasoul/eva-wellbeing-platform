@@ -1,0 +1,85 @@
+import React from 'react';
+import { Sprout, Flame, Gem } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+const UserPersonasSection: React.FC = () => {
+  const personas = [
+    {
+      title: "Первые признаки",
+      subtitle: "Вам 45+? Нерегулярные месячные?",
+      description: "Получите ясность и контроль",
+      Icon: Sprout,
+      colorClass: "from-success/80 to-success",
+      features: ["Трекинг ранних симптомов", "Образовательный контент", "Сообщество поддержки"]
+    },
+    {
+      title: "Активная фаза",
+      subtitle: "Приливы мешают жить?",
+      description: "Найдите эффективные решения",
+      Icon: Flame,
+      colorClass: "from-warning/80 to-warning",
+      features: ["Биомаркеры", "Консультации врачей", "Персональные планы"]
+    },
+    {
+      title: "Поздняя менопауза",
+      subtitle: "Защитите здоровье костей и сердца",
+      description: "В долгосрочной перспективе",
+      Icon: Gem,
+      colorClass: "from-primary/80 to-primary",
+      features: ["Генетическое тестирование", "Программы долголетия", "VIP сопровождение"]
+    }
+  ];
+
+  return (
+    <section className="py-20 bg-muted/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-foreground mb-4">
+            Найдите свой путь к здоровью
+          </h2>
+          <p className="text-xl text-muted-foreground">
+            Каждая фаза менопаузы требует особого подхода
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {personas.map((persona, index) => {
+            const IconComponent = persona.Icon;
+            return (
+              <div key={index} className="bg-card rounded-xl shadow-clean overflow-hidden hover:shadow-soft transition-all duration-300">
+                <div className={`bg-gradient-to-br ${persona.colorClass} p-6 text-white`}>
+                  <div className="inline-flex p-3 bg-white/20 rounded-full mb-4">
+                    <IconComponent className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
+                  <p className="text-lg opacity-90">{persona.subtitle}</p>
+                </div>
+                
+                <div className="p-6">
+                  <p className="text-muted-foreground mb-6">{persona.description}</p>
+                  
+                  <ul className="space-y-3 mb-6">
+                    {persona.features.map((feature, i) => (
+                      <li key={i} className="flex items-center">
+                        <span className="text-success mr-2">✓</span>
+                        <span className="text-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Button 
+                    className={`w-full bg-gradient-to-r ${persona.colorClass} text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
+                  >
+                    Подробнее
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default UserPersonasSection;
