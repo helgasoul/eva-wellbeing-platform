@@ -168,6 +168,7 @@ const App = () => (
             {/* Add placeholder routes for footer links */}
             <Route path="/about" element={<AboutPlatform />} />
             <Route path="/how-we-help" element={<HowWeHelp />} />
+            <Route path="/pricing" element={<HowWeHelp />} />
             
             <Route path="/services" element={
               <Layout>
