@@ -146,34 +146,44 @@ function App() {
                     } />
                     
                     <Route path="/patient/insights" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
-                        <PatientInsights />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/patient/chat" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
-                        <AIChat />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/patient/nutrition" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
-                        <FoodDiary />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/patient/doctor-booking" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
-                        <DoctorBooking />
-                      </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/patient/community" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
-                        <Community />
-                      </ProtectedRoute>
-                    } />
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <PatientInsights />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/chat" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <AIChat />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/nutrition" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <FoodDiary />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/doctor-booking" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <DoctorBooking />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/community" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <Community />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
 
                     {/* DOCTOR ROUTES */}
                     <Route path="/doctor/dashboard" element={

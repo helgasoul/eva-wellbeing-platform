@@ -46,7 +46,7 @@ const PatientOnboarding = () => {
     dataBridge: false
   });
   
-  const { user } = useAuth();
+  const { user, completeOnboarding } = useAuth();
   const navigate = useNavigate();
 
   // ✅ ИСПРАВЛЕНИЕ: Загружаем данные через DataBridge
@@ -205,23 +205,37 @@ const PatientOnboarding = () => {
     }
   };
 
-  const handleOnboardingComplete = () => {
-    // ✅ ИСПРАВЛЕНИЕ: Используем DataBridge для безопасной очистки
-    dataBridge.cleanupTransferData();
-    
-    // Очищаем локальные данные онбординга
-    localStorage.removeItem(STORAGE_KEY);
-    
-    // Mark onboarding as completed in user context
-    // This would typically involve an API call to update user profile
-    
-    toast({
-      title: 'Онбординг завершен!',
-      description: 'Добро пожаловать в вашу персональную панель управления здоровьем!',
-    });
-    
-    // Navigate to patient dashboard
-    navigate('/patient/dashboard');
+  const handleOnboardingComplete = async () => {
+    try {
+      // ✅ ИСПРАВЛЕНИЕ: Используем AuthContext для завершения онбординга
+      // Подготавливаем данные онбординга для сохранения
+      const onboardingSummary = {
+        phaseResult,
+        recommendations,
+        formData,
+        completedAt: new Date().toISOString()
+      };
+      
+      // Завершаем онбординг через AuthContext
+      await completeOnboarding(onboardingSummary);
+      
+      // ✅ Используем DataBridge для безопасной очистки
+      dataBridge.cleanupTransferData();
+      
+      // Очищаем локальные данные онбординга
+      localStorage.removeItem(STORAGE_KEY);
+      
+      // Navigate to patient dashboard
+      navigate('/patient/dashboard');
+      
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Произошла ошибка при завершении онбординга. Попробуйте еще раз.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const canGoNext = () => {
