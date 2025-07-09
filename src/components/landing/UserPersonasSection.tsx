@@ -3,6 +3,7 @@ import { Sprout, Flame, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import beginningChangesImage from '@/assets/beginning-changes-card.jpg';
 import activePhaseImage from '@/assets/active-phase-card.jpg';
+import afterTransitionImage from '@/assets/after-transition-card.jpg';
 
 const UserPersonasSection: React.FC = () => {
   const personas = [
@@ -31,7 +32,7 @@ const UserPersonasSection: React.FC = () => {
       Icon: Gem,
       colorClass: "from-primary/80 to-primary",
       features: ["Генетические тесты для профилактики", "Программы осознанного долголетия", "Персональный подход и поддержка"],
-      ctaText: "Получить поддержку"
+      ctaText: "Долгосрочные рекомендации"
     }
   ];
 
@@ -78,6 +79,23 @@ const UserPersonasSection: React.FC = () => {
                       className="w-full h-48 object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-warning/90 via-warning/60 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
+                        <IconComponent className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
+                      <p className="text-base opacity-90">{persona.subtitle}</p>
+                    </div>
+                  </div>
+                ) : index === 2 ? (
+                  // Специальный дизайн для третьей карточки с изображением
+                  <div className="relative">
+                    <img 
+                      src={afterTransitionImage} 
+                      alt="Поддержка и забота для женщин после менопаузы"
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/60 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                       <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
                         <IconComponent className="h-6 w-6 text-white" />
