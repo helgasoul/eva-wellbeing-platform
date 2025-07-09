@@ -2,6 +2,7 @@ import React from 'react';
 import { Sprout, Flame, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import beginningChangesImage from '@/assets/beginning-changes-card.jpg';
+import activePhaseImage from '@/assets/active-phase-card.jpg';
 
 const UserPersonasSection: React.FC = () => {
   const personas = [
@@ -15,13 +16,13 @@ const UserPersonasSection: React.FC = () => {
       ctaText: "Узнать больше"
     },
     {
-      title: "В разгар перемен",
-      subtitle: "Приливы или другие ощущения влияют на ваше самочувствие?",
-      description: "Вместе подберём решения, которые работают для вас",
+      title: "Активная фаза",
+      subtitle: "Приливы или другие ощущения мешают вашему комфорту?",
+      description: "Вместе найдём решения, подходящие именно вам",
       Icon: Flame,
       colorClass: "from-warning/80 to-warning",
-      features: ["Современные биомаркеры", "Индивидуальные консультации", "Персональные рекомендации"],
-      ctaText: "Посмотреть рекомендации"
+      features: ["Современные биомаркеры", "Индивидуальные консультации", "Персональные рекомендации и планы"],
+      ctaText: "Посмотреть решения"
     },
     {
       title: "После перемен",
@@ -60,6 +61,23 @@ const UserPersonasSection: React.FC = () => {
                       className="w-full h-48 object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-success/90 via-success/60 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
+                        <IconComponent className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
+                      <p className="text-base opacity-90">{persona.subtitle}</p>
+                    </div>
+                  </div>
+                ) : index === 1 ? (
+                  // Специальный дизайн для второй карточки с изображением
+                  <div className="relative">
+                    <img 
+                      src={activePhaseImage} 
+                      alt="Поддержка и решения для женщин в активной фазе перемен"
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-warning/90 via-warning/60 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                       <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
                         <IconComponent className="h-6 w-6 text-white" />
