@@ -717,25 +717,177 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Additional Services */}
-        <section className="py-20 bg-muted/20">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
-              Дополнительные услуги
-            </h2>
+        <section className="py-20 bg-gradient-to-br from-pink-50/30 via-purple-50/20 to-background relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-100/5 via-transparent to-purple-100/5"></div>
+          
+          <div className="max-w-7xl mx-auto px-4 relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+                Дополнительные услуги
+              </h2>
+              <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                Персональная забота именно тогда, когда она вам нужна
+              </p>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ADDITIONAL_SERVICES.map((service) => (
-                <div key={service.id} className="bg-card rounded-lg p-6 shadow-clean hover:shadow-soft transition-all">
-                  <h3 className="font-semibold text-lg mb-2 text-foreground">{service.name}</h3>
-                  <p className="text-muted-foreground mb-4">{service.description}</p>
-                  <div className="text-2xl font-bold text-primary mb-4">
-                    ₽{service.price.toLocaleString()}
-                  </div>
-                  <button className="w-full bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                    Записаться
-                  </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Онлайн-консилиум врачей */}
+              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">👩‍⚕️</div>
+                <h3 className="font-semibold text-xl mb-3 text-foreground">Онлайн-консилиум врачей</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <span className="font-medium text-primary">Ваша персональная команда заботы</span><br />
+                  Мультидисциплинарная консультация, чтобы принять верное решение вместе с ведущими специалистами.
+                </p>
+                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <span className="text-lg">💰</span>
+                  ₽15,000
                 </div>
-              ))}
+                <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                  Записаться
+                </button>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <span>🤝</span>
+                    Остались вопросы? Мы поможем
+                  </p>
+                </div>
+              </div>
+
+              {/* МРТ молочной железы */}
+              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🩺</div>
+                <h3 className="font-semibold text-xl mb-3 text-foreground">МРТ молочной железы с контрастным усилением</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <span className="font-medium text-primary">Современная диагностика для вашего спокойствия</span><br />
+                  Магнитно-резонансная томография с бережным отношением к вашему здоровью.
+                </p>
+                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <span className="text-lg">💰</span>
+                  ₽8,500
+                </div>
+                <button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                  Записаться
+                </button>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <span>🤝</span>
+                    Остались вопросы? Мы поможем
+                  </p>
+                </div>
+              </div>
+
+              {/* DEXA-сканирование */}
+              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🦴</div>
+                <h3 className="font-semibold text-xl mb-3 text-foreground">DEXA-сканирование</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <span className="font-medium text-primary">Контроль плотности костей для женского здоровья</span><br />
+                  Точная диагностика, заботливо и быстро.
+                </p>
+                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <span className="text-lg">💰</span>
+                  ₽4,000
+                </div>
+                <button className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                  Записаться
+                </button>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <span>🤝</span>
+                    Остались вопросы? Мы поможем
+                  </p>
+                </div>
+              </div>
+
+              {/* Персональный план питания */}
+              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🍏</div>
+                <h3 className="font-semibold text-xl mb-3 text-foreground">Персональный план питания</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <span className="font-medium text-primary">Индивидуально, с заботой о вас</span><br />
+                  Рекомендации от нутрициолога, учитывающие ваши особенности и потребности.
+                </p>
+                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <span className="text-lg">💰</span>
+                  ₽2,500
+                </div>
+                <button className="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                  Записаться
+                </button>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <span>🤝</span>
+                    Остались вопросы? Мы поможем
+                  </p>
+                </div>
+              </div>
+
+              {/* Генетическое тестирование */}
+              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2 relative">
+                <div className="absolute -top-3 -right-3 bg-gradient-to-r from-orange-400 to-red-400 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  Популярное
+                </div>
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🧬</div>
+                <h3 className="font-semibold text-xl mb-3 text-foreground">Генетическое тестирование</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <span className="font-medium text-primary">Ваша уникальная карта здоровья</span><br />
+                  Экзомное секвенирование для понимания генетических особенностей и рисков.
+                </p>
+                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <span className="text-lg">💰</span>
+                  ₽25,000
+                </div>
+                <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                  Записаться
+                </button>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <span>🤝</span>
+                    Остались вопросы? Мы поможем
+                  </p>
+                </div>
+              </div>
+
+              {/* Маммография */}
+              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🔬</div>
+                <h3 className="font-semibold text-xl mb-3 text-foreground">Маммография</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <span className="font-medium text-primary">Деликатная забота о женском здоровье</span><br />
+                  Рентгеновское исследование молочных желез с комфортом и заботой.
+                </p>
+                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <span className="text-lg">💰</span>
+                  ₽5,000
+                </div>
+                <button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                  Записаться
+                </button>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <span>🤝</span>
+                    Остались вопросы? Мы поможем
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Support Message */}
+            <div className="mt-16 text-center">
+              <div className="bg-gradient-to-r from-pink-50/50 to-purple-50/50 rounded-3xl p-8 border border-pink-100/50 max-w-4xl mx-auto">
+                <div className="text-4xl mb-4">💖</div>
+                <h3 className="text-2xl font-bold mb-4 text-foreground">Мы рядом на каждом шаге</h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Каждая услуга — это не просто процедура, а проявление заботы о вашем здоровье и спокойствии. 
+                  Наши специалисты всегда готовы ответить на ваши вопросы и поддержать вас.
+                </p>
+                <div className="mt-6 flex items-center justify-center gap-2 text-muted-foreground">
+                  <span className="text-xl">📞</span>
+                  <span>Горячая линия: 8 (800) 123-45-67</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
