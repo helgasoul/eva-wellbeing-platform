@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useRegistration } from '@/context/RegistrationContext';
 import { useAuth } from '@/context/AuthContext';
-import { CheckCircle, Sparkles, Heart, Shield, ArrowRight } from 'lucide-react';
+import { CheckCircle, Sparkles, Heart, Shield, ArrowRight, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const menopausePersonas = {
@@ -31,14 +31,18 @@ export const RegistrationComplete: React.FC = () => {
   const { state, resetRegistration } = useRegistration();
   const { completeRegistration } = useAuth();
   const navigate = useNavigate();
+  const [isDataTransferred, setIsDataTransferred] = useState(false);
+  const [newUser, setNewUser] = useState(null);
   
   const selectedPersona = state.step3Data.selectedPersona 
     ? menopausePersonas[state.step3Data.selectedPersona]
     : null;
 
   useEffect(() => {
-    // Завершаем регистрацию в системе аутентификации
+    // ✅ ИСПРАВЛЕНИЕ: Завершаем регистрацию и сохраняем данные ПЕРЕД очисткой
     const completeAuthRegistration = async () => {
+      if (!state.isCompleted || isDataTransferred) return;
+
       try {
         const registrationData = {
           step1: state.step1Data,
@@ -52,22 +56,41 @@ export const RegistrationComplete: React.FC = () => {
           lastName: state.step4Data.lastName
         };
 
-        // Используем новый метод из AuthContext
-        const newUser = await completeRegistration(registrationData);
+        // Завершаем регистрацию и получаем созданного пользователя
+        const createdUser = await completeRegistration(registrationData);
+        setNewUser(createdUser);
+        
+        // ✅ НОВОЕ: Сохраняем данные для онбординга в localStorage
+        const onboardingPresets = {
+          fromRegistration: true,
+          personaId: state.step3Data.selectedPersona,
+          registrationTimestamp: new Date().toISOString(),
+          basicInfo: {
+            firstName: state.step4Data.firstName,
+            lastName: state.step4Data.lastName,
+            email: state.step1Data.email,
+            phone: state.step1Data.phone
+          },
+          consents: {
+            ...state.step2Data,
+            timestamp: new Date().toISOString()
+          },
+          expectedOnboardingPath: getOnboardingPathByPersona(state.step3Data.selectedPersona)
+        };
+        
+        localStorage.setItem('eva_onboarding_presets', JSON.stringify(onboardingPresets));
+        
+        setIsDataTransferred(true);
         
         toast({
           title: 'Регистрация завершена!',
-          description: `Добро пожаловать, ${newUser.firstName}!`,
+          description: `Добро пожаловать, ${createdUser.firstName}!`,
         });
 
-        // Автоматический переход к онбордингу через 3 секунды
-        setTimeout(() => {
-          resetRegistration();
-          navigate('/patient/onboarding');
-        }, 3000);
+        console.log('✅ Registration data successfully transferred and saved');
         
       } catch (error) {
-        console.error('Ошибка завершения регистрации:', error);
+        console.error('❌ Error completing registration:', error);
         toast({
           title: 'Ошибка',
           description: error instanceof Error ? error.message : 'Произошла ошибка при завершении регистрации',
@@ -76,15 +99,35 @@ export const RegistrationComplete: React.FC = () => {
       }
     };
 
-    if (state.isCompleted) {
-      completeAuthRegistration();
-    }
-  }, [state, completeRegistration, navigate, resetRegistration]);
+    completeAuthRegistration();
+  }, [state, completeRegistration, isDataTransferred]);
 
+  // ✅ ИСПРАВЛЕНИЕ: Переход только после успешной передачи данных
   const handleContinueManually = () => {
+    if (!isDataTransferred) {
+      toast({
+        title: 'Подождите',
+        description: 'Завершается подготовка ваших данных...',
+        variant: 'default',
+      });
+      return;
+    }
+
+    // Теперь безопасно очищаем регистрационные данные
     resetRegistration();
     navigate('/patient/onboarding');
   };
+
+  // Автоматический переход через 5 секунд после успешной передачи данных
+  useEffect(() => {
+    if (isDataTransferred) {
+      const timer = setTimeout(() => {
+        handleContinueManually();
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isDataTransferred]);
 
   return (
     <div className="min-h-screen bloom-gradient flex items-center justify-center p-4">
@@ -100,9 +143,37 @@ export const RegistrationComplete: React.FC = () => {
           </h1>
           
           <p className="text-muted-foreground mb-6">
-            Ваш профиль создан успешно. Сейчас мы перейдем к детальному анкетированию 
-            для персонализации рекомендаций.
+            Ваш профиль создан успешно. Сейчас мы подготавливаем персонализированную анкету 
+            специально для вашего этапа.
           </p>
+
+          {/* ✅ НОВОЕ: Показываем статус подготовки данных */}
+          <div className="bg-card rounded-lg p-4 mb-6 border border-muted">
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Подготовка персонализации
+            </h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Сохранение профиля</span>
+                <span className={newUser ? "text-green-600" : "text-yellow-600"}>
+                  {newUser ? "✅" : "⏳"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Подготовка анкеты</span>
+                <span className={isDataTransferred ? "text-green-600" : "text-yellow-600"}>
+                  {isDataTransferred ? "✅" : "⏳"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Интеграция данных</span>
+                <span className={isDataTransferred ? "text-green-600" : "text-yellow-600"}>
+                  {isDataTransferred ? "✅" : "⏳"}
+                </span>
+              </div>
+            </div>
+          </div>
           
           {/* Информация о выбранной персоне */}
           {selectedPersona && (
@@ -150,24 +221,60 @@ export const RegistrationComplete: React.FC = () => {
           {/* Кнопка продолжения */}
           <Button
             onClick={handleContinueManually}
-            className="bloom-button w-full mb-4"
+            disabled={!isDataTransferred}
+            className={`w-full mb-4 ${
+              isDataTransferred 
+                ? 'bloom-button' 
+                : 'bg-muted text-muted-foreground cursor-not-allowed'
+            }`}
           >
-            Продолжить к анкете
+            {isDataTransferred ? 'Продолжить к персональной анкете' : 'Подготовка данных...'}
           </Button>
           
-          <p className="text-xs text-muted-foreground">
-            Переход произойдет автоматически через несколько секунд...
-          </p>
+          {isDataTransferred ? (
+            <p className="text-xs text-muted-foreground">
+              Автоматический переход через 5 секунд...
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Пожалуйста, подождите завершения подготовки...
+            </p>
+          )}
         </div>
 
         {/* Мотивирующее сообщение */}
         <div className="mt-6 p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20">
           <p className="text-sm text-foreground">
             <strong>🌟 Вы сделали важный шаг!</strong> <br />
-            Теперь у вас есть персональный помощник для навигации через этот важный этап жизни.
+            {selectedPersona && `Анкета адаптирована для этапа "${selectedPersona.title}". `}
+            Персональные рекомендации уже ждут вас!
           </p>
         </div>
       </div>
     </div>
   );
+};
+
+// ✅ НОВОЕ: Вспомогательные функции для определения пути онбординга
+const getOnboardingPathByPersona = (personaId: string | null) => {
+  if (!personaId) return { focus: ['general'], priorityQuestions: ['basic_info'] };
+  
+  const paths = {
+    'first_signs': {
+      focus: ['cycle_tracking', 'education', 'prevention'],
+      priorityQuestions: ['menstrual_history', 'family_history', 'lifestyle'],
+      recommendedLength: 'standard'
+    },
+    'active_phase': {
+      focus: ['symptom_management', 'quality_of_life', 'treatment_options'],
+      priorityQuestions: ['current_symptoms', 'impact_assessment', 'treatment_preferences'],
+      recommendedLength: 'detailed'
+    },
+    'postmenopause': {
+      focus: ['long_term_health', 'prevention', 'wellness'],
+      priorityQuestions: ['health_screening', 'bone_health', 'cardiovascular_health'],
+      recommendedLength: 'comprehensive'
+    }
+  };
+  return paths[personaId as keyof typeof paths] || paths['active_phase'];
 };

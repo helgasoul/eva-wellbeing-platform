@@ -42,13 +42,48 @@ const PatientOnboarding = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Load saved data on mount
+  // ✅ ИСПРАВЛЕНИЕ: Загружаем данные регистрации И сохраненные данные онбординга
   useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
+    // Проверяем данные из регистрации
+    const registrationPresets = localStorage.getItem('eva_onboarding_presets');
+    const savedOnboardingData = localStorage.getItem(STORAGE_KEY);
+    
+    if (registrationPresets) {
       try {
-        const parsed = JSON.parse(savedData);
-        setFormData(parsed);
+        const presets = JSON.parse(registrationPresets);
+        console.log('✅ Loading registration presets:', presets);
+        
+        // Предзаполняем базовую информацию из регистрации
+        const presetsFormData = {
+          basicInfo: {
+            age: 0, // Пользователь заполнит
+            height: 0, // Пользователь заполнит  
+            weight: 0, // Пользователь заполнит
+            ...presets.basicInfo // firstName, lastName, email, phone из регистрации
+          },
+          registrationPersona: presets.personaId,
+          fromRegistration: true,
+          expectedPath: presets.expectedOnboardingPath
+        };
+        
+        setFormData(presetsFormData);
+        
+        toast({
+          title: 'Добро пожаловать!',
+          description: `Анкета подготовлена для профиля "${getPersonaTitle(presets.personaId)}"`,
+        });
+        
+      } catch (error) {
+        console.error('Failed to load registration presets:', error);
+      }
+    }
+    
+    // Если есть сохраненные данные онбординга, они имеют приоритет
+    if (savedOnboardingData) {
+      try {
+        const saved = JSON.parse(savedOnboardingData);
+        setFormData(prev => ({ ...prev, ...saved }));
+        console.log('✅ Loading saved onboarding progress');
       } catch (error) {
         console.error('Failed to load saved onboarding data:', error);
       }
@@ -116,11 +151,17 @@ const PatientOnboarding = () => {
   };
 
   const handleOnboardingComplete = () => {
-    // Clear saved data
+    // ✅ ИСПРАВЛЕНИЕ: Очищаем ВСЕ связанные данные
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('eva_onboarding_presets');
     
     // Mark onboarding as completed in user context
     // This would typically involve an API call to update user profile
+    
+    toast({
+      title: 'Онбординг завершен!',
+      description: 'Добро пожаловать в вашу персональную панель управления здоровьем!',
+    });
     
     // Navigate to patient dashboard
     navigate('/patient/dashboard');
@@ -250,6 +291,16 @@ const PatientOnboarding = () => {
       </div>
     </PatientLayout>
   );
+};
+
+// ✅ НОВОЕ: Вспомогательная функция для получения названия персоны
+const getPersonaTitle = (personaId: string) => {
+  const titles = {
+    'first_signs': 'Первые признаки',
+    'active_phase': 'Активная фаза', 
+    'postmenopause': 'Постменопауза'
+  };
+  return titles[personaId as keyof typeof titles] || 'Персональный профиль';
 };
 
 export default PatientOnboarding;
