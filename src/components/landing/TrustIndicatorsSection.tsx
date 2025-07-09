@@ -1,76 +1,76 @@
 import React from 'react';
-import { Stethoscope, BookOpen, Lock, CheckCircle } from 'lucide-react';
+import { Heart, Users, Shield, UserCheck } from 'lucide-react';
 
 const TrustIndicatorsSection: React.FC = () => {
   const trustFactors = [
     {
-      title: "Медицинская команда",
-      description: "Врачи-гинекологи с опытом 10+ лет",
-      Icon: Stethoscope
+      title: "Опытные женщины-врачи рядом с вами",
+      description: "Наши специалисты заботятся о вас на каждом этапе",
+      Icon: Users
     },
     {
-      title: "Научная база",
-      description: "Рекомендации основаны на международных протоколах",
-      Icon: BookOpen
+      title: "Современные знания — для вашего спокойствия",
+      description: "Мы используем только научно доказанные подходы",
+      Icon: Heart
     },
     {
-      title: "Безопасность данных",
-      description: "Соответствие GDPR и 152-ФЗ",
-      Icon: Lock
+      title: "Ваши данные под надёжной защитой",
+      description: "Строгое соблюдение конфиденциальности и стандартов безопасности",
+      Icon: Shield
     },
     {
-      title: "Качество проверки",
-      description: "Каждый инсайт проверяется врачами",
-      Icon: CheckCircle
+      title: "Каждый совет — под контролем экспертов",
+      description: "Все рекомендации проверяются нашими специалистами",
+      Icon: UserCheck
     }
   ];
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-20 bg-gradient-to-br from-muted/30 via-background to-accent/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-foreground mb-4">
-            Доверие - основа здоровья
+        <div className="text-center mb-16 animate-fade-in">
+          <h2 className="text-4xl font-bold text-foreground mb-6 leading-tight">
+            Доверие. Забота. <br />
+            <span className="text-primary">Ваше здоровье — в надёжных руках</span>
           </h2>
-          <p className="text-xl text-muted-foreground">
-            Медицинская экспертиза и научный подход
+          <p className="text-xl text-muted-foreground mb-4">
+            Мы объединяем внимание к деталям и мировую медицину
+          </p>
+          <p className="text-base text-muted-foreground italic">
+            "Нам важна ваша уверенность — именно поэтому мы делаем всё, чтобы вы чувствовали себя защищённо."
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {trustFactors.map((factor, index) => {
             const IconComponent = factor.Icon;
             return (
-              <div key={index} className="text-center">
-                <div className="inline-flex p-4 bg-primary/10 rounded-full mb-4">
+              <div 
+                key={index} 
+                className="bg-card rounded-3xl p-6 text-center shadow-elegant hover:shadow-soft transition-all duration-300 hover:scale-105 animate-fade-in border border-border/50"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="inline-flex p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full mb-6 animate-gentle-float">
                   <IconComponent className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{factor.title}</h3>
-                <p className="text-muted-foreground">{factor.description}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-3 leading-tight">{factor.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{factor.description}</p>
               </div>
             );
           })}
         </div>
 
-        <div className="mt-16 bg-muted/50 rounded-2xl p-8">
+        <div className="bg-gradient-to-r from-success/10 via-background to-primary/10 rounded-3xl p-8 border border-border/30 shadow-clean">
           <div className="text-center">
-            <h3 className="text-2xl font-bold text-foreground mb-4">
-              Гарантии качества
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="flex items-center justify-center">
-                <span className="text-success mr-2">✓</span>
-                <span className="text-foreground">Возврат средств в течение 30 дней</span>
-              </div>
-              <div className="flex items-center justify-center">
-                <span className="text-success mr-2">✓</span>
-                <span className="text-foreground">Лицензированные врачи</span>
-              </div>
-              <div className="flex items-center justify-center">
-                <span className="text-success mr-2">✓</span>
-                <span className="text-foreground">Аккредитованные лаборатории</span>
-              </div>
+            <div className="inline-flex items-center justify-center p-3 bg-success/20 rounded-full mb-4">
+              <Heart className="h-6 w-6 text-success animate-pulse" />
             </div>
+            <p className="text-lg font-medium text-foreground mb-2">
+              Наши специалисты всегда на связи
+            </p>
+            <p className="text-muted-foreground text-sm">
+              Постоянная поддержка и забота о вашем здоровье
+            </p>
           </div>
         </div>
       </div>
