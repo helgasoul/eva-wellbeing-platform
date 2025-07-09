@@ -284,11 +284,74 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     navigate('/admin/dashboard');
   };
 
+  // ✅ НОВОЕ: Обновление пользователя
+  const updateUser = async (updates: Partial<User>): Promise<void> => {
+    if (!user) {
+      throw new Error('Пользователь не авторизован');
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // Обновляем пользователя в состоянии
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      
+      // Сохраняем в localStorage
+      localStorage.setItem('eva-user', JSON.stringify(updatedUser));
+      
+      console.log('✅ User updated successfully:', updates);
+      
+    } catch (error) {
+      console.error('❌ Error updating user:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ✅ НОВОЕ: Завершение онбординга
+  const completeOnboarding = async (onboardingData: any): Promise<void> => {
+    if (!user) {
+      throw new Error('Пользователь не авторизован');
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // Обновляем статус онбординга
+      await updateUser({
+        onboardingCompleted: true,
+        onboardingData
+      });
+      
+      toast({
+        title: 'Онбординг завершен!',
+        description: 'Добро пожаловать в Eva! Теперь у вас есть доступ ко всем функциям платформы.',
+      });
+      
+      console.log('✅ Onboarding completed successfully');
+      
+    } catch (error) {
+      console.error('❌ Error completing onboarding:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Произошла ошибка при завершении онбординга',
+        variant: 'destructive',
+      });
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     login,
     register,
     completeRegistration,
+    updateUser,
+    completeOnboarding,
     logout,
     forgotPassword,
     isLoading,

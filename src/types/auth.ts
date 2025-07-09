@@ -142,6 +142,8 @@ export interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   completeRegistration: (data: MultiStepRegistrationData) => Promise<User>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  completeOnboarding: (onboardingData: any) => Promise<void>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
   isLoading: boolean;

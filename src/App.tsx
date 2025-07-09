@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
+import { OnboardingGuard } from "./components/auth/OnboardingGuard";
+
 // Auth pages
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -119,13 +121,16 @@ function App() {
                       </ProtectedRoute>
                     } />
 
-                    {/* PATIENT ROUTES */}
+                    {/* PATIENT ROUTES - с OnboardingGuard */}
                     <Route path="/patient/dashboard" element={
                       <ProtectedRoute allowedRoles={['patient']}>
-                        <PatientDashboard />
+                        <OnboardingGuard>
+                          <PatientDashboard />
+                        </OnboardingGuard>
                       </ProtectedRoute>
                     } />
                     
+                    {/* Онбординг БЕЗ OnboardingGuard */}
                     <Route path="/patient/onboarding" element={
                       <ProtectedRoute allowedRoles={['patient']}>
                         <PatientOnboarding />
@@ -134,7 +139,9 @@ function App() {
                     
                     <Route path="/patient/symptoms" element={
                       <ProtectedRoute allowedRoles={['patient']}>
-                        <SymptomTracker />
+                        <OnboardingGuard>
+                          <SymptomTracker />
+                        </OnboardingGuard>
                       </ProtectedRoute>
                     } />
                     
