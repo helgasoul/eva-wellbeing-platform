@@ -512,61 +512,206 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Comparison Table */}
-        <section className="py-20 bg-card">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
-              Сравнение тарифов
-            </h2>
+        <section className="py-20 bg-gradient-to-br from-pink-50/50 via-purple-50/30 to-background relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-100/10 via-transparent to-purple-100/10"></div>
+          
+          <div className="max-w-7xl mx-auto px-4 relative z-10">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+                Сравнение тарифов
+              </h2>
+              <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
+                Ваша забота — ваш выбор
+              </p>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                Платформа bloom предлагает несколько тарифов — выберите подходящий для вашего этапа жизни.
+                Вот, что входит в каждый тариф:
+              </p>
+            </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse bg-card rounded-lg shadow-clean">
-                <thead>
-                  <tr className="border-b-2 border-border">
-                    <th className="text-left p-4 font-semibold text-foreground">Функция</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Essential</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Plus</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Optimum</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-border">
-                    <td className="p-4 font-medium text-foreground">Цена в год</td>
-                    <td className="text-center p-4 text-foreground">₽2,990</td>
-                    <td className="text-center p-4 text-foreground">₽9,990</td>
-                    <td className="text-center p-4 text-foreground">₽15,990</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Трекер симптомов</td>
-                    <td className="text-center p-4">✅</td>
-                    <td className="text-center p-4">✅</td>
-                    <td className="text-center p-4">✅</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Биомаркеры</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-success">40+</td>
-                    <td className="text-center p-4 text-success">100+</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Консультации врачей</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-success">2/год</td>
-                    <td className="text-center p-4 text-success">4/год</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Генетическое тестирование</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4">✅</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Личный координатор</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4">✅</td>
-                  </tr>
-                </tbody>
-              </table>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-elegant border border-pink-100/50 p-8">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b-2 border-pink-200/50">
+                      <th className="text-left p-6 font-semibold text-foreground text-lg"></th>
+                      <th className="text-center p-6">
+                        <div className="text-center">
+                          <div className="text-4xl mb-2">🌸</div>
+                          <div className="font-semibold text-lg text-foreground">Essential</div>
+                          <div className="text-sm text-muted-foreground">Базовый уход</div>
+                        </div>
+                      </th>
+                      <th className="text-center p-6">
+                        <div className="text-center relative">
+                          <div className="text-4xl mb-2">💜</div>
+                          <div className="font-semibold text-lg text-foreground">Plus</div>
+                          <div className="text-sm text-muted-foreground">Персональная забота</div>
+                          <div className="absolute -top-2 -right-2 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground px-3 py-1 rounded-full text-xs font-bold">
+                            Популярный
+                          </div>
+                        </div>
+                      </th>
+                      <th className="text-center p-6">
+                        <div className="text-center">
+                          <div className="text-4xl mb-2">⭐</div>
+                          <div className="font-semibold text-lg text-foreground">Optimum</div>
+                          <div className="text-sm text-muted-foreground">Максимальная экспертиза</div>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-pink-100/50">
+                      <td className="p-6 font-medium text-foreground text-lg">Стоимость за год</td>
+                      <td className="text-center p-6">
+                        <div className="text-2xl font-bold text-primary">₽2,990</div>
+                      </td>
+                      <td className="text-center p-6">
+                        <div className="text-2xl font-bold text-primary">₽9,990</div>
+                      </td>
+                      <td className="text-center p-6">
+                        <div className="text-2xl font-bold text-primary">₽15,990</div>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-pink-100/50">
+                      <td className="p-6 text-foreground text-lg">Трекер симптомов</td>
+                      <td className="text-center p-6">
+                        <div className="text-3xl">🌷</div>
+                      </td>
+                      <td className="text-center p-6">
+                        <div className="text-3xl">🌷</div>
+                      </td>
+                      <td className="text-center p-6">
+                        <div className="text-3xl">🌷</div>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-pink-100/50">
+                      <td className="p-6 text-foreground text-lg">Биомаркеры</td>
+                      <td className="text-center p-6 text-muted-foreground text-lg">—</td>
+                      <td className="text-center p-6">
+                        <div className="text-lg font-semibold text-success">40+</div>
+                      </td>
+                      <td className="text-center p-6">
+                        <div className="text-lg font-semibold text-success">100+</div>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-pink-100/50">
+                      <td className="p-6 text-foreground text-lg">Консультации врача</td>
+                      <td className="text-center p-6 text-muted-foreground text-lg">—</td>
+                      <td className="text-center p-6">
+                        <div className="text-lg font-semibold text-success">2/год</div>
+                      </td>
+                      <td className="text-center p-6">
+                        <div className="text-lg font-semibold text-success">4/год</div>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-pink-100/50">
+                      <td className="p-6 text-foreground text-lg">Генетическое тестирование</td>
+                      <td className="text-center p-6 text-muted-foreground text-lg">—</td>
+                      <td className="text-center p-6 text-muted-foreground text-lg">—</td>
+                      <td className="text-center p-6">
+                        <div className="text-3xl">🧬</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-6 text-foreground text-lg">Личный координатор</td>
+                      <td className="text-center p-6 text-muted-foreground text-lg">—</td>
+                      <td className="text-center p-6 text-muted-foreground text-lg">—</td>
+                      <td className="text-center p-6">
+                        <div className="text-3xl">👩‍⚕️</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-6">
+              {SUBSCRIPTION_PLANS.map((plan, index) => (
+                <div key={plan.id} className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-elegant border border-pink-100/50 p-6 relative">
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground px-4 py-1 rounded-full text-sm font-bold">
+                      Популярный
+                    </div>
+                  )}
+                  
+                  <div className="text-center mb-6">
+                    <div className="text-5xl mb-3">
+                      {plan.id === 'essential' ? '🌸' : plan.id === 'plus' ? '💜' : '⭐'}
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">{plan.name}</h3>
+                    <p className="text-muted-foreground">
+                      {plan.id === 'essential' ? 'Базовый уход' : plan.id === 'plus' ? 'Персональная забота' : 'Максимальная экспертиза'}
+                    </p>
+                    <div className="text-3xl font-bold text-primary mt-4">
+                      ₽{plan.price.toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground">Трекер симптомов</span>
+                      <div className="text-2xl">🌷</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground">Биомаркеры</span>
+                      <span className="text-muted-foreground">
+                        {plan.id === 'essential' ? '—' : plan.id === 'plus' ? '40+' : '100+'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground">Консультации врача</span>
+                      <span className="text-muted-foreground">
+                        {plan.id === 'essential' ? '—' : plan.id === 'plus' ? '2/год' : '4/год'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground">Генетическое тестирование</span>
+                      {plan.id === 'optimum' ? <div className="text-2xl">🧬</div> : <span className="text-muted-foreground">—</span>}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-foreground">Личный координатор</span>
+                      {plan.id === 'optimum' ? <div className="text-2xl">👩‍⚕️</div> : <span className="text-muted-foreground">—</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* How to Choose Section */}
+            <div className="mt-16 text-center">
+              <h3 className="text-2xl font-bold mb-8 text-foreground">Как выбрать?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-clean">
+                  <div className="text-3xl mb-4">🌸</div>
+                  <h4 className="font-semibold text-lg mb-2 text-foreground">Essential</h4>
+                  <p className="text-muted-foreground">Забота о себе на старте, базовый мониторинг и поддержка</p>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-clean">
+                  <div className="text-3xl mb-4">💜</div>
+                  <h4 className="font-semibold text-lg mb-2 text-foreground">Plus</h4>
+                  <p className="text-muted-foreground">Для тех, кто хочет персонализированные рекомендации и регулярный контроль</p>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-clean">
+                  <div className="text-3xl mb-4">⭐</div>
+                  <h4 className="font-semibold text-lg mb-2 text-foreground">Optimum</h4>
+                  <p className="text-muted-foreground">Для женщин, которым важно всё: генетика, максимальная медицинская поддержка, личный координатор</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Microcopy */}
+            <div className="mt-12 text-center">
+              <div className="bg-gradient-to-r from-pink-50/50 to-purple-50/50 rounded-2xl p-6 border border-pink-100/50">
+                <p className="text-muted-foreground leading-relaxed">
+                  <span className="text-xl mr-2">✨</span>
+                  Каждый тариф включает бесплатную onboarding-консультацию и доступ к женскому сообществу поддержки.
+                </p>
+              </div>
             </div>
           </div>
         </section>
