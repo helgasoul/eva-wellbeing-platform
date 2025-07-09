@@ -52,7 +52,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
                     <img 
                       src={data.photo || founderPhoto}
                       alt={data.name}
-                      className="w-full h-full object-cover object-center"
+                      className="w-full h-full object-cover object-top"
                     />
                   </div>
                   {/* Декоративные элементы вокруг фото */}
