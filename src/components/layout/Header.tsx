@@ -14,7 +14,6 @@ export const Header = () => {
     { path: '/', label: 'Домой' },
     { path: '/about', label: 'Почему Bloom' },
     { path: '/how-we-help', label: 'Как мы помогаем' },
-    { path: '/pricing', label: 'Тарифы' },
     { path: '/contact', label: 'Написать команде' }
   ];
 
