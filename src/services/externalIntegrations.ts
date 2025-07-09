@@ -1,4 +1,5 @@
 // Интеграции с внешними сервисами для системы питания
+import type { SupplementRecommendation } from './nutritionAnalyzer';
 
 export interface OrderResult {
   success: boolean;
@@ -41,12 +42,7 @@ export interface ShoppingItem {
   estimatedPrice?: number;
 }
 
-export interface SupplementRecommendation {
-  name: string;
-  dosage: string;
-  form: string;
-  brand?: string;
-}
+// Import SupplementRecommendation from nutritionAnalyzer.ts to avoid duplication
 
 // Сервисы доставки продуктов
 export class DeliveryService {
@@ -161,8 +157,7 @@ export class SupplementStores {
         body: JSON.stringify({
           supplements: supplements.map(s => ({
             name: s.name,
-            form: s.form,
-            brand: s.brand
+            form: s.form
           }))
         })
       });
