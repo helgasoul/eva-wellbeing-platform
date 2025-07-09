@@ -147,7 +147,7 @@ const Home = () => {
               <Link to="/register">
                 <Button className="bg-gradient-to-r from-purple-500/90 via-primary to-pink-500/85 text-white hover:shadow-glow text-xl px-12 py-6 font-semibold rounded-3xl transition-all duration-300 hover:scale-105 group border border-primary/20 mb-4">
                   <Heart className="mr-3 h-6 w-6 group-hover:animate-pulse transition-all duration-300" />
-                  Присоединиться с заботой — бесплатно
+                  Присоединиться с заботой
                 </Button>
               </Link>
               
