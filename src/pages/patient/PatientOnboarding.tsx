@@ -334,6 +334,7 @@ const PatientOnboarding = () => {
         <OnboardingResults
           phaseResult={phaseResult}
           recommendations={recommendations}
+          onboardingData={formData}
           onComplete={handleOnboardingComplete}
         />
       </PatientLayout>
