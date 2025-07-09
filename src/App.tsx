@@ -28,11 +28,13 @@ import Community from "./pages/patient/Community";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
+import { RecommendationsDemo } from "./pages/patient/RecommendationsDemo";
 import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
 import HowWeHelp from "./pages/HowWeHelp";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { FoodDiaryProvider } from "./contexts/FoodDiaryContext";
+import { BasicNotificationProvider } from "./contexts/BasicNotificationContext";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,7 @@ const App = () => (
         <AuthProvider>
           <SubscriptionProvider>
             <FoodDiaryProvider>
+              <BasicNotificationProvider>
           <Routes>
             {/* Auth routes without layout */}
             <Route path="/login" element={<Login />} />
@@ -159,6 +162,13 @@ const App = () => (
               </ProtectedRoute>
             } />
             
+            {/* Patient recommendations demo route */}
+            <Route path="/patient/recommendations" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <RecommendationsDemo />
+              </ProtectedRoute>
+            } />
+            
             {/* Role-specific protected dashboards */}
             <Route path="/patient/dashboard" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
@@ -243,6 +253,7 @@ const App = () => (
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+              </BasicNotificationProvider>
             </FoodDiaryProvider>
           </SubscriptionProvider>
         </AuthProvider>
