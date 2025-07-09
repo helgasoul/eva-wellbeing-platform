@@ -3,6 +3,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import HeroSection from '@/components/landing/HeroSection';
 import ValuePropositionSection from '@/components/landing/ValuePropositionSection';
 import UserPersonasSection from '@/components/landing/UserPersonasSection';
@@ -43,7 +45,9 @@ const Home = () => {
   ];
 
   return (
-    <div className="bg-background">
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="bg-background flex-1">
       {/* Новая героическая секция */}
       <HeroSection />
       
@@ -158,6 +162,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+      </div>
+      <Footer />
     </div>
   );
 };
