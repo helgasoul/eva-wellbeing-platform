@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Heart, Cloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import bloomLogo from '@/assets/bloom-logo.png';
+import bloomLogo from '@/assets/bloom-logo-white-bg.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);

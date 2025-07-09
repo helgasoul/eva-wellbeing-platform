@@ -1,6 +1,6 @@
 import React from 'react';
 import { AdminEditableSection } from './AdminEditableSection';
-import { Heart, Users, Award, Target, Sparkles, Shield } from 'lucide-react';
+import { Trophy, Users, Award, Target } from 'lucide-react';
 
 interface AchievementsSectionProps {
   data: {
@@ -48,48 +48,26 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
     onUpdate('awards', awards);
   };
 
-  const statIcons = [Heart, Users, Sparkles, Shield];
+  const statIcons = [Users, Target, Trophy, Award];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-rose-50/20 rounded-3xl mb-8 relative overflow-hidden">
-      {/* Мягкие декоративные элементы */}
-      <div className="absolute inset-0 opacity-15">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-purple-200/40 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-40 h-40 bg-pink-200/40 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-rose-200/30 rounded-full blur-2xl"></div>
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#53415B] mb-6 leading-tight animate-fade-in">
-            Сила сообщества — ваши истории и наша поддержка
-          </h2>
-          <p className="text-xl md:text-2xl text-[#A97FB2] max-w-4xl mx-auto leading-relaxed animate-fade-in mb-6" style={{ animationDelay: '0.2s' }}>
-            Спасибо, что выбираете нас — вместе мы делаем женское здоровье понятнее, доступнее и теплее
-          </p>
-          <p className="text-lg text-[#A97FB2] italic animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            Наше сообщество — в цифрах и историях
+    <section className="py-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-8">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-foreground mb-4">Наши достижения</h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Цифры и факты, которые говорят о нашем успехе
           </p>
         </div>
 
         {/* Статистика */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {data.stats.map((stat, index) => {
             const Icon = statIcons[index % statIcons.length];
-            const gradients = [
-              'from-pink-400/80 to-rose-500/80',
-              'from-purple-400/80 to-indigo-500/80', 
-              'from-blue-400/80 to-cyan-500/80',
-              'from-green-400/80 to-teal-500/80'
-            ];
             return (
-              <div 
-                key={index} 
-                className="text-center group animate-fade-in bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-white/50"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className={`w-20 h-20 bg-gradient-to-br ${gradients[index]} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all duration-300 shadow-lg`}>
-                  <Icon className="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300" />
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Icon className="w-8 h-8 text-white" />
                 </div>
                 
                 <AdminEditableSection
@@ -98,7 +76,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                   isEditing={isEditing}
                   onUpdate={(value) => updateStat(index, 'number', value)}
                   placeholder="Число"
-                  className="text-4xl md:text-5xl font-bold text-[#53415B] mb-4"
+                  className="text-4xl font-bold text-foreground mb-2"
                 />
                 
                 <AdminEditableSection
@@ -107,13 +85,13 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                   isEditing={isEditing}
                   onUpdate={(value) => updateStat(index, 'description', value)}
                   placeholder="Описание достижения"
-                  className="text-[#A97FB2] leading-relaxed"
+                  className="text-muted-foreground"
                 />
                 
                 {isEditing && (
                   <button
                     onClick={() => removeStat(index)}
-                    className="text-red-400 hover:text-red-300 text-sm mt-4 px-3 py-1 rounded-full bg-red-50 hover:bg-red-100 transition-colors"
+                    className="text-red-400 hover:text-red-300 text-sm mt-2"
                   >
                     Удалить
                   </button>
@@ -125,29 +103,23 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
           {isEditing && (
             <div 
               onClick={addStat}
-              className="bg-white/30 backdrop-blur-sm rounded-3xl border-2 border-dashed border-purple-300/40 hover:border-purple-400/60 transition-colors cursor-pointer flex items-center justify-center min-h-[280px] group"
+              className="bg-white/10 backdrop-blur-sm rounded-xl border-2 border-dashed border-white/30 hover:border-white/50 transition-colors cursor-pointer flex items-center justify-center min-h-[150px]"
             >
-              <div className="text-center text-[#A97FB2] group-hover:text-[#53415B] transition-colors">
-                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">+</div>
-                <p className="font-medium">Добавить статистику</p>
+              <div className="text-center text-muted-foreground">
+                <div className="text-2xl mb-2">+</div>
+                <p>Добавить статистику</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Партнерства и награды */}
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Партнерства */}
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-400/80 to-indigo-500/80 rounded-xl flex items-center justify-center mr-4">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-[#53415B]">Наши партнёры</h3>
-            </div>
-            <div className="space-y-4">
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6">
+            <h3 className="text-2xl font-bold text-foreground mb-4">Партнерства</h3>
+            <div className="space-y-2">
               {data.partnerships.map((partnership, index) => (
-                <div key={index} className="flex items-center justify-between bg-white/50 rounded-xl p-4 border border-purple-200/30">
+                <div key={index} className="flex items-center justify-between">
                   <AdminEditableSection
                     title={`Партнерство ${index + 1}`}
                     content={partnership}
@@ -157,8 +129,8 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                       newPartnerships[index] = value;
                       updatePartnerships(newPartnerships);
                     }}
-                    placeholder="Описание партнерства"
-                    className="text-[#A97FB2] flex-1 leading-relaxed"
+                    placeholder="Название партнера"
+                    className="text-muted-foreground flex-1"
                   />
                   {isEditing && (
                     <button
@@ -166,7 +138,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                         const newPartnerships = data.partnerships.filter((_, i) => i !== index);
                         updatePartnerships(newPartnerships);
                       }}
-                      className="text-red-400 hover:text-red-300 ml-4 p-2 rounded-full hover:bg-red-50 transition-colors"
+                      className="text-red-400 hover:text-red-300 ml-2"
                     >
                       ✕
                     </button>
@@ -176,7 +148,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {isEditing && (
                 <button
                   onClick={() => updatePartnerships([...data.partnerships, ''])}
-                  className="w-full text-[#A97FB2] hover:text-[#53415B] border-2 border-dashed border-purple-300/40 hover:border-purple-400/60 rounded-xl p-4 transition-colors"
+                  className="text-muted-foreground hover:text-foreground text-sm mt-2"
                 >
                   + Добавить партнера
                 </button>
@@ -184,17 +156,11 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
             </div>
           </div>
 
-          {/* Награды */}
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-pink-400/80 to-rose-500/80 rounded-xl flex items-center justify-center mr-4">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-[#53415B]">Наши достижения</h3>
-            </div>
-            <div className="space-y-4">
+          <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6">
+            <h3 className="text-2xl font-bold text-foreground mb-4">Награды</h3>
+            <div className="space-y-2">
               {data.awards.map((award, index) => (
-                <div key={index} className="flex items-center justify-between bg-white/50 rounded-xl p-4 border border-pink-200/30">
+                <div key={index} className="flex items-center justify-between">
                   <AdminEditableSection
                     title={`Награда ${index + 1}`}
                     content={award}
@@ -205,7 +171,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                       updateAwards(newAwards);
                     }}
                     placeholder="Название награды"
-                    className="text-[#A97FB2] flex-1 leading-relaxed"
+                    className="text-muted-foreground flex-1"
                   />
                   {isEditing && (
                     <button
@@ -213,7 +179,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                         const newAwards = data.awards.filter((_, i) => i !== index);
                         updateAwards(newAwards);
                       }}
-                      className="text-red-400 hover:text-red-300 ml-4 p-2 rounded-full hover:bg-red-50 transition-colors"
+                      className="text-red-400 hover:text-red-300 ml-2"
                     >
                       ✕
                     </button>
@@ -223,23 +189,12 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {isEditing && (
                 <button
                   onClick={() => updateAwards([...data.awards, ''])}
-                  className="w-full text-[#A97FB2] hover:text-[#53415B] border-2 border-dashed border-pink-300/40 hover:border-pink-400/60 rounded-xl p-4 transition-colors"
+                  className="text-muted-foreground hover:text-foreground text-sm mt-2"
                 >
                   + Добавить награду
                 </button>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Закрывающее послание */}
-        <div className="text-center mt-16 animate-fade-in" style={{ animationDelay: '1s' }}>
-          <div className="inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm rounded-full px-8 py-4 border border-primary/20 shadow-lg">
-            <Heart className="h-5 w-5 text-primary animate-pulse" />
-            <p className="text-lg font-medium text-[#53415B] italic">
-              Ваша история — важна для нас. Bloom — это не только сервис, это сообщество поддержки.
-            </p>
-            <Heart className="h-5 w-5 text-primary animate-pulse" />
           </div>
         </div>
       </div>
