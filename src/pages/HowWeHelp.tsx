@@ -596,29 +596,96 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Guarantees */}
-        <section className="py-20 bg-primary text-primary-foreground">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-12">Гарантии качества</h2>
+        <section className="py-20 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="text-5xl mb-4">🛡️</div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+                Гарантии вашей уверенности и безопасности
+              </h2>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Для всех тарифов</h3>
-                <ul className="space-y-2 text-primary-foreground/80">
-                  <li>✓ Возврат средств в течение 30 дней</li>
-                  <li>✓ Соответствие GDPR и 152-ФЗ</li>
-                  <li>✓ Страхование данных на ₽1 млн</li>
-                  <li>✓ Сертификация ISO 27001</li>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+              {/* Для всех планов */}
+              <div className="bg-card rounded-2xl p-8 shadow-elegant border-2 border-accent/20 hover:border-primary/30 transition-all">
+                <h3 className="text-xl font-semibold mb-6 text-foreground text-center">
+                  Для всех планов
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">🛡️</span>
+                    <div>
+                      <div className="font-medium text-foreground">30 дней на обдумывание</div>
+                      <div className="text-sm text-muted-foreground">Вернём средства, если передумали</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">🗝️</span>
+                    <div>
+                      <div className="font-medium text-foreground">Ваши данные защищены по всем стандартам</div>
+                      <div className="text-sm text-muted-foreground">GDPR, 152-ФЗ</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">💎</span>
+                    <div>
+                      <div className="font-medium text-foreground">Данные под надёжной защитой</div>
+                      <div className="text-sm text-muted-foreground">Застрахованы на ₽1 млн</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">📄</span>
+                    <div>
+                      <div className="font-medium text-foreground">Международные сертификаты безопасности</div>
+                      <div className="text-sm text-muted-foreground">ISO 27001</div>
+                    </div>
+                  </li>
                 </ul>
               </div>
               
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Медицинские гарантии</h3>
-                <ul className="space-y-2 text-primary-foreground/80">
-                  <li>✓ Лицензированные врачи с опытом 10+ лет</li>
-                  <li>✓ Аккредитованные лаборатории</li>
-                  <li>✓ Контроль качества каждого анализа</li>
-                  <li>✓ Повторное тестирование при необходимости</li>
+              {/* Медицинская поддержка */}
+              <div className="bg-card rounded-2xl p-8 shadow-elegant border-2 border-accent/20 hover:border-primary/30 transition-all">
+                <h3 className="text-xl font-semibold mb-6 text-foreground text-center">
+                  Медицинская поддержка
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">👩‍⚕️</span>
+                    <div>
+                      <div className="font-medium text-foreground">Только сертифицированные врачи</div>
+                      <div className="text-sm text-muted-foreground">С опытом 10+ лет</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">🧪</span>
+                    <div>
+                      <div className="font-medium text-foreground">Проверенные лаборатории</div>
+                      <div className="text-sm text-muted-foreground">Только аккредитованные партнёры</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">🔬</span>
+                    <div>
+                      <div className="font-medium text-foreground">Тройной контроль качества</div>
+                      <div className="text-sm text-muted-foreground">Для каждого анализа</div>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <span className="text-xl mt-1">🔁</span>
+                    <div>
+                      <div className="font-medium text-foreground">Бесплатное повторное тестирование</div>
+                      <div className="text-sm text-muted-foreground">Если нужно</div>
+                    </div>
+                  </li>
                 </ul>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="bg-gradient-to-r from-accent/10 to-primary/10 rounded-2xl p-6 border border-accent/20 max-w-3xl mx-auto">
+                <p className="text-lg text-muted-foreground italic">
+                  Мы заботимся о вашем спокойствии — и отвечаем за результат на каждом шаге.
+                </p>
               </div>
             </div>
           </div>
