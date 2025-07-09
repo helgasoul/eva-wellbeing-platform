@@ -1,119 +1,133 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import React, { useState } from 'react';
 import { PatientLayout } from '@/components/layout/PatientLayout';
-import { PersonalizedRecommendationsContent } from '@/components/lab/PersonalizedRecommendationsContent';
+import { LabRecommendationWidget } from '@/components/lab/LabRecommendationWidget';
 import { LabTestCard } from '@/components/lab/LabTestCard';
 import { CartSummary } from '@/components/lab/CartSummary';
-import { getPersonalizedLabRecommendations, getAllLabTests, type LabTest } from '@/services/labRecommendationService';
+import { PersonalizedRecommendationsContent } from '@/components/lab/PersonalizedRecommendationsContent';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, Clock, MapPin, FileText, ShoppingCart, Stethoscope } from 'lucide-react';
 
-interface LabOrder {
+interface LabTest {
   id: string;
-  patient_id: string;
-  tests: LabTest[];
-  total_price: number;
-  lab_provider: string;
-  order_date: string;
-  preferred_collection_date?: string;
-  collection_method: 'home_visit' | 'lab_visit' | 'pickup_point';
-  collection_address?: string;
-  status: 'pending' | 'confirmed' | 'collected' | 'processing' | 'ready' | 'delivered';
-  tracking_number?: string;
-  results?: LabResult[];
-  ai_interpretation?: string;
-  doctor_recommendations?: string[];
-  created_at: string;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  preparationTime: string;
+  resultTime: string;
+  fasting: boolean;
+  urgent: boolean;
 }
 
-interface LabResult {
-  test_id: string;
-  biomarker: string;
-  value: number;
-  unit: string;
-  reference_range: { min: number; max: number };
-  status: 'normal' | 'below_normal' | 'above_normal' | 'critical';
-  interpretation: string;
-  trend?: 'improving' | 'stable' | 'worsening';
-  previous_values?: { date: string; value: number }[];
+interface LabProvider {
+  id: string;
+  name: string;
+  rating: number;
+  address: string;
+  distance: string;
+  priceRange: string;
+  workingHours: string;
+  services: string[];
 }
+
+const mockLabTests: LabTest[] = [
+  {
+    id: '1',
+    name: 'Общий анализ крови',
+    price: 450,
+    description: 'Базовый анализ крови для оценки общего состояния здоровья',
+    category: 'Общие',
+    preparationTime: 'Не требуется',
+    resultTime: '1 день',
+    fasting: false,
+    urgent: false
+  },
+  {
+    id: '2',
+    name: 'Биохимический анализ крови',
+    price: 850,
+    description: 'Расширенный анализ для оценки функций органов',
+    category: 'Биохимия',
+    preparationTime: 'Натощак 8-12 часов',
+    resultTime: '1-2 дня',
+    fasting: true,
+    urgent: false
+  },
+  {
+    id: '3',
+    name: 'Гормональный профиль',
+    price: 1200,
+    description: 'Анализ основных гормонов для женского здоровья',
+    category: 'Гормоны',
+    preparationTime: 'Утром натощак',
+    resultTime: '2-3 дня',
+    fasting: true,
+    urgent: true
+  }
+];
+
+const mockLabProviders: LabProvider[] = [
+  {
+    id: '1',
+    name: 'Медицинский центр "Здоровье"',
+    rating: 4.8,
+    address: 'ул. Ленина, 123',
+    distance: '1.2 км',
+    priceRange: '400-2000₽',
+    workingHours: '8:00-20:00',
+    services: ['Анализы крови', 'УЗИ', 'ЭКГ']
+  },
+  {
+    id: '2',
+    name: 'Лаборатория "Диагност"',
+    rating: 4.6,
+    address: 'пр. Мира, 45',
+    distance: '2.1 км',
+    priceRange: '350-1800₽',
+    workingHours: '7:30-19:00',
+    services: ['Лабораторные анализы', 'Биохимия', 'Гормоны']
+  }
+];
 
 export default function LabTests() {
-  const { user } = useAuth();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'recommendations' | 'catalog' | 'orders' | 'results'>('recommendations');
-  const [recommendedTests, setRecommendedTests] = useState<LabTest[]>([]);
-  const [allTests, setAllTests] = useState<LabTest[]>([]);
-  const [myOrders, setMyOrders] = useState<LabOrder[]>([]);
-  const [cart, setCart] = useState<LabTest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedTests, setSelectedTests] = useState<string[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string>('');
 
-  useEffect(() => {
-    loadPersonalizedRecommendations();
-    loadLabCatalog();
-    loadMyOrders();
-  }, []);
+  const handleTestToggle = (testId: string) => {
+    setSelectedTests(prev => 
+      prev.includes(testId) 
+        ? prev.filter(id => id !== testId)
+        : [...prev, testId]
+    );
+  };
 
-  const loadPersonalizedRecommendations = async () => {
-    try {
-      setIsLoading(true);
-      // ИИ-анализ для персональных рекомендаций
-      const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${user?.id}`) || '[]');
-      const recommendations = await getPersonalizedLabRecommendations(
-        user?.onboardingData,
-        symptomEntries
-      );
-      setRecommendedTests(recommendations);
-    } catch (error) {
+  const handleBooking = () => {
+    if (selectedTests.length === 0) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить персональные рекомендации",
-        variant: "destructive",
+        title: "Выберите анализы",
+        description: "Добавьте хотя бы один анализ в корзину",
+        variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
+      return;
     }
-  };
 
-  const loadLabCatalog = async () => {
-    try {
-      const tests = await getAllLabTests();
-      setAllTests(tests);
-    } catch (error) {
+    if (!selectedProvider) {
       toast({
-        title: "Ошибка",
-        description: "Не удалось загрузить каталог анализов",
-        variant: "destructive",
+        title: "Выберите лабораторию",
+        description: "Выберите медицинский центр для сдачи анализов",
+        variant: "destructive"
       });
+      return;
     }
-  };
 
-  const loadMyOrders = async () => {
-    // Загрузка заказов пользователя из localStorage (имитация)
-    const orders = JSON.parse(localStorage.getItem(`lab_orders_${user?.id}`) || '[]');
-    setMyOrders(orders);
-  };
-
-  const addToCart = (test: LabTest) => {
-    if (!cart.some(item => item.id === test.id)) {
-      setCart([...cart, test]);
-      toast({
-        title: "Добавлено в корзину",
-        description: `${test.name} добавлен в корзину`,
-      });
-    }
-  };
-
-  const removeFromCart = (testId: string) => {
-    setCart(cart.filter(item => item.id !== testId));
-  };
-
-  const clearCart = () => {
-    setCart([]);
     toast({
-      title: "Корзина очищена",
-      description: "Все анализы удалены из корзины",
+      title: "Запись успешно создана!",
+      description: "Вы будете перенаправлены на страницу оплаты",
     });
   };
 
@@ -122,250 +136,162 @@ export default function LabTests() {
     { label: 'Лабораторные анализы', href: '/patient/lab-tests' }
   ];
 
+  const totalPrice = selectedTests.reduce((sum, testId) => {
+    const test = mockLabTests.find(t => t.id === testId);
+    return sum + (test?.price || 0);
+  }, 0);
+
   return (
     <PatientLayout title="Лабораторные анализы | Eva" breadcrumbs={breadcrumbs}>
       <div className="space-y-6">
         
-        {/* Заголовок */}
+        {/* Header */}
         <div className="bloom-card bg-white/90 backdrop-blur-sm p-6">
           <h1 className="text-3xl font-playfair font-bold gentle-text flex items-center mb-2">
-            🧪 Лабораторные исследования
+            <FileText className="mr-3 text-eva-dusty-rose" size={32} />
+            Лабораторные анализы
           </h1>
           <p className="soft-text">
-            Персональные рекомендации анализов для мониторинга здоровья в менопаузе
+            Заказывайте анализы онлайн с доставкой результатов в личный кабинет
           </p>
         </div>
 
-        {/* Корзина (если есть товары) */}
-        <CartSummary 
-          cart={cart}
-          onRemoveFromCart={removeFromCart}
-          onClearCart={clearCart}
-        />
-
-        {/* Табы */}
-        <div className="bloom-card bg-white/90 backdrop-blur-sm p-1">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="recommendations" className="flex items-center gap-2">
-                🎯 Рекомендации
-              </TabsTrigger>
-              <TabsTrigger value="catalog" className="flex items-center gap-2">
-                📋 Каталог
-              </TabsTrigger>
-              <TabsTrigger value="orders" className="flex items-center gap-2">
-                📦 Заказы
-              </TabsTrigger>
-              <TabsTrigger value="results" className="flex items-center gap-2">
-                📊 Результаты
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="recommendations" className="mt-6">
-              {isLoading ? (
-                <div className="bloom-card bg-white/90 backdrop-blur-sm p-8 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                  <p className="soft-text">Анализируем ваш профиль...</p>
-                </div>
-              ) : (
-                <PersonalizedRecommendationsContent 
-                  tests={recommendedTests}
-                  cart={cart}
-                  onAddToCart={addToCart}
-                />
-              )}
-            </TabsContent>
-
-            <TabsContent value="catalog" className="mt-6">
-              <LabCatalogContent 
-                tests={allTests}
-                cart={cart}
-                onAddToCart={addToCart}
-              />
-            </TabsContent>
-
-            <TabsContent value="orders" className="mt-6">
-              <MyOrdersContent orders={myOrders} />
-            </TabsContent>
-
-            <TabsContent value="results" className="mt-6">
-              <MyResultsContent orders={myOrders.filter(o => o.results)} />
-            </TabsContent>
-          </Tabs>
+        {/* Recommendations Widget */}
+        <div className="bloom-card bg-white/90 backdrop-blur-sm p-6">
+          <h2 className="text-xl font-semibold gentle-text mb-4">Рекомендованные анализы</h2>
+          <p className="soft-text">На основе ваших данных мы рекомендуем следующие анализы</p>
         </div>
+
+        {/* Main Content */}
+        <Tabs defaultValue="tests" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="tests">Анализы</TabsTrigger>
+            <TabsTrigger value="providers">Лаборатории</TabsTrigger>
+            <TabsTrigger value="recommendations">Рекомендации</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="tests" className="space-y-4">
+            <div className="grid gap-4">
+              {mockLabTests.map((test) => (
+                <Card key={test.id} className="bloom-card">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg gentle-text">{test.name}</CardTitle>
+                        <CardDescription>{test.description}</CardDescription>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-semibold gentle-text">{test.price}₽</div>
+                        <Button 
+                          size="sm" 
+                          variant={selectedTests.includes(test.id) ? "default" : "outline"}
+                          onClick={() => handleTestToggle(test.id)}
+                        >
+                          {selectedTests.includes(test.id) ? "Убрать" : "Добавить"}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="providers" className="space-y-4">
+            <div className="grid gap-4">
+              {mockLabProviders.map((provider) => (
+                <Card 
+                  key={provider.id}
+                  className={`bloom-card cursor-pointer transition-all ${
+                    selectedProvider === provider.id ? 'ring-2 ring-eva-dusty-rose' : ''
+                  }`}
+                  onClick={() => setSelectedProvider(provider.id)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg gentle-text">
+                          {provider.name}
+                        </CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center">
+                            <span className="text-yellow-500">★</span>
+                            <span className="text-sm soft-text ml-1">{provider.rating}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {provider.distance}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-semibold gentle-text">
+                          {provider.priceRange}
+                        </div>
+                        <div className="text-sm soft-text">
+                          {provider.workingHours}
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin size={16} className="text-eva-dusty-rose" />
+                      <span className="text-sm soft-text">{provider.address}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {provider.services.map((service, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {service}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="recommendations">
+            <Card className="bloom-card">
+              <CardHeader>
+                <CardTitle className="text-lg gentle-text">Персональные рекомендации</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="soft-text">На основе ваших данных о здоровье мы рекомендуем регулярно проверять следующие показатели.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Cart Summary */}
+        {selectedTests.length > 0 && (
+          <Card className="bloom-card">
+            <CardHeader>
+              <CardTitle className="text-lg gentle-text">Корзина анализов</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {selectedTests.map(testId => {
+                  const test = mockLabTests.find(t => t.id === testId);
+                  return test ? (
+                    <div key={testId} className="flex justify-between items-center">
+                      <span>{test.name}</span>
+                      <span className="font-semibold">{test.price}₽</span>
+                    </div>
+                  ) : null;
+                })}
+                <div className="border-t pt-2 flex justify-between items-center font-semibold">
+                  <span>Итого:</span>
+                  <span>{totalPrice}₽</span>
+                </div>
+              </div>
+              <Button className="w-full mt-4" onClick={handleBooking}>
+                Оформить заказ
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </PatientLayout>
   );
 }
-
-// Компонент каталога анализов
-const LabCatalogContent = ({ tests, cart, onAddToCart }: {
-  tests: LabTest[];
-  cart: LabTest[];
-  onAddToCart: (test: LabTest) => void;
-}) => {
-  const [filter, setFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const categories = [
-    { id: 'all', name: 'Все анализы', icon: '🧪' },
-    { id: 'hormones', name: 'Гормоны', icon: '🧬' },
-    { id: 'vitamins', name: 'Витамины', icon: '💊' },
-    { id: 'genetics', name: 'Генетика', icon: '🧬' },
-    { id: 'microbiome', name: 'Микробиом', icon: '🦠' },
-    { id: 'cancer_markers', name: 'Онкомаркеры', icon: '🎗️' },
-    { id: 'metabolic', name: 'Метаболизм', icon: '⚡' }
-  ];
-
-  const filteredTests = tests.filter(test => {
-    const matchesFilter = filter === 'all' || test.category === filter;
-    const matchesSearch = test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         test.biomarkers.some(marker => marker.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesFilter && matchesSearch;
-  });
-
-  return (
-    <div className="space-y-6">
-      {/* Фильтры */}
-      <div className="bloom-card bg-white/90 backdrop-blur-sm p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Поиск анализов или биомаркеров..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setFilter(category.id)}
-                className={cn(
-                  "px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1",
-                  filter === category.id
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                )}
-              >
-                <span>{category.icon}</span>
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Результаты */}
-      <div className="bloom-card bg-white/90 backdrop-blur-sm p-6">
-        <div className="mb-4">
-          <h2 className="text-lg font-bold text-gray-800">
-            {filter === 'all' ? 'Все анализы' : categories.find(c => c.id === filter)?.name} 
-            <span className="text-gray-500 ml-2">({filteredTests.length})</span>
-          </h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTests.map(test => (
-            <LabTestCard
-              key={test.id}
-              test={test}
-              isInCart={cart.some(c => c.id === test.id)}
-              onAddToCart={() => onAddToCart(test)}
-            />
-          ))}
-        </div>
-        
-        {filteredTests.length === 0 && (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-2">🔍</div>
-            <p className="text-gray-600">Анализы не найдены</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Компонент заказов
-const MyOrdersContent = ({ orders }: { orders: LabOrder[] }) => {
-  return (
-    <div className="space-y-4">
-      {orders.length === 0 ? (
-        <div className="bloom-card bg-white/90 backdrop-blur-sm p-8 text-center">
-          <div className="text-4xl mb-2">📦</div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">У вас пока нет заказов</h3>
-          <p className="text-gray-600">Выберите нужные анализы в разделе рекомендаций или каталога</p>
-        </div>
-      ) : (
-        orders.map(order => (
-          <div key={order.id} className="bloom-card bg-white/90 backdrop-blur-sm p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="font-bold text-gray-800">Заказ #{order.id.slice(-6)}</h3>
-                <p className="text-sm text-gray-600">{new Date(order.order_date).toLocaleDateString('ru-RU')}</p>
-              </div>
-              <span className={cn(
-                "px-3 py-1 rounded-full text-xs font-medium",
-                order.status === 'pending' ? "bg-yellow-100 text-yellow-700" :
-                order.status === 'ready' ? "bg-green-100 text-green-700" :
-                "bg-blue-100 text-blue-700"
-              )}>
-                {getOrderStatusLabel(order.status)}
-              </span>
-            </div>
-            
-            <div className="space-y-2 mb-4">
-              {order.tests.map(test => (
-                <div key={test.id} className="flex justify-between text-sm">
-                  <span>{test.name}</span>
-                  <span className="font-medium">{test.price.toLocaleString()} ₽</span>
-                </div>
-              ))}
-            </div>
-            
-            <div className="border-t pt-2 flex justify-between font-bold">
-              <span>Итого:</span>
-              <span>{order.total_price.toLocaleString()} ₽</span>
-            </div>
-          </div>
-        ))
-      )}
-    </div>
-  );
-};
-
-// Компонент результатов
-const MyResultsContent = ({ orders }: { orders: LabOrder[] }) => {
-  return (
-    <div className="space-y-4">
-      {orders.length === 0 ? (
-        <div className="bloom-card bg-white/90 backdrop-blur-sm p-8 text-center">
-          <div className="text-4xl mb-2">📊</div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Результатов пока нет</h3>
-          <p className="text-gray-600">Результаты анализов появятся здесь после их готовности</p>
-        </div>
-      ) : (
-        <div className="bloom-card bg-white/90 backdrop-blur-sm p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">📊 Результаты анализов</h2>
-          <p className="text-gray-600">Результаты анализов с ИИ-интерпретацией появятся здесь</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Вспомогательная функция для статусов заказов
-const getOrderStatusLabel = (status: string) => {
-  switch (status) {
-    case 'pending': return 'Ожидает';
-    case 'confirmed': return 'Подтвержден';
-    case 'collected': return 'Собран';
-    case 'processing': return 'Обработка';
-    case 'ready': return 'Готов';
-    case 'delivered': return 'Доставлен';
-    default: return status;
-  }
-};

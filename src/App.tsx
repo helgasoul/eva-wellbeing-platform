@@ -30,6 +30,10 @@ import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import { RecommendationsDemo } from "./pages/patient/RecommendationsDemo";
 import { AdvancedRecommendationsDemo } from "./pages/patient/AdvancedRecommendationsDemo";
+import LabTests from "./pages/patient/LabTests";
+import DoctorBooking from "./pages/patient/DoctorBooking";
+import ClinicIntegration from "./pages/patient/ClinicIntegration";
+import PharmacyIntegration from "./pages/patient/PharmacyIntegration";
 import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
 import HowWeHelp from "./pages/HowWeHelp";
@@ -109,15 +113,31 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            {/* Patient lab tests route - placeholder */}
+            {/* Patient lab tests route */}
             <Route path="/patient/lab-tests" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <div className="min-h-screen flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <h1 className="text-2xl font-bold mb-4">Лабораторные анализы</h1>
-                    <p className="text-muted-foreground">Этот раздел будет доступен в следующих версиях</p>
-                  </div>
-                </div>
+                <LabTests />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient doctor booking route */}
+            <Route path="/patient/doctor-booking" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <DoctorBooking />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient clinic integration route */}
+            <Route path="/patient/clinic-integration" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <ClinicIntegration />
+              </ProtectedRoute>
+            } />
+            
+            {/* Patient pharmacy integration route */}
+            <Route path="/patient/pharmacy-integration" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <PharmacyIntegration />
               </ProtectedRoute>
             } />
             
