@@ -223,7 +223,7 @@ const HowWeHelp: React.FC = () => {
                     ₽{service.price.toLocaleString()}
                   </div>
                   <button className="w-full bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                    Заказать
+                    Записаться
                   </button>
                 </div>
               ))}
