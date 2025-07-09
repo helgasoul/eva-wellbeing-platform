@@ -85,8 +85,48 @@ export interface GoalsAndPriorities {
   communicationFrequency: 'daily' | 'weekly' | 'monthly' | 'as_needed';
 }
 
+export interface LocationData {
+  country: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  region?: string;
+}
+
+export interface WeatherData {
+  current: {
+    temperature: number;
+    humidity: number;
+    pressure: number;
+    uv_index: number;
+    wind_speed: number;
+    weather_condition: string;
+  };
+  today: {
+    temperature_max: number;
+    temperature_min: number;
+    precipitation: number;
+    sunrise: string;
+    sunset: string;
+  };
+  air_quality: {
+    pm2_5: number;
+    pm10: number;
+    o3: number;
+    no2: number;
+  };
+}
+
+export interface GeolocationInfo {
+  location: LocationData;
+  weather: WeatherData;
+  recordedAt: string;
+}
+
 export interface OnboardingData {
   basicInfo?: BasicInfo;
+  geolocation?: GeolocationInfo;
   menstrualHistory?: MenstrualHistory;
   symptoms?: MenopauseSymptoms;
   medicalHistory?: MedicalHistory;

@@ -13,18 +13,20 @@ import { SymptomsStep } from '@/components/onboarding/steps/SymptomsStep';
 import { MedicalHistoryStep } from '@/components/onboarding/steps/MedicalHistoryStep';
 import { LifestyleStep } from '@/components/onboarding/steps/LifestyleStep';
 import { GoalsStep } from '@/components/onboarding/steps/GoalsStep';
+import GeolocationStep from '@/components/onboarding/steps/GeolocationStep';
 import { OnboardingData } from '@/types/onboarding';
 import { detectMenopausePhase } from '@/utils/menopausePhaseDetector';
 import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
 import { dataBridge, OnboardingPresets } from '@/services/dataBridge';
 
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 8;
 const STORAGE_KEY = 'bloom-onboarding-data';
 
 const stepTitles = [
   'Добро пожаловать',
   'Базовая информация',
+  'Местоположение и климат',
   'История менструального цикла',
   'Текущие симптомы',
   'Медицинская история',
@@ -249,10 +251,15 @@ const PatientOnboarding = () => {
                formData.basicInfo.height > 0 && 
                formData.basicInfo.weight > 0;
       case 3:
+        // GeolocationStep - требуется выбранное местоположение
+        return !!(formData.geolocation && 
+                formData.geolocation.location && 
+                formData.geolocation.weather);
+      case 4:
         // MenstrualHistoryStep - требуется возраст первой менструации
         return formData.menstrualHistory && 
                formData.menstrualHistory.ageOfFirstPeriod > 0;
-      case 4:
+      case 5:
         // SymptomsStep - требуется хотя бы заполнение базовых симптомов
         return formData.symptoms && (
           formData.symptoms.hotFlashes?.frequency !== undefined ||
@@ -260,17 +267,17 @@ const PatientOnboarding = () => {
           formData.symptoms.sleepProblems?.frequency !== undefined ||
           formData.symptoms.moodChanges?.frequency !== undefined
         );
-      case 5:
+      case 6:
         // MedicalHistoryStep - принимаем любые данные (даже пустые массивы)
         return formData.medicalHistory !== undefined;
-      case 6:
+      case 7:
         // LifestyleStep - требуется заполнение основных полей
         return formData.lifestyle && 
                formData.lifestyle.exerciseFrequency !== undefined &&
                formData.lifestyle.dietType !== undefined &&
                formData.lifestyle.smokingStatus !== undefined &&
                formData.lifestyle.alcoholConsumption !== undefined;
-      case 7:
+      case 8:
         // GoalsStep - требуется выбор хотя бы одной цели или заботы
         return formData.goals && (
           (formData.goals.primaryConcerns && formData.goals.primaryConcerns.length > 0) ||
@@ -306,33 +313,40 @@ const PatientOnboarding = () => {
         );
       case 3:
         return (
+          <GeolocationStep
+            data={formData.geolocation}
+            onChange={(data) => updateFormData({ geolocation: { ...data, recordedAt: new Date().toISOString() } })}
+          />
+        );
+      case 4:
+        return (
           <MenstrualHistoryStep
             data={formData.menstrualHistory}
             onChange={(data) => updateFormData({ menstrualHistory: data })}
           />
         );
-      case 4:
+      case 5:
         return (
           <SymptomsStep
             data={formData.symptoms}
             onChange={(data) => updateFormData({ symptoms: data })}
           />
         );
-      case 5:
+      case 6:
         return (
           <MedicalHistoryStep
             data={formData.medicalHistory}
             onChange={(data) => updateFormData({ medicalHistory: data })}
           />
         );
-      case 6:
+      case 7:
         return (
           <LifestyleStep
             data={formData.lifestyle}
             onChange={(data) => updateFormData({ lifestyle: data })}
           />
         );
-      case 7:
+      case 8:
         return (
           <GoalsStep
             data={formData.goals}
