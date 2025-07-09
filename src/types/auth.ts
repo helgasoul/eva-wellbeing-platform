@@ -16,6 +16,13 @@ export interface User {
   avatar?: string;
   createdAt: Date;
   onboardingData?: any;
+  
+  // Новые поля из многоэтапной регистрации
+  phone?: string;
+  emailVerified?: boolean;
+  phoneVerified?: boolean;
+  registrationCompleted?: boolean;
+  onboardingCompleted?: boolean;
 }
 
 export interface LoginCredentials {

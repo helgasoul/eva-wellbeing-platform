@@ -1,63 +1,66 @@
 
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types/roles';
-import { ErrorMessage } from '@/components/ui/error-message';
-import { Shield } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-interface ProtectedRouteProps {
+export interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: UserRole;
-  allowedRoles?: UserRole[];
+  allowedRoles?: ('patient' | 'doctor' | 'admin')[];
+  requiredRole?: ('patient' | 'doctor' | 'admin'); // Backward compatibility
+  requireGuest?: boolean; // НОВЫЙ ПРОП: для защиты от авторизованных пользователей
+  redirectTo?: string;
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
+  allowedRoles,
   requiredRole,
-  allowedRoles
+  requireGuest = false,
+  redirectTo
 }) => {
   const { user, isLoading } = useAuth();
-  const location = useLocation();
 
   // Показываем загрузку пока проверяем аутентификацию
   if (isLoading) {
     return (
-      <div className="min-h-screen bloom-gradient flex items-center justify-center">
-        <div className="bloom-card p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Проверяем доступ...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
       </div>
     );
   }
 
-  // Если пользователь не аутентифицирован, редиректим на логин
+  // ЛОГИКА ДЛЯ requireGuest (регистрация/вход)
+  if (requireGuest) {
+    // Если пользователь уже авторизован, редиректим
+    if (user) {
+      const defaultRedirect = getDashboardByRole(user.role);
+      return <Navigate to={redirectTo || defaultRedirect} replace />;
+    }
+    // Если не авторизован, показываем страницу (регистрацию/вход)
+    return <>{children}</>;
+  }
+
+  // СТАНДАРТНАЯ ЛОГИКА ДЛЯ ЗАЩИЩЕННЫХ РОУТОВ
+  // Если пользователь не авторизован, редиректим на логин
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace />;
   }
 
-  // Проверяем роль, если она требуется
-  if (requiredRole && user.role !== requiredRole) {
+  // Проверяем роли, если они указаны
+  const rolesToCheck = allowedRoles || (requiredRole ? [requiredRole] : undefined);
+  if (rolesToCheck && !rolesToCheck.includes(user.role)) {
     return (
-      <div className="min-h-screen bloom-gradient flex items-center justify-center py-12 px-4">
-        <div className="bloom-card p-8 text-center max-w-md">
-          <div className="inline-flex p-4 bg-destructive/10 rounded-full mb-6">
-            <Shield className="h-8 w-8 text-destructive" />
-          </div>
-          <h2 className="text-xl font-playfair font-semibold text-foreground mb-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">
             Доступ запрещен
-          </h2>
-          <ErrorMessage 
-            message={`Эта страница доступна только для роли: ${requiredRole}`}
-            className="justify-center mb-4"
-          />
-          <p className="text-muted-foreground mb-6">
-            Ваша текущая роль: {user.role}
+          </h1>
+          <p className="text-gray-600 mb-6">
+            У вас нет прав для доступа к этой странице
           </p>
-          <button 
+          <button
             onClick={() => window.history.back()}
-            className="bloom-button"
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
           >
             Вернуться назад
           </button>
@@ -66,34 +69,45 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Проверяем массив разрешенных ролей
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return (
-      <div className="min-h-screen bloom-gradient flex items-center justify-center py-12 px-4">
-        <div className="bloom-card p-8 text-center max-w-md">
-          <div className="inline-flex p-4 bg-destructive/10 rounded-full mb-6">
-            <Shield className="h-8 w-8 text-destructive" />
-          </div>
-          <h2 className="text-xl font-playfair font-semibold text-foreground mb-4">
-            Доступ запрещен
-          </h2>
-          <ErrorMessage 
-            message="У вас нет прав для доступа к этой странице"
-            className="justify-center mb-4"
-          />
-          <p className="text-muted-foreground mb-6">
-            Ваша текущая роль: {user.role}
-          </p>
-          <button 
-            onClick={() => window.history.back()}
-            className="bloom-button"
-          >
-            Вернуться назад
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // Если все проверки пройдены, показываем контент
   return <>{children}</>;
+};
+
+// Вспомогательная функция для определения дашборда по роли
+const getDashboardByRole = (role: string): string => {
+  switch (role) {
+    case 'patient':
+      return '/patient/dashboard';
+    case 'doctor':
+      return '/doctor/dashboard';
+    case 'admin':
+      return '/admin/dashboard';
+    default:
+      return '/';
+  }
+};
+
+// Дополнительный хук для проверки завершения регистрации
+export const useRegistrationGuard = () => {
+  const { user } = useAuth();
+  
+  const checkRegistrationComplete = () => {
+    if (!user) return false;
+    
+    // Проверяем, завершена ли многоэтапная регистрация
+    return user.registrationCompleted === true;
+  };
+
+  const checkOnboardingComplete = () => {
+    if (!user) return false;
+    
+    return user.onboardingCompleted === true;
+  };
+
+  return {
+    isRegistrationComplete: checkRegistrationComplete(),
+    isOnboardingComplete: checkOnboardingComplete(),
+    needsRegistration: user && !checkRegistrationComplete(),
+    needsOnboarding: user && checkRegistrationComplete() && !checkOnboardingComplete()
+  };
 };
