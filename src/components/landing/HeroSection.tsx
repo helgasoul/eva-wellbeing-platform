@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Heart, Shield, Leaf } from 'lucide-react';
+import { Sparkles, Heart, Shield, Flower } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection: React.FC = () => {
@@ -17,7 +17,7 @@ const HeroSection: React.FC = () => {
           {/* Иконка */}
           <div className="flex justify-center mb-8 animate-fade-in">
             <div className="inline-flex p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full shadow-elegant animate-gentle-float">
-              <Leaf className="h-8 w-8 text-primary" />
+              <Flower className="h-8 w-8 text-primary" />
             </div>
           </div>
 
