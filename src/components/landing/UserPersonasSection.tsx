@@ -10,7 +10,7 @@ const UserPersonasSection: React.FC = () => {
   const navigate = useNavigate();
 
   const handlePersonaClick = (planId: string) => {
-    navigate(`/pricing#${planId}`);
+    navigate(`/how-we-help#${planId}`);
   };
 
   const personas = [
