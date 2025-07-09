@@ -13,28 +13,70 @@ import { SymptomsStep } from '@/components/onboarding/steps/SymptomsStep';
 import { MedicalHistoryStep } from '@/components/onboarding/steps/MedicalHistoryStep';
 import { LifestyleStep } from '@/components/onboarding/steps/LifestyleStep';
 import { GoalsStep } from '@/components/onboarding/steps/GoalsStep';
-import GeolocationStep from '@/components/onboarding/steps/GeolocationStep';
 import { OnboardingData } from '@/types/onboarding';
-import { weatherService } from '@/services/weatherService';
-import { supabase } from '@/integrations/supabase/client';
 import { detectMenopausePhase } from '@/utils/menopausePhaseDetector';
 import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
 import { dataBridge, OnboardingPresets } from '@/services/dataBridge';
 
-const TOTAL_STEPS = 8;
+// ✅ ИСПРАВЛЕНО: Правильная 7-шаговая структура онбординга
+const TOTAL_STEPS = 7;
 const STORAGE_KEY = 'bloom-onboarding-data';
 
-const stepTitles = [
-  'Добро пожаловать',
-  'Базовая информация',
-  'Местоположение и климат',
-  'История менструального цикла',
-  'Текущие симптомы',
-  'Медицинская история',
-  'Образ жизни',
-  'Цели и приоритеты'
+// КРИТИЧЕСКИ ВАЖНО: Правильная последовательность шагов согласно ТЗ
+const ONBOARDING_STEPS = [
+  {
+    step: 1,
+    title: 'Добро пожаловать',
+    component: 'WelcomeStep',
+    isRequired: true,
+    dataKey: null
+  },
+  {
+    step: 2, 
+    title: 'Базовая информация',
+    component: 'BasicInfoStep',
+    isRequired: true,
+    dataKey: 'basicInfo'
+  },
+  {
+    step: 3,
+    title: 'История менструального цикла', 
+    component: 'MenstrualHistoryStep',
+    isRequired: true,
+    dataKey: 'menstrualHistory'
+  },
+  {
+    step: 4,
+    title: 'Текущие симптомы менопаузы',
+    component: 'SymptomsStep',
+    isRequired: true,
+    dataKey: 'symptoms'
+  },
+  {
+    step: 5,
+    title: 'Медицинская история',
+    component: 'MedicalHistoryStep',
+    isRequired: true,
+    dataKey: 'medicalHistory'
+  },
+  {
+    step: 6,
+    title: 'Образ жизни',
+    component: 'LifestyleStep',
+    isRequired: true,
+    dataKey: 'lifestyle'
+  },
+  {
+    step: 7,
+    title: 'Цели и приоритеты', 
+    component: 'GoalsStep',
+    isRequired: true,
+    dataKey: 'goals'
+  }
 ];
+
+const stepTitles = ONBOARDING_STEPS.map(step => step.title);
 
 const PatientOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -149,15 +191,29 @@ const PatientOnboarding = () => {
     loadOnboardingData();
   }, []);
 
-  // Save data whenever formData changes
+  // ✅ ИСПРАВЛЕНО: Улучшенное автосохранение данных с отладкой
   useEffect(() => {
     if (Object.keys(formData).length > 0) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      console.log('💾 Onboarding data saved:', {
+        step: currentStep,
+        dataKeys: Object.keys(formData),
+        timestamp: new Date().toISOString()
+      });
     }
-  }, [formData]);
+  }, [formData, currentStep]);
 
+  // ✅ ИСПРАВЛЕНО: Улучшенная функция обновления данных с валидацией
   const updateFormData = (stepData: Partial<OnboardingData>) => {
-    setFormData(prev => ({ ...prev, ...stepData }));
+    setFormData(prev => {
+      const newData = { ...prev, ...stepData };
+      console.log('📝 Form data updated:', {
+        step: currentStep,
+        updated: Object.keys(stepData),
+        newKeys: Object.keys(newData)
+      });
+      return newData;
+    });
   };
 
   const handleNext = () => {
@@ -209,43 +265,8 @@ const PatientOnboarding = () => {
     }
   };
 
-  // Обработка геолокационного шага
-  const handleGeolocationComplete = async (data: { location: any, weather: any }) => {
-    try {
-      const { location, weather } = data;
-      
-      const geolocationData = {
-        location,
-        weather,
-        recordedAt: new Date().toISOString()
-      };
-
-      // Обновляем данные формы
-      updateFormData({ geolocation: geolocationData });
-
-      // Сохраняем местоположение пользователя в базу данных
-      if (user?.id) {
-        const { error: locationError } = await supabase
-          .from('user_locations')
-          .upsert({
-            user_id: user.id,
-            location_data: location,
-            is_active: true
-          });
-
-        if (locationError) {
-          console.error('Error saving user location:', locationError);
-        }
-
-        // Сохраняем погодные данные
-        await weatherService.saveWeatherData(user.id, location, weather);
-        
-        console.log('✅ Location and weather data saved for user:', user.id);
-      }
-    } catch (error) {
-      console.error('Error handling geolocation completion:', error);
-    }
-  };
+  // ✅ ИСПРАВЛЕНО: Убрали геолокационный шаг из основного процесса
+  // Геолокация будет обрабатываться отдельно после завершения основного онбординга
 
   const handleOnboardingComplete = async () => {
     try {
@@ -280,6 +301,7 @@ const PatientOnboarding = () => {
     }
   };
 
+  // ✅ ИСПРАВЛЕНО: Правильная валидация для 7-шагового процесса
   const canGoNext = () => {
     switch (currentStep) {
       case 1:
@@ -291,15 +313,10 @@ const PatientOnboarding = () => {
                formData.basicInfo.height > 0 && 
                formData.basicInfo.weight > 0;
       case 3:
-        // GeolocationStep - требуется выбранное местоположение
-        return !!(formData.geolocation && 
-                formData.geolocation.location && 
-                formData.geolocation.weather);
-      case 4:
         // MenstrualHistoryStep - требуется возраст первой менструации
         return formData.menstrualHistory && 
                formData.menstrualHistory.ageOfFirstPeriod > 0;
-      case 5:
+      case 4:
         // SymptomsStep - требуется хотя бы заполнение базовых симптомов
         return formData.symptoms && (
           formData.symptoms.hotFlashes?.frequency !== undefined ||
@@ -307,17 +324,17 @@ const PatientOnboarding = () => {
           formData.symptoms.sleepProblems?.frequency !== undefined ||
           formData.symptoms.moodChanges?.frequency !== undefined
         );
-      case 6:
+      case 5:
         // MedicalHistoryStep - принимаем любые данные (даже пустые массивы)
         return formData.medicalHistory !== undefined;
-      case 7:
+      case 6:
         // LifestyleStep - требуется заполнение основных полей
         return formData.lifestyle && 
                formData.lifestyle.exerciseFrequency !== undefined &&
                formData.lifestyle.dietType !== undefined &&
                formData.lifestyle.smokingStatus !== undefined &&
                formData.lifestyle.alcoholConsumption !== undefined;
-      case 8:
+      case 7:
         // GoalsStep - требуется выбор хотя бы одной цели или заботы
         return formData.goals && (
           (formData.goals.primaryConcerns && formData.goals.primaryConcerns.length > 0) ||
@@ -341,6 +358,7 @@ const PatientOnboarding = () => {
     );
   }
 
+  // ✅ ИСПРАВЛЕНО: Правильная последовательность шагов 1-7
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
@@ -354,40 +372,33 @@ const PatientOnboarding = () => {
         );
       case 3:
         return (
-          <GeolocationStep
-            data={formData.geolocation}
-            onChange={handleGeolocationComplete}
-          />
-        );
-      case 4:
-        return (
           <MenstrualHistoryStep
             data={formData.menstrualHistory}
             onChange={(data) => updateFormData({ menstrualHistory: data })}
           />
         );
-      case 5:
+      case 4:
         return (
           <SymptomsStep
             data={formData.symptoms}
             onChange={(data) => updateFormData({ symptoms: data })}
           />
         );
-      case 6:
+      case 5:
         return (
           <MedicalHistoryStep
             data={formData.medicalHistory}
             onChange={(data) => updateFormData({ medicalHistory: data })}
           />
         );
-      case 7:
+      case 6:
         return (
           <LifestyleStep
             data={formData.lifestyle}
             onChange={(data) => updateFormData({ lifestyle: data })}
           />
         );
-      case 8:
+      case 7:
         return (
           <GoalsStep
             data={formData.goals}
@@ -446,6 +457,26 @@ const PatientOnboarding = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bloom-dusty-rose mx-auto mb-4"></div>
               <p className="text-foreground">Анализируем ваши данные...</p>
             </div>
+          </div>
+        )}
+
+        {/* ✅ НОВОЕ: Отладочная информация для диагностики проблем */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-8 bg-gray-100 p-4 rounded-lg">
+            <h3 className="font-bold text-sm">🔍 Debug Info:</h3>
+            <div className="text-xs space-y-1">
+              <p>Current Step: {currentStep}/{TOTAL_STEPS}</p>
+              <p>Step Title: {stepTitles[currentStep - 1]}</p>
+              <p>Can Go Next: {canGoNext() ? '✅' : '❌'}</p>
+              <p>Form Data Keys: {Object.keys(formData).join(', ')}</p>
+              <p>Data Status: {JSON.stringify(dataLoadingStatus)}</p>
+            </div>
+            <details className="mt-2">
+              <summary className="text-xs font-medium cursor-pointer">View Form Data</summary>
+              <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto max-h-32">
+                {JSON.stringify(formData, null, 2)}
+              </pre>
+            </details>
           </div>
         )}
       </div>

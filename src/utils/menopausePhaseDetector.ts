@@ -120,6 +120,54 @@ function calculateSymptomScore(symptoms: any): number {
   return Math.round(score);
 }
 
+// ✅ НОВОЕ: Добавляем функцию для расчета месяцев без менструации
+function getMonthsSinceLastPeriod(lastPeriodDate: string | null): number {
+  if (!lastPeriodDate) return 0;
+  
+  const lastDate = new Date(lastPeriodDate);
+  const now = new Date();
+  const monthsDiff = (now.getFullYear() - lastDate.getFullYear()) * 12 + 
+                     (now.getMonth() - lastDate.getMonth());
+  
+  return Math.max(0, monthsDiff);
+}
+
+// ✅ НОВОЕ: Добавляем функцию генерации рекомендаций по фазе
+function generateRecommendations(phase: MenopausePhase, data: OnboardingData): string[] {
+  const recommendations: string[] = [];
+  
+  switch (phase) {
+    case MenopausePhase.PREMENOPAUSE:
+      recommendations.push('Поддерживайте здоровый образ жизни');
+      recommendations.push('Регулярные профилактические осмотры у гинеколога');
+      recommendations.push('Следите за изменениями менструального цикла');
+      break;
+      
+    case MenopausePhase.PERIMENOPAUSE:
+      recommendations.push('Отслеживайте менструальный цикл');
+      recommendations.push('Управление симптомами через питание и физические упражнения');
+      recommendations.push('Консультация с гинекологом о возможных методах поддержки');
+      recommendations.push('Рассмотрите прием кальция и витамина D');
+      break;
+      
+    case MenopausePhase.MENOPAUSE:
+      recommendations.push('Подтверждение статуса менопаузы анализами (ФСГ, ЛГ)');
+      recommendations.push('Обсуждение заместительной гормональной терапии с врачом');
+      recommendations.push('Профилактика остеопороза');
+      recommendations.push('Поддержка сердечно-сосудистого здоровья');
+      break;
+      
+    case MenopausePhase.POSTMENOPAUSE:
+      recommendations.push('Регулярное наблюдение у гинеколога и кардиолога');
+      recommendations.push('Профилактика остеопороза и сердечно-сосудистых заболеваний');
+      recommendations.push('Маммографический скрининг');
+      recommendations.push('Поддержание активного образа жизни');
+      break;
+  }
+  
+  return recommendations;
+}
+
 export function getPhaseName(phase: MenopausePhase): string {
   switch (phase) {
     case MenopausePhase.PREMENOPAUSE:
