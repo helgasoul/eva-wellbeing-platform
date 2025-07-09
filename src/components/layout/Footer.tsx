@@ -5,47 +5,47 @@ import { Link } from 'react-router-dom';
 
 export const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-bloom-soft-pink to-bloom-warm-beige border-t border-bloom-dusty-rose/20">
+    <footer className="bg-gradient-to-b from-background via-purple-50/20 to-pink-50/30 border-t border-purple-200/20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="p-2 bg-gradient-to-br from-primary to-bloom-mauve rounded-full">
-                <Heart className="h-6 w-6 text-white" />
+              <div className="p-2 bg-gradient-to-br from-primary to-purple-400 rounded-full animate-gentle-float">
+                <Heart className="h-6 w-6 text-white animate-pulse" />
               </div>
-              <span className="text-2xl font-poppins font-semibold text-foreground bloom-brand">
+              <span className="text-2xl font-semibold text-foreground">
                 bloom
               </span>
             </div>
-            <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
-              Платформа поддержки женщин в период менопаузы. Мы помогаем женщинам 
-              справляться с изменениями в организме, предоставляя профессиональную 
-              медицинскую поддержку и создавая сообщество взаимопомощи.
+            <p className="text-muted-foreground mb-6 max-w-md leading-relaxed text-lg">
+              bloom — пространство поддержки и заботы для женщин в период перемен. 
+              Мы рядом, чтобы помочь принять и понять все изменения, делиться знаниями 
+              и теплом, и быть вместе в сообществе, где важна каждая история.
             </p>
             <div className="flex space-x-4">
-              <div className="p-2 bg-white/70 rounded-full hover:bg-white transition-colors cursor-pointer">
-                <Heart className="h-5 w-5 text-primary" />
+              <div className="p-2 bg-white/70 rounded-full hover:bg-white transition-all duration-300 cursor-pointer hover:scale-110">
+                <Heart className="h-5 w-5 text-primary animate-pulse" />
               </div>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-playfair font-semibold text-foreground mb-4">
-              Быстрые ссылки
+            <h3 className="font-semibold text-foreground mb-4">
+              Навигация
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {[
-                { label: 'О платформе', path: '/about' },
-                { label: 'Услуги', path: '/services' },
-                { label: 'Специалисты', path: '/doctors' },
-                { label: 'Поддержка', path: '/support' }
+                { label: 'О нас', path: '/about' },
+                { label: 'Как мы помогаем', path: '/services' },
+                { label: 'Команда', path: '/doctors' },
+                { label: 'Вопросы и поддержка', path: '/support' }
               ].map((link) => (
                 <li key={link.path}>
                   <Link 
                     to={link.path}
-                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+                    className="text-muted-foreground hover:text-primary transition-colors duration-200 hover:scale-105 inline-block"
                   >
                     {link.label}
                   </Link>
@@ -56,36 +56,50 @@ export const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="font-playfair font-semibold text-foreground mb-4">
+            <h3 className="font-semibold text-foreground mb-4">
               Контакты
             </h3>
+            <p className="text-sm text-muted-foreground mb-4 italic">
+              Напишите или позвоните — мы всегда ответим с заботой
+            </p>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/70 rounded-full">
+              <div className="flex items-center space-x-3 group">
+                <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full group-hover:scale-110 transition-transform duration-300">
                   <Phone className="h-4 w-4 text-primary" />
                 </div>
                 <span className="text-muted-foreground">+7 (800) 123-45-67</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/70 rounded-full">
+              <div className="flex items-center space-x-3 group">
+                <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full group-hover:scale-110 transition-transform duration-300">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
                 <span className="text-muted-foreground">info@bloom-health.ru</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/70 rounded-full">
+              <div className="flex items-center space-x-3 group">
+                <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full group-hover:scale-110 transition-transform duration-300">
                   <MapPin className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-muted-foreground">Москва, Россия</span>
+                <span className="text-muted-foreground">Работаем онлайн для всей России и мира</span>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Care Message */}
+        <div className="text-center mt-12 mb-8">
+          <div className="flex items-center justify-center space-x-2">
+            <Heart className="h-5 w-5 text-primary animate-pulse" />
+            <p className="text-lg font-medium text-foreground italic">
+              С заботой о вас, команда bloom
+            </p>
+            <Heart className="h-5 w-5 text-primary animate-pulse" />
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="border-t border-bloom-dusty-rose/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-purple-200/20 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 bloom. Все права защищены.
+            © 2024 bloom. Всё для вашего спокойствия и уверенности.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link 
