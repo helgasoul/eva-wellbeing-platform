@@ -137,26 +137,26 @@ const defaultData: AboutPlatformData = {
   },
   achievements: {
     stats: [
-      { number: "10,000+", description: "Довольных пользователей" },
-      { number: "50+", description: "Врачей-экспертов" },
-      { number: "95%", description: "Положительных отзывов" },
-      { number: "24/7", description: "Поддержка пользователей" }
+      { number: "10,000+", description: "женщин доверяют нам" },
+      { number: "50+", description: "врачей-экспертов" },
+      { number: "95%", description: "вдохновляющих отзывов" },
+      { number: "24/7", description: "заботливая поддержка каждый день" }
     ],
     partnerships: [
-      "Ведущие медицинские центры",
-      "Научные институты",
-      "Технологические партнеры"
+      "Гордимся сотрудничеством с ведущими медицинскими центрами",
+      "Партнёрство с научными институтами",
+      "Технологические партнёры для вашего удобства"
     ],
     awards: [
       "Лучшее приложение года в категории 'Здоровье'",
-      "Награда за инновации в медицине",
-      "Сертификат качества ISO 27001"
+      "Награда за инновации в медицине — признание вашей веры в нас",
+      "ISO 27001 — ваши данные под надёжной защитой"
     ]
   },
   contacts: {
-    general: "info@bloom-health.com",
-    partnerships: "partners@bloom-health.com",
-    press: "press@bloom-health.com"
+    general: "Всегда готовы поддержать и ответить — напишите нам! info@bloom-health.com",
+    partnerships: "Открыты к совместным проектам ради женского здоровья partners@bloom-health.com",
+    press: "Готовы рассказать и поделиться историей Bloom press@bloom-health.com"
   }
 };
 
