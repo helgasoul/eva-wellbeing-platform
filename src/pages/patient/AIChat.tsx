@@ -29,10 +29,10 @@ const AIChat: React.FC = () => {
 
   // Быстрые действия для пациенток
   const quickActions = [
-    { icon: Heart, text: 'Как справиться с приливами?', category: 'symptoms' },
-    { icon: Moon, text: 'Проблемы со сном', category: 'sleep' },
-    { icon: Activity, text: 'Рекомендации по физической активности', category: 'exercise' },
-    { icon: Zap, text: 'Упадок сил и энергии', category: 'energy' }
+    { icon: Heart, text: 'Как мягко справляться с приливами?', category: 'symptoms' },
+    { icon: Moon, text: 'Как улучшить сон и высыпаться?', category: 'sleep' },
+    { icon: Activity, text: 'Как выбрать свою физическую активность?', category: 'exercise' },
+    { icon: Zap, text: 'Как поддерживать энергию каждый день?', category: 'energy' }
   ];
 
   // Загрузка истории чата и обновление лимитов
@@ -60,7 +60,7 @@ const AIChat: React.FC = () => {
   const addWelcomeMessage = () => {
     const welcomeMessage: ChatMessage = {
       role: 'assistant',
-      content: 'Привет! Я Eva, ваш персональный ИИ-помощник по женскому здоровью. Я здесь, чтобы поддержать вас в период менопаузы. Расскажите, что вас беспокоит?',
+      content: 'Здравствуйте! Я всегда рядом, чтобы поддержать вас на пути к гармонии в период менопаузы. Вы не одни — давайте разберемся вместе. 🌸\n\nЗдесь вы можете спокойно поговорить о любом вопросе, который вас волнует.',
       timestamp: new Date().toISOString()
     };
     setMessages([welcomeMessage]);
@@ -155,20 +155,28 @@ const AIChat: React.FC = () => {
   };
 
   return (
-    <PatientLayout title="bloom - ИИ-консультант Eva" breadcrumbs={breadcrumbs}>
+    <PatientLayout title="bloom - Eva, ваш цифровой помощник" breadcrumbs={breadcrumbs}>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Заголовок с информацией о лимитах */}
-        <div className="bloom-card p-6">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gradient-to-br from-bloom-golden to-bloom-caramel rounded-full animate-gentle-float">
-              <MessageSquare className="h-8 w-8 text-white" />
+        <div className="bg-gradient-to-br from-background via-primary/5 to-accent/10 p-8 rounded-3xl shadow-elegant border border-primary/10">
+          <div className="flex items-center space-x-6">
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20 rounded-full flex items-center justify-center animate-gentle-float backdrop-blur-sm">
+                <span className="text-3xl">🌸</span>
+              </div>
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+                <span className="text-xs text-white">✨</span>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-playfair font-bold text-foreground">
-                ИИ-консультант Eva 🤖
+            <div className="flex-1">
+              <h1 className="text-4xl font-playfair font-bold text-foreground mb-2">
+                Eva, ваш цифровой помощник 🌸
               </h1>
-              <p className="text-muted-foreground">
-                Персональный помощник для поддержки в период менопаузы
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                Рада помочь вам сегодня! Я всегда рядом, чтобы поддержать вас на пути к гармонии.
+              </p>
+              <p className="text-primary/80 text-sm mt-2 italic">
+                Здесь вы можете спокойно поговорить о любом вопросе, который вас волнует.
               </p>
             </div>
           </div>
@@ -180,21 +188,31 @@ const AIChat: React.FC = () => {
         </div>
 
         {/* Быстрые действия */}
-        <Card className="bloom-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Частые вопросы</CardTitle>
+        <Card className="bg-gradient-to-br from-card/90 to-accent/5 backdrop-blur-sm border-primary/10 shadow-elegant rounded-2xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-foreground flex items-center gap-2">
+              <span className="text-2xl">💝</span>
+              <span className="font-playfair">Мои быстрые советы</span>
+            </CardTitle>
+            <p className="text-muted-foreground text-sm">
+              Выберите то, что откликается вашему сердцу прямо сейчас
+            </p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {quickActions.map((action, index) => (
                 <Button
                   key={index}
                   variant="outline"
                   onClick={() => handleQuickAction(action)}
-                  className="h-auto p-4 text-left justify-start gentle-border interactive-hover bg-gradient-to-r from-white to-bloom-vanilla"
+                  className="h-auto p-6 text-left justify-start border-primary/20 bg-gradient-to-br from-background/80 to-primary/5 hover:from-primary/10 hover:to-accent/10 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl group"
                 >
-                  <action.icon className="h-5 w-5 text-primary mr-3 flex-shrink-0" />
-                  <span className="text-foreground">{action.text}</span>
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                    <action.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-foreground font-medium leading-relaxed">{action.text}</span>
+                  </div>
                 </Button>
               ))}
             </div>
@@ -212,15 +230,35 @@ const AIChat: React.FC = () => {
         />
 
         {/* Дополнительная информация */}
-        <Card className="bloom-card">
-          <CardContent className="p-4">
-            <div className="text-center text-sm text-muted-foreground">
-              <p className="mb-2">
-                💡 <strong>Совет:</strong> Задавайте конкретные вопросы о симптомах для получения более точных рекомендаций
-              </p>
-              <p>
-                🔒 Ваши данные защищены и используются только для улучшения консультаций
-              </p>
+        <Card className="bg-gradient-to-br from-card/90 to-accent/5 backdrop-blur-sm border-primary/10 shadow-soft rounded-2xl">
+          <CardContent className="p-6">
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="text-2xl">🌷</span>
+                <p className="text-foreground font-medium">
+                  Не нашли свой вопрос? Просто начните чат — я поддержу вас.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl border border-primary/10">
+                  <p className="flex items-start gap-2">
+                    <span className="text-primary">💝</span>
+                    <span className="text-muted-foreground">
+                      <strong className="text-foreground">Говорите открыто:</strong> Задавайте любые вопросы о симптомах — я отвечу деликатно и с пониманием
+                    </span>
+                  </p>
+                </div>
+                
+                <div className="p-4 bg-gradient-to-br from-secondary/5 to-accent/5 rounded-2xl border border-secondary/10">
+                  <p className="flex items-start gap-2">
+                    <span className="text-secondary">🔐</span>
+                    <span className="text-muted-foreground">
+                      <strong className="text-foreground">Ваша приватность:</strong> Все наши беседы конфиденциальны и защищены
+                    </span>
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
