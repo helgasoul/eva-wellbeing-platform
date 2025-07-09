@@ -93,7 +93,7 @@ const HowWeHelp: React.FC = () => {
             {SUBSCRIPTION_PLANS.map((plan, index) => (
               <div key={plan.id} className="mb-20">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                  <div className={index % 2 === 0 ? 'order-1' : 'order-2'}>
+                  <div className="order-1">
                     <div className="text-center lg:text-left">
                       <div className="text-6xl mb-4">
                         {plan.id === 'essential' ? '🌱' : plan.icon}
@@ -171,7 +171,7 @@ const HowWeHelp: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className={index % 2 === 0 ? 'order-2' : 'order-1'}>
+                  <div className="order-2">
                     <div
                       id={plan.id}
                       className={`rounded-2xl p-8 shadow-elegant transition-all duration-300 hover:shadow-soft ${
