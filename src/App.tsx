@@ -23,7 +23,7 @@ import NutritionTracker from "./pages/patient/NutritionTracker";
 import CycleTracker from "./pages/patient/CycleTracker";
 import Community from "./pages/patient/Community";
 import DoctorDashboard from "./pages/DoctorDashboard";
-import MedicalCalculators from "./pages/doctor/MedicalCalculators";
+import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
@@ -143,9 +143,9 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            <Route path="/doctor/calculators" element={
+            <Route path="/doctor/embedded-calculators" element={
               <ProtectedRoute requiredRole={UserRole.DOCTOR}>
-                <MedicalCalculators />
+                <EmbeddedCalculators />
               </ProtectedRoute>
             } />
             

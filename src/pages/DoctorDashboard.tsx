@@ -198,12 +198,12 @@ const DoctorDashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate('/doctor/calculators')}
+                onClick={() => navigate('/doctor/embedded-calculators')}
                 className="h-auto py-4 px-6 flex flex-col items-center space-y-2 border-blue-300 hover:bg-blue-50"
               >
                 <Calculator className="h-6 w-6 text-blue-600" />
-                <span className="text-sm">Мед. калькуляторы</span>
-                <span className="text-xs text-blue-500">MDCalc</span>
+                <span className="text-sm">Калькуляторы</span>
+                <span className="text-xs text-blue-500">Встроенные</span>
               </Button>
               <Button
                 variant="outline"
