@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, AuthContextType, LoginCredentials, RegisterData, UserRole } from '@/types/auth';
+import { User, AuthContextType, LoginCredentials, RegisterData, UserRole, MultiStepRegistrationData } from '@/types/auth';
 import { getRoleDashboardPath } from '@/types/roles';
 import { toast } from '@/hooks/use-toast';
 
@@ -229,6 +229,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     navigate(dashboardPath);
   };
 
+  // Complete multi-step registration
+  const completeRegistration = async (data: MultiStepRegistrationData): Promise<User> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Create new user from multi-step registration data
+      const newUser: User = {
+        id: Math.random().toString(36).substr(2, 9),
+        email: data.step1.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        role: UserRole.PATIENT, // Multi-step registration is for patients
+        phone: data.step1.phone,
+        emailVerified: data.step1.emailVerified,
+        phoneVerified: data.step1.phoneVerified,
+        registrationCompleted: true,
+        onboardingCompleted: false,
+        createdAt: new Date()
+      };
+
+      setUser(newUser);
+      localStorage.setItem('eva-user', JSON.stringify(newUser));
+
+      return newUser;
+    } catch (error) {
+      const errorMessage = 'Ошибка завершения регистрации';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Функция возврата к оригинальной роли администратора
   const returnToOriginalRole = () => {
     if (!originalUser || !isTestingRole) {
@@ -251,6 +288,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     login,
     register,
+    completeRegistration,
     logout,
     forgotPassword,
     isLoading,

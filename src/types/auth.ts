@@ -113,10 +113,35 @@ export interface RegisterForm {
   agreeToPrivacy: boolean;
 }
 
+// Multi-step registration data
+export interface MultiStepRegistrationData {
+  step1: {
+    email: string;
+    phone?: string;
+    emailVerified: boolean;
+    phoneVerified: boolean;
+  };
+  step2: {
+    gdpr_basic: boolean;
+    medical_data: boolean;
+    ai_analysis: boolean;
+    research_participation: boolean;
+    marketing_communications: boolean;
+  };
+  step3: {
+    personaId: string;
+    additionalData: Record<string, string>;
+  };
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface AuthContextType {
   user: User | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
+  completeRegistration: (data: MultiStepRegistrationData) => Promise<User>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
   isLoading: boolean;

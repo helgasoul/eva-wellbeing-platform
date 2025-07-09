@@ -4,296 +4,195 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { Layout } from "./components/layout/Layout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { DashboardRedirect } from "./components/DashboardRedirect";
-import { UserRole } from "./types/roles";
-import Home from "./pages/Home";
+
+// Auth pages
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import MultiStepRegistration from "./pages/auth/MultiStepRegistration";
 import ForgotPassword from "./pages/ForgotPassword";
+
+// NEW: Multi-step registration
+import MultiStepRegistration from "./pages/auth/MultiStepRegistration";
+
+// Patient pages
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientOnboarding from "./pages/patient/PatientOnboarding";
 import SymptomTracker from "./pages/patient/SymptomTracker";
-import AIChat from "./pages/patient/AIChat";
 import PatientInsights from "./pages/patient/PatientInsights";
-import WearableDevices from "./pages/patient/WearableDevices";
-
-import NutritionTracker from "./pages/patient/NutritionTracker";
-import NutritionPlan from "./pages/patient/NutritionPlan";
-import NutritionAnalysis from "./pages/patient/NutritionAnalysis";
+import AIChat from "./pages/patient/AIChat";
 import FoodDiary from "./pages/patient/FoodDiary";
-import CycleTracker from "./pages/patient/CycleTracker";
-import Community from "./pages/patient/Community";
-import DoctorDashboard from "./pages/DoctorDashboard";
-import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
-import AdminDashboard from "./pages/AdminDashboard";
-import { RecommendationsDemo } from "./pages/patient/RecommendationsDemo";
-import { AdvancedRecommendationsDemo } from "./pages/patient/AdvancedRecommendationsDemo";
-import LabTests from "./pages/patient/LabTests";
 import DoctorBooking from "./pages/patient/DoctorBooking";
-import ClinicIntegration from "./pages/patient/ClinicIntegration";
-import PharmacyIntegration from "./pages/patient/PharmacyIntegration";
+import Community from "./pages/patient/Community";
+
+// Doctor pages
+import DoctorDashboard from "./pages/DoctorDashboard";
+
+// Admin pages
+import AdminDashboard from "./pages/AdminDashboard";
+
+// Landing and other pages
+import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import AboutPlatform from "./pages/AboutPlatform";
-import HowWeHelp from "./pages/HowWeHelp";
+
+// Providers
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { FoodDiaryProvider } from "./contexts/FoodDiaryContext";
 import { BasicNotificationProvider } from "./contexts/BasicNotificationContext";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <SubscriptionProvider>
-            <FoodDiaryProvider>
-              <BasicNotificationProvider>
-          <Routes>
-            {/* Auth routes without layout */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/register-new" element={
-              <ProtectedRoute requireGuest>
-                <MultiStepRegistration />
-              </ProtectedRoute>
-            } />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            
-            {/* Legacy dashboard route - redirect to role-specific dashboard */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <DashboardRedirect />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient onboarding route */}
-            <Route path="/patient/onboarding" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <PatientOnboarding />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient symptom tracker route */}
-            <Route path="/patient/symptoms" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <SymptomTracker />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient AI chat route */}
-            <Route path="/patient/ai-chat" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <AIChat />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient insights route */}
-            <Route path="/patient/insights" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <PatientInsights />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient wearable devices route */}
-            <Route path="/patient/wearables" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <WearableDevices />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient doctors route - placeholder */}
-            <Route path="/patient/doctors" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <div className="min-h-screen flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <h1 className="text-2xl font-bold mb-4">Врачи</h1>
-                    <p className="text-muted-foreground">Этот раздел будет доступен в следующих версиях</p>
-                  </div>
-                </div>
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient lab tests route */}
-            <Route path="/patient/lab-tests" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <LabTests />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient doctor booking route */}
-            <Route path="/patient/doctor-booking" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <DoctorBooking />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient clinic integration route */}
-            <Route path="/patient/clinic-integration" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <ClinicIntegration />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient pharmacy integration route */}
-            <Route path="/patient/pharmacy-integration" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <PharmacyIntegration />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient nutrition tracker route */}
-            <Route path="/patient/nutrition" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <NutritionTracker />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient nutrition plan route */}
-            <Route path="/patient/nutrition-plan" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <NutritionPlan />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient nutrition analysis route */}
-            <Route path="/patient/nutrition-analysis" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <NutritionAnalysis />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient food diary route */}
-            <Route path="/patient/food-diary" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <FoodDiary />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient cycle tracker route */}
-            <Route path="/patient/cycle" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <CycleTracker />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient community route */}
-            <Route path="/patient/community" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <Community />
-              </ProtectedRoute>
-            } />
-            
-            {/* Patient recommendations demo route */}
-            <Route path="/patient/recommendations" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <RecommendationsDemo />
-              </ProtectedRoute>
-            } />
-            
-            {/* Advanced recommendations demo route */}
-            <Route path="/patient/advanced-recommendations" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <AdvancedRecommendationsDemo />
-              </ProtectedRoute>
-            } />
-            
-            {/* Role-specific protected dashboards */}
-            <Route path="/patient/dashboard" element={
-              <ProtectedRoute requiredRole={UserRole.PATIENT}>
-                <PatientDashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/doctor/dashboard" element={
-              <ProtectedRoute requiredRole={UserRole.DOCTOR}>
-                <DoctorDashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/doctor/embedded-calculators" element={
-              <ProtectedRoute requiredRole={UserRole.DOCTOR}>
-                <EmbeddedCalculators />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/dashboard" element={
-              <ProtectedRoute requiredRole={UserRole.ADMIN}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            
-            {/* Main routes with layout */}
-            <Route path="/" element={
-              <Layout>
-                <Home />
-              </Layout>
-            } />
-            
-            {/* Add placeholder routes for footer links */}
-            <Route path="/about" element={<AboutPlatform />} />
-            <Route path="/how-we-help" element={<HowWeHelp />} />
-            <Route path="/pricing" element={<HowWeHelp />} />
-            
-            <Route path="/services" element={
-              <Layout>
-                <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                  <div className="bloom-card p-8 text-center">
-                    <h1 className="text-2xl font-playfair font-bold mb-4">Услуги</h1>
-                    <p className="text-muted-foreground">Эта страница в разработке</p>
-                  </div>
-                </div>
-              </Layout>
-            } />
-            
-            <Route path="/contact" element={
-              <Layout>
-                <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                  <div className="bloom-card p-8 text-center">
-                    <h1 className="text-2xl font-playfair font-bold mb-4">Контакты</h1>
-                    <p className="text-muted-foreground">Эта страница в разработке</p>
-                  </div>
-                </div>
-              </Layout>
-            } />
-            
-            <Route path="/privacy" element={
-              <Layout>
-                <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                  <div className="bloom-card p-8 text-center">
-                    <h1 className="text-2xl font-playfair font-bold mb-4">Политика конфиденциальности</h1>
-                    <p className="text-muted-foreground">Эта страница в разработке</p>
-                  </div>
-                </div>
-              </Layout>
-            } />
-            
-            <Route path="/terms" element={
-              <Layout>
-                <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                  <div className="bloom-card p-8 text-center">
-                    <h1 className="text-2xl font-playfair font-bold mb-4">Условия использования</h1>
-                    <p className="text-muted-foreground">Эта страница в разработке</p>
-                  </div>
-                </div>
-              </Layout>
-            } />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-              </BasicNotificationProvider>
-            </FoodDiaryProvider>
-          </SubscriptionProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <SubscriptionProvider>
+              <FoodDiaryProvider>
+                <BasicNotificationProvider>
+                  <Routes>
+                    {/* PUBLIC ROUTES */}
+                    <Route path="/" element={<Home />} />
+                    
+                    {/* LEGAL ROUTES */}
+                    <Route path="/privacy" element={
+                      <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                        <div className="bloom-card p-8 text-center">
+                          <h1 className="text-2xl font-playfair font-bold mb-4">Политика конфиденциальности</h1>
+                          <p className="text-muted-foreground">Эта страница в разработке</p>
+                        </div>
+                      </div>
+                    } />
+                    <Route path="/terms" element={
+                      <div className="min-h-screen bloom-gradient flex items-center justify-center">
+                        <div className="bloom-card p-8 text-center">
+                          <h1 className="text-2xl font-playfair font-bold mb-4">Условия использования</h1>
+                          <p className="text-muted-foreground">Эта страница в разработке</p>
+                        </div>
+                      </div>
+                    } />
+
+                    {/* GUEST-ONLY ROUTES (для незарегистрированных) */}
+                    <Route
+                      path="/login"
+                      element={
+                        <ProtectedRoute requireGuest={true}>
+                          <Login />
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/register"
+                      element={
+                        <ProtectedRoute requireGuest={true}>
+                          <Register />
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    {/* NEW: Multi-step registration */}
+                    <Route
+                      path="/registration/*"
+                      element={
+                        <ProtectedRoute requireGuest={true}>
+                          <MultiStepRegistration />
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/forgot-password"
+                      element={
+                        <ProtectedRoute requireGuest={true}>
+                          <ForgotPassword />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* Legacy dashboard route - redirect to role-specific dashboard */}
+                    <Route path="/dashboard" element={
+                      <ProtectedRoute>
+                        <Navigate to="/patient/dashboard" replace />
+                      </ProtectedRoute>
+                    } />
+
+                    {/* PATIENT ROUTES */}
+                    <Route path="/patient/dashboard" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <PatientDashboard />
+                      </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/patient/onboarding" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <PatientOnboarding />
+                      </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/patient/symptoms" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <SymptomTracker />
+                      </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/patient/insights" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <PatientInsights />
+                      </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/patient/chat" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <AIChat />
+                      </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/patient/nutrition" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <FoodDiary />
+                      </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/patient/doctor-booking" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <DoctorBooking />
+                      </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/patient/community" element={
+                      <ProtectedRoute allowedRoles={['patient']}>
+                        <Community />
+                      </ProtectedRoute>
+                    } />
+
+                    {/* DOCTOR ROUTES */}
+                    <Route path="/doctor/dashboard" element={
+                      <ProtectedRoute allowedRoles={['doctor']}>
+                        <DoctorDashboard />
+                      </ProtectedRoute>
+                    } />
+
+                    {/* ADMIN ROUTES */}
+                    <Route path="/admin/dashboard" element={
+                      <ProtectedRoute allowedRoles={['admin']}>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    } />
+
+                    {/* FALLBACK */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BasicNotificationProvider>
+              </FoodDiaryProvider>
+            </SubscriptionProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
