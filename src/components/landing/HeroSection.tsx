@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Heart, Shield, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import heroWomenIllustration from '@/assets/hero-women-illustration.jpg';
 
 const HeroSection: React.FC = () => {
   return (
@@ -38,8 +39,8 @@ const HeroSection: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/15 to-primary/10 rounded-3xl blur-2xl transform scale-110"></div>
             <div className="relative bg-card rounded-3xl overflow-hidden shadow-elegant border border-primary/10">
               <img 
-                src="/lovable-uploads/fe3895a3-05ff-4913-93b4-996d4825fe84.png" 
-                alt="Группа улыбающихся женщин разных возрастов — поддержка и радость вместе"
+                src={heroWomenIllustration} 
+                alt="Цифровая иллюстрация женщин разных возрастов в мягких тонах — символ поддержки и заботы"
                 className="w-full h-auto object-cover"
               />
             </div>
