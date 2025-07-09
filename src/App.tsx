@@ -184,6 +184,32 @@ function App() {
         </OnboardingGuard>
       </ProtectedRoute>
     } />
+    
+    <Route path="/patient/sleep-dashboard" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <div className="p-6">
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold">Анализ сна</h1>
+            </div>
+            <div>Компонент SleepDashboard будет загружен здесь</div>
+          </div>
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/data-sources" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <div className="p-6">
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold">Источники данных</h1>
+            </div>
+            <div>Компонент DataSourcesDashboard будет загружен здесь</div>
+          </div>
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
 
                     {/* DOCTOR ROUTES */}
                     <Route path="/doctor/dashboard" element={
