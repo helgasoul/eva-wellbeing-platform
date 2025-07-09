@@ -193,7 +193,7 @@ export const Step2LegalConsents: React.FC = () => {
       title="Согласия на обработку данных"
       subtitle="Ваша конфиденциальность и безопасность данных - наш главный приоритет"
       step={2}
-      totalSteps={3}
+      totalSteps={4}
     >
       <div className="space-y-4">
         {consentItems.map(item => (

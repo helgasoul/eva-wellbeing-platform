@@ -243,7 +243,7 @@ const AdditionalQuestions: React.FC<AdditionalQuestionsProps> = ({
 };
 
 export const Step3PersonaSelection: React.FC = () => {
-  const { state, updateStep3Data, nextStep, prevStep, completeRegistration } = useRegistration();
+  const { state, updateStep3Data, nextStep, prevStep } = useRegistration();
   const { step3Data } = state;
   
   const [additionalAnswers, setAdditionalAnswers] = useState<Record<string, string>>({});
@@ -253,10 +253,10 @@ export const Step3PersonaSelection: React.FC = () => {
     setAdditionalAnswers({}); // Сброс дополнительных ответов при смене персоны
   };
 
-  const handleComplete = () => {
+  const handleNext = () => {
     if (step3Data.selectedPersona) {
       updateStep3Data({ additionalAnswers });
-      completeRegistration();
+      nextStep();
     }
   };
 
@@ -265,7 +265,7 @@ export const Step3PersonaSelection: React.FC = () => {
       title="Какой этап ближе всего описывает ваше состояние?"
       subtitle="Это поможет нам персонализировать рекомендации специально для вас"
       step={3}
-      totalSteps={3}
+      totalSteps={4}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {menopausePersonas.map(persona => (
@@ -296,11 +296,11 @@ export const Step3PersonaSelection: React.FC = () => {
           Назад
         </Button>
         <Button
-          onClick={handleComplete}
+          onClick={nextStep}
           disabled={!step3Data.selectedPersona}
           className="bloom-button px-8"
         >
-          Завершить регистрацию
+          Продолжить к созданию аккаунта
         </Button>
       </div>
     </StepWrapper>

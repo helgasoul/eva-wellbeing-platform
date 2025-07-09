@@ -205,7 +205,7 @@ export const Step1ContactVerification: React.FC = () => {
       title="Подтвердите ваш email"
       subtitle="Это обеспечит безопасность вашего аккаунта и позволит получать важные уведомления"
       step={1}
-      totalSteps={3}
+      totalSteps={4}
     >
       {error && (
         <ErrorMessage message={error} />

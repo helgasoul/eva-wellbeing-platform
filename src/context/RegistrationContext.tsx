@@ -27,10 +27,15 @@ export interface PersonaSelectionData {
 }
 
 export interface RegistrationState {
-  currentStep: 1 | 2 | 3;
+  currentStep: 1 | 2 | 3 | 4;
   step1Data: ContactVerificationData;
   step2Data: LegalConsentsData;
   step3Data: PersonaSelectionData;
+  step4Data: {
+    password: string;
+    firstName: string;
+    lastName: string;
+  };
   isCompleted: boolean;
 }
 
@@ -39,6 +44,7 @@ interface RegistrationContextType {
   updateStep1Data: (data: Partial<ContactVerificationData>) => void;
   updateStep2Data: (data: Partial<LegalConsentsData>) => void;
   updateStep3Data: (data: Partial<PersonaSelectionData>) => void;
+  updateStep4Data: (data: Partial<{ password: string; firstName: string; lastName: string }>) => void;
   nextStep: () => void;
   prevStep: () => void;
   canProceedToStep: (step: number) => boolean;
@@ -68,6 +74,11 @@ const initialState: RegistrationState = {
     selectedPersona: null,
     additionalAnswers: {}
   },
+  step4Data: {
+    password: '',
+    firstName: '',
+    lastName: ''
+  },
   isCompleted: false
 };
 
@@ -95,17 +106,24 @@ export const RegistrationProvider: React.FC<{ children: ReactNode }> = ({ childr
     }));
   };
 
+  const updateStep4Data = (data: Partial<{ password: string; firstName: string; lastName: string }>) => {
+    setState(prev => ({
+      ...prev,
+      step4Data: { ...prev.step4Data, ...data }
+    }));
+  };
+
   const nextStep = () => {
     setState(prev => ({
       ...prev,
-      currentStep: Math.min(3, prev.currentStep + 1) as 1 | 2 | 3
+      currentStep: Math.min(4, prev.currentStep + 1) as 1 | 2 | 3 | 4
     }));
   };
 
   const prevStep = () => {
     setState(prev => ({
       ...prev,
-      currentStep: Math.max(1, prev.currentStep - 1) as 1 | 2 | 3
+      currentStep: Math.max(1, prev.currentStep - 1) as 1 | 2 | 3 | 4
     }));
   };
 
@@ -118,6 +136,8 @@ export const RegistrationProvider: React.FC<{ children: ReactNode }> = ({ childr
       case 3:
         const requiredConsents = ['gdpr_basic', 'medical_data', 'ai_analysis'] as const;
         return requiredConsents.every(consent => state.step2Data[consent]);
+      case 4:
+        return !!state.step3Data.selectedPersona;
       default:
         return false;
     }
@@ -148,6 +168,7 @@ export const RegistrationProvider: React.FC<{ children: ReactNode }> = ({ childr
       updateStep1Data,
       updateStep2Data,
       updateStep3Data,
+      updateStep4Data,
       nextStep,
       prevStep,
       canProceedToStep,

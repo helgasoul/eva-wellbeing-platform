@@ -29,7 +29,7 @@ const menopausePersonas = {
 
 export const RegistrationComplete: React.FC = () => {
   const { state, resetRegistration } = useRegistration();
-  const { register } = useAuth();
+  const { completeRegistration } = useAuth();
   const navigate = useNavigate();
   
   const selectedPersona = state.step3Data.selectedPersona 
@@ -40,40 +40,24 @@ export const RegistrationComplete: React.FC = () => {
     // Завершаем регистрацию в системе аутентификации
     const completeAuthRegistration = async () => {
       try {
-        // Собираем все данные для регистрации
         const registrationData = {
-          email: state.step1Data.email,
-          password: 'temp_password', // В реальном приложении пароль должен быть введен пользователем
-          confirmPassword: 'temp_password',
-          firstName: 'User', // Можно добавить в форму
-          lastName: 'Name', // Можно добавить в форму
-          role: 'patient' as const,
-          agreeToTerms: state.step2Data.gdpr_basic,
-          agreeToPrivacy: state.step2Data.gdpr_basic,
-          
-          // Дополнительные данные из нашего процесса
-          emailVerified: state.step1Data.emailVerified,
-          phoneVerified: state.step1Data.phoneVerified,
-          phone: state.step1Data.phone,
-          consents: {
-            ...state.step2Data,
-            timestamp: new Date().toISOString()
-          },
-          selectedPersona: {
-            id: state.step3Data.selectedPersona!,
-            selectedAt: new Date().toISOString(),
+          step1: state.step1Data,
+          step2: state.step2Data,
+          step3: {
+            personaId: state.step3Data.selectedPersona!,
             additionalData: state.step3Data.additionalAnswers
           },
-          registrationCompleted: true,
-          onboardingCompleted: false
+          password: state.step4Data.password,
+          firstName: state.step4Data.firstName,
+          lastName: state.step4Data.lastName
         };
 
-        // В реальном приложении здесь должен быть вызов register
-        console.log('Данные регистрации:', registrationData);
+        // Используем новый метод из AuthContext
+        const newUser = await completeRegistration(registrationData);
         
         toast({
           title: 'Регистрация завершена!',
-          description: 'Добро пожаловать в Eva Platform',
+          description: `Добро пожаловать, ${newUser.firstName}!`,
         });
 
         // Автоматический переход к онбордингу через 3 секунды
@@ -86,7 +70,7 @@ export const RegistrationComplete: React.FC = () => {
         console.error('Ошибка завершения регистрации:', error);
         toast({
           title: 'Ошибка',
-          description: 'Произошла ошибка при завершении регистрации',
+          description: error instanceof Error ? error.message : 'Произошла ошибка при завершении регистрации',
           variant: 'destructive',
         });
       }
@@ -95,7 +79,7 @@ export const RegistrationComplete: React.FC = () => {
     if (state.isCompleted) {
       completeAuthRegistration();
     }
-  }, [state, register, navigate, resetRegistration]);
+  }, [state, completeRegistration, navigate, resetRegistration]);
 
   const handleContinueManually = () => {
     resetRegistration();
