@@ -5,6 +5,7 @@ import { useRegistration } from '@/context/RegistrationContext';
 import { useAuth } from '@/context/AuthContext';
 import { CheckCircle, Sparkles, Heart, Shield, ArrowRight, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { dataBridge } from '@/services/dataBridge';
 
 const menopausePersonas = {
   first_signs: {
@@ -33,6 +34,7 @@ export const RegistrationComplete: React.FC = () => {
   const navigate = useNavigate();
   const [isDataTransferred, setIsDataTransferred] = useState(false);
   const [newUser, setNewUser] = useState(null);
+  const [transferResult, setTransferResult] = useState(null);
   
   const selectedPersona = state.step3Data.selectedPersona 
     ? menopausePersonas[state.step3Data.selectedPersona]
@@ -60,27 +62,44 @@ export const RegistrationComplete: React.FC = () => {
         const createdUser = await completeRegistration(registrationData);
         setNewUser(createdUser);
         
-        // ✅ НОВОЕ: Сохраняем данные для онбординга в localStorage
-        const onboardingPresets = {
-          fromRegistration: true,
-          personaId: state.step3Data.selectedPersona,
-          registrationTimestamp: new Date().toISOString(),
-          basicInfo: {
-            firstName: state.step4Data.firstName,
-            lastName: state.step4Data.lastName,
-            email: state.step1Data.email,
-            phone: state.step1Data.phone
-          },
-          consents: {
-            ...state.step2Data,
-            timestamp: new Date().toISOString()
-          },
-          expectedOnboardingPath: getOnboardingPathByPersona(state.step3Data.selectedPersona)
-        };
+        // ✅ НОВОЕ: Используем DataBridge для безопасной передачи данных
+        const result = dataBridge.transferRegistrationToOnboarding(createdUser, {
+          step1: state.step1Data,
+          step2: state.step2Data,
+          step3: state.step3Data
+        });
         
-        localStorage.setItem('eva_onboarding_presets', JSON.stringify(onboardingPresets));
+        setTransferResult(result);
         
-        setIsDataTransferred(true);
+        if (result.success) {
+          setIsDataTransferred(true);
+          
+          // Логируем успешную передачу с аналитикой
+          const analytics = dataBridge.getTransferAnalytics();
+          console.log('✅ DataBridge analytics:', analytics);
+        } else {
+          console.error('❌ DataBridge transfer failed:', result.errors);
+          // Fallback to old method
+          const onboardingPresets = {
+            fromRegistration: true,
+            personaId: state.step3Data.selectedPersona,
+            registrationTimestamp: new Date().toISOString(),
+            basicInfo: {
+              firstName: state.step4Data.firstName,
+              lastName: state.step4Data.lastName,
+              email: state.step1Data.email,
+              phone: state.step1Data.phone
+            },
+            consents: {
+              ...state.step2Data,
+              timestamp: new Date().toISOString()
+            },
+            expectedOnboardingPath: getOnboardingPathByPersona(state.step3Data.selectedPersona)
+          };
+          
+          localStorage.setItem('eva_onboarding_presets', JSON.stringify(onboardingPresets));
+          setIsDataTransferred(true);
+        }
         
         toast({
           title: 'Регистрация завершена!',
@@ -147,7 +166,7 @@ export const RegistrationComplete: React.FC = () => {
             специально для вашего этапа.
           </p>
 
-          {/* ✅ НОВОЕ: Показываем статус подготовки данных */}
+          {/* ✅ НОВОЕ: Показываем статус подготовки данных с DataBridge */}
           <div className="bg-card rounded-lg p-4 mb-6 border border-muted">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" />
@@ -161,17 +180,23 @@ export const RegistrationComplete: React.FC = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Подготовка анкеты</span>
-                <span className={isDataTransferred ? "text-green-600" : "text-yellow-600"}>
-                  {isDataTransferred ? "✅" : "⏳"}
+                <span className="text-muted-foreground">Передача данных</span>
+                <span className={transferResult?.success ? "text-green-600" : "text-yellow-600"}>
+                  {transferResult?.success ? "✅" : "⏳"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Интеграция данных</span>
+                <span className="text-muted-foreground">Валидация целостности</span>
                 <span className={isDataTransferred ? "text-green-600" : "text-yellow-600"}>
                   {isDataTransferred ? "✅" : "⏳"}
                 </span>
               </div>
+              {transferResult?.transferredKeys && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Ключей создано: {transferResult.transferredKeys.length}</span>
+                  <span className="text-green-600">✅</span>
+                </div>
+              )}
             </div>
           </div>
           

@@ -17,6 +17,7 @@ import { OnboardingData } from '@/types/onboarding';
 import { detectMenopausePhase } from '@/utils/menopausePhaseDetector';
 import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
+import { dataBridge, OnboardingPresets } from '@/services/dataBridge';
 
 const TOTAL_STEPS = 7;
 const STORAGE_KEY = 'bloom-onboarding-data';
@@ -38,56 +39,110 @@ const PatientOnboarding = () => {
   const [showResults, setShowResults] = useState(false);
   const [phaseResult, setPhaseResult] = useState(null);
   const [recommendations, setRecommendations] = useState(null);
+  const [onboardingPresets, setOnboardingPresets] = useState<OnboardingPresets | null>(null);
+  const [dataLoadingStatus, setDataLoadingStatus] = useState({
+    registration: false,
+    onboarding: false,
+    dataBridge: false
+  });
   
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ ИСПРАВЛЕНИЕ: Загружаем данные регистрации И сохраненные данные онбординга
+  // ✅ ИСПРАВЛЕНИЕ: Загружаем данные через DataBridge
   useEffect(() => {
-    // Проверяем данные из регистрации
-    const registrationPresets = localStorage.getItem('eva_onboarding_presets');
-    const savedOnboardingData = localStorage.getItem(STORAGE_KEY);
-    
-    if (registrationPresets) {
+    const loadOnboardingData = async () => {
       try {
-        const presets = JSON.parse(registrationPresets);
-        console.log('✅ Loading registration presets:', presets);
+        // 1. Пытаемся загрузить данные через DataBridge
+        const presets = dataBridge.getOnboardingPresets();
         
-        // Предзаполняем базовую информацию из регистрации
-        const presetsFormData = {
-          basicInfo: {
-            age: 0, // Пользователь заполнит
-            height: 0, // Пользователь заполнит  
-            weight: 0, // Пользователь заполнит
-            ...presets.basicInfo // firstName, lastName, email, phone из регистрации
-          },
-          registrationPersona: presets.personaId,
-          fromRegistration: true,
-          expectedPath: presets.expectedOnboardingPath
-        };
+        if (presets) {
+          console.log('✅ Loading data via DataBridge:', presets);
+          setOnboardingPresets(presets);
+          
+          // Предзаполняем данные из DataBridge
+          const presetsFormData = {
+            basicInfo: {
+              age: 0,
+              height: 0,
+              weight: 0,
+              location: '',
+              occupation: '',
+              hasChildren: false,
+              ...presets.prefills.basicInfo
+            },
+            registrationPersona: presets.persona.id,
+            fromRegistration: true,
+            expectedPath: presets.persona.onboardingPath,
+            onboardingConfig: presets.onboardingConfig
+          };
+          
+          setFormData(presetsFormData);
+          setDataLoadingStatus(prev => ({ ...prev, dataBridge: true }));
+          
+          toast({
+            title: 'Персональная анкета готова!',
+            description: `Анкета адаптирована для профиля "${getPersonaTitle(presets.persona.id)}" • ${presets.onboardingConfig.estimatedDuration}`,
+          });
+          
+        } else {
+          console.log('⚠️ No DataBridge presets found, falling back to legacy method');
+          
+          // 2. Fallback: проверяем старый метод
+          const legacyPresets = localStorage.getItem('eva_onboarding_presets');
+          if (legacyPresets) {
+            try {
+              const presets = JSON.parse(legacyPresets);
+              console.log('✅ Loading legacy registration presets:', presets);
+              
+              const presetsFormData = {
+                basicInfo: {
+                  age: 0,
+                  height: 0,
+                  weight: 0,
+                  location: '',
+                  occupation: '',
+                  hasChildren: false,
+                  ...presets.basicInfo
+                },
+                registrationPersona: presets.personaId,
+                fromRegistration: true,
+                expectedPath: presets.expectedOnboardingPath
+              };
+              
+              setFormData(presetsFormData);
+              setDataLoadingStatus(prev => ({ ...prev, registration: true }));
+              
+              toast({
+                title: 'Добро пожаловать!',
+                description: `Анкета подготовлена для профиля "${getPersonaTitle(presets.personaId)}"`,
+              });
+              
+            } catch (error) {
+              console.error('Failed to load registration presets:', error);
+            }
+          }
+        }
         
-        setFormData(presetsFormData);
-        
-        toast({
-          title: 'Добро пожаловать!',
-          description: `Анкета подготовлена для профиля "${getPersonaTitle(presets.personaId)}"`,
-        });
+        // 3. Загружаем сохраненный прогресс онбординга
+        const savedOnboardingData = localStorage.getItem(STORAGE_KEY);
+        if (savedOnboardingData) {
+          try {
+            const saved = JSON.parse(savedOnboardingData);
+            setFormData(prev => ({ ...prev, ...saved }));
+            setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
+            console.log('✅ Loading saved onboarding progress');
+          } catch (error) {
+            console.error('Failed to load saved onboarding data:', error);
+          }
+        }
         
       } catch (error) {
-        console.error('Failed to load registration presets:', error);
+        console.error('Error loading onboarding data:', error);
       }
-    }
+    };
     
-    // Если есть сохраненные данные онбординга, они имеют приоритет
-    if (savedOnboardingData) {
-      try {
-        const saved = JSON.parse(savedOnboardingData);
-        setFormData(prev => ({ ...prev, ...saved }));
-        console.log('✅ Loading saved onboarding progress');
-      } catch (error) {
-        console.error('Failed to load saved onboarding data:', error);
-      }
-    }
+    loadOnboardingData();
   }, []);
 
   // Save data whenever formData changes
@@ -151,9 +206,11 @@ const PatientOnboarding = () => {
   };
 
   const handleOnboardingComplete = () => {
-    // ✅ ИСПРАВЛЕНИЕ: Очищаем ВСЕ связанные данные
+    // ✅ ИСПРАВЛЕНИЕ: Используем DataBridge для безопасной очистки
+    dataBridge.cleanupTransferData();
+    
+    // Очищаем локальные данные онбординга
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem('eva_onboarding_presets');
     
     // Mark onboarding as completed in user context
     // This would typically involve an API call to update user profile
@@ -256,8 +313,21 @@ const PatientOnboarding = () => {
   };
 
   return (
-    <PatientLayout title="Онбординг bloom">
+    <PatientLayout title={onboardingPresets ? `Персональная анкета для "${getPersonaTitle(onboardingPresets.persona.id)}"` : "Онбординг bloom"}>
       <div className="min-h-screen">
+        {/* ✅ НОВОЕ: Индикатор загрузки данных */}
+        {(dataLoadingStatus.dataBridge || dataLoadingStatus.registration) && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center space-x-2 text-sm">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-green-800">
+                ✅ Данные из регистрации загружены
+                {onboardingPresets && ` • ${onboardingPresets.onboardingConfig.estimatedDuration}`}
+              </span>
+            </div>
+          </div>
+        )}
+
         <OnboardingProgress
           currentStep={currentStep}
           totalSteps={TOTAL_STEPS}
@@ -269,7 +339,10 @@ const PatientOnboarding = () => {
         ) : (
           <StepWrapper
             title={stepTitles[currentStep - 1]}
-            description="Пожалуйста, заполните информацию для персонализации вашего опыта"
+            description={onboardingPresets ? 
+              `Персонализированные вопросы для вашего профиля "${getPersonaTitle(onboardingPresets.persona.id)}"` :
+              "Пожалуйста, заполните информацию для персонализации вашего опыта"
+            }
             onNext={handleNext}
             onPrev={handlePrev}
             canGoNext={canGoNext()}

@@ -90,6 +90,17 @@ export interface OnboardingData {
   medicalHistory?: MedicalHistory;
   lifestyle?: LifestyleInfo;
   goals?: GoalsAndPriorities;
+  // ✅ НОВОЕ: Поля для персонализации
+  registrationPersona?: string;
+  fromRegistration?: boolean;
+  expectedPath?: any;
+  onboardingConfig?: {
+    estimatedDuration?: string;
+    prioritySteps?: number[];
+    customQuestions?: any;
+    skipValidations?: string[];
+    prefilledSections?: string[];
+  };
 }
 
 export enum MenopausePhase {

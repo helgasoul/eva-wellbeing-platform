@@ -3,8 +3,13 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Clock, CheckCircle } from 'lucide-react';
+import { dataBridge } from '@/services/dataBridge';
 
 export const WelcomeStep: React.FC = () => {
+  // ✅ НОВОЕ: Получаем данные персонализации
+  const presets = dataBridge.getOnboardingPresets();
+  const analytics = dataBridge.getTransferAnalytics();
+  
   return (
     <div className="max-w-2xl mx-auto text-center space-y-8">
       {/* Welcome Header */}
@@ -13,10 +18,16 @@ export const WelcomeStep: React.FC = () => {
           <Heart className="h-10 w-10 text-white" />
         </div>
         <h1 className="text-3xl font-playfair font-bold text-foreground mb-4">
-          Добро пожаловать в bloom!
+          {presets ? 
+            `Добро пожаловать в bloom, ${presets.user.firstName}!` : 
+            'Добро пожаловать в bloom!'
+          }
         </h1>
         <p className="text-lg text-muted-foreground">
-          Давайте создадим персональный план поддержки вашего здоровья и благополучия
+          {presets ? 
+            `Ваша персональная анкета готова для профиля "${getPersonaTitle(presets.persona.id)}"` :
+            'Давайте создадим персональный план поддержки вашего здоровья и благополучия'
+          }
         </p>
       </div>
 
@@ -58,11 +69,16 @@ export const WelcomeStep: React.FC = () => {
       {/* Time Estimate */}
       <div className="bg-bloom-soft-pink/30 rounded-lg p-4">
         <p className="text-bloom-dusty-rose font-medium">
-          ⏱️ Это займет всего 5-7 минут
+          ⏱️ Это займет всего {presets?.onboardingConfig.estimatedDuration || '5-7 минут'}
         </p>
         <p className="text-sm text-muted-foreground mt-1">
           Ваш прогресс автоматически сохраняется
         </p>
+        {presets?.onboardingConfig.prefilledSections?.length > 0 && (
+          <p className="text-sm text-green-600 mt-2">
+            ✅ Базовая информация уже заполнена
+          </p>
+        )}
       </div>
 
       {/* Privacy Note */}
@@ -71,7 +87,22 @@ export const WelcomeStep: React.FC = () => {
           🔒 <strong>Конфиденциальность:</strong> Вся информация надежно защищена и используется 
           только для персонализации вашего опыта в bloom
         </p>
+        {analytics && (
+          <p className="text-xs text-green-600 mt-2">
+            ✅ Данные целостности: {analytics.dataIntegrity}%
+          </p>
+        )}
       </div>
     </div>
   );
+};
+
+// ✅ НОВОЕ: Вспомогательная функция для получения названия персоны
+const getPersonaTitle = (personaId: string) => {
+  const titles = {
+    'first_signs': 'Первые признаки',
+    'active_phase': 'Активная фаза', 
+    'postmenopause': 'Постменопауза'
+  };
+  return titles[personaId as keyof typeof titles] || 'Персональный профиль';
 };
