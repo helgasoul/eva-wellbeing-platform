@@ -48,7 +48,7 @@ export const baseMealPlans = {
       fat: 6,
       menopausePhase: 'premenopause',
       benefits: ['Детокс', 'Витамины', 'Энергия'],
-      difficulty: 'easy',
+      difficulty: 'easy' as const,
       prepTime: 5,
       cookTime: 0
     },
@@ -65,7 +65,7 @@ export const baseMealPlans = {
       fat: 22,
       menopausePhase: 'premenopause',
       benefits: ['Стабилизация гормонов', 'Белок', 'Полезные жиры'],
-      difficulty: 'easy',
+      difficulty: 'easy' as const,
       prepTime: 15,
       cookTime: 10
     },
@@ -82,7 +82,7 @@ export const baseMealPlans = {
       fat: 12,
       menopausePhase: 'premenopause',
       benefits: ['Омега-3', 'Легкое пищеварение', 'Качественный белок'],
-      difficulty: 'medium',
+      difficulty: 'medium' as const,
       prepTime: 10,
       cookTime: 25
     }
