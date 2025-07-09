@@ -9,20 +9,24 @@ import { ComprehensiveRecommendation } from '@/types/comprehensiveRecommendation
 import { getPhaseName, getPhaseDescription } from '@/utils/menopausePhaseDetector';
 import { generateComprehensiveRecommendations } from '@/services/comprehensiveRecommendationService';
 import { ComprehensiveRecommendations } from './ComprehensiveRecommendations';
-import { CheckCircle, Heart, BookOpen, Calendar, Stethoscope, FlaskConical } from 'lucide-react';
+import { CheckCircle, Heart, BookOpen, Calendar, Stethoscope, FlaskConical, MapPin, ArrowRight } from 'lucide-react';
 
 interface OnboardingResultsProps {
   phaseResult: PhaseResult;
   recommendations: PersonalizedRecommendations;
   onboardingData: OnboardingData;
   onComplete: () => void;
+  onSetupGeolocation?: () => void; // ✅ НОВОЕ: функция настройки геолокации
+  hasGeolocation?: boolean; // ✅ НОВОЕ: флаг наличия геолокации
 }
 
 export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
   phaseResult,
   recommendations,
   onboardingData,
-  onComplete
+  onComplete,
+  onSetupGeolocation, // ✅ НОВОЕ: деструктурируем
+  hasGeolocation // ✅ НОВОЕ: деструктурируем
 }) => {
   const [comprehensiveRecommendations, setComprehensiveRecommendations] = useState<ComprehensiveRecommendation[]>([]);
 
@@ -219,17 +223,97 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
         </TabsContent>
       </Tabs>
 
+      {/* ✅ НОВОЕ: Секция настройки геолокации */}
+      {onSetupGeolocation && !hasGeolocation && (
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 dark:from-blue-950 dark:to-indigo-950 dark:border-blue-800">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
+              <MapPin className="h-5 w-5" />
+              <span>Настройте персонализацию по климату</span>
+            </CardTitle>
+            <CardDescription className="text-blue-600 dark:text-blue-400">
+              Получайте рекомендации с учетом погоды и климата вашего региона
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                  Анализ корреляций с погодными условиями
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  Обнаружение связи между изменениями погоды и вашими симптомами
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                  Персонализированные уведомления
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400">
+                  Предупреждения о неблагоприятных погодных условиях
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 pt-2">
+              <Button
+                onClick={onSetupGeolocation}
+                variant="default"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <MapPin className="h-4 w-4 mr-2" />
+                Настроить геолокацию
+              </Button>
+              <Button
+                onClick={onComplete}
+                variant="outline"
+                className="border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-300"
+              >
+                Пропустить
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ✅ НОВОЕ: Индикатор настроенной геолокации */}
+      {hasGeolocation && (
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 dark:from-green-950 dark:to-emerald-950 dark:border-green-800">
+          <CardContent className="flex items-center space-x-3 py-4">
+            <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                Геолокация настроена
+              </p>
+              <p className="text-xs text-green-600 dark:text-green-400">
+                Вы будете получать персонализированные рекомендации на основе климата
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Continue Button */}
       <div className="text-center pt-6">
-        <Button
-          onClick={onComplete}
-          size="lg"
-          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3"
-        >
-          Перейти в приложение
-        </Button>
+        {hasGeolocation || !onSetupGeolocation ? (
+          <Button
+            onClick={onComplete}
+            size="lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3"
+          >
+            Перейти в приложение
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        ) : null}
+        
         <p className="text-sm text-muted-foreground mt-2">
-          Ваши данные сохранены. Вы сможете начать отслеживание симптомов и использовать все функции Eva.
+          Ваши данные сохранены. Вы сможете начать отслеживание симптомов и использовать все функции bloom.
         </p>
       </div>
     </div>

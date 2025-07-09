@@ -13,7 +13,10 @@ import { SymptomsStep } from '@/components/onboarding/steps/SymptomsStep';
 import { MedicalHistoryStep } from '@/components/onboarding/steps/MedicalHistoryStep';
 import { LifestyleStep } from '@/components/onboarding/steps/LifestyleStep';
 import { GoalsStep } from '@/components/onboarding/steps/GoalsStep';
+import GeolocationStep from '@/components/onboarding/steps/GeolocationStep';
 import { OnboardingData } from '@/types/onboarding';
+import { weatherService } from '@/services/weatherService';
+import { supabase } from '@/integrations/supabase/client';
 import { detectMenopausePhase } from '@/utils/menopausePhaseDetector';
 import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
@@ -83,13 +86,15 @@ const PatientOnboarding = () => {
   const [formData, setFormData] = useState<OnboardingData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showGeolocation, setShowGeolocation] = useState(false); // ✅ НОВОЕ: состояние для геолокации
   const [phaseResult, setPhaseResult] = useState(null);
   const [recommendations, setRecommendations] = useState(null);
   const [onboardingPresets, setOnboardingPresets] = useState<OnboardingPresets | null>(null);
   const [dataLoadingStatus, setDataLoadingStatus] = useState({
     registration: false,
     onboarding: false,
-    dataBridge: false
+    dataBridge: false,
+    geolocation: false // ✅ НОВОЕ: статус геолокации
   });
   
   const { user, completeOnboarding } = useAuth();
@@ -265,8 +270,69 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ ИСПРАВЛЕНО: Убрали геолокационный шаг из основного процесса
-  // Геолокация будет обрабатываться отдельно после завершения основного онбординга
+  // ✅ НОВОЕ: Обработка геолокационного шага после основного онбординга
+  const handleGeolocationComplete = async (data: { location: any, weather: any }) => {
+    try {
+      const { location, weather } = data;
+      
+      const geolocationData = {
+        location,
+        weather,
+        recordedAt: new Date().toISOString()
+      };
+
+      // Обновляем данные формы
+      updateFormData({ geolocation: geolocationData });
+
+      // Сохраняем местоположение пользователя в базу данных
+      if (user?.id) {
+        const { error: locationError } = await supabase
+          .from('user_locations')
+          .upsert({
+            user_id: user.id,
+            location_data: location,
+            is_active: true
+          });
+
+        if (locationError) {
+          console.error('Error saving user location:', locationError);
+        }
+
+        // Сохраняем погодные данные
+        await weatherService.saveWeatherData(user.id, location, weather);
+        
+        console.log('✅ Location and weather data saved for user:', user.id);
+      }
+
+      setDataLoadingStatus(prev => ({ ...prev, geolocation: true }));
+      setShowGeolocation(false);
+      setShowResults(true); // ✅ ИСПРАВЛЕНО: возвращаемся к результатам
+      
+      toast({
+        title: 'Геолокация настроена!',
+        description: 'Теперь вы будете получать персонализированные рекомендации на основе климата.',
+      });
+
+    } catch (error) {
+      console.error('Error handling geolocation completion:', error);
+      toast({
+        title: 'Ошибка геолокации',
+        description: 'Не удалось сохранить данные местоположения. Вы можете настроить это позже.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleStartGeolocation = () => {
+    setShowResults(false);
+    setShowGeolocation(true);
+  };
+
+  const handleSkipGeolocation = () => {
+    console.log('📍 User skipped geolocation setup');
+    setShowGeolocation(false);
+    setShowResults(true); // ✅ ИСПРАВЛЕНО: возвращаемся к результатам без геолокации
+  };
 
   const handleOnboardingComplete = async () => {
     try {
@@ -345,6 +411,30 @@ const PatientOnboarding = () => {
     }
   };
 
+  // ✅ НОВОЕ: Рендеринг геолокационного шага
+  if (showGeolocation) {
+    return (
+      <PatientLayout title="Настройка персонализации">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-playfair font-bold text-foreground mb-2">
+              Последний шаг - настроим геолокацию
+            </h2>
+            <p className="text-muted-foreground">
+              Это поможет получать персонализированные рекомендации на основе климата и окружающей среды
+            </p>
+          </div>
+          
+          <GeolocationStep
+            data={formData.geolocation}
+            onChange={handleGeolocationComplete}
+            onSkip={handleSkipGeolocation}
+          />
+        </div>
+      </PatientLayout>
+    );
+  }
+
   if (showResults && phaseResult && recommendations) {
     return (
       <PatientLayout title="Результаты онбординга">
@@ -353,6 +443,8 @@ const PatientOnboarding = () => {
           recommendations={recommendations}
           onboardingData={formData}
           onComplete={handleOnboardingComplete}
+          onSetupGeolocation={handleStartGeolocation}
+          hasGeolocation={!!formData.geolocation}
         />
       </PatientLayout>
     );

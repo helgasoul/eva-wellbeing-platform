@@ -40,11 +40,13 @@ interface GeolocationStepProps {
     weather?: WeatherData;
   };
   onChange: (data: { location: LocationData; weather: WeatherData }) => void;
+  onSkip?: () => void; // ✅ НОВОЕ: опциональная функция пропуска
 }
 
 const GeolocationStep: React.FC<GeolocationStepProps> = ({ 
   data,
-  onChange
+  onChange,
+  onSkip // ✅ НОВОЕ: деструктурируем onSkip
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<LocationData[]>([]);
@@ -452,6 +454,26 @@ const GeolocationStep: React.FC<GeolocationStepProps> = ({
           </div>
         </div>
       )}
+      
+      {/* ✅ НОВОЕ: Кнопки действий */}
+      <div className="flex space-x-4 mt-6">
+        {onSkip && (
+          <button
+            onClick={onSkip}
+            className="flex-1 py-3 px-4 border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground"
+          >
+            Пропустить
+          </button>
+        )}
+        {selectedLocation && weatherData && (
+          <button
+            onClick={() => onChange({ location: selectedLocation, weather: weatherData })}
+            className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+          >
+            Сохранить и продолжить
+          </button>
+        )}
+      </div>
       
       <p className="text-xs text-muted-foreground text-center mt-4">
         Данные о погоде будут обновляться ежедневно для анализа корреляций с вашими симптомами
