@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sprout, Flame, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import beginningChangesImage from '@/assets/beginning-changes-card.jpg';
 
 const UserPersonasSection: React.FC = () => {
   const personas = [
@@ -49,14 +50,33 @@ const UserPersonasSection: React.FC = () => {
           {personas.map((persona, index) => {
             const IconComponent = persona.Icon;
             return (
-              <div key={index} className="bg-card rounded-xl shadow-clean overflow-hidden hover:shadow-soft transition-all duration-300">
-                <div className={`bg-gradient-to-br ${persona.colorClass} p-6 text-white`}>
-                  <div className="inline-flex p-3 bg-white/20 rounded-full mb-4">
-                    <IconComponent className="h-8 w-8 text-white" />
+              <div key={index} className="bg-card rounded-xl shadow-clean overflow-hidden hover:shadow-soft transition-all duration-300 animate-fade-in">
+                {index === 0 ? (
+                  // Специальный дизайн для первой карточки с изображением
+                  <div className="relative">
+                    <img 
+                      src={beginningChangesImage} 
+                      alt="Поддержка для женщин на старте перемен"
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-success/90 via-success/60 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
+                        <IconComponent className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
+                      <p className="text-base opacity-90">{persona.subtitle}</p>
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
-                  <p className="text-lg opacity-90">{persona.subtitle}</p>
-                </div>
+                ) : (
+                  <div className={`bg-gradient-to-br ${persona.colorClass} p-6 text-white`}>
+                    <div className="inline-flex p-3 bg-white/20 rounded-full mb-4">
+                      <IconComponent className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
+                    <p className="text-lg opacity-90">{persona.subtitle}</p>
+                  </div>
+                )}
                 
                 <div className="p-6">
                   <p className="text-muted-foreground mb-6">{persona.description}</p>
