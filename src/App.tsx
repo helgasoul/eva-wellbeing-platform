@@ -11,6 +11,7 @@ import { UserRole } from "./types/roles";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import MultiStepRegistration from "./pages/auth/MultiStepRegistration";
 import ForgotPassword from "./pages/ForgotPassword";
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientOnboarding from "./pages/patient/PatientOnboarding";
@@ -57,6 +58,11 @@ const App = () => (
             {/* Auth routes without layout */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/register-new" element={
+              <ProtectedRoute requireGuest>
+                <MultiStepRegistration />
+              </ProtectedRoute>
+            } />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             
             {/* Legacy dashboard route - redirect to role-specific dashboard */}
