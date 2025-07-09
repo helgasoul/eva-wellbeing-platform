@@ -572,25 +572,104 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Additional Services */}
-        <section className="py-20 bg-muted/20">
+        <section className="py-20 bg-gradient-to-br from-accent/5 via-primary/5 to-accent/10">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
-              Дополнительные услуги
-            </h2>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+                Дополнительные услуги
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Персональная забота и современная диагностика для вашего спокойствия
+              </p>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ADDITIONAL_SERVICES.map((service) => (
-                <div key={service.id} className="bg-card rounded-lg p-6 shadow-clean hover:shadow-soft transition-all">
-                  <h3 className="font-semibold text-lg mb-2 text-foreground">{service.name}</h3>
-                  <p className="text-muted-foreground mb-4">{service.description}</p>
-                  <div className="text-2xl font-bold text-primary mb-4">
-                    ₽{service.price.toLocaleString()}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {ADDITIONAL_SERVICES.map((service) => {
+                const getServiceIcon = (id: string) => {
+                  switch(id) {
+                    case 'consultation': return '👩‍⚕️';
+                    case 'biomarkers': return '🧬';
+                    case 'genetic_test': return '🧬';
+                    case 'dexa_scan': return '🦴';
+                    case 'nutrition_plan': return '🍏';
+                    case 'mammography': return '🩺';
+                    case 'endoscopy': return '🔬';
+                    case 'gynecologist_ultrasound': return '👩‍⚕️';
+                    case 'online_consilium': return '👥';
+                    case 'mri_breast': return '🩺';
+                    case 'mri_pelvis': return '🩺';
+                    default: return '💜';
+                  }
+                };
+
+                const getServiceTitle = (id: string, name: string) => {
+                  switch(id) {
+                    case 'online_consilium': return 'Онлайн-консилиум врачей';
+                    case 'mri_breast': return 'МРТ молочной железы с контрастным усилением';
+                    case 'dexa_scan': return 'DEXA-сканирование';
+                    case 'nutrition_plan': return 'Персональный план питания';
+                    default: return name;
+                  }
+                };
+
+                const getServiceSubtitle = (id: string) => {
+                  switch(id) {
+                    case 'online_consilium': return 'Ваша персональная команда заботы';
+                    case 'mri_breast': return 'Современная диагностика для вашего спокойствия';
+                    case 'dexa_scan': return 'Контроль плотности костей для женского здоровья';
+                    case 'nutrition_plan': return 'Индивидуально, с заботой о вас';
+                    case 'consultation': return 'Экспертная поддержка когда нужно';
+                    case 'biomarkers': return 'Понимание вашего здоровья на глубоком уровне';
+                    case 'genetic_test': return 'Персональная медицина для вашего будущего';
+                    case 'mammography': return 'Бережная забота о женском здоровье';
+                    case 'endoscopy': return 'Комфортная диагностика с заботой о вас';
+                    case 'gynecologist_ultrasound': return 'Комплексная забота в одном посещении';
+                    case 'mri_pelvis': return 'Точная диагностика с вниманием к деталям';
+                    default: return 'Забота о вашем здоровье';
+                  }
+                };
+
+                const getServiceDescription = (id: string, description: string) => {
+                  switch(id) {
+                    case 'online_consilium': return 'Мультидисциплинарная консультация, чтобы принять верное решение вместе с ведущими специалистами';
+                    case 'mri_breast': return 'Магнитно-резонансная томография с бережным отношением к вашему здоровью';
+                    case 'dexa_scan': return 'Точная диагностика, заботливо и быстро';
+                    case 'nutrition_plan': return 'План питания, созданный специально для вас';
+                    default: return description;
+                  }
+                };
+
+                return (
+                  <div key={service.id} className="bg-card rounded-3xl p-8 shadow-elegant hover:shadow-soft transition-all duration-300 hover:-translate-y-1 border-2 border-accent/20 hover:border-primary/30">
+                    <div className="text-center mb-6">
+                      <div className="text-4xl mb-4">{getServiceIcon(service.id)}</div>
+                      <h3 className="font-semibold text-xl mb-2 text-foreground">
+                        {getServiceTitle(service.id, service.name)}
+                      </h3>
+                      <p className="text-primary font-medium mb-3">
+                        {getServiceSubtitle(service.id)}
+                      </p>
+                      <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                        {getServiceDescription(service.id, service.description)}
+                      </p>
+                      <div className="text-2xl font-bold text-primary mb-6">
+                        ₽{service.price.toLocaleString()}
+                      </div>
+                    </div>
+                    <button className="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-3 px-6 rounded-xl hover:from-primary/90 hover:to-primary/70 transition-all duration-300 font-semibold shadow-elegant hover:shadow-soft">
+                      Записаться
+                    </button>
                   </div>
-                  <button className="w-full bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                    Записаться
-                  </button>
-                </div>
-              ))}
+                );
+              })}
+            </div>
+            
+            <div className="text-center mt-12">
+              <div className="bg-gradient-to-r from-accent/10 to-primary/10 rounded-2xl p-6 border border-accent/20 max-w-2xl mx-auto">
+                <p className="text-muted-foreground">
+                  <span className="text-lg">🤝</span> Остались вопросы? Наши специалисты с радостью помогут вам выбрать подходящую услугу
+                </p>
+              </div>
             </div>
           </div>
         </section>
