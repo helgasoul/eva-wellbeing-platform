@@ -27,7 +27,7 @@ export const Header = () => {
               <img 
                 src={bloomLogo} 
                 alt="Bloom - Ваш заботливый помощник в мире женского здоровья"
-                className="h-12 w-auto object-contain group-hover:animate-bloom-glow transition-all duration-300"
+                className="h-24 w-auto object-contain group-hover:animate-bloom-glow transition-all duration-300"
               />
               {/* Декоративная аура при hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-md scale-110"></div>
