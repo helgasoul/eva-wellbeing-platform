@@ -124,29 +124,36 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-6 bg-primary">
-        <div className="container mx-auto text-center">
+      {/* Gentle CTA Section */}
+      <section className="py-20 px-6 bg-gradient-to-br from-purple-100/60 via-pink-100/40 to-rose-100/30 relative overflow-hidden">
+        {/* Gentle gradient animation */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-200/20 via-pink-200/20 to-purple-200/20 animate-pulse opacity-50"></div>
+        
+        <div className="container mx-auto text-center relative z-10">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Начните заботу о себе уже сегодня
-            </h2>
-            <p className="text-lg text-white/90 mb-10 leading-relaxed">
-              Не откладывайте заботу о своём здоровье и благополучии. 
-              Присоединяйтесь к BLOOM и получите доступ к персонализированной 
-              поддержке уже сегодня
+            <div className="flex items-center justify-center mb-6 animate-fade-in">
+              <Heart className="h-8 w-8 text-primary mr-4 animate-pulse" />
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
+                Ваш путь к заботе начинается 
+                <span className="text-primary ml-2">здесь</span>
+              </h2>
+            </div>
+            
+            <p className="text-xl text-muted-foreground mb-12 leading-relaxed max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Здесь вы найдёте поддержку и внимание — просто попробуйте, когда будете готовы.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            
+            <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <Link to="/register">
-                <Button className="bg-white text-primary hover:bg-white/90 text-lg px-8 py-3 font-medium rounded-xl btn-hover">
-                  Создать аккаунт бесплатно
+                <Button className="bg-gradient-to-r from-purple-500/90 via-primary to-pink-500/85 text-white hover:shadow-glow text-xl px-12 py-6 font-semibold rounded-3xl transition-all duration-300 hover:scale-105 group border border-primary/20 mb-4">
+                  <Heart className="mr-3 h-6 w-6 group-hover:animate-pulse transition-all duration-300" />
+                  Присоединиться с заботой — бесплатно
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button variant="outline" className="text-lg px-8 py-3 border-2 border-white/40 text-white hover:bg-white/10 font-medium rounded-xl btn-hover">
-                  Уже есть аккаунт?
-                </Button>
-              </Link>
+              
+              <p className="text-sm text-muted-foreground/70 italic mt-4 max-w-md mx-auto">
+                Вы всегда в безопасности. Можно уйти в любой момент.
+              </p>
             </div>
           </div>
         </div>
