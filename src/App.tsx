@@ -27,6 +27,9 @@ import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
+import Pricing from "./pages/Pricing";
+import HowWeHelp from "./pages/HowWeHelp";
+import { SubscriptionProvider } from "./context/SubscriptionContext";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +40,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <SubscriptionProvider>
           <Routes>
             {/* Auth routes without layout */}
             <Route path="/login" element={<Login />} />
@@ -164,6 +168,8 @@ const App = () => (
             
             {/* Add placeholder routes for footer links */}
             <Route path="/about" element={<AboutPlatform />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/how-we-help" element={<HowWeHelp />} />
             
             <Route path="/services" element={
               <Layout>
@@ -212,6 +218,7 @@ const App = () => (
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </SubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
