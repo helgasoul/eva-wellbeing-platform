@@ -27,6 +27,7 @@ import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
+import Services from "./pages/Services";
 
 const queryClient = new QueryClient();
 
@@ -167,12 +168,7 @@ const App = () => (
             
             <Route path="/services" element={
               <Layout>
-                <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                  <div className="bloom-card p-8 text-center">
-                    <h1 className="text-2xl font-playfair font-bold mb-4">Услуги</h1>
-                    <p className="text-muted-foreground">Эта страница в разработке</p>
-                  </div>
-                </div>
+                <Services />
               </Layout>
             } />
             
