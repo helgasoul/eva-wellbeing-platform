@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart } from 'lucide-react';
+import { Menu, X, Heart, Cloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const Header = () => {
@@ -10,10 +10,10 @@ export const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { path: '/', label: 'Главная' },
-    { path: '/about', label: 'О платформе' },
-    { path: '/services', label: 'Услуги' },
-    { path: '/contact', label: 'Контакты' }
+    { path: '/', label: 'Домой' },
+    { path: '/about', label: 'Почему Bloom' },
+    { path: '/services', label: 'Как мы помогаем' },
+    { path: '/contact', label: 'Написать команде' }
   ];
 
   return (
@@ -52,19 +52,24 @@ export const Header = () => {
             <Link to="/login">
               <Button 
                 variant="ghost"
-                className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-lg transition-all duration-200"
+                className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
               >
-                Войти
+                Мой Bloom
               </Button>
             </Link>
-            <Link to="/register">
-              <Button 
-                className="btn-gradient-soft text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group"
-              >
-                <Heart className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                Начать сейчас
-              </Button>
-            </Link>
+            <div className="flex flex-col items-center">
+              <Link to="/register">
+                <Button 
+                  className="bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground font-semibold px-8 py-3 rounded-2xl transition-all duration-300 shadow-elegant hover:shadow-soft hover:scale-105 group border border-primary/20"
+                >
+                  <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
+                  С заботой о себе
+                </Button>
+              </Link>
+              <p className="text-xs text-muted-foreground mt-1 italic">
+                Сделайте шаг к спокойствию
+              </p>
+            </div>
           </div>
 
           {/* Мобильное меню */}
@@ -105,16 +110,21 @@ export const Header = () => {
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <Button 
                     variant="ghost" 
-                    className="w-full justify-center py-3 font-medium"
+                    className="w-full justify-center py-3 font-medium rounded-xl"
                   >
-                    Войти
+                    Мой Bloom
                   </Button>
                 </Link>
                 <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full btn-gradient-soft text-primary-foreground py-3 font-semibold group">
-                    <Heart className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                    Начать сейчас
-                  </Button>
+                  <div className="flex flex-col items-center">
+                    <Button className="w-full bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground py-3 font-semibold group rounded-2xl border border-primary/20">
+                      <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
+                      С заботой о себе
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1 italic">
+                      Сделайте шаг к спокойствию
+                    </p>
+                  </div>
                 </Link>
               </div>
             </nav>
