@@ -892,6 +892,36 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_weather_records: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          location_data: Json
+          updated_at: string
+          user_id: string
+          weather_data: Json
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          location_data: Json
+          updated_at?: string
+          user_id: string
+          weather_data: Json
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          location_data?: Json
+          updated_at?: string
+          user_id?: string
+          weather_data?: Json
+        }
+        Relationships: []
+      }
       data_exports: {
         Row: {
           completed_at: string | null
@@ -5908,6 +5938,33 @@ export type Database = {
           id?: string
           points_to_next_level?: number | null
           total_points?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_locations: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          location_data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location_data: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location_data?: Json
           updated_at?: string
           user_id?: string
         }
