@@ -97,28 +97,27 @@ const Home = () => {
             
             <div className="text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
               {/* Supportive illustration placeholder */}
-              <div className="bg-gradient-to-br from-purple-100/50 to-pink-100/50 rounded-3xl p-12 mb-8 border border-purple-200/30">
-                <div className="inline-flex p-8 bg-gradient-to-br from-purple-200/50 to-pink-200/50 rounded-full mb-6 animate-gentle-float">
-                  <Heart className="h-16 w-16 text-primary animate-pulse" />
+              <div className="bg-gradient-to-br from-purple-50/80 via-pink-50/60 to-rose-50/40 rounded-3xl p-12 mb-8 border border-purple-200/20 shadow-soft">
+                <div className="inline-flex p-8 bg-gradient-to-br from-purple-100/60 to-pink-100/60 rounded-full mb-8 animate-gentle-float relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-xl scale-150 animate-pulse"></div>
+                  <Heart className="h-16 w-16 text-primary relative z-10 animate-pulse" />
                 </div>
-                <h3 className="text-2xl font-semibold text-foreground mb-4">
-                  Готовы почувствовать поддержку?
+                <h3 className="text-3xl font-bold text-foreground mb-4 leading-tight">
+                  Присоединяйтесь к кругу заботы
                 </h3>
-                <p className="text-base text-muted-foreground mb-6 leading-relaxed">
-                  Присоединяйтесь к тысячам женщин, которые уже нашли понимание и заботу в BLOOM
+                <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-md mx-auto">
+                  Вы не одна — вместе уже столько удивительных женщин
                 </p>
                 <Link to="/register">
-                  <Button className="w-full text-lg py-4 bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground font-semibold rounded-2xl transition-all duration-300 shadow-elegant hover:shadow-soft hover:scale-105 group border border-primary/20">
+                  <Button className="w-full text-lg py-4 bg-gradient-to-r from-purple-500/90 via-primary to-pink-500/85 text-white font-semibold rounded-3xl transition-all duration-300 shadow-elegant hover:shadow-glow hover:scale-105 group border border-primary/20 mb-4">
                     <Heart className="mr-3 h-5 w-5 group-hover:animate-pulse transition-all duration-300" />
-                    Начать с заботы о себе
+                    Стать частью сообщества
                   </Button>
                 </Link>
                 
-                <div className="mt-6 bg-gradient-to-r from-success/10 to-primary/10 rounded-2xl px-4 py-3 border border-success/20">
-                  <p className="text-sm text-muted-foreground">
-                    💚 Бесплатное начало • ⭐ Без обязательств • 🤗 Полная поддержка
-                  </p>
-                </div>
+                <p className="text-sm text-muted-foreground/70 italic">
+                  Можно начать в любое время. Выбор всегда за вами.
+                </p>
               </div>
             </div>
           </div>
