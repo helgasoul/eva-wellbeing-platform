@@ -50,7 +50,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-400/30 via-pink-400/30 to-rose-400/30 rounded-full blur-2xl"></div>
                   <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-white/50 shadow-2xl">
                     <img 
-                      src={founderPhoto}
+                      src={data.photo || founderPhoto}
                       alt={data.name}
                       className="w-full h-full object-cover object-center"
                     />
