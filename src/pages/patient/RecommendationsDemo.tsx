@@ -2,6 +2,7 @@ import React from 'react';
 import { Bell, Zap, Target, Clock } from 'lucide-react';
 import { useBasicNotifications } from '../../contexts/BasicNotificationContext';
 import { SimpleNotification } from '../../components/notifications/SimpleNotification';
+import { NotificationSystem } from '../../components/notifications/NotificationSystem';
 
 export const RecommendationsDemo: React.FC = () => {
   const {
@@ -20,12 +21,17 @@ export const RecommendationsDemo: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
+      {/* Система уведомлений */}
+      <div className="fixed top-4 right-4 z-50">
+        <NotificationSystem />
+      </div>
+      
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Система рекомендаций Eva
+          Система рекомендаций Eva - Расширенная версия
         </h1>
         <p className="text-gray-600">
-          Персонализированные подсказки для поддержания здоровья
+          Персонализированные подсказки с центром уведомлений и расширенной логикой
         </p>
       </div>
 
@@ -68,6 +74,11 @@ export const RecommendationsDemo: React.FC = () => {
       {/* Управление */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h3 className="font-semibold text-lg mb-4">Управление рекомендациями</h3>
+        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+          <p className="text-sm text-blue-800">
+            💡 Новая система включает центр уведомлений с фильтрацией, показатели эффективности и персонализированные рекомендации
+          </p>
+        </div>
         <div className="flex space-x-4">
           <button
             onClick={triggerRecommendation}

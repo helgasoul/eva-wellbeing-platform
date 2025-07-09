@@ -57,6 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           { name: 'ИИ-помощник', href: '/patient/ai-chat', icon: MessageSquare, badge: 2 },
           { name: 'Мои документы', href: '/patient/documents', icon: FileText },
           { name: 'Рекомендации Eva', href: '/patient/recommendations', icon: AlertTriangle },
+          { name: 'Расширенные рекомендации', href: '/patient/advanced-recommendations', icon: Brain },
           { name: 'Сообщество', href: '/patient/community', icon: Users },
           { name: 'Календарь здоровья', href: '/patient/calendar', icon: Calendar },
           { name: 'Настройки', href: '/patient/settings', icon: Settings },

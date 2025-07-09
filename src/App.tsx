@@ -29,6 +29,7 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import EmbeddedCalculators from "./pages/doctor/EmbeddedCalculators";
 import AdminDashboard from "./pages/AdminDashboard";
 import { RecommendationsDemo } from "./pages/patient/RecommendationsDemo";
+import { AdvancedRecommendationsDemo } from "./pages/patient/AdvancedRecommendationsDemo";
 import NotFound from "./pages/NotFound";
 import AboutPlatform from "./pages/AboutPlatform";
 import HowWeHelp from "./pages/HowWeHelp";
@@ -166,6 +167,13 @@ const App = () => (
             <Route path="/patient/recommendations" element={
               <ProtectedRoute requiredRole={UserRole.PATIENT}>
                 <RecommendationsDemo />
+              </ProtectedRoute>
+            } />
+            
+            {/* Advanced recommendations demo route */}
+            <Route path="/patient/advanced-recommendations" element={
+              <ProtectedRoute requiredRole={UserRole.PATIENT}>
+                <AdvancedRecommendationsDemo />
               </ProtectedRoute>
             } />
             
