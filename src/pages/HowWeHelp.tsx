@@ -177,22 +177,108 @@ const HowWeHelp: React.FC = () => {
                       className={`rounded-2xl p-8 shadow-elegant transition-all duration-300 hover:shadow-soft ${
                         plan.popular 
                           ? 'bg-gradient-to-br from-warning via-warning/90 to-warning/80 text-warning-foreground transform scale-105' 
-                          : 'bg-card border-2 border-border hover:border-primary'
+                          : 'bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 border-2 border-accent/20 hover:border-primary/30'
                       }`}
                     >
-                      <h3 className="text-xl font-semibold mb-6 text-center">
-                        Что включено:
-                      </h3>
-                      <ul className="space-y-3">
-                        {plan.features.map((feature, i) => (
-                          <li key={i} className="flex items-start">
-                            <span className={`mr-2 mt-1 ${plan.popular ? 'text-warning-foreground' : 'text-primary'}`}>•</span>
-                            <span className={`text-sm ${plan.popular ? 'text-warning-foreground/90' : 'text-muted-foreground'}`}>
-                              {feature}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
+                      {plan.id === 'essential' ? (
+                        <>
+                          <div className="text-center mb-6">
+                            <div className="text-4xl mb-3">💜</div>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">
+                              Ваша поддержка и забота — в каждом элементе
+                            </h3>
+                            <p className="text-muted-foreground text-sm">
+                              Всё, что нужно для спокойствия, баланса и уверенности каждый день.
+                            </p>
+                          </div>
+                          <ul className="space-y-4">
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🌿</span>
+                              <div>
+                                <div className="font-medium text-foreground">Трекер самочувствия и симптомов</div>
+                                <div className="text-sm text-muted-foreground">Помогает замечать перемены и поддерживать себя, когда это важно</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🌙</span>
+                              <div>
+                                <div className="font-medium text-foreground">Трекер менструального цикла</div>
+                                <div className="text-sm text-muted-foreground">Для лучшего понимания своего ритма и комфорта</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">💬</span>
+                              <div>
+                                <div className="font-medium text-foreground">24/7 ИИ-ассистент по менопаузе</div>
+                                <div className="text-sm text-muted-foreground">Ответы и поддержка тогда, когда вы захотите</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🍽️</span>
+                              <div>
+                                <div className="font-medium text-foreground">Дневник питания с персональными рекомендациями</div>
+                                <div className="text-sm text-muted-foreground">Забота о себе через питание, без строгих ограничений</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">📅</span>
+                              <div>
+                                <div className="font-medium text-foreground">Календарь здоровья с напоминаниями</div>
+                                <div className="text-sm text-muted-foreground">Нежные напоминания о заботе о себе</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">📚</span>
+                              <div>
+                                <div className="font-medium text-foreground">Библиотека статей и ответов на вопросы</div>
+                                <div className="text-sm text-muted-foreground">Только достоверная и понятная информация</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧘</span>
+                              <div>
+                                <div className="font-medium text-foreground">Простые упражнения и медитации</div>
+                                <div className="text-sm text-muted-foreground">Для восстановления сил и внутренней гармонии</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">👥</span>
+                              <div>
+                                <div className="font-medium text-foreground">Сообщество поддержки</div>
+                                <div className="text-sm text-muted-foreground">Место, где вас услышат и поймут</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">👩‍⚕️</span>
+                              <div>
+                                <div className="font-medium text-foreground">Блог врачей</div>
+                                <div className="text-sm text-muted-foreground">Советы и забота от профессионалов, понятным языком</div>
+                              </div>
+                            </li>
+                          </ul>
+                          <div className="mt-6 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
+                            <p className="text-sm text-center text-muted-foreground italic">
+                              Этот набор — ваш "набор поддержки", собранный с любовью и вниманием к деталям.
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <h3 className="text-xl font-semibold mb-6 text-center">
+                            Что включено:
+                          </h3>
+                          <ul className="space-y-3">
+                            {plan.features.map((feature, i) => (
+                              <li key={i} className="flex items-start">
+                                <span className={`mr-2 mt-1 ${plan.popular ? 'text-warning-foreground' : 'text-primary'}`}>•</span>
+                                <span className={`text-sm ${plan.popular ? 'text-warning-foreground/90' : 'text-muted-foreground'}`}>
+                                  {feature}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
