@@ -5,28 +5,31 @@ import { Button } from '@/components/ui/button';
 const UserPersonasSection: React.FC = () => {
   const personas = [
     {
-      title: "Первые признаки",
-      subtitle: "Вам 45+? Нерегулярные месячные?",
-      description: "Получите ясность и контроль",
+      title: "Начало перемен",
+      subtitle: "Замечаете изменения в цикле?",
+      description: "Почувствуйте уверенность на этом этапе",
       Icon: Sprout,
       colorClass: "from-success/80 to-success",
-      features: ["Трекинг ранних симптомов", "Образовательный контент", "Сообщество поддержки"]
+      features: ["Мягкий трекинг ощущений и симптомов", "Пошаговые полезные материалы", "Поддерживающее сообщество"],
+      ctaText: "Узнать больше"
     },
     {
-      title: "Активная фаза",
-      subtitle: "Приливы мешают жить?",
-      description: "Найдите эффективные решения",
+      title: "В разгар перемен",
+      subtitle: "Приливы или другие ощущения влияют на ваше самочувствие?",
+      description: "Вместе подберём решения, которые работают для вас",
       Icon: Flame,
       colorClass: "from-warning/80 to-warning",
-      features: ["Биомаркеры", "Консультации врачей", "Персональные планы"]
+      features: ["Современные биомаркеры", "Индивидуальные консультации", "Персональные рекомендации"],
+      ctaText: "Посмотреть рекомендации"
     },
     {
-      title: "Поздняя менопауза",
-      subtitle: "Защитите здоровье костей и сердца",
-      description: "В долгосрочной перспективе",
+      title: "После перемен",
+      subtitle: "Поддержите здоровье и качество жизни в новом этапе",
+      description: "Ваша забота о себе — в приоритете",
       Icon: Gem,
       colorClass: "from-primary/80 to-primary",
-      features: ["Генетическое тестирование", "Программы долголетия", "VIP сопровождение"]
+      features: ["Генетические тесты для профилактики", "Программы осознанного долголетия", "Персональный подход и поддержка"],
+      ctaText: "Получить поддержку"
     }
   ];
 
@@ -70,7 +73,7 @@ const UserPersonasSection: React.FC = () => {
                   <Button 
                     className={`w-full bg-gradient-to-r ${persona.colorClass} text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
                   >
-                    Подробнее
+                    {persona.ctaText}
                   </Button>
                 </div>
               </div>
