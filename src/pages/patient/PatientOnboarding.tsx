@@ -243,21 +243,39 @@ const PatientOnboarding = () => {
       case 1:
         return true; // Welcome step
       case 2:
+        // BasicInfoStep - требуются обязательные поля
         return formData.basicInfo && 
                formData.basicInfo.age > 0 && 
                formData.basicInfo.height > 0 && 
                formData.basicInfo.weight > 0;
       case 3:
+        // MenstrualHistoryStep - требуется возраст первой менструации
         return formData.menstrualHistory && 
                formData.menstrualHistory.ageOfFirstPeriod > 0;
       case 4:
-        return formData.symptoms !== undefined;
+        // SymptomsStep - требуется хотя бы заполнение базовых симптомов
+        return formData.symptoms && (
+          formData.symptoms.hotFlashes?.frequency !== undefined ||
+          formData.symptoms.nightSweats?.frequency !== undefined ||
+          formData.symptoms.sleepProblems?.frequency !== undefined ||
+          formData.symptoms.moodChanges?.frequency !== undefined
+        );
       case 5:
+        // MedicalHistoryStep - принимаем любые данные (даже пустые массивы)
         return formData.medicalHistory !== undefined;
       case 6:
-        return formData.lifestyle !== undefined;
+        // LifestyleStep - требуется заполнение основных полей
+        return formData.lifestyle && 
+               formData.lifestyle.exerciseFrequency !== undefined &&
+               formData.lifestyle.dietType !== undefined &&
+               formData.lifestyle.smokingStatus !== undefined &&
+               formData.lifestyle.alcoholConsumption !== undefined;
       case 7:
-        return formData.goals !== undefined;
+        // GoalsStep - требуется выбор хотя бы одной цели или заботы
+        return formData.goals && (
+          (formData.goals.primaryConcerns && formData.goals.primaryConcerns.length > 0) ||
+          (formData.goals.goals && formData.goals.goals.length > 0)
+        );
       default:
         return false;
     }
