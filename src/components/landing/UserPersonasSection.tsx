@@ -61,13 +61,15 @@ const UserPersonasSection: React.FC = () => {
                       alt="Поддержка для женщин на старте перемен"
                       className="w-full h-48 object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-success/90 via-success/60 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
-                        <IconComponent className="h-6 w-6 text-white" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4">
+                        <div className="inline-flex p-2 bg-success/90 rounded-full mb-3">
+                          <IconComponent className="h-6 w-6 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-lg">{persona.title}</h3>
+                        <p className="text-base text-white/95 drop-shadow-md">{persona.subtitle}</p>
                       </div>
-                      <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
-                      <p className="text-base opacity-90">{persona.subtitle}</p>
                     </div>
                   </div>
                 ) : index === 1 ? (
@@ -78,13 +80,15 @@ const UserPersonasSection: React.FC = () => {
                       alt="Поддержка и решения для женщин в активной фазе перемен"
                       className="w-full h-48 object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-warning/90 via-warning/60 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
-                        <IconComponent className="h-6 w-6 text-white" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4">
+                        <div className="inline-flex p-2 bg-warning/90 rounded-full mb-3">
+                          <IconComponent className="h-6 w-6 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-lg">{persona.title}</h3>
+                        <p className="text-base text-white/95 drop-shadow-md">{persona.subtitle}</p>
                       </div>
-                      <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
-                      <p className="text-base opacity-90">{persona.subtitle}</p>
                     </div>
                   </div>
                 ) : index === 2 ? (
@@ -95,13 +99,15 @@ const UserPersonasSection: React.FC = () => {
                       alt="Поддержка и забота для женщин после менопаузы"
                       className="w-full h-48 object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/60 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <div className="inline-flex p-2 bg-white/20 rounded-full mb-3">
-                        <IconComponent className="h-6 w-6 text-white" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="bg-black/20 backdrop-blur-sm rounded-lg p-4">
+                        <div className="inline-flex p-2 bg-primary/90 rounded-full mb-3">
+                          <IconComponent className="h-6 w-6 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-lg">{persona.title}</h3>
+                        <p className="text-base text-white/95 drop-shadow-md">{persona.subtitle}</p>
                       </div>
-                      <h3 className="text-2xl font-bold mb-2">{persona.title}</h3>
-                      <p className="text-base opacity-90">{persona.subtitle}</p>
                     </div>
                   </div>
                 ) : (
