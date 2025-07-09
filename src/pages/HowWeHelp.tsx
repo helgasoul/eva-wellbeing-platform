@@ -512,61 +512,167 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Comparison Table */}
-        <section className="py-20 bg-card">
+        <section className="py-20 bg-gradient-to-br from-card via-accent/5 to-card">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">
-              Сравнение тарифов
-            </h2>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+                Сравнение тарифов
+              </h2>
+              <p className="text-xl text-muted-foreground mb-2">
+                Ваша забота — ваш выбор
+              </p>
+              <p className="text-muted-foreground max-w-3xl mx-auto">
+                Платформа Bloom предлагает несколько тарифов — выберите подходящий для вашего этапа жизни. 
+                Вот, что входит в каждый тариф:
+              </p>
+            </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse bg-card rounded-lg shadow-clean">
-                <thead>
-                  <tr className="border-b-2 border-border">
-                    <th className="text-left p-4 font-semibold text-foreground">Функция</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Essential</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Plus</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Optimum</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-border">
-                    <td className="p-4 font-medium text-foreground">Цена в год</td>
-                    <td className="text-center p-4 text-foreground">₽2,990</td>
-                    <td className="text-center p-4 text-foreground">₽9,990</td>
-                    <td className="text-center p-4 text-foreground">₽15,990</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Трекер симптомов</td>
-                    <td className="text-center p-4">✅</td>
-                    <td className="text-center p-4">✅</td>
-                    <td className="text-center p-4">✅</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Биомаркеры</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-success">40+</td>
-                    <td className="text-center p-4 text-success">100+</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Консультации врачей</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-success">2/год</td>
-                    <td className="text-center p-4 text-success">4/год</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Генетическое тестирование</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4">✅</td>
-                  </tr>
-                  <tr className="border-b border-border">
-                    <td className="p-4 text-foreground">Личный координатор</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4 text-muted-foreground">—</td>
-                    <td className="text-center p-4">✅</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+              {/* Essential */}
+              <div className="bg-card rounded-3xl p-8 shadow-elegant border-2 border-accent/20 hover:border-primary/30 transition-all">
+                <div className="text-center mb-8">
+                  <div className="text-4xl mb-4">🌸</div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Essential</h3>
+                  <p className="text-muted-foreground mb-4">Базовый уход</p>
+                  <div className="text-3xl font-bold text-primary">₽2,990/год</div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Трекер симптомов</span>
+                    <span className="text-2xl">✅</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Биомаркеры</span>
+                    <span className="text-muted-foreground">—</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Консультации врача</span>
+                    <span className="text-muted-foreground">—</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Генетическое тестирование</span>
+                    <span className="text-muted-foreground">—</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Личный координатор</span>
+                    <span className="text-muted-foreground">—</span>
+                  </div>
+                </div>
+                
+                <button className="w-full mt-8 bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-elegant">
+                  Выбрать Essential
+                </button>
+              </div>
+
+              {/* Plus */}
+              <div className="bg-card rounded-3xl p-8 shadow-elegant border-2 border-warning/50 hover:border-warning/70 transition-all transform scale-105 relative">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-gradient-to-r from-warning to-warning/80 text-warning-foreground px-4 py-2 rounded-full text-sm font-bold">
+                    🌸 Самый популярный
+                  </span>
+                </div>
+                
+                <div className="text-center mb-8 mt-4">
+                  <div className="text-4xl mb-4">💜</div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Plus</h3>
+                  <p className="text-muted-foreground mb-4">Персональная забота</p>
+                  <div className="text-3xl font-bold text-primary">₽9,990/год</div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Трекер симптомов</span>
+                    <span className="text-2xl">✅</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Биомаркеры</span>
+                    <span className="text-success font-semibold">40+</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Консультации врача</span>
+                    <span className="text-success font-semibold">2/год</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Генетическое тестирование</span>
+                    <span className="text-muted-foreground">—</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Личный координатор</span>
+                    <span className="text-muted-foreground">—</span>
+                  </div>
+                </div>
+                
+                <button className="w-full mt-8 bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-elegant">
+                  Выбрать Plus
+                </button>
+              </div>
+
+              {/* Optimum */}
+              <div className="bg-card rounded-3xl p-8 shadow-elegant border-2 border-accent/20 hover:border-primary/30 transition-all">
+                <div className="text-center mb-8">
+                  <div className="text-4xl mb-4">⭐</div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Optimum</h3>
+                  <p className="text-muted-foreground mb-4">Максимальная экспертиза</p>
+                  <div className="text-3xl font-bold text-primary">₽15,990/год</div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Трекер симптомов</span>
+                    <span className="text-2xl">✅</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Биомаркеры</span>
+                    <span className="text-success font-semibold">100+</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Консультации врача</span>
+                    <span className="text-success font-semibold">4/год</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Генетическое тестирование</span>
+                    <span className="text-2xl">✅</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-foreground">Личный координатор</span>
+                    <span className="text-2xl">✅</span>
+                  </div>
+                </div>
+                
+                <button className="w-full mt-8 bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-elegant">
+                  Выбрать Optimum
+                </button>
+              </div>
+            </div>
+
+            {/* How to choose */}
+            <div className="bg-gradient-to-r from-accent/10 to-primary/10 rounded-3xl p-8 border border-accent/20 mb-8">
+              <h3 className="text-2xl font-bold text-foreground mb-6 text-center">Как выбрать?</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl mb-3">🌸</div>
+                  <h4 className="font-semibold text-foreground mb-2">Essential</h4>
+                  <p className="text-muted-foreground text-sm">Забота о себе на старте, базовый мониторинг и поддержка</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl mb-3">💜</div>
+                  <h4 className="font-semibold text-foreground mb-2">Plus</h4>
+                  <p className="text-muted-foreground text-sm">Для тех, кто хочет персонализированные рекомендации и регулярный контроль</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl mb-3">⭐</div>
+                  <h4 className="font-semibold text-foreground mb-2">Optimum</h4>
+                  <p className="text-muted-foreground text-sm">Для женщин, которым важно всё: генетика, максимальная медицинская поддержка, личный координатор</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional info */}
+            <div className="text-center">
+              <p className="text-muted-foreground">
+                <span className="text-xl">✨</span> Каждый тариф включает бесплатную onboarding-консультацию и доступ к женскому сообществу поддержки
+              </p>
             </div>
           </div>
         </section>
