@@ -296,7 +296,7 @@ const PatientOnboarding = () => {
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return <WelcomeStep />;
+        return <WelcomeStep onNext={handleNext} />;
       case 2:
         return (
           <BasicInfoStep

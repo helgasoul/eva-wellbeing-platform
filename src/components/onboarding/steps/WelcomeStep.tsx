@@ -2,10 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Clock, CheckCircle } from 'lucide-react';
+import { Heart, Clock, CheckCircle, ArrowRight } from 'lucide-react';
 import { dataBridge } from '@/services/dataBridge';
 
-export const WelcomeStep: React.FC = () => {
+interface WelcomeStepProps {
+  onNext?: () => void;
+}
+
+export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext }) => {
   // ✅ НОВОЕ: Получаем данные персонализации
   const presets = dataBridge.getOnboardingPresets();
   const analytics = dataBridge.getTransferAnalytics();
@@ -92,6 +96,18 @@ export const WelcomeStep: React.FC = () => {
             ✅ Данные целостности: {analytics.dataIntegrity}%
           </p>
         )}
+      </div>
+
+      {/* Start Button */}
+      <div className="pt-4">
+        <Button
+          onClick={onNext}
+          size="lg"
+          className="bg-bloom-dusty-rose hover:bg-bloom-mauve text-white px-8 py-3 text-lg"
+        >
+          <span>Начать анкету</span>
+          <ArrowRight className="ml-2 h-5 w-5" />
+        </Button>
       </div>
     </div>
   );
