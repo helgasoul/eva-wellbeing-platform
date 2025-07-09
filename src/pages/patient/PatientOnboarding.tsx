@@ -15,6 +15,8 @@ import { LifestyleStep } from '@/components/onboarding/steps/LifestyleStep';
 import { GoalsStep } from '@/components/onboarding/steps/GoalsStep';
 import GeolocationStep from '@/components/onboarding/steps/GeolocationStep';
 import { OnboardingData } from '@/types/onboarding';
+import { weatherService } from '@/services/weatherService';
+import { supabase } from '@/integrations/supabase/client';
 import { detectMenopausePhase } from '@/utils/menopausePhaseDetector';
 import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
@@ -207,6 +209,44 @@ const PatientOnboarding = () => {
     }
   };
 
+  // Обработка геолокационного шага
+  const handleGeolocationComplete = async (data: { location: any, weather: any }) => {
+    try {
+      const { location, weather } = data;
+      
+      const geolocationData = {
+        location,
+        weather,
+        recordedAt: new Date().toISOString()
+      };
+
+      // Обновляем данные формы
+      updateFormData({ geolocation: geolocationData });
+
+      // Сохраняем местоположение пользователя в базу данных
+      if (user?.id) {
+        const { error: locationError } = await supabase
+          .from('user_locations')
+          .upsert({
+            user_id: user.id,
+            location_data: location,
+            is_active: true
+          });
+
+        if (locationError) {
+          console.error('Error saving user location:', locationError);
+        }
+
+        // Сохраняем погодные данные
+        await weatherService.saveWeatherData(user.id, location, weather);
+        
+        console.log('✅ Location and weather data saved for user:', user.id);
+      }
+    } catch (error) {
+      console.error('Error handling geolocation completion:', error);
+    }
+  };
+
   const handleOnboardingComplete = async () => {
     try {
       // ✅ ИСПРАВЛЕНИЕ: Используем AuthContext для завершения онбординга
@@ -315,7 +355,7 @@ const PatientOnboarding = () => {
         return (
           <GeolocationStep
             data={formData.geolocation}
-            onChange={(data) => updateFormData({ geolocation: { ...data, recordedAt: new Date().toISOString() } })}
+            onChange={handleGeolocationComplete}
           />
         );
       case 4:
