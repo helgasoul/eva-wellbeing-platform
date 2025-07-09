@@ -302,6 +302,95 @@ const HowWeHelp: React.FC = () => {
                             </p>
                           </div>
                         </>
+                      ) : plan.id === 'plus' ? (
+                        <>
+                          <div className="text-center mb-6">
+                            <div className="text-4xl mb-3">🌷</div>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">
+                              Что входит в план Plus
+                            </h3>
+                            <p className="text-muted-foreground text-sm">
+                              Всё для комплексной поддержки вашего здоровья, понимания себя и заботы о каждом дне.
+                            </p>
+                          </div>
+                          <ul className="space-y-4">
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧩</span>
+                              <div>
+                                <div className="font-medium text-foreground">Всё из базового пакета — без ограничений</div>
+                                <div className="text-sm text-muted-foreground">Полный доступ ко всем функциям Essential</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧬</span>
+                              <div>
+                                <div className="font-medium text-foreground">Расширенные лабораторные анализы</div>
+                                <div className="text-sm text-muted-foreground">Понимаем ваши гормоны, метаболизм, витамины, здоровье костей и щитовидной железы</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">📒</span>
+                              <div>
+                                <div className="font-medium text-foreground">Трекеры и напоминания</div>
+                                <div className="text-sm text-muted-foreground">Цикл, симптомы, питание и движение всегда под контролем</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🥗</span>
+                              <div>
+                                <div className="font-medium text-foreground">Индивидуальный план питания и рекомендации</div>
+                                <div className="text-sm text-muted-foreground">С учётом ваших анализов и потребностей</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">👩‍⚕️</span>
+                              <div>
+                                <div className="font-medium text-foreground">Личные советы от врачей и нутрициологов</div>
+                                <div className="text-sm text-muted-foreground">2 консультации в год с профильными специалистами</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">💬</span>
+                              <div>
+                                <div className="font-medium text-foreground">Доступ к поддержке 24/7 и приоритетные ответы</div>
+                                <div className="text-sm text-muted-foreground">Приоритетная поддержка, когда она нужна</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🏃‍♀️</span>
+                              <div>
+                                <div className="font-medium text-foreground">Персональные рекомендации по физической активности</div>
+                                <div className="text-sm text-muted-foreground">Поддержим тело и эмоции на каждом этапе</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">📲</span>
+                              <div>
+                                <div className="font-medium text-foreground">Интеграция с носимыми устройствами</div>
+                                <div className="text-sm text-muted-foreground">Apple Health, Garmin, Oura и другие</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">📝</span>
+                              <div>
+                                <div className="font-medium text-foreground">Разбор анализов с врачом</div>
+                                <div className="text-sm text-muted-foreground">Поддержка на каждом шаге</div>
+                              </div>
+                            </li>
+                            <li className="flex items-start space-x-3">
+                              <span className="text-xl mt-1">🧑‍🤝‍🧑</span>
+                              <div>
+                                <div className="font-medium text-foreground">Клуб поддержки, медитации и блог врачей</div>
+                                <div className="text-sm text-muted-foreground">Сообщество и экспертные материалы</div>
+                              </div>
+                            </li>
+                          </ul>
+                          <div className="mt-6 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
+                            <p className="text-sm text-center text-muted-foreground italic">
+                              Всё, чтобы вы чувствовали себя уверенно и спокойно — каждый день.
+                            </p>
+                          </div>
+                        </>
                       ) : (
                         <>
                           <h3 className="text-xl font-semibold mb-6 text-center">
