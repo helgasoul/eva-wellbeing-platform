@@ -75,228 +75,286 @@ const FoodDiary: React.FC = () => {
 
   return (
     <PatientLayout title="bloom - Дневник питания" breadcrumbs={breadcrumbs}>
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Заголовок и выбор даты */}
-        <div className="bg-gradient-to-br from-background via-primary/5 to-accent/10 p-8 rounded-3xl shadow-elegant border border-primary/10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20 rounded-full flex items-center justify-center animate-gentle-float">
-                <Utensils className="h-8 w-8 text-primary" />
+      <div className="caring-bg min-h-screen">
+        <div className="max-w-7xl mx-auto space-y-8 py-4">
+          {/* Теплое приветствие */}
+          <div className="caring-card spacious-card super-rounded">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/20 super-rounded flex items-center justify-center animate-warm-glow">
+                  <Utensils className="h-10 w-10 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-playfair font-bold text-foreground mb-3">
+                    Дневник питания 🥗
+                  </h1>
+                  <p className="soft-text text-xl mb-2">
+                    Заботимся о себе вместе: отмечайте, что и когда вы едите — и получайте персональные рекомендации для лёгкости и баланса.
+                  </p>
+                  <p className="caring-text text-lg">
+                    Помните: питание — это забота о себе, а не контроль. Здесь вы можете мягко отслеживать свои привычки и получать добрые советы.
+                  </p>
+                </div>
               </div>
+              <div className="flex items-center gap-4">
+                <Input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-44 super-rounded border-caring-mint/40 bg-caring-cream"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Мотивационный баннер */}
+          <div className="motivational-banner">
+            <div className="flex items-center gap-4">
+              <div className="text-3xl animate-gentle-wave">🌸</div>
               <div>
-                <h1 className="text-4xl font-playfair font-bold text-foreground mb-2">
-                  Дневник питания 📖
-                </h1>
-                <p className="text-muted-foreground text-lg">
-                  Отслеживайте свой рацион и прогресс по нутриентам
+                <p className="warm-text text-lg font-semibold">
+                  "Каждый ваш шаг — вклад в здоровье. Даже если вы просто посмотрели сюда — это уже забота о себе."
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-40"
-              />
-            </div>
           </div>
-        </div>
 
-        {/* Сводка по нутриентам */}
-        <Card className="bg-gradient-to-br from-background via-primary/5 to-accent/10 border-primary/10 shadow-elegant rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-xl font-playfair text-foreground flex items-center gap-2">
-              <Target className="h-6 w-6 text-primary" />
-              Прогресс по нутриентам
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Сводка по нутриентам */}
+          <div className="gentle-card spacious-card super-rounded">
+            <div className="flex items-center gap-3 mb-6">
+              <Target className="h-8 w-8 text-primary animate-caring-pulse" />
+              <div>
+                <h2 className="text-2xl font-playfair font-bold text-foreground">
+                  Ваш прогресс сегодня 📊
+                </h2>
+                <p className="soft-text">
+                  Мягко отслеживайте баланс нутриентов — каждая запись помогает лучше узнать свое тело
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Калории */}
-              <div className="space-y-3">
+              <div className="personal-touch space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-foreground">Калории</span>
-                  <span className="text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">⚡</span>
+                    <span className="font-semibold text-foreground">Энергия</span>
+                  </div>
+                  <span className="text-sm soft-text">
                     {dailyNutrients.calories}/{targetNutrients.calories}
                   </span>
                 </div>
                 <Progress 
                   value={getNutrientProgress(dailyNutrients.calories, targetNutrients.calories)} 
-                  className="h-2"
+                  className="h-3 super-rounded"
                 />
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{dailyNutrients.calories}</div>
-                  <div className="text-xs text-muted-foreground">ккал</div>
+                  <div className="text-3xl font-bold text-primary">{dailyNutrients.calories}</div>
+                  <div className="text-sm soft-text">ккал</div>
                 </div>
               </div>
 
               {/* Белки */}
-              <div className="space-y-3">
+              <div className="personal-touch space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-foreground">Белки</span>
-                  <span className="text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">💪</span>
+                    <span className="font-semibold text-foreground">Белки</span>
+                  </div>
+                  <span className="text-sm soft-text">
                     {dailyNutrients.protein}/{targetNutrients.protein}
                   </span>
                 </div>
                 <Progress 
                   value={getNutrientProgress(dailyNutrients.protein, targetNutrients.protein)} 
-                  className="h-2"
+                  className="h-3 super-rounded"
                 />
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-secondary">{dailyNutrients.protein}</div>
-                  <div className="text-xs text-muted-foreground">г</div>
+                  <div className="text-3xl font-bold text-secondary">{dailyNutrients.protein}</div>
+                  <div className="text-sm soft-text">г</div>
                 </div>
               </div>
 
               {/* Углеводы */}
-              <div className="space-y-3">
+              <div className="personal-touch space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-foreground">Углеводы</span>
-                  <span className="text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🌾</span>
+                    <span className="font-semibold text-foreground">Углеводы</span>
+                  </div>
+                  <span className="text-sm soft-text">
                     {dailyNutrients.carbs}/{targetNutrients.carbs}
                   </span>
                 </div>
                 <Progress 
                   value={getNutrientProgress(dailyNutrients.carbs, targetNutrients.carbs)} 
-                  className="h-2"
+                  className="h-3 super-rounded"
                 />
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-accent">{dailyNutrients.carbs}</div>
-                  <div className="text-xs text-muted-foreground">г</div>
+                  <div className="text-3xl font-bold text-accent">{dailyNutrients.carbs}</div>
+                  <div className="text-sm soft-text">г</div>
                 </div>
               </div>
 
               {/* Жиры */}
-              <div className="space-y-3">
+              <div className="personal-touch space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-foreground">Жиры</span>
-                  <span className="text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🥑</span>
+                    <span className="font-semibold text-foreground">Жиры</span>
+                  </div>
+                  <span className="text-sm soft-text">
                     {dailyNutrients.fat}/{targetNutrients.fat}
                   </span>
                 </div>
                 <Progress 
                   value={getNutrientProgress(dailyNutrients.fat, targetNutrients.fat)} 
-                  className="h-2"
+                  className="h-3 super-rounded"
                 />
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{dailyNutrients.fat}</div>
-                  <div className="text-xs text-muted-foreground">г</div>
+                  <div className="text-3xl font-bold caring-text">{dailyNutrients.fat}</div>
+                  <div className="text-sm soft-text">г</div>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Записи по типам приема пищи */}
-        <div className="space-y-6">
-          {Object.entries(groupedEntries).map(([mealType, entries]) => (
-            <Card key={mealType} className="bg-gradient-to-br from-card/90 to-accent/5 backdrop-blur-sm border-primary/10 shadow-soft rounded-2xl">
-              <CardHeader>
-                <CardTitle className="text-lg font-playfair text-foreground flex items-center gap-2">
-                  <span className="text-xl">{mealTypeLabels[mealType as keyof typeof mealTypeLabels].icon}</span>
-                  {mealTypeLabels[mealType as keyof typeof mealTypeLabels].label}
-                  <Badge variant="outline" className="text-xs">
-                    {entries.length} записей
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              
-              <CardContent>
-                {entries.length === 0 ? (
-                  <div className="text-center py-8">
-                    <ChefHat className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Нет записей для этого приема пищи</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Добавьте блюда из рецептов или вручную
+          {/* Записи по типам приема пищи */}
+          <div className="space-y-8">
+            {Object.entries(groupedEntries).map(([mealType, entries]) => (
+              <div key={mealType} className="mint-card spacious-card super-rounded">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-3xl animate-gentle-wave">
+                    {mealTypeLabels[mealType as keyof typeof mealTypeLabels].icon}
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-playfair font-bold text-foreground">
+                      {mealTypeLabels[mealType as keyof typeof mealTypeLabels].label}
+                    </h3>
+                    <p className="soft-text text-sm">
+                      {entries.length === 0 ? 'Пока нет записей' : `${entries.length} записей`}
                     </p>
                   </div>
+                </div>
+                
+                {entries.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="text-6xl mb-4 animate-caring-pulse">🍽️</div>
+                    <h4 className="text-lg font-semibold text-foreground mb-2">
+                      Сегодня вы ещё ничего не отмечали
+                    </h4>
+                    <p className="soft-text mb-4">
+                      Начните с малого: добавьте первый приём пищи, и я помогу вам отслеживать баланс.
+                    </p>
+                    <div className="flex gap-2 justify-center">
+                      <span className="text-sm caring-text">💚</span>
+                      <span className="text-sm caring-text">Каждый шаг важен</span>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {entries.map((entry) => (
-                      <div key={entry.id} className="flex items-center justify-between p-4 bg-background/50 rounded-xl border border-border/50 hover:shadow-soft transition-shadow">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="font-medium text-foreground">{entry.name}</span>
-                            {entry.source === 'recipe' && (
-                              <Badge variant="outline" className="text-xs border-primary/20">
-                                Из рецепта
-                              </Badge>
-                            )}
-                            {entry.portionSize !== 1 && (
-                              <Badge variant="secondary" className="text-xs">
-                                {entry.portionSize}x порция
-                              </Badge>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                            <span>{entry.calories} ккал</span>
-                            <span>{entry.protein}г белка</span>
-                            <span>{entry.carbs}г углеводов</span>
-                            <span>{entry.fat}г жиров</span>
-                          </div>
-                          
-                          {entry.benefits && entry.benefits.length > 0 && (
-                            <div className="text-xs text-primary">
-                              Польза: {entry.benefits.slice(0, 3).join(', ')}
+                      <div key={entry.id} className="personal-touch p-6 hover:shadow-caring transition-all duration-300">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-4 mb-3">
+                              <span className="text-lg font-semibold text-foreground">{entry.name}</span>
+                              {entry.source === 'recipe' && (
+                                <Badge className="bg-gradient-to-r from-primary/20 to-accent/20 text-primary border-primary/20">
+                                  Из рецепта
+                                </Badge>
+                              )}
+                              {entry.portionSize !== 1 && (
+                                <Badge className="bg-gradient-to-r from-secondary/20 to-accent/20 text-secondary border-secondary/20">
+                                  {entry.portionSize}x порция
+                                </Badge>
+                              )}
                             </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            <span>{entry.time}</span>
+                            
+                            <div className="flex items-center gap-6 text-sm caring-text mb-3">
+                              <span className="flex items-center gap-1">
+                                <span className="text-lg">⚡</span>
+                                {entry.calories} ккал
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-lg">💪</span>
+                                {entry.protein}г белка
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-lg">🌾</span>
+                                {entry.carbs}г углеводов
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-lg">🥑</span>
+                                {entry.fat}г жиров
+                              </span>
+                            </div>
+                            
+                            {entry.benefits && entry.benefits.length > 0 && (
+                              <div className="text-sm gentle-text">
+                                <span className="text-lg mr-2">🌟</span>
+                                Польза: {entry.benefits.slice(0, 3).join(', ')}
+                              </div>
+                            )}
                           </div>
-                          <Button
-                            onClick={() => handleDeleteEntry(entry.id)}
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 text-sm soft-text">
+                              <Clock className="h-4 w-4" />
+                              <span>{entry.time}</span>
+                            </div>
+                            <Button
+                              onClick={() => handleDeleteEntry(entry.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="h-10 w-10 p-0 text-muted-foreground hover:text-destructive super-rounded"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
 
-        {/* Быстрые действия */}
-        <Card className="bg-gradient-to-br from-secondary/10 to-accent/10 border-secondary/20 shadow-elegant rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-lg font-playfair text-foreground flex items-center gap-2">
-              <Plus className="h-5 w-5 text-secondary" />
-              Быстрое добавление
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Быстрые действия */}
+          <div className="peach-card spacious-card super-rounded">
+            <div className="flex items-center gap-3 mb-6">
+              <Plus className="h-8 w-8 text-primary animate-caring-pulse" />
+              <div>
+                <h3 className="text-xl font-playfair font-bold text-foreground">
+                  Быстрые действия
+                </h3>
+                <p className="soft-text">
+                  Добавьте приём пищи или получите совет по питанию
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Button
                 onClick={() => window.location.href = '/patient/nutrition-plan'}
-                className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 h-12"
+                className="btn-caring spacious-button"
               >
-                <ChefHat className="h-5 w-5 mr-2" />
+                <ChefHat className="h-6 w-6 mr-3" />
                 Добавить из рецептов
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 border-primary/20 hover:bg-primary/10 h-12"
+                className="btn-gentle spacious-button"
                 disabled={!canUseAdvanced}
               >
-                <Plus className="h-5 w-5 mr-2" />
+                <Plus className="h-6 w-6 mr-3" />
                 {canUseAdvanced ? 'Добавить вручную' : 'Ручное добавление в Plus'}
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </PatientLayout>
   );

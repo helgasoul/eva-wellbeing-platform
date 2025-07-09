@@ -37,38 +37,46 @@
 
 @layer base {
   :root {
-    /* Нежная палитра для женского здоровья */
-    --background: 0 0% 100%;
+    /* Теплая и заботливая палитра для женского здоровья */
+    --background: 351 100% 99%;
     --foreground: 220 15% 25%;
     
-    /* Primary - сливовый цвет */
+    /* Primary - мягкий сливовый цвет */
     --primary: 310 45% 45%;
     --primary-foreground: 0 0% 100%;
     
-    /* Теплые вторичные цвета - адаптированы под сливовый */
-    --secondary: 320 25% 97%;
+    /* Теплые вторичные цвета */
+    --secondary: 166 50% 70%;
     --secondary-foreground: 220 20% 25%;
     
-    /* Мягкие приглушенные тона - адаптированы под сливовый */
-    --muted: 320 20% 96%;
+    /* Мягкие приглушенные тона */
+    --muted: 345 30% 94%;
     --muted-foreground: 310 15% 55%;
     
     /* UI элементы */
-    --border: 320 15% 90%;
-    --input: 320 20% 96%;
+    --border: 345 20% 88%;
+    --input: 345 25% 92%;
     --ring: 310 45% 45%;
     
-    /* Карточки и поверхности */
-    --card: 0 0% 100%;
+    /* Карточки и поверхности - теплее */
+    --card: 345 57% 97%;
     --card-foreground: 220 15% 25%;
     
     /* Поповеры */
-    --popover: 0 0% 100%;
+    --popover: 345 57% 97%;
     --popover-foreground: 220 15% 25%;
     
-    /* Акцентные цвета - адаптированы под сливовый */
-    --accent: 320 30% 95%;
+    /* Акцентные цвета - персиковый */
+    --accent: 24 95% 83%;
     --accent-foreground: 220 20% 25%;
+    
+    /* Заботливые цвета для дневника питания */
+    --caring-peach: 24 95% 83%;
+    --caring-mint: 166 50% 70%;
+    --caring-lavender: 280 60% 85%;
+    --caring-cream: 351 100% 96%;
+    --caring-warm: 345 57% 97%;
+    --caring-rose: 333 68% 88%;
     
     /* Доверительный бадж */
     --trust: 140 40% 90%;
@@ -86,7 +94,26 @@
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
+    
+    /* Заботливые градиенты */
+    --gradient-warm-bg: linear-gradient(135deg, hsl(351 100% 99%), hsl(345 57% 97%));
+    --gradient-caring: linear-gradient(135deg, hsl(333 68% 88% / 0.3), hsl(24 95% 83% / 0.2));
+    --gradient-gentle: linear-gradient(135deg, hsl(166 50% 70% / 0.2), hsl(280 60% 85% / 0.15));
+    --gradient-peach: linear-gradient(135deg, hsl(24 95% 83% / 0.4), hsl(333 68% 88% / 0.3));
+    --gradient-mint: linear-gradient(135deg, hsl(166 50% 70% / 0.3), hsl(345 57% 97%));
+    
+    /* Мягкие тени */
+    --shadow-elegant: 0 10px 30px -10px hsl(333 68% 65% / 0.15);
+    --shadow-soft: 0 4px 24px hsl(333 68% 65% / 0.08);
+    --shadow-caring: 0 8px 32px hsl(24 95% 83% / 0.2);
+    --shadow-gentle: 0 2px 16px hsl(166 50% 70% / 0.15);
+    --shadow-warm: 0 6px 20px hsl(345 57% 85% / 0.25);
+    
+    /* Анимации и переходы */
+    --transition-gentle: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-caring: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
   }
 }
 
@@ -232,6 +259,237 @@ p {
 
 .shadow-elegant {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Заботливые стили для дневника питания */
+.caring-bg {
+  background: var(--gradient-warm-bg);
+  background-attachment: fixed;
+}
+
+.caring-card {
+  background: var(--gradient-caring);
+  border: 1px solid hsl(var(--caring-peach) / 0.3);
+  box-shadow: var(--shadow-caring);
+  transition: var(--transition-caring);
+  border-radius: var(--radius);
+}
+
+.caring-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-warm);
+}
+
+.gentle-card {
+  background: var(--gradient-gentle);
+  border: 1px solid hsl(var(--caring-mint) / 0.4);
+  box-shadow: var(--shadow-gentle);
+  transition: var(--transition-gentle);
+  border-radius: var(--radius);
+}
+
+.peach-card {
+  background: var(--gradient-peach);
+  border: 1px solid hsl(var(--caring-peach) / 0.5);
+  box-shadow: var(--shadow-caring);
+  transition: var(--transition-bounce);
+  border-radius: var(--radius);
+}
+
+.mint-card {
+  background: var(--gradient-mint);
+  border: 1px solid hsl(var(--caring-mint) / 0.5);
+  box-shadow: var(--shadow-gentle);
+  transition: var(--transition-gentle);
+  border-radius: var(--radius);
+}
+
+/* Заботливые кнопки */
+.btn-caring {
+  background: linear-gradient(135deg, hsl(var(--caring-peach)) 0%, hsl(var(--caring-rose)) 100%);
+  color: hsl(var(--foreground));
+  border: none;
+  box-shadow: var(--shadow-caring);
+  transition: var(--transition-bounce);
+  border-radius: calc(var(--radius) * 0.8);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-caring:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-warm);
+  background: linear-gradient(135deg, hsl(var(--caring-peach) / 0.9) 0%, hsl(var(--caring-rose) / 0.9) 100%);
+}
+
+.btn-gentle {
+  background: linear-gradient(135deg, hsl(var(--caring-mint) / 0.8) 0%, hsl(var(--caring-lavender) / 0.6) 100%);
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--caring-mint) / 0.4);
+  box-shadow: var(--shadow-gentle);
+  transition: var(--transition-gentle);
+  border-radius: calc(var(--radius) * 0.8);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-gentle:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+  background: linear-gradient(135deg, hsl(var(--caring-mint) / 0.9) 0%, hsl(var(--caring-lavender) / 0.7) 100%);
+}
+
+/* Эмпатичные текстовые стили */
+.caring-text {
+  color: hsl(var(--caring-peach) / 0.8);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.gentle-text {
+  color: hsl(var(--caring-mint) / 0.9);
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.soft-text {
+  color: hsl(var(--muted-foreground));
+  font-weight: 400;
+  line-height: 1.8;
+}
+
+.warm-text {
+  color: hsl(var(--caring-rose) / 0.8);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* Анимации для заботливых элементов */
+@keyframes caringPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes gentleWave {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(2px) rotate(1deg);
+  }
+  75% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+}
+
+@keyframes warmGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px hsl(var(--caring-peach) / 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px hsl(var(--caring-peach) / 0.5));
+  }
+}
+
+.animate-caring-pulse {
+  animation: caringPulse 3s ease-in-out infinite;
+}
+
+.animate-gentle-wave {
+  animation: gentleWave 4s ease-in-out infinite;
+}
+
+.animate-warm-glow {
+  animation: warmGlow 2s ease-in-out infinite;
+}
+
+/* Мягкие тени для элементов */
+.shadow-caring {
+  box-shadow: var(--shadow-caring);
+}
+
+.shadow-gentle {
+  box-shadow: var(--shadow-gentle);
+}
+
+.shadow-warm {
+  box-shadow: var(--shadow-warm);
+}
+
+/* Пустые состояния с эмпатией */
+.empty-state {
+  background: var(--gradient-gentle);
+  border: 2px dashed hsl(var(--caring-mint) / 0.4);
+  border-radius: calc(var(--radius) * 1.2);
+  padding: 2rem;
+  text-align: center;
+  transition: var(--transition-gentle);
+}
+
+.empty-state:hover {
+  border-color: hsl(var(--caring-mint) / 0.6);
+  background: var(--gradient-peach);
+}
+
+.motivational-banner {
+  background: var(--gradient-peach);
+  border: 1px solid hsl(var(--caring-peach) / 0.4);
+  border-radius: calc(var(--radius) * 1.5);
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: var(--shadow-caring);
+  animation: warmGlow 3s ease-in-out infinite;
+}
+
+/* Персонализированные элементы */
+.personal-touch {
+  background: linear-gradient(135deg, hsl(var(--caring-cream)), hsl(var(--caring-warm)));
+  border: 1px solid hsl(var(--caring-peach) / 0.3);
+  border-radius: calc(var(--radius) * 1.2);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-gentle);
+  position: relative;
+  overflow: hidden;
+}
+
+.personal-touch::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, hsl(var(--caring-peach) / 0.1) 0%, transparent 70%);
+  animation: gentleWave 6s ease-in-out infinite;
+}
+
+/* Увеличенные отступы для "воздуха" */
+.spacious-card {
+  padding: 2rem;
+}
+
+.spacious-section {
+  padding: 2.5rem 0;
+}
+
+.spacious-button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* Круглые формы */
+.super-rounded {
+  border-radius: calc(var(--radius) * 2);
+}
+
+.extra-rounded {
+  border-radius: calc(var(--radius) * 1.5);
 }
 
 /* Remove all old conflicting styles */
