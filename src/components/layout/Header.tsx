@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Heart, Cloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import bloomLogo from '@/assets/bloom-logo.png';
+import bloomLogo from '@/assets/bloom-logo-white-bg.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -27,7 +27,7 @@ export const Header = () => {
               <img 
                 src={bloomLogo} 
                 alt="Bloom - Ваш заботливый помощник в мире женского здоровья"
-                className="h-8 w-auto object-contain group-hover:animate-bloom-glow transition-all duration-300"
+                className="h-12 w-auto object-contain group-hover:animate-bloom-glow transition-all duration-300"
               />
               {/* Декоративная аура при hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-md scale-110"></div>
