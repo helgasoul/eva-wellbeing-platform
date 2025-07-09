@@ -13,7 +13,8 @@ export const Header = () => {
   const navItems = [
     { path: '/', label: 'Домой' },
     { path: '/about', label: 'Почему Bloom' },
-    { path: '/services', label: 'Как мы помогаем' },
+    { path: '/how-we-help', label: 'Как мы помогаем' },
+    { path: '/pricing', label: 'Тарифы' },
     { path: '/contact', label: 'Написать команде' }
   ];
 
