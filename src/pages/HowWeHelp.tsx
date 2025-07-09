@@ -692,20 +692,44 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Final CTA */}
-        <section className="py-20 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-6">
-              Готовы начать свой путь к здоровью?
+        <section className="py-20 bg-gradient-to-br from-background via-pink-50/30 to-purple-50/30 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-100/20 via-transparent to-purple-100/20"></div>
+          
+          <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+            {/* Decorative icon */}
+            <div className="text-6xl mb-6 animate-pulse">
+              🌸
+            </div>
+            
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground leading-tight">
+              Сделайте первый шаг к заботе о себе
             </h2>
-            <p className="text-xl mb-8 text-accent-foreground/80">
-              Выберите план выше и начните заботиться о себе уже сегодня
+            
+            <p className="text-xl mb-8 text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Мы рядом, чтобы поддержать вас на каждом этапе.<br />
+              Выберите свой тариф — и позвольте себе заботу и экспертную поддержку уже сегодня.
             </p>
+            
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="bg-accent-foreground text-accent px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent-foreground/90 transition-colors shadow-elegant"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-10 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 shadow-elegant hover:shadow-soft hover:scale-105 hover:-translate-y-1 inline-flex items-center gap-2 group"
             >
-              Выбрать план
+              <span className="group-hover:scale-110 transition-transform">🌸</span>
+              Начать заботиться о себе
             </button>
+            
+            {/* Microcopy */}
+            <div className="mt-8 space-y-2 text-sm text-muted-foreground">
+              <p className="flex items-center justify-center gap-2">
+                <span>✨</span>
+                <span>Ваш выбор можно изменить в любой момент</span>
+              </p>
+              <p className="flex items-center justify-center gap-2">
+                <span>💬</span>
+                <span>Остались вопросы? Мы всегда на связи!</span>
+              </p>
+            </div>
           </div>
         </section>
       </div>
