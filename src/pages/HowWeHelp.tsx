@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { SUBSCRIPTION_PLANS, ADDITIONAL_SERVICES } from '@/data/subscriptionPlans';
 import { Layout } from '@/components/layout/Layout';
+import caringSupport from '@/assets/caring-support-hero.jpg';
 
 const HowWeHelp: React.FC = () => {
   const { user } = useAuth();
@@ -39,18 +40,39 @@ const HowWeHelp: React.FC = () => {
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-muted/20">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-primary-foreground py-24">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Как мы помогаем на каждом этапе
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-primary-foreground/80 max-w-3xl mx-auto">
-              Персонализированный подход к женскому здоровью в период менопаузы
-            </p>
-            <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-lg p-6 max-w-2xl mx-auto">
-              <p className="text-lg font-medium">
-                То, что стоит ₽50,000 в частных клиниках, доступно от ₽2,990 в год
-              </p>
+        <section className="bg-gradient-to-br from-primary/5 via-purple-50 to-accent/10 py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10"></div>
+          <div className="max-w-7xl mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="order-2 lg:order-1">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground leading-tight">
+                  Мы рядом на каждом этапе вашего пути
+                </h1>
+                <p className="text-xl md:text-2xl mb-8 text-muted-foreground leading-relaxed">
+                  Забота, поддержка и знания — для вашего спокойствия и уверенности в любой момент менопаузы.
+                </p>
+                <p className="text-lg mb-8 text-muted-foreground leading-relaxed">
+                  Мы знаем, что у каждой женщины свой опыт. Здесь вы получите персональную поддержку, основанную на уважении к вашим чувствам, потребностям и истории.
+                </p>
+                <div className="bg-gradient-to-r from-primary/10 to-accent/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-primary/20 shadow-elegant">
+                  <p className="text-lg font-medium text-foreground">
+                    Всё, что обычно стоит десятки тысяч в частных клиниках, теперь становится ближе — от 2 990 ₽ в год
+                  </p>
+                </div>
+                <button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-elegant hover:shadow-soft transform hover:-translate-y-1">
+                  Начать путь с Bloom
+                </button>
+              </div>
+              <div className="order-1 lg:order-2 flex justify-center">
+                <div className="relative">
+                  <img 
+                    src={caringSupport} 
+                    alt="Поддержка на каждом этапе" 
+                    className="w-full max-w-lg rounded-3xl shadow-elegant"
+                  />
+                  <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl -z-10 blur-xl"></div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
