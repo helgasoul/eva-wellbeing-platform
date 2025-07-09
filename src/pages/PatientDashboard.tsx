@@ -237,55 +237,55 @@ const PatientDashboard = () => {
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('symptoms')}
-                className="h-auto py-6 px-4 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl"
+                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
               >
-                <Plus className="h-6 w-6 text-primary" />
-                <span className="text-sm text-center leading-tight">Сегодняшнее самочувствие</span>
+                <Plus className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-xs text-center leading-tight break-words hyphens-auto">Сегодняшнее самочувствие</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('cycle')}
-                className="h-auto py-6 px-4 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl"
+                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
               >
-                <Calendar className="h-6 w-6 text-primary" />
-                <span className="text-sm text-center leading-tight">Мой цикл и гормоны</span>
+                <Calendar className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-xs text-center leading-tight break-words hyphens-auto">Мой цикл и гормоны</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('insights')}
-                className="h-auto py-6 px-4 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl"
+                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
               >
-                <Brain className="h-6 w-6 text-primary" />
-                <span className="text-sm text-center leading-tight">Мои открытия</span>
+                <Brain className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-xs text-center leading-tight break-words hyphens-auto">Мои открытия</span>
               </Button>
               
               <Button
                 variant="outline"
-                onClick={() => handleQuickAction('ai-chat')}
-                className="h-auto py-6 px-4 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl"
+                onClick={() => handleQuickAction('ai-chat')}  
+                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
               >
-                <MessageSquare className="h-6 w-6 text-primary" />
-                <span className="text-sm text-center leading-tight">Спросить совет</span>
+                <MessageSquare className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-xs text-center leading-tight break-words hyphens-auto">Спросить совет у ассистента Eva</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('community')}
-                className="h-auto py-6 px-4 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl"
+                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
               >
-                <Users className="h-6 w-6 text-primary" />
-                <span className="text-sm text-center leading-tight">Поддержка от женщин</span>
+                <Users className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-xs text-center leading-tight break-words hyphens-auto">Поддержка от женщин</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('doctors')}
-                className="h-auto py-6 px-4 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl"
+                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
               >
-                <Stethoscope className="h-6 w-6 text-primary" />
-                <span className="text-sm text-center leading-tight">Задать вопрос врачу</span>
+                <Stethoscope className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-xs text-center leading-tight break-words hyphens-auto">Задать вопрос врачу</span>
               </Button>
             </div>
           </CardContent>
