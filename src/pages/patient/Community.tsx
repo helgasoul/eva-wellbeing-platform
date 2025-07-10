@@ -1,48 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { useAuth } from '@/context/AuthContext';
 import { CommunityFeed } from '@/components/community/CommunityFeed';
 import { CommunityGroups } from '@/components/community/CommunityGroups';
 import { CreatePostModal } from '@/components/community/CreatePostModal';
-import { getCommunityContent } from '@/services/communityService';
+import { 
+  communityService, 
+  getCommunityContent, 
+  CommunityPost, 
+  CommunityGroup 
+} from '@/services/communityService';
 import { cn } from '@/lib/utils';
 import { Users, MessageSquare, FileText, Bookmark, Plus, Heart, TrendingUp } from 'lucide-react';
-
-interface CommunityPost {
-  id: string;
-  author_id: string;
-  author_name: string;
-  author_avatar?: string;
-  author_age_group: '35-40' | '40-45' | '45-50' | '50-55' | '55-60' | '60+';
-  author_menopause_phase: 'premenopause' | 'perimenopause' | 'menopause' | 'postmenopause';
-  title: string;
-  content: string;
-  category: 'general' | 'symptoms' | 'treatment' | 'lifestyle' | 'success_stories' | 'questions' | 'support';
-  tags: string[];
-  is_anonymous: boolean;
-  created_at: string;
-  updated_at?: string;
-  likes_count: number;
-  comments_count: number;
-  is_pinned: boolean;
-  is_verified: boolean;
-  sensitivity_level: 'public' | 'sensitive' | 'private';
-}
-
-interface CommunityGroup {
-  id: string;
-  name: string;
-  description: string;
-  category: 'phase' | 'age' | 'symptoms' | 'treatment' | 'location' | 'interests';
-  member_count: number;
-  post_count: number;
-  is_private: boolean;
-  moderators: string[];
-  tags: string[];
-  icon: string;
-  cover_image?: string;
-  created_at: string;
-}
+import { toast } from 'sonner';
 
 // Компонент быстрых действий
 const QuickActions = ({ onCreatePost }: { onCreatePost: () => void }) => {
@@ -184,19 +154,47 @@ export default function Community() {
     { label: 'Сообщество' }
   ];
 
-  useEffect(() => {
-    loadCommunityData();
-  }, [activeTab, selectedCategory]);
-
-  const loadCommunityData = async () => {
+  // Загрузка данных сообщества
+  const loadCommunityData = useCallback(async () => {
     try {
       const communityData = await getCommunityContent(activeTab, selectedCategory);
       setPosts(communityData.posts);
       setGroups(communityData.groups);
     } catch (error) {
       console.error('Error loading community data:', error);
+      toast.error('Ошибка загрузки данных сообщества');
     }
-  };
+  }, [activeTab, selectedCategory]);
+
+  // Обработчик нового поста через real-time
+  const handleNewPost = useCallback((newPost: CommunityPost) => {
+    setPosts(prev => {
+      // Проверяем, нет ли уже этого поста
+      if (prev.some(p => p.id === newPost.id)) {
+        return prev;
+      }
+      // Добавляем новый пост в начало списка
+      return [newPost, ...prev];
+    });
+    toast.success('Появился новый пост в сообществе!');
+  }, []);
+
+  // Инициализация и подписка на real-time обновления
+  useEffect(() => {
+    loadCommunityData();
+
+    // Подписываемся на новые посты только если смотрим ленту
+    let unsubscribe: (() => void) | undefined;
+    if (activeTab === 'feed') {
+      unsubscribe = communityService.subscribeToNewPosts(handleNewPost);
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [activeTab, selectedCategory, loadCommunityData, handleNewPost]);
 
   const tabItems = [
     { key: 'feed', label: 'Лента', icon: FileText },

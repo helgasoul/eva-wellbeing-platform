@@ -1,4 +1,7 @@
-interface CommunityPost {
+import { supabase } from '@/integrations/supabase/client';
+import { RealtimeChannel } from '@supabase/supabase-js';
+
+export interface CommunityPost {
   id: string;
   author_id: string;
   author_name: string;
@@ -19,7 +22,7 @@ interface CommunityPost {
   sensitivity_level: 'public' | 'sensitive' | 'private';
 }
 
-interface CommunityGroup {
+export interface CommunityGroup {
   id: string;
   name: string;
   description: string;
@@ -34,7 +37,7 @@ interface CommunityGroup {
   created_at: string;
 }
 
-interface CommunityComment {
+export interface CommunityComment {
   id: string;
   post_id: string;
   author_id: string;
@@ -48,51 +51,473 @@ interface CommunityComment {
   is_verified: boolean;
 }
 
+export interface CreatePostData {
+  title: string;
+  content: string;
+  category: CommunityPost['category'];
+  tags?: string[];
+  is_anonymous?: boolean;
+  sensitivity_level?: 'public' | 'sensitive' | 'private';
+  author_age_group?: CommunityPost['author_age_group'];
+  author_menopause_phase?: CommunityPost['author_menopause_phase'];
+}
+
+export interface PostFilters {
+  category?: string;
+  tag?: string;
+  author_id?: string;
+  sensitivity_level?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface ExpertArticleData {
+  title: string;
+  content: string;
+  category: string;
+  excerpt?: string;
+  tags?: string[];
+  featured_image?: string;
+}
+
+export interface ExpertArticle {
+  id: string;
+  title: string;
+  content: string;
+  excerpt?: string;
+  author_name: string;
+  author_title?: string;
+  author_avatar?: string;
+  category: string;
+  tags: string[];
+  featured_image?: string;
+  views_count: number;
+  likes_count: number;
+  comments_count: number;
+  created_at: string;
+  published_at?: string;
+}
+
+class CommunityService {
+  private realtimeChannels: Map<string, RealtimeChannel> = new Map();
+
+  // === ПОСТЫ ===
+  async createPost(post: CreatePostData): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Получаем профиль пользователя для имени
+    let authorName = 'Пользователь';
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('first_name, last_name')
+        .eq('id', user.id)
+        .single();
+
+      authorName = post.is_anonymous 
+        ? 'Анонимно' 
+        : `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Пользователь';
+    } catch (error) {
+      console.warn('Could not load user profile:', error);
+    }
+
+    // Используем существующую таблицу community_posts с обходом типов
+    const insertData = {
+      author_id: user.id,
+      content: post.content,
+      anonymous_name: authorName,
+      is_anonymous: post.is_anonymous || false,
+      tags: post.tags || [],
+      group_id: 'general' // Временное решение
+    };
+
+    const { data, error } = await supabase
+      .from('community_posts')
+      .insert(insertData as any)
+      .select('id')
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data.id;
+  }
+
+  async getPosts(filters: PostFilters = {}): Promise<CommunityPost[]> {
+    try {
+      let query = supabase
+        .from('community_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (filters.author_id) {
+        query = query.eq('author_id', filters.author_id);
+      }
+
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+
+      const { data, error } = await query;
+      if (error) throw new Error(error.message);
+
+      // Преобразуем данные в нужный формат
+      return await this.enrichPostsWithProfiles(data || []);
+    } catch (error) {
+      console.error('Error loading posts from Supabase:', error);
+      // Fallback к демо-данным
+      return getDefaultPosts();
+    }
+  }
+
+  async getUserPosts(userId: string): Promise<CommunityPost[]> {
+    return this.getPosts({ author_id: userId });
+  }
+
+  async likePost(postId: string): Promise<void> {
+    // Пока используем локальную симуляцию
+    console.log('Liking post:', postId);
+  }
+
+  async unlikePost(postId: string): Promise<void> {
+    // Пока используем локальную симуляцию
+    console.log('Unliking post:', postId);
+  }
+
+  async isPostLiked(postId: string): Promise<boolean> {
+    // Пока возвращаем случайное значение
+    return Math.random() > 0.5;
+  }
+
+  // === КОММЕНТАРИИ ===
+  async addComment(postId: string, content: string, parentCommentId?: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Используем существующую таблицу post_replies с обходом типов
+    const insertData = {
+      post_id: postId,
+      author_id: user.id,
+      content,
+      anonymous_name: 'Пользователь'
+    };
+
+    const { error } = await supabase
+      .from('post_replies')
+      .insert(insertData as any);
+
+    if (error) throw new Error(error.message);
+  }
+
+  async getComments(postId: string): Promise<CommunityComment[]> {
+    try {
+      const { data, error } = await supabase
+        .from('post_replies')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw new Error(error.message);
+
+      // Преобразуем данные в нужный формат
+      return await this.enrichCommentsWithProfiles(data || []);
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      // Fallback к демо-комментариям
+      return getDemoComments(postId);
+    }
+  }
+
+  // === ЭКСПЕРТНЫЕ СТАТЬИ ===
+  async createArticle(article: ExpertArticleData): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Получаем профиль пользователя для имени
+    let authorName = 'Эксперт';
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('first_name, last_name')
+        .eq('id', user.id)
+        .single();
+
+      authorName = `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Эксперт';
+    } catch (error) {
+      console.warn('Could not load user profile:', error);
+    }
+
+    const { data, error } = await supabase
+      .from('expert_blog_posts')
+      .insert({
+        author_id: user.id,
+        author_name: authorName,
+        title: article.title,
+        content: article.content,
+        excerpt: article.excerpt,
+        category: article.category,
+        tags: article.tags || [],
+        featured_image: article.featured_image,
+        status: 'pending',
+        moderation_status: 'pending'
+      })
+      .select('id')
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data.id;
+  }
+
+  async getPublishedArticles(): Promise<ExpertArticle[]> {
+    const { data, error } = await supabase
+      .from('expert_blog_posts')
+      .select('*')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false });
+
+    if (error) throw new Error(error.message);
+    return data || [];
+  }
+
+  async moderateArticle(articleId: string, status: 'approved' | 'rejected', notes?: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const updateData: any = {
+      moderation_status: status,
+      moderated_by: user.id,
+      moderated_at: new Date().toISOString(),
+      moderation_notes: notes
+    };
+
+    if (status === 'approved') {
+      updateData.status = 'published';
+      updateData.is_published = true;
+      updateData.published_at = new Date().toISOString();
+    }
+
+    const { error } = await supabase
+      .from('expert_blog_posts')
+      .update(updateData)
+      .eq('id', articleId);
+
+    if (error) throw new Error(error.message);
+  }
+
+  // === ГРУППЫ ===
+  async getGroups(): Promise<CommunityGroup[]> {
+    return getDefaultGroups();
+  }
+
+  async getRecommendedGroups(): Promise<CommunityGroup[]> {
+    const allGroups = await this.getGroups();
+    return getRecommendedGroups(allGroups);
+  }
+
+  // === REAL-TIME ПОДПИСКИ ===
+  subscribeToNewPosts(callback: (post: CommunityPost) => void): () => void {
+    const channel = supabase
+      .channel('community_posts_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'community_posts'
+        },
+        async (payload) => {
+          try {
+            const enrichedPosts = await this.enrichPostsWithProfiles([payload.new as any]);
+            if (enrichedPosts.length > 0) {
+              callback(enrichedPosts[0]);
+            }
+          } catch (error) {
+            console.error('Error handling real-time post:', error);
+          }
+        }
+      )
+      .subscribe();
+
+    this.realtimeChannels.set('posts', channel);
+
+    return () => {
+      channel.unsubscribe();
+      this.realtimeChannels.delete('posts');
+    };
+  }
+
+  subscribeToPostComments(postId: string, callback: (comment: CommunityComment) => void): () => void {
+    const channel = supabase
+      .channel(`post_${postId}_comments`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'post_replies',
+          filter: `post_id=eq.${postId}`
+        },
+        async (payload) => {
+          try {
+            const enrichedComments = await this.enrichCommentsWithProfiles([payload.new as any]);
+            if (enrichedComments.length > 0) {
+              callback(enrichedComments[0]);
+            }
+          } catch (error) {
+            console.error('Error handling real-time comment:', error);
+          }
+        }
+      )
+      .subscribe();
+
+    this.realtimeChannels.set(`comments_${postId}`, channel);
+
+    return () => {
+      channel.unsubscribe();
+      this.realtimeChannels.delete(`comments_${postId}`);
+    };
+  }
+
+  // === ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ===
+  private async enrichPostsWithProfiles(posts: any[]): Promise<CommunityPost[]> {
+    if (!posts.length) return [];
+
+    const authorIds = [...new Set(posts.map(p => p.author_id))];
+    let profileMap = new Map();
+
+    try {
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', authorIds);
+
+      profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+    } catch (error) {
+      console.warn('Could not load user profiles:', error);
+    }
+
+    return posts.map(post => {
+      const profile = profileMap.get(post.author_id);
+      return {
+        id: post.id,
+        author_id: post.author_id,
+        author_name: post.is_anonymous 
+          ? 'Анонимно' 
+          : post.anonymous_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Пользователь',
+        author_avatar: post.is_anonymous ? undefined : profile?.avatar_url,
+        author_age_group: '45-50',
+        author_menopause_phase: 'perimenopause',
+        title: post.title || 'Пост сообщества',
+        content: post.content,
+        category: 'general',
+        tags: post.tags || [],
+        is_anonymous: post.is_anonymous || false,
+        created_at: post.created_at,
+        updated_at: post.updated_at,
+        likes_count: post.like_count || 0,
+        comments_count: post.reply_count || 0,
+        is_pinned: false,
+        is_verified: false,
+        sensitivity_level: 'public'
+      } as CommunityPost;
+    });
+  }
+
+  private async enrichCommentsWithProfiles(comments: any[]): Promise<CommunityComment[]> {
+    if (!comments.length) return [];
+
+    const authorIds = [...new Set(comments.map(c => c.author_id))];
+    let profileMap = new Map();
+
+    try {
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', authorIds);
+
+      profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+    } catch (error) {
+      console.warn('Could not load user profiles:', error);
+    }
+
+    return comments.map(comment => {
+      const profile = profileMap.get(comment.author_id);
+      return {
+        id: comment.id,
+        post_id: comment.post_id,
+        author_id: comment.author_id,
+        author_name: comment.is_anonymous 
+          ? 'Анонимно' 
+          : comment.anonymous_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Пользователь',
+        author_avatar: comment.is_anonymous ? undefined : profile?.avatar_url,
+        content: comment.content,
+        parent_comment_id: undefined,
+        created_at: comment.created_at,
+        likes_count: comment.like_count || 0,
+        is_anonymous: comment.is_anonymous || false,
+        is_verified: false
+      } as CommunityComment;
+    });
+  }
+
+  cleanup(): void {
+    this.realtimeChannels.forEach(channel => channel.unsubscribe());
+    this.realtimeChannels.clear();
+  }
+}
+
+// Экспортируем singleton
+export const communityService = new CommunityService();
+
+// === СОВМЕСТИМОСТЬ С СУЩЕСТВУЮЩИМ КОДОМ ===
 export const getCommunityContent = async (
   tab: string,
   category: string
 ): Promise<{ posts: CommunityPost[]; groups: CommunityGroup[] }> => {
-  // Инициализируем демо-данные, если их нет
-  const existingPosts = JSON.parse(localStorage.getItem('community_posts') || '[]');
-  if (existingPosts.length === 0) {
-    const demoPosts = getDefaultPosts();
-    localStorage.setItem('community_posts', JSON.stringify(demoPosts));
+  try {
+    const posts = await communityService.getPosts({ category: category === 'all' ? undefined : category });
+    const groups = await communityService.getGroups();
+    return { posts, groups };
+  } catch (error) {
+    console.error('Error loading community content:', error);
+    // Fallback к демо-данным в случае ошибки
+    return { posts: getDefaultPosts(), groups: getDefaultGroups() };
   }
-
-  // Загрузка из localStorage (позже заменить на API)
-  const posts = JSON.parse(localStorage.getItem('community_posts') || '[]');
-  const groups = getDefaultGroups();
-
-  return { posts, groups };
 };
 
 export const getPostComments = async (postId: string): Promise<CommunityComment[]> => {
-  // Возвращаем демо-комментарии
-  return [
-    {
-      id: '1',
-      post_id: postId,
-      author_id: 'user1',
-      author_name: 'Мария',
-      content: 'Спасибо за такой честный пост! У меня похожий опыт.',
-      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      likes_count: 5,
-      is_anonymous: false,
-      is_verified: false
-    },
-    {
-      id: '2',
-      post_id: postId,
-      author_id: 'user2',
-      author_name: 'Анонимно',
-      content: 'Очень поддерживающее сообщество, чувствую себя понятой.',
-      created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-      likes_count: 3,
-      is_anonymous: true,
-      is_verified: false
-    }
-  ];
+  try {
+    return await communityService.getComments(postId);
+  } catch (error) {
+    console.error('Error loading comments:', error);
+    // Fallback к демо-комментариям
+    return getDemoComments(postId);
+  }
 };
+
+const getDemoComments = (postId: string): CommunityComment[] => [
+  {
+    id: '1',
+    post_id: postId,
+    author_id: 'user1',
+    author_name: 'Мария',
+    content: 'Спасибо за такой честный пост! У меня похожий опыт.',
+    created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    likes_count: 5,
+    is_anonymous: false,
+    is_verified: false
+  },
+  {
+    id: '2',
+    post_id: postId,
+    author_id: 'user2',
+    author_name: 'Анонимно',
+    content: 'Очень поддерживающее сообщество, чувствую себя понятой.',
+    created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    likes_count: 3,
+    is_anonymous: true,
+    is_verified: false
+  }
+];
 
 export const getDefaultGroups = (): CommunityGroup[] => [
   {
@@ -183,7 +608,7 @@ export const getDefaultPosts = (): CommunityPost[] => [
     author_age_group: '45-50',
     author_menopause_phase: 'perimenopause',
     title: 'Мой первый год перименопаузы - что я узнала',
-    content: 'Привет, девочки! Хочу поделиться своим опытом первого года перименопаузы. Начну с того, что первые симптомы я заметила около года назад - стали нерегулярными месячные, появились приливы по ночам и резкие перепады настроения. Сначала я списывала все на стресс на работе, но когда симптомы усилились, поняла, что это начало нового этапа. Самое главное, что я поняла - не нужно молчать и терпеть. Обращение к гинекологу-эндокринологу помогло мне разобраться в происходящем и подобрать подходящую поддержку. Сейчас принимаю растительные препараты, скорректировала питание и начала заниматься йогой. Состояние значительно улучшилось!',
+    content: 'Привет, девочки! Хочу поделиться своим опытом первого года перименопаузы. Начну с того, что первые симптомы я заметила около года назад - стали нерегулярными месячные, появились приливы по ночам и резкие перепады настроения. Сначала я списывала все на стресс на работе, но когда симптомы усилились, поняла, что это начало нового этапа. Самое главное, что я поняла - не нужно молчать и терпеть. Обращение к гинекологу-эндокринологу помогло мне разобраться в происходящем и подобрать подходящую поддержку.',
     category: 'success_stories',
     tags: ['перименопауза', 'первый опыт', 'симптомы'],
     is_anonymous: false,
@@ -201,7 +626,7 @@ export const getDefaultPosts = (): CommunityPost[] => [
     author_age_group: '50-55',
     author_menopause_phase: 'menopause',
     title: 'Как справиться с приливами на работе?',
-    content: 'Девочки, подскажите, как вы справляетесь с приливами на работе? У меня они стали очень частыми и интенсивными. Работаю в офисе, и это очень неловко, когда вдруг краснею и потею. Пока спасаюсь веером и холодной водой, но хотелось бы узнать, есть ли более эффективные способы. Может, кто-то принимает что-то специальное? Врач предлагает ЗГТ, но я пока сомневаюсь.',
+    content: 'Девочки, подскажите, как вы справляетесь с приливами на работе? У меня они стали очень частыми и интенсивными. Работаю в офисе, и это очень неловко, когда вдруг краснею и потею. Пока спасаюсь веером и холодной водой, но хотелось бы узнать, есть ли более эффективные способы.',
     category: 'symptoms',
     tags: ['приливы', 'работа', 'советы'],
     is_anonymous: true,
@@ -219,7 +644,7 @@ export const getDefaultPosts = (): CommunityPost[] => [
     author_age_group: '40-45',
     author_menopause_phase: 'perimenopause',
     title: 'Натуральные способы борьбы с перепадами настроения',
-    content: 'Хочу поделиться тем, что мне помогло справиться с эмоциональными качелями в начале перименопаузы. Раньше я была очень спокойным человеком, а тут стала плакать от любой мелочи и срываться на близких. Что помогло: 1) Магний перед сном - значительно улучшил качество сна и снизил тревожность. 2) Медитация 10 минут утром - использую приложение Headspace. 3) Регулярные прогулки на свежем воздухе, особенно в лесу. 4) Травяной чай с мятой и мелиссой вечером. 5) Ведение дневника эмоций - помогает отслеживать триггеры. Результат заметила уже через месяц!',
+    content: 'Хочу поделиться тем, что мне помогло справиться с эмоциональными качелями в начале перименопаузы. Раньше я была очень спокойным человеком, а тут стала плакать от любой мелочи и срываться на близких. Что помогло: магний перед сном, медитация утром, прогулки на свежем воздухе.',
     category: 'lifestyle',
     tags: ['настроение', 'натуральные методы', 'стресс'],
     is_anonymous: false,
@@ -229,47 +654,10 @@ export const getDefaultPosts = (): CommunityPost[] => [
     is_pinned: false,
     is_verified: true,
     sensitivity_level: 'public'
-  },
-  {
-    id: '4',
-    author_id: 'user4',
-    author_name: 'Анонимно',
-    author_age_group: '45-50',
-    author_menopause_phase: 'perimenopause',
-    title: 'Очень нужна поддержка - чувствую себя сломленной',
-    content: 'Девочки, очень нужна ваша поддержка. Последние месяцы чувствую себя ужасно. Постоянная усталость, депрессивные мысли, кажется, что жизнь проходит мимо. Муж не понимает, что со мной происходит, дети выросли и живут своей жизнью. Ощущение, что я никому не нужна и ничего хорошего впереди не ждет. Знаю, что это гормоны, но от этого не легче. Как вы находите в себе силы продолжать? Что помогает вам в такие моменты?',
-    category: 'support',
-    tags: ['депрессия', 'поддержка', 'одиночество'],
-    is_anonymous: true,
-    created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-    likes_count: 8,
-    comments_count: 23,
-    is_pinned: false,
-    is_verified: false,
-    sensitivity_level: 'sensitive'
-  },
-  {
-    id: '5',
-    author_id: 'user5',
-    author_name: 'Доктор Светлана',
-    author_age_group: '50-55',
-    author_menopause_phase: 'postmenopause',
-    title: 'Мифы о ЗГТ, которые пора развеять',
-    content: 'Как врач-гинеколог, хочу развеять несколько распространенных мифов о заместительной гормональной терапии. Миф 1: ЗГТ всегда приводит к раку. Реальность: современные исследования показывают, что правильно подобранная ЗГТ в оптимальном временном окне (первые 10 лет менопаузы) имеет минимальные риски. Миф 2: ЗГТ подходит всем. Реальность: есть противопоказания, поэтому нужна индивидуальная оценка. Миф 3: Натуральные средства всегда безопаснее. Реальность: некоторые травы могут взаимодействовать с лекарствами. Главное - найти квалифицированного специалиста и принимать решение на основе фактов, а не страхов.',
-    category: 'treatment',
-    tags: ['ЗГТ', 'мифы', 'врач'],
-    is_anonymous: false,
-    created_at: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
-    likes_count: 45,
-    comments_count: 15,
-    is_pinned: true,
-    is_verified: true,
-    sensitivity_level: 'public'
   }
 ];
 
 export const getRecommendedGroups = (allGroups: CommunityGroup[]): CommunityGroup[] => {
-  // Простая логика рекомендаций на основе профиля пользователя
   return allGroups.filter(group => 
     group.category === 'phase' || group.category === 'treatment' || group.category === 'symptoms'
   ).slice(0, 4);
