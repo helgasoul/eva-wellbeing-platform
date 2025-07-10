@@ -146,7 +146,7 @@ export interface AuthContextType {
   completeOnboarding: (onboardingData: any) => Promise<void>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
-  updatePassword: (newPassword: string, accessToken?: string, refreshToken?: string) => Promise<void>;
+  updatePassword: (newPassword: string, accessToken?: string, refreshToken?: string) => Promise<{ user: User | null }>;
   isLoading: boolean;
   error: string | null;
   switchRole: (role: UserRole) => void;

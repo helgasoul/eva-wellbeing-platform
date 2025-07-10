@@ -277,7 +277,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const updatePassword = async (newPassword: string, accessToken?: string, refreshToken?: string): Promise<void> => {
+  const updatePassword = async (newPassword: string, accessToken?: string, refreshToken?: string): Promise<{ user: User | null }> => {
     setIsLoading(true);
     setError(null);
 
@@ -294,14 +294,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(updateError);
       }
 
-      toast({
-        title: 'Пароль обновлен',
-        description: 'Ваш пароль был успешно изменен',
-      });
+      // После успешного обновления пароля получаем актуального пользователя
+      const { user: updatedUser } = await authService.getCurrentUser();
+      
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+
+      return { user: updatedUser };
 
     } catch (error: any) {
       console.error('Update password error:', error);
-      // Ошибка уже обработана выше
+      throw error;
     } finally {
       setIsLoading(false);
     }

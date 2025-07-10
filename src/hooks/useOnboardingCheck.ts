@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/auth';
 
@@ -10,14 +10,19 @@ import { UserRole } from '@/types/auth';
  * - Если пользователь авторизован И завершил онбординг → редирект на дашборд
  * - Если пользователь авторизован НО не завершил онбординг → редирект на онбординг
  * - Для других ролей (doctor, admin) → проверка не нужна
+ * - Исключение: не редиректим если пользователь на странице сброса пароля
  */
 export const useOnboardingCheck = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Ждем загрузки пользователя
     if (isLoading || !user) return;
+
+    // Не редиректим если пользователь на странице сброса пароля
+    if (location.pathname === '/reset-password') return;
 
     // Проверяем только пациенток
     if (user.role === UserRole.PATIENT) {
@@ -29,7 +34,7 @@ export const useOnboardingCheck = () => {
         navigate('/patient/onboarding', { replace: true });
       }
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, location.pathname]);
 
   return {
     user,

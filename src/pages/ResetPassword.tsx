@@ -52,12 +52,22 @@ export default function ResetPassword() {
     setIsLoading(true);
 
     try {
-      await updatePassword(password, accessToken, refreshToken);
+      const { user: updatedUser } = await updatePassword(password, accessToken, refreshToken);
       toast({
         title: 'Пароль обновлен',
         description: 'Ваш пароль был успешно изменен',
       });
-      navigate('/login');
+      
+      // Проверяем статус онбординга и редиректим соответственно
+      if (updatedUser?.role === 'patient') {
+        if (updatedUser.onboardingCompleted) {
+          navigate('/patient/dashboard');
+        } else {
+          navigate('/patient/onboarding');
+        }
+      } else {
+        navigate('/login');
+      }
     } catch (error: any) {
       setError(error.message || 'Произошла ошибка при обновлении пароля');
     } finally {
