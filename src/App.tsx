@@ -39,6 +39,7 @@ import DoctorBooking from "./pages/patient/DoctorBooking";
 import Community from "./pages/patient/Community";
 import Settings from "./pages/patient/Settings";
 import Documents from "./pages/patient/Documents";
+import DocumentPlatform from "./pages/patient/DocumentPlatform";
 import DataDiagnostics from "./pages/patient/DataDiagnostics";
 
 // Doctor pages
@@ -316,6 +317,14 @@ function App() {
       <ProtectedRoute allowedRoles={['patient']}>
         <OnboardingGuard>
           <Documents />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/document-platform" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <DocumentPlatform />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
