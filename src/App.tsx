@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { useState, useEffect } from "react";
+import AuthDebug from "./components/debug/AuthDebug";
 
 import { OnboardingGuard } from "./components/auth/OnboardingGuard";
 
@@ -58,6 +60,20 @@ import { BasicNotificationProvider } from "./contexts/BasicNotificationContext";
 const queryClient = new QueryClient();
 
 function App() {
+  const [showDebug, setShowDebug] = useState(false);
+
+  // Добавляем обработчик для комбинации клавиш Ctrl+Shift+D
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        setShowDebug(true);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -328,6 +344,9 @@ function App() {
                     {/* FALLBACK */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+                  
+                  {/* ОТЛАДОЧНЫЙ КОМПОНЕНТ */}
+                  {showDebug && <AuthDebug />}
                 </BasicNotificationProvider>
               </FoodDiaryProvider>
             </SubscriptionProvider>
