@@ -43,6 +43,8 @@ import Documents from "./pages/patient/Documents";
 import DocumentPlatform from "./pages/patient/DocumentPlatform";
 import DataDiagnostics from "./pages/patient/DataDiagnostics";
 import PatientRecommendations from "./pages/patient/PatientRecommendations";
+import Calendar from "./pages/patient/Calendar";
+import AdvancedRecommendations from "./pages/patient/AdvancedRecommendations";
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -382,6 +384,22 @@ function App() {
       <ProtectedRoute allowedRoles={['patient']}>
         <OnboardingGuard>
           <DataDiagnostics />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/calendar" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <Calendar />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/advanced-recommendations" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <AdvancedRecommendations />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
