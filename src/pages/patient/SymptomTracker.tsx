@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { PatientLayout } from '@/components/layout/PatientLayout';
@@ -6,42 +5,18 @@ import { DateSelector } from '@/components/symptom-tracker/DateSelector';
 import { SymptomEntryForm } from '@/components/symptom-tracker/SymptomEntryForm';
 import { SymptomEntryView } from '@/components/symptom-tracker/SymptomEntryView';
 import { RecentEntries } from '@/components/symptom-tracker/RecentEntries';
-
-interface SymptomEntry {
-  id: string;
-  date: string; // YYYY-MM-DD
-  hotFlashes: {
-    count: number;
-    severity: number; // 1-5
-    triggers?: string[];
-  };
-  nightSweats: {
-    occurred: boolean;
-    severity: number; // 1-5
-  };
-  sleep: {
-    hoursSlept: number;
-    quality: number; // 1-5
-    fallAsleepTime?: string;
-    wakeUpTime?: string;
-  };
-  mood: {
-    overall: number; // 1-5 (1=очень плохое, 5=отличное)
-    anxiety: number; // 1-5
-    irritability: number; // 1-5
-  };
-  physicalSymptoms: string[]; // ['headache', 'joint_pain', 'fatigue', 'bloating']
-  energy: number; // 1-5
-  notes?: string;
-  createdAt: string;
-}
+import { healthDataService } from '@/services/healthDataService';
+import type { SymptomEntry } from '@/types/healthData';
+import { useToast } from '@/hooks/use-toast';
 
 const SymptomTracker: React.FC = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [entries, setEntries] = useState<SymptomEntry[]>([]);
   const [currentEntry, setCurrentEntry] = useState<SymptomEntry | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const breadcrumbs = [
     { label: 'Главная', href: '/patient/dashboard' },
@@ -50,33 +25,126 @@ const SymptomTracker: React.FC = () => {
 
   // Загрузка записей при монтировании компонента
   useEffect(() => {
-    loadEntries();
-  }, []);
+    if (user?.id) {
+      loadEntries();
+    }
+  }, [user?.id]);
 
   // Загрузка записи для выбранной даты
   useEffect(() => {
-    const entry = entries.find(e => e.date === selectedDate);
-    setCurrentEntry(entry || null);
-    setIsEditing(false);
-  }, [selectedDate, entries]);
+    if (user?.id) {
+      loadCurrentEntry();
+    }
+  }, [selectedDate, user?.id]);
 
-  const loadEntries = () => {
-    // Загрузка из localStorage (позже заменить на API)
-    const saved = localStorage.getItem(`symptom_entries_${user?.id}`);
-    if (saved) {
-      setEntries(JSON.parse(saved));
+  const loadEntries = async () => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    try {
+      // Загружаем последние 30 дней для отображения в календаре
+      const endDate = new Date().toISOString().split('T')[0];
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      const data = await healthDataService.getSymptomEntries(user.id, {
+        start: startDate,
+        end: endDate
+      });
+      
+      setEntries(data);
+    } catch (error) {
+      console.error('Error loading symptom entries:', error);
+      
+      // Fallback к localStorage при ошибке
+      const saved = localStorage.getItem(`symptom_entries_${user.id}`);
+      if (saved) {
+        try {
+          const localData = JSON.parse(saved);
+          setEntries(localData);
+        } catch (parseError) {
+          console.error('Error parsing local data:', parseError);
+        }
+      }
+      
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить данные с сервера. Используются локальные данные.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const saveEntry = (entry: SymptomEntry) => {
-    const updated = entries.filter(e => e.date !== entry.date);
-    updated.push(entry);
-    updated.sort((a, b) => b.date.localeCompare(a.date));
+  const loadCurrentEntry = async () => {
+    if (!user?.id) return;
     
-    setEntries(updated);
-    localStorage.setItem(`symptom_entries_${user?.id}`, JSON.stringify(updated));
-    setCurrentEntry(entry);
-    setIsEditing(false);
+    try {
+      const entry = await healthDataService.getSymptomEntry(user.id, selectedDate);
+      setCurrentEntry(entry);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error loading current entry:', error);
+      // Fallback к поиску в уже загруженных данных
+      const entry = entries.find(e => e.entry_date === selectedDate);
+      setCurrentEntry(entry || null);
+    }
+  };
+
+  const saveEntry = async (entryData: Omit<SymptomEntry, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    try {
+      const savedEntry = await healthDataService.saveSymptomEntry(user.id, entryData);
+      
+      if (savedEntry) {
+        // Обновляем локальные данные
+        const updatedEntries = entries.filter(e => e.entry_date !== savedEntry.entry_date);
+        updatedEntries.push(savedEntry);
+        updatedEntries.sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+        
+        setEntries(updatedEntries);
+        setCurrentEntry(savedEntry);
+        setIsEditing(false);
+
+        // Сохраняем в localStorage как резервную копию
+        localStorage.setItem(`symptom_entries_${user.id}`, JSON.stringify(updatedEntries));
+
+        toast({
+          title: "Запись сохранена",
+          description: "Данные успешно сохранены в облаке"
+        });
+      }
+    } catch (error) {
+      console.error('Error saving symptom entry:', error);
+      
+      // Fallback к localStorage
+      const localEntry: SymptomEntry = {
+        id: Date.now().toString(),
+        user_id: user.id,
+        ...entryData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      const updated = entries.filter(e => e.entry_date !== localEntry.entry_date);
+      updated.push(localEntry);
+      updated.sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+      
+      setEntries(updated);
+      setCurrentEntry(localEntry);
+      setIsEditing(false);
+      localStorage.setItem(`symptom_entries_${user.id}`, JSON.stringify(updated));
+
+      toast({
+        title: "Сохранено локально",
+        description: "Данные сохранены на устройстве. Синхронизация произойдет при восстановлении соединения.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -107,7 +175,8 @@ const SymptomTracker: React.FC = () => {
             <div className="space-y-2">
               <button 
                 onClick={() => setIsEditing(true)}
-                className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors"
+                disabled={isLoading}
+                className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {currentEntry ? 'Редактировать запись' : 'Добавить запись'}
               </button>

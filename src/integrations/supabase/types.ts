@@ -4550,6 +4550,42 @@ export type Database = {
         }
         Relationships: []
       }
+      menstrual_entries: {
+        Row: {
+          created_at: string | null
+          cycle_day: number | null
+          entry_date: string
+          flow_level: number | null
+          id: string
+          is_period_start: boolean | null
+          notes: string | null
+          symptoms: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cycle_day?: number | null
+          entry_date: string
+          flow_level?: number | null
+          id?: string
+          is_period_start?: boolean | null
+          notes?: string | null
+          symptoms?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cycle_day?: number | null
+          entry_date?: string
+          flow_level?: number | null
+          id?: string
+          is_period_start?: boolean | null
+          notes?: string | null
+          symptoms?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       mission_images: {
         Row: {
           created_at: string
@@ -4662,6 +4698,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      nutrition_entries: {
+        Row: {
+          calories: number | null
+          created_at: string | null
+          entry_date: string
+          food_items: Json
+          id: string
+          macros: Json | null
+          meal_type: string
+          symptoms_after: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          calories?: number | null
+          created_at?: string | null
+          entry_date: string
+          food_items: Json
+          id?: string
+          macros?: Json | null
+          meal_type: string
+          symptoms_after?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          calories?: number | null
+          created_at?: string | null
+          entry_date?: string
+          food_items?: Json
+          id?: string
+          macros?: Json | null
+          meal_type?: string
+          symptoms_after?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       onboarding_data: {
         Row: {
@@ -5617,6 +5689,51 @@ export type Database = {
         }
         Relationships: []
       }
+      symptom_entries: {
+        Row: {
+          created_at: string | null
+          energy_level: number | null
+          entry_date: string
+          hot_flashes: Json | null
+          id: string
+          mood_data: Json | null
+          night_sweats: Json | null
+          notes: string | null
+          physical_symptoms: string[] | null
+          sleep_data: Json | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          energy_level?: number | null
+          entry_date: string
+          hot_flashes?: Json | null
+          id?: string
+          mood_data?: Json | null
+          night_sweats?: Json | null
+          notes?: string | null
+          physical_symptoms?: string[] | null
+          sleep_data?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          energy_level?: number | null
+          entry_date?: string
+          hot_flashes?: Json | null
+          id?: string
+          mood_data?: Json | null
+          night_sweats?: Json | null
+          notes?: string | null
+          physical_symptoms?: string[] | null
+          sleep_data?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       symptom_mood_logs: {
         Row: {
           created_at: string
@@ -6186,6 +6303,78 @@ export type Database = {
           token_expires_at?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      wearable_data: {
+        Row: {
+          calories_burned: number | null
+          created_at: string | null
+          device_type: string
+          heart_rate_data: Json | null
+          id: string
+          recorded_date: string
+          sleep_data: Json | null
+          steps: number | null
+          stress_level: number | null
+          user_id: string | null
+        }
+        Insert: {
+          calories_burned?: number | null
+          created_at?: string | null
+          device_type: string
+          heart_rate_data?: Json | null
+          id?: string
+          recorded_date: string
+          sleep_data?: Json | null
+          steps?: number | null
+          stress_level?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          calories_burned?: number | null
+          created_at?: string | null
+          device_type?: string
+          heart_rate_data?: Json | null
+          id?: string
+          recorded_date?: string
+          sleep_data?: Json | null
+          steps?: number | null
+          stress_level?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      weather_data: {
+        Row: {
+          air_quality: Json | null
+          created_at: string | null
+          id: string
+          location_data: Json
+          menopause_impact_score: number | null
+          recorded_date: string
+          user_id: string | null
+          weather_metrics: Json
+        }
+        Insert: {
+          air_quality?: Json | null
+          created_at?: string | null
+          id?: string
+          location_data: Json
+          menopause_impact_score?: number | null
+          recorded_date: string
+          user_id?: string | null
+          weather_metrics: Json
+        }
+        Update: {
+          air_quality?: Json | null
+          created_at?: string | null
+          id?: string
+          location_data?: Json
+          menopause_impact_score?: number | null
+          recorded_date?: string
+          user_id?: string | null
+          weather_metrics?: Json
         }
         Relationships: []
       }

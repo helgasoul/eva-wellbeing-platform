@@ -4,59 +4,22 @@ import { PatientLayout } from '@/components/layout/PatientLayout';
 import { TodayNutritionContent } from '@/components/nutrition/TodayNutritionContent';
 import { NutritionTrendsContent } from '@/components/nutrition/NutritionTrendsContent';
 import { NutritionInsightsContent } from '@/components/nutrition/NutritionInsightsContent';
+import { healthDataService } from '@/services/healthDataService';
+import type { 
+  FoodEntry, 
+  MealData, 
+  SupplementEntry
+} from '@/types/nutritionCompat';
+import { 
+  convertNutritionEntryToFoodEntry,
+  convertFoodEntryToNutritionEntries
+} from '@/types/nutritionCompat';
 import { cn } from '@/lib/utils';
-
-interface FoodEntry {
-  id: string;
-  date: string; // YYYY-MM-DD
-  meals: {
-    breakfast: MealData[];
-    lunch: MealData[];
-    dinner: MealData[];
-    snacks: MealData[];
-  };
-  water_intake: number; // литры
-  supplements: SupplementEntry[];
-  notes?: string;
-  mood_before_meals: {
-    breakfast: number; // 1-5
-    lunch: number;
-    dinner: number;
-  };
-  mood_after_meals: {
-    breakfast: number; // 1-5  
-    lunch: number;
-    dinner: number;
-  };
-  energy_levels: {
-    morning: number; // 1-5
-    afternoon: number;
-    evening: number;
-  };
-  digestive_comfort: number; // 1-5
-  created_at: string;
-}
-
-interface MealData {
-  id: string;
-  name: string;
-  category: 'protein' | 'carbs' | 'fats' | 'vegetables' | 'fruits' | 'dairy' | 'grains' | 'other';
-  portion_size: string;
-  estimated_calories?: number;
-  contains_trigger_foods: string[]; // ['caffeine', 'alcohol', 'spicy', 'sugar']
-  time?: string; // HH:MM
-}
-
-interface SupplementEntry {
-  id: string;
-  name: string;
-  dosage: string;
-  time: string;
-  type: 'vitamin' | 'mineral' | 'herbal' | 'omega' | 'probiotic' | 'other';
-}
+import { useToast } from '@/hooks/use-toast';
 
 export default function NutritionTracker() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [entries, setEntries] = useState<FoodEntry[]>([]);
   const [currentEntry, setCurrentEntry] = useState<FoodEntry | null>(null);
@@ -68,36 +31,115 @@ export default function NutritionTracker() {
     { label: 'Дневник питания' }
   ];
 
-  // Загрузка данных из localStorage
+  // Загрузка данных из Supabase
   useEffect(() => {
     if (user?.id) {
+      loadNutritionData();
+    }
+  }, [user?.id]);
+
+  // Обновление текущей записи при изменении выбранной даты
+  useEffect(() => {
+    const dayEntry = entries.find(entry => entry.date === selectedDate);
+    setCurrentEntry(dayEntry || null);
+  }, [selectedDate, entries]);
+
+  const loadNutritionData = async () => {
+    if (!user?.id) return;
+    
+    try {
+      // Загружаем последние 30 дней
+      const endDate = new Date().toISOString().split('T')[0];
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      const nutritionEntries = await healthDataService.getNutritionEntries(user.id, {
+        start: startDate,
+        end: endDate
+      });
+
+      // Группируем записи по датам и конвертируем в FoodEntry
+      const entriesByDate = nutritionEntries.reduce((acc, entry) => {
+        if (!acc[entry.entry_date]) {
+          acc[entry.entry_date] = [];
+        }
+        acc[entry.entry_date].push(entry);
+        return acc;
+      }, {} as Record<string, any[]>);
+
+      const foodEntries: FoodEntry[] = Object.entries(entriesByDate).map(([date, dateEntries]) => {
+        return convertNutritionEntryToFoodEntry(dateEntries);
+      });
+
+      setEntries(foodEntries);
+    } catch (error) {
+      console.error('Error loading nutrition data:', error);
+      
+      // Fallback к localStorage
       const saved = localStorage.getItem(`nutrition_entries_${user.id}`);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           setEntries(parsed);
-          
-          // Найти запись для выбранной даты
-          const dayEntry = parsed.find((entry: FoodEntry) => entry.date === selectedDate);
-          setCurrentEntry(dayEntry || null);
-        } catch (error) {
-          console.error('Ошибка загрузки данных питания:', error);
+        } catch (parseError) {
+          console.error('Error parsing local nutrition data:', parseError);
         }
       }
+      
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить данные с сервера. Используются локальные данные.",
+        variant: "destructive"
+      });
     }
-  }, [user?.id, selectedDate]);
+  };
 
-  // Сохранение данных в localStorage
-  const saveEntry = (entry: FoodEntry) => {
+  const saveEntry = async (entry: FoodEntry) => {
     if (!user?.id) return;
 
-    const updatedEntries = entries.filter(e => e.id !== entry.id);
-    updatedEntries.push(entry);
-    
-    setEntries(updatedEntries);
-    setCurrentEntry(entry);
-    localStorage.setItem(`nutrition_entries_${user.id}`, JSON.stringify(updatedEntries));
-    setIsEditing(false);
+    try {
+      // Конвертируем FoodEntry обратно в NutritionEntry записи
+      const nutritionEntries = convertFoodEntryToNutritionEntries(entry);
+      
+      // Сохраняем каждую запись в Supabase
+      for (const nutritionEntry of nutritionEntries) {
+        await healthDataService.saveNutritionEntry(user.id, nutritionEntry);
+      }
+
+      // Обновляем локальное состояние
+      const updatedEntries = entries.filter(e => e.date !== entry.date);
+      updatedEntries.push(entry);
+      updatedEntries.sort((a, b) => b.date.localeCompare(a.date));
+      
+      setEntries(updatedEntries);
+      setCurrentEntry(entry);
+      setIsEditing(false);
+
+      // Сохраняем в localStorage как резервную копию
+      localStorage.setItem(`nutrition_entries_${user.id}`, JSON.stringify(updatedEntries));
+
+      toast({
+        title: "Запись сохранена",
+        description: "Данные успешно сохранены в облаке"
+      });
+    } catch (error) {
+      console.error('Error saving nutrition entry:', error);
+      
+      // Fallback к localStorage
+      const updatedEntries = entries.filter(e => e.date !== entry.date);
+      updatedEntries.push(entry);
+      updatedEntries.sort((a, b) => b.date.localeCompare(a.date));
+      
+      setEntries(updatedEntries);
+      setCurrentEntry(entry);
+      setIsEditing(false);
+      localStorage.setItem(`nutrition_entries_${user.id}`, JSON.stringify(updatedEntries));
+
+      toast({
+        title: "Сохранено локально",
+        description: "Данные сохранены на устройстве. Синхронизация произойдет при восстановлении соединения.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
