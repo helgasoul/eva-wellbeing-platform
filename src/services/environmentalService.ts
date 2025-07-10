@@ -97,8 +97,6 @@ export class EnvironmentalService {
       daily: [
         'temperature_2m_max',
         'temperature_2m_min',
-        'surface_pressure',
-        'relative_humidity_2m',
         'wind_speed_10m_max',
         'weather_code',
         'uv_index_max'
@@ -134,8 +132,8 @@ export class EnvironmentalService {
       daily: {
         temperature_2m_max: data.daily.temperature_2m_max,
         temperature_2m_min: data.daily.temperature_2m_min,
-        pressure_msl: data.daily.surface_pressure,
-        humidity: data.daily.relative_humidity_2m,
+        pressure_msl: [data.current.surface_pressure], // fallback to current pressure
+        humidity: [data.current.relative_humidity_2m], // fallback to current humidity
         wind_speed_10m_max: data.daily.wind_speed_10m_max,
         weather_code: data.daily.weather_code,
         uv_index_max: data.daily.uv_index_max

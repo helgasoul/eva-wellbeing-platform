@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { environmentalService } from '../../services/environmentalService';
+import { toast } from '@/hooks/use-toast';
 
 interface LocationSettingsProps {
   currentLocation: { lat: number; lon: number; city: string } | null;
@@ -23,26 +24,46 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
         throw new Error('Геолокация не поддерживается вашим браузером');
       }
 
+      console.log('🌍 Запрашиваем геолокацию...');
+
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          reject(new Error('Превышено время ожидания геолокации'));
+        }, 15000);
+
         navigator.geolocation.getCurrentPosition(
-          resolve, 
-          reject, 
+          (pos) => {
+            clearTimeout(timeoutId);
+            resolve(pos);
+          }, 
+          (err) => {
+            clearTimeout(timeoutId);
+            reject(err);
+          }, 
           {
             enableHighAccuracy: true,
-            timeout: 15000,
+            timeout: 10000,
             maximumAge: 300000 // 5 минут
           }
         );
       });
 
       const { latitude, longitude } = position.coords;
+      console.log(`📍 Координаты получены: ${latitude}, ${longitude}`);
       
       // Получаем название города через reverse geocoding
       const city = await environmentalService.getCityName(latitude, longitude);
+      console.log(`🏙️ Город определен: ${city}`);
       
       onLocationUpdate({ lat: latitude, lon: longitude, city });
+      
+      toast({
+        title: "Местоположение определено",
+        description: `Найден город: ${city}`,
+      });
+      
     } catch (error: any) {
-      console.error('Ошибка определения местоположения:', error);
+      console.error('❌ Ошибка определения местоположения:', error);
       let errorMessage = 'Не удалось определить местоположение';
       
       if (error.code === 1) {
@@ -51,7 +72,15 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
         errorMessage = 'Местоположение недоступно. Проверьте соединение с интернетом.';
       } else if (error.code === 3) {
         errorMessage = 'Превышено время ожидания. Попробуйте еще раз.';
+      } else if (error.message?.includes('время ожидания')) {
+        errorMessage = 'Превышено время ожидания. Попробуйте еще раз.';
       }
+      
+      toast({
+        title: "Ошибка геолокации",
+        description: errorMessage,
+        variant: "destructive"
+      });
       
       onError?.(errorMessage);
     } finally {
