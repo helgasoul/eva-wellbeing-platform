@@ -6900,6 +6900,15 @@ export type Database = {
           policy_check: string
         }[]
       }
+      check_user_exists: {
+        Args: { user_email: string }
+        Returns: {
+          user_exists: boolean
+          user_id: string
+          email_confirmed: boolean
+          last_sign_in: string
+        }[]
+      }
       cleanup_old_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -6907,6 +6916,16 @@ export type Database = {
       generate_ticket_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_auth_users_info: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          created_at: string
+          email_confirmed_at: string
+          last_sign_in_at: string
+        }[]
       }
       has_patient_data_permission: {
         Args: {

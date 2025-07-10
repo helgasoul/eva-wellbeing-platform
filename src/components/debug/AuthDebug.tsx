@@ -105,9 +105,16 @@ const AuthDebug = () => {
       try {
         // Пытаемся получить текущего пользователя через auth
         const { data: { user }, error } = await supabase.auth.getUser();
+        
+        // Получаем информацию о всех пользователях через RPC
+        const { data: usersInfo, error: usersError } = await supabase
+          .rpc('get_auth_users_info');
+        
         return {
           currentUser: user,
-          error: error?.message || null
+          error: error?.message || null,
+          allUsersInfo: usersInfo || [],
+          usersError: usersError?.message || null
         };
       } catch (e) {
         return { error: e.message };
