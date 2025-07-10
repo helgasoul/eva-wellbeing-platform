@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { AuthErrorBoundary } from '@/components/auth/AuthErrorBoundary';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -108,7 +109,8 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="bloom-card p-8 w-full max-w-md mx-auto">
+    <AuthErrorBoundary>
+      <div className="bloom-card p-8 w-full max-w-md mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-playfair font-semibold text-foreground mb-2">
           Добро пожаловать в bloom
@@ -269,5 +271,6 @@ export const LoginForm = () => {
         </p>
       </div>
     </div>
+    </AuthErrorBoundary>
   );
 };

@@ -8,6 +8,7 @@ import { DataFlowValidator } from '@/services/dataFlowValidator';
 import { authService } from '@/services/authService';
 import { onboardingService } from '@/services/onboardingService';
 import { supabase } from '@/integrations/supabase/client';
+import { AuthErrorBoundary } from '@/components/auth/AuthErrorBoundary';
 import { DataBridge } from '@/services/DataBridge';
 
 // Предустановленные админские credentials
@@ -782,8 +783,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+    <AuthErrorBoundary>
+      <AuthContext.Provider value={value}>
+        {children}
+      </AuthContext.Provider>
+    </AuthErrorBoundary>
   );
 };

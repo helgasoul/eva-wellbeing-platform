@@ -226,13 +226,7 @@ function App() {
       </ProtectedRoute>
     } />
     
-    <Route path="/patient/chat" element={
-      <ProtectedRoute allowedRoles={['patient']}>
-        <OnboardingGuard>
-          <AIChat />
-        </OnboardingGuard>
-      </ProtectedRoute>
-    } />
+    {/* Removed duplicate /patient/chat route - use /patient/ai-chat instead */}
     
     <Route path="/patient/ai-chat" element={
       <ProtectedRoute allowedRoles={['patient']}>
