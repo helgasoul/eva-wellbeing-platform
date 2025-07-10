@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { generateId, showNotification } from '@/utils/dataUtils';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ interface ChatMessage {
 }
 
 const AIChat: React.FC = () => {
-  const { user } = useAuth();
+  const { user, saveUserData, loadUserData, getUserDataSummary } = useAuth();
   const [chatService] = useState(() => new ClaudeChatService());
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -39,31 +40,56 @@ const AIChat: React.FC = () => {
   useEffect(() => {
     loadChatHistory();
     updateLimitStatus();
-  }, []);
+  }, [user?.id]);
 
-  const loadChatHistory = () => {
-    const saved = localStorage.getItem(`ai_chat_${user?.id}`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setMessages(parsed);
-      } catch (error) {
-        console.error('Ошибка загрузки истории чата:', error);
-        // Добавляем приветственное сообщение при ошибке
+  const loadChatHistory = async () => {
+    if (!user?.id) return;
+    
+    try {
+      console.log('🔄 AIChat: Загрузка истории чата...');
+      
+      const chatHistory = await loadUserData('ai_chat_history');
+      if (chatHistory && Array.isArray(chatHistory)) {
+        setMessages(chatHistory);
+        console.log(`✅ AIChat: Загружено ${chatHistory.length} сообщений`);
+      } else {
+        console.log('📥 AIChat: История чата не найдена, создание приветственного сообщения');
         addWelcomeMessage();
       }
-    } else {
-      addWelcomeMessage();
+    } catch (error) {
+      console.error('❌ AIChat: Ошибка загрузки истории чата:', error);
+      // Fallback к старому localStorage
+      const saved = localStorage.getItem(`ai_chat_${user.id}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setMessages(parsed);
+        } catch (parseError) {
+          console.error('Ошибка парсинга истории чата:', parseError);
+          addWelcomeMessage();
+        }
+      } else {
+        addWelcomeMessage();
+      }
     }
   };
 
-  const addWelcomeMessage = () => {
+  const addWelcomeMessage = async () => {
     const welcomeMessage: ChatMessage = {
       role: 'assistant',
       content: 'Здравствуйте! Я всегда рядом, чтобы поддержать вас на пути к гармонии в период менопаузы. Вы не одни — давайте разберемся вместе. 🌸\n\nЗдесь вы можете спокойно поговорить о любом вопросе, который вас волнует.',
       timestamp: new Date().toISOString()
     };
     setMessages([welcomeMessage]);
+    
+    // Сохраняем приветственное сообщение
+    if (user?.id) {
+      try {
+        await saveUserData('ai_chat_history', [welcomeMessage]);
+      } catch (error) {
+        console.error('Error saving welcome message:', error);
+      }
+    }
   };
 
   const updateLimitStatus = () => {
@@ -76,24 +102,31 @@ const AIChat: React.FC = () => {
   const sendMessage = async () => {
     if (!inputMessage.trim() || !user?.id || isLoading) return;
 
-    const userMessage: ChatMessage = {
-      role: 'user',
-      content: inputMessage,
-      timestamp: new Date().toISOString()
-    };
-
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setInputMessage('');
-    setIsLoading(true);
-
-    console.log('Отправляем сообщение:', inputMessage);
-    console.log('User ID:', user.id);
-
     try {
+      setIsLoading(true);
+      console.log('🔄 AIChat: Отправка сообщения...');
+
+      // Добавить сообщение пользователя
+      const userMessage: ChatMessage = {
+        role: 'user',
+        content: inputMessage.trim(),
+        timestamp: new Date().toISOString()
+      };
+
+      const updatedMessages = [...messages, userMessage];
+      setMessages(updatedMessages);
+      setInputMessage('');
+
+      // Получить полный контекст пользователя для персонализации
+      const userDataSummary = await getUserDataSummary();
+      
+      // Создать персонализированный промпт
+      const contextPrompt = createPersonalizedPrompt(userMessage.content, userDataSummary);
+      
+      // Отправить запрос к ИИ сервису
       const response = await chatService.sendMessage(
         user.id, 
-        inputMessage, 
+        contextPrompt, 
         messages
       );
 
@@ -106,19 +139,23 @@ const AIChat: React.FC = () => {
 
         const finalMessages = [...updatedMessages, assistantMessage];
         setMessages(finalMessages);
-        
-        // Сохраняем историю
-        localStorage.setItem(`ai_chat_${user.id}`, JSON.stringify(finalMessages));
+
+        // Сохранить обновленную историю через DataBridge
+        await saveUserData('ai_chat_history', finalMessages);
+
+        console.log('✅ AIChat: Сообщение отправлено и сохранено');
         
         // Добавляем дисклеймер если нужно
         if (response.metadata?.medicalDisclaimer) {
-          setTimeout(() => {
+          setTimeout(async () => {
             const disclaimerMessage: ChatMessage = {
               role: 'assistant',
               content: '⚠️ Эта информация носит образовательный характер и не заменяет консультацию врача.',
               timestamp: new Date().toISOString()
             };
-            setMessages(prev => [...prev, disclaimerMessage]);
+            const messagesWithDisclaimer = [...finalMessages, disclaimerMessage];
+            setMessages(messagesWithDisclaimer);
+            await saveUserData('ai_chat_history', messagesWithDisclaimer);
           }, 1000);
         }
       } else {
@@ -128,30 +165,70 @@ const AIChat: React.FC = () => {
           content: response.error || 'Произошла ошибка. Попробуйте позже.',
           timestamp: new Date().toISOString()
         };
-        setMessages(prev => [...prev, errorMessage]);
+        const messagesWithError = [...updatedMessages, errorMessage];
+        setMessages(messagesWithError);
+        await saveUserData('ai_chat_history', messagesWithError);
       }
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('❌ AIChat: Ошибка отправки сообщения:', error);
       const errorMessage: ChatMessage = {
         role: 'assistant',
         content: 'Произошла ошибка соединения. Пожалуйста, попробуйте позже.',
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorMessage]);
+      showNotification('Ошибка отправки сообщения', 'error');
     } finally {
       setIsLoading(false);
       updateLimitStatus();
     }
   };
 
+  // Создание персонализированного промпта
+  const createPersonalizedPrompt = (message: string, userSummary: any): string => {
+    let context = `Контекст пользователя:\n`;
+    
+    if (userSummary?.userData) {
+      context += `- Имя: ${userSummary.userData.firstName}\n`;
+      context += `- Фаза менопаузы: ${userSummary.userData.menopausePhase || 'не определена'}\n`;
+    }
+    
+    if (userSummary?.onboardingData) {
+      context += `- Онбординг завершен: да\n`;
+      context += `- Основные симптомы: ${JSON.stringify(userSummary.onboardingData.symptoms || {})}\n`;
+    }
+    
+    if (userSummary?.symptomEntries) {
+      context += `- Записей симптомов: ${userSummary.symptomEntries.length}\n`;
+    }
+    
+    context += `\nВопрос пользователя: ${message}\n`;
+    context += `\nОтветь персонализированно и поддерживающе, учитывая весь контекст.`;
+    
+    return context;
+  };
+
   const handleQuickAction = (action: any) => {
     setInputMessage(action.text);
   };
 
-  const clearChat = () => {
-    setMessages([]);
-    localStorage.removeItem(`ai_chat_${user?.id}`);
-    addWelcomeMessage();
+  const clearChat = async () => {
+    if (!confirm('Вы уверены, что хотите очистить всю историю чата?')) {
+      return;
+    }
+
+    try {
+      setMessages([]);
+      await saveUserData('ai_chat_history', []);
+      // Очищаем также старый localStorage
+      localStorage.removeItem(`ai_chat_${user?.id}`);
+      await addWelcomeMessage();
+      console.log('✅ AIChat: История чата очищена');
+      showNotification('История чата очищена', 'success');
+    } catch (error) {
+      console.error('❌ AIChat: Ошибка очистки чата:', error);
+      showNotification('Ошибка очистки чата', 'error');
+    }
   };
 
   return (

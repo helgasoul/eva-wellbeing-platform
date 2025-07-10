@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { generateId, showNotification } from '@/utils/dataUtils';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { OnboardingProgress } from '@/components/onboarding/OnboardingProgress';
 import { StepWrapper } from '@/components/onboarding/StepWrapper';
@@ -99,7 +100,7 @@ const PatientOnboarding = () => {
     geolocation: false // ✅ НОВОЕ: статус геолокации
   });
   
-  const { user, completeOnboarding, updateUser } = useAuth();
+  const { user, completeOnboarding, updateUser, saveUserData, loadUserData } = useAuth();
   const navigate = useNavigate();
 
   // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Проверка статуса онбординга при загрузке
@@ -137,13 +138,30 @@ const PatientOnboarding = () => {
     console.log('🔄 User needs to complete onboarding');
   }, [user, navigate, updateUser]);
 
-  // ✅ НОВОЕ: Загружаем данные из Supabase и DataBridge
+  // ✅ УЛУЧШЕННАЯ ЗАГРУЗКА: Загружаем данные через DataBridge
   useEffect(() => {
     const loadOnboardingData = async () => {
       if (!user?.id) return;
       
       try {
-        // 1. Сначала загружаем данные из Supabase
+        console.log('🔄 PatientOnboarding: Загрузка данных через DataBridge...');
+        
+        // 1. Сначала пытаемся загрузить сохраненный прогресс
+        const savedProgress = await loadUserData('onboarding_progress');
+        if (savedProgress) {
+          setFormData(prev => ({ ...prev, ...savedProgress.data }));
+          setCurrentStep(savedProgress.currentStep || 1);
+          setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
+          console.log(`📥 PatientOnboarding: Восстановлен прогресс на шаге ${savedProgress.currentStep}`);
+          
+          toast({
+            title: 'Прогресс восстановлен',
+            description: 'Ваши данные онбординга загружены',
+          });
+          return;
+        }
+
+        // 2. Загружаем данные из Supabase
         const { data: supabaseData } = await onboardingService.loadUserOnboarding(user.id);
         
         if (supabaseData && Object.keys(supabaseData).length > 0) {
@@ -156,7 +174,7 @@ const PatientOnboarding = () => {
             description: 'Ваши данные онбординга загружены из облака',
           });
         } else {
-          // 2. Fallback: пытаемся загрузить данные через DataBridge
+          // 3. Fallback: пытаемся загрузить данные через DataBridge
           const presets = dataBridge.getOnboardingPresets();
           
           if (presets) {
@@ -187,7 +205,7 @@ const PatientOnboarding = () => {
               description: `Анкета адаптирована для профиля "${getPersonaTitle(presets.persona.id)}" • ${presets.onboardingConfig.estimatedDuration}`,
             });
           } else {
-            // 3. Последний fallback: localStorage
+            // 4. Последний fallback: localStorage
             const savedOnboardingData = localStorage.getItem(STORAGE_KEY);
             if (savedOnboardingData) {
               try {
@@ -208,18 +226,25 @@ const PatientOnboarding = () => {
     };
     
     loadOnboardingData();
-  }, [user?.id]);
+  }, [user?.id, loadUserData]);
 
-  // ✅ НОВОЕ: Автосохранение в Supabase и localStorage
+  // ✅ УЛУЧШЕННОЕ АВТОСОХРАНЕНИЕ: Через DataBridge с резервированием в Supabase
   useEffect(() => {
     const saveOnboardingData = async () => {
       if (!user?.id || Object.keys(formData).length === 0) return;
       
       try {
-        // Сохраняем в localStorage для оффлайн работы
+        // 1. Автосохранение прогресса через DataBridge
+        await saveUserData('onboarding_progress', {
+          data: formData,
+          currentStep,
+          timestamp: new Date().toISOString()
+        });
+
+        // 2. Резервное сохранение в localStorage
         localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
         
-        // Определяем какой шаг сохранять
+        // 3. Определяем какой шаг сохранять в Supabase
         const stepMapping = [
           { key: 'basicInfo', stepNumber: 2, stepName: 'basicInfo' },
           { key: 'menstrualHistory', stepNumber: 3, stepName: 'menstrualHistory' },
@@ -229,18 +254,20 @@ const PatientOnboarding = () => {
           { key: 'goals', stepNumber: 7, stepName: 'goals' }
         ];
         
-        // Сохраняем текущий шаг в Supabase
+        // 4. Асинхронно сохраняем в Supabase (не блокируем UI)
         const currentStepData = stepMapping.find(s => s.stepNumber === currentStep);
         if (currentStepData && formData[currentStepData.key]) {
-          await onboardingService.saveStep(
+          onboardingService.saveStep(
             user.id,
             currentStepData.stepNumber,
             currentStepData.stepName,
             formData[currentStepData.key]
-          );
+          ).catch(error => {
+            console.warn('⚠️ Supabase save failed, but data saved locally:', error);
+          });
         }
         
-        console.log('💾 Onboarding data saved:', {
+        console.log('💾 Onboarding data auto-saved:', {
           step: currentStep,
           dataKeys: Object.keys(formData),
           timestamp: new Date().toISOString()
@@ -248,14 +275,17 @@ const PatientOnboarding = () => {
         
       } catch (error) {
         console.error('Error saving onboarding data:', error);
-        // Не показываем ошибку пользователю, так как данные сохраняются в localStorage
+        // Показываем уведомление только при критической ошибке
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          showNotification('Ошибка сохранения прогресса', 'warning');
+        }
       }
     };
     
     // Дебаунсим сохранение для избежания избыточных запросов
     const timeoutId = setTimeout(saveOnboardingData, 1000);
     return () => clearTimeout(timeoutId);
-  }, [formData, currentStep, user?.id]);
+  }, [formData, currentStep, user?.id, saveUserData]);
 
   // ✅ ИСПРАВЛЕНО: Улучшенная функция обновления данных с валидацией
   const updateFormData = (stepData: Partial<OnboardingData>) => {
@@ -401,17 +431,26 @@ const PatientOnboarding = () => {
         completedAt: new Date().toISOString()
       };
       
-      // 1. Обновляем пользователя локально для немедленного эффекта
-      updateUser({ 
+      // 1. Сохраняем финальные данные через DataBridge
+      await saveUserData('onboarding_data', {
+        ...formData,
+        phaseResult,
+        recommendations,
+        completedAt: new Date().toISOString(),
+        version: '1.0'
+      });
+
+      // 2. Обновляем пользователя локально для немедленного эффекта
+      await updateUser({ 
         onboardingCompleted: true,
         onboardingData: onboardingSummary
       });
       
-      // 2. Сохраняем в localStorage для надежности
+      // 3. Сохраняем в localStorage для совместимости
       localStorage.setItem('onboardingCompleted', 'true');
       localStorage.setItem('onboardingData', JSON.stringify(onboardingSummary));
       
-      // 3. Асинхронно завершаем онбординг в Supabase
+      // 4. Асинхронно завершаем онбординг в Supabase
       try {
         await completeOnboarding(onboardingSummary);
         console.log('✅ Onboarding saved to Supabase');
@@ -419,8 +458,9 @@ const PatientOnboarding = () => {
         console.warn('⚠️ Failed to save onboarding to Supabase, but user updated locally:', supabaseError);
       }
       
-      // 4. Очищаем временные данные
+      // 5. Очищаем временные данные
       dataBridge.cleanupTransferData();
+      await saveUserData('onboarding_progress', null); // Очищаем прогресс
       localStorage.removeItem(STORAGE_KEY);
       
       console.log('✅ Onboarding completion successful, navigating to dashboard');

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { generateId, showNotification } from '@/utils/dataUtils';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { DateSelector } from '@/components/symptom-tracker/DateSelector';
 import { SymptomEntryForm } from '@/components/symptom-tracker/SymptomEntryForm';
@@ -10,7 +11,7 @@ import type { SymptomEntry } from '@/types/healthData';
 import { useToast } from '@/hooks/use-toast';
 
 const SymptomTracker: React.FC = () => {
-  const { user } = useAuth();
+  const { user, saveUserData, loadUserData } = useAuth();
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [entries, setEntries] = useState<SymptomEntry[]>([]);
@@ -42,7 +43,17 @@ const SymptomTracker: React.FC = () => {
     
     setIsLoading(true);
     try {
-      // Загружаем последние 30 дней для отображения в календаре
+      console.log('🔄 SymptomTracker: Загрузка записей...');
+      
+      // 1. Сначала пытаемся загрузить через DataBridge
+      const savedEntries = await loadUserData('symptom_entries');
+      if (savedEntries && Array.isArray(savedEntries)) {
+        setEntries(savedEntries);
+        console.log(`✅ SymptomTracker: Загружено ${savedEntries.length} записей через DataBridge`);
+        return;
+      }
+
+      // 2. Fallback: загружаем из Supabase
       const endDate = new Date().toISOString().split('T')[0];
       const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       
@@ -51,19 +62,32 @@ const SymptomTracker: React.FC = () => {
         end: endDate
       });
       
-      setEntries(data);
-    } catch (error) {
-      console.error('Error loading symptom entries:', error);
+      if (data && data.length > 0) {
+        setEntries(data);
+        // Сохраняем в DataBridge для будущих загрузок
+        await saveUserData('symptom_entries', data);
+        console.log(`✅ SymptomTracker: Загружено ${data.length} записей из Supabase`);
+      } else {
+        console.log('📥 SymptomTracker: Записи не найдены, создание пустого массива');
+        setEntries([]);
+      }
       
-      // Fallback к localStorage при ошибке
+    } catch (error) {
+      console.error('❌ SymptomTracker: Ошибка загрузки записей:', error);
+      
+      // Последний fallback к старому localStorage
       const saved = localStorage.getItem(`symptom_entries_${user.id}`);
       if (saved) {
         try {
           const localData = JSON.parse(saved);
           setEntries(localData);
+          showNotification('Данные загружены из локального хранилища', 'warning');
         } catch (parseError) {
           console.error('Error parsing local data:', parseError);
+          setEntries([]);
         }
+      } else {
+        setEntries([]);
       }
       
       toast({
@@ -96,32 +120,47 @@ const SymptomTracker: React.FC = () => {
     
     setIsLoading(true);
     try {
-      const savedEntry = await healthDataService.saveSymptomEntry(user.id, entryData);
+      console.log('🔄 SymptomTracker: Сохранение новой записи...');
+
+      // Создать новую запись с уникальным ID
+      const newEntry: SymptomEntry = {
+        id: generateId(),
+        user_id: user.id,
+        ...entryData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      // Обновить локальные данные
+      const updatedEntries = entries.filter(e => e.entry_date !== newEntry.entry_date);
+      updatedEntries.push(newEntry);
+      updatedEntries.sort((a, b) => b.entry_date.localeCompare(a.entry_date));
       
-      if (savedEntry) {
-        // Обновляем локальные данные
-        const updatedEntries = entries.filter(e => e.entry_date !== savedEntry.entry_date);
-        updatedEntries.push(savedEntry);
-        updatedEntries.sort((a, b) => b.entry_date.localeCompare(a.entry_date));
-        
-        setEntries(updatedEntries);
-        setCurrentEntry(savedEntry);
-        setIsEditing(false);
+      setEntries(updatedEntries);
+      setCurrentEntry(newEntry);
+      setIsEditing(false);
 
-        // Сохраняем в localStorage как резервную копию
-        localStorage.setItem(`symptom_entries_${user.id}`, JSON.stringify(updatedEntries));
+      // Сохранить через DataBridge
+      await saveUserData('symptom_entries', updatedEntries);
 
-        toast({
-          title: "Запись сохранена",
-          description: "Данные успешно сохранены в облаке"
-        });
-      }
+      console.log('✅ SymptomTracker: Запись сохранена успешно');
+      showNotification('Запись симптомов сохранена', 'success');
+
+      // Асинхронно пытаемся сохранить в Supabase
+      healthDataService.saveSymptomEntry(user.id, entryData).then(savedEntry => {
+        if (savedEntry) {
+          console.log('✅ SymptomTracker: Запись синхронизирована с облаком');
+        }
+      }).catch(error => {
+        console.warn('⚠️ SymptomTracker: Не удалось синхронизировать с облаком:', error);
+      });
+      
     } catch (error) {
-      console.error('Error saving symptom entry:', error);
+      console.error('❌ SymptomTracker: Ошибка сохранения записи:', error);
       
-      // Fallback к localStorage
+      // Fallback к старому localStorage
       const localEntry: SymptomEntry = {
-        id: Date.now().toString(),
+        id: generateId(),
         user_id: user.id,
         ...entryData,
         created_at: new Date().toISOString(),
@@ -137,6 +176,8 @@ const SymptomTracker: React.FC = () => {
       setIsEditing(false);
       localStorage.setItem(`symptom_entries_${user.id}`, JSON.stringify(updated));
 
+      showNotification('Запись сохранена локально', 'warning');
+      
       toast({
         title: "Сохранено локально",
         description: "Данные сохранены на устройстве. Синхронизация произойдет при восстановлении соединения.",

@@ -39,6 +39,7 @@ import DoctorBooking from "./pages/patient/DoctorBooking";
 import Community from "./pages/patient/Community";
 import Settings from "./pages/patient/Settings";
 import Documents from "./pages/patient/Documents";
+import DataDiagnostics from "./pages/patient/DataDiagnostics";
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -341,6 +342,14 @@ function App() {
             </div>
             <div>Компонент DataSourcesDashboard будет загружен здесь</div>
           </div>
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/diagnostics" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <DataDiagnostics />
         </OnboardingGuard>
       </ProtectedRoute>
     } />

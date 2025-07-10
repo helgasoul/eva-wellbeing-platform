@@ -8,6 +8,7 @@ import { DataFlowValidator } from '@/services/dataFlowValidator';
 import { authService } from '@/services/authService';
 import { onboardingService } from '@/services/onboardingService';
 import { supabase } from '@/integrations/supabase/client';
+import { DataBridge } from '@/services/dataBridge';
 
 // Предустановленные админские credentials
 const ADMIN_CREDENTIALS = {
@@ -36,6 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true); // ✅ Начинаем с true для загрузки сессии
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const dataBridge = DataBridge.getInstance();
 
   // ✅ ИСПРАВЛЕНО: Инициализация с проверкой миграции онбординга
   useEffect(() => {
@@ -484,6 +486,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     
     console.log('✅ User updated locally:', updatedUser);
+  };
+
+  // Универсальное сохранение данных пользователя
+  const saveUserData = async (key: string, data: any) => {
+    try {
+      if (!user) {
+        throw new Error('Пользователь не авторизован');
+      }
+
+      // Создать уникальный ключ для пользователя
+      const userKey = key.includes('_') ? key : `${key}_${user.id}`;
+      
+      await dataBridge.saveData(userKey, data);
+      
+      // Обновить локальное состояние если это основные данные пользователя
+      if (key === 'user_data' || key === 'eva_user_data') {
+        setUser(prev => ({ ...prev, ...data }));
+      }
+      
+      console.log(`✅ AuthContext: Сохранены данные пользователя: ${key}`);
+    } catch (error) {
+      console.error(`❌ AuthContext: Ошибка сохранения ${key}:`, error);
+      throw error;
+    }
+  };
+
+  // Универсальная загрузка данных пользователя
+  const loadUserData = async (key: string) => {
+    try {
+      if (!user) {
+        console.log('AuthContext: Пользователь не авторизован');
+        return null;
+      }
+
+      const userKey = key.includes('_') ? key : `${key}_${user.id}`;
+      const data = await dataBridge.loadData(userKey);
+      
+      console.log(`📥 AuthContext: Загружены данные пользователя: ${key}`);
+      return data;
+    } catch (error) {
+      console.error(`❌ AuthContext: Ошибка загрузки ${key}:`, error);
+      return null;
+    }
+  };
+
+  // Получить полную сводку данных пользователя
+  const getUserDataSummary = async () => {
+    try {
+      if (!user) return null;
+      
+      return await dataBridge.getUserDataSummary(user.id);
+    } catch (error) {
+      console.error('❌ AuthContext: Ошибка получения сводки:', error);
+      return null;
+    }
   };
 
   // ✅ УЛУЧШЕНО: Завершение онбординга через Supabase
