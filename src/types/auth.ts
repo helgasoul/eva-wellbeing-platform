@@ -157,4 +157,8 @@ export interface AuthContextType {
   getDataFlowStatus: () => any[];
   repairDataFlow: () => Promise<boolean>;
   exportUserDataDump: () => any;
+  
+  // Добавляем флаг для определения нужна ли миграция
+  needsMigration: boolean;
+  isAuthenticated: boolean;
 }

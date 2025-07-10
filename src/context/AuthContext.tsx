@@ -7,6 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { DataFlowValidator } from '@/services/dataFlowValidator';
 import { authService } from '@/services/authService';
 import { onboardingService } from '@/services/onboardingService';
+import { supabase } from '@/integrations/supabase/client';
 
 // Предустановленные админские credentials
 const ADMIN_CREDENTIALS = {
@@ -53,16 +54,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await onboardingService.migrateFromLocalStorage(currentUser.id);
           
         } else {
-          // Fallback: проверяем localStorage для совместимости
-          const savedUser = localStorage.getItem('eva-user');
-          if (savedUser) {
+          // Fallback: проверяем localStorage для пользователей нуждающихся в миграции
+          const localUser = localStorage.getItem('eva_user_data');
+          if (localUser) {
             try {
-              const parsedUser = JSON.parse(savedUser);
-              setUser(parsedUser);
-              console.log('🔄 Using legacy localStorage user data');
+              const userData = JSON.parse(localUser);
+               // Устанавливаем пользователя из localStorage как временного
+               const tempUser = {
+                 id: 'temp-' + Date.now(),
+                 email: userData.email,
+                 firstName: userData.first_name || '',
+                 lastName: userData.last_name || '',
+                 role: (userData.role as UserRole) || UserRole.PATIENT,
+                 createdAt: new Date(),
+                 registrationCompleted: false,
+                 onboardingCompleted: userData.onboarding_completed || false
+               } as User;
+              setUser(tempUser);
+              console.log('🔄 Using legacy localStorage user data for migration');
             } catch (error) {
-              console.error('Error parsing saved user:', error);
-              localStorage.removeItem('eva-user');
+              console.error('Error parsing localStorage:', error);
+              localStorage.removeItem('eva_user_data');
             }
           }
         }
@@ -275,7 +287,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       setUser(null);
+      // Очищаем все данные localStorage при выходе, включая данные миграции
       localStorage.removeItem('eva-user');
+      localStorage.removeItem('eva_user_data');
+      localStorage.removeItem('eva_onboarding_data');
       navigate('/');
       
       toast({
@@ -288,6 +303,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Всё равно очищаем локальное состояние
       setUser(null);
       localStorage.removeItem('eva-user');
+      localStorage.removeItem('eva_user_data');
+      localStorage.removeItem('eva_onboarding_data');
       navigate('/');
     }
   };
@@ -532,6 +549,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     getDataFlowStatus,
     repairDataFlow,
     exportUserDataDump,
+    // Добавляем флаг для определения нужна ли миграция
+    needsMigration: user?.id?.startsWith('temp-') || false,
+    isAuthenticated: !!user
   };
 
   return (
