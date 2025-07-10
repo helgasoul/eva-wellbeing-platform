@@ -1,12 +1,16 @@
-// ✅ ЭТАП 3: Сервис аутентификации с Supabase
+// ✅ ЭТАП 4: Сервис аутентификации с Supabase + Audit Logging
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { User, LoginCredentials, RegisterData } from '@/types/auth';
 import { UserRole } from '@/types/roles';
+import { authAuditService } from './authAuditService';
+import { rateLimitService } from './rateLimitService';
 
 export interface AuthResponse {
   user: User | null;
   error: string | null;
+  rateLimited?: boolean;
+  retryAfter?: number;
 }
 
 class AuthService {
@@ -33,6 +37,24 @@ class AuthService {
     try {
       console.log('📝 Начинаем регистрацию для:', userData.email);
 
+      // Проверяем rate limiting
+      const rateLimitResult = await rateLimitService.checkRateLimit('register', userData.email);
+      if (!rateLimitResult.allowed) {
+        await authAuditService.logRegistrationAttempt(
+          userData.email,
+          false,
+          'Rate limit exceeded',
+          undefined,
+          userData.role
+        );
+        return {
+          user: null,
+          error: `Превышено количество попыток регистрации. Попробуйте через ${Math.ceil(rateLimitResult.retryAfter! / 60)} минут.`,
+          rateLimited: true,
+          retryAfter: rateLimitResult.retryAfter
+        };
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
@@ -48,11 +70,26 @@ class AuthService {
 
       if (error) {
         console.error('❌ Ошибка регистрации:', error);
+        // Логируем неудачную попытку регистрации
+        await authAuditService.logRegistrationAttempt(
+          userData.email, 
+          false, 
+          error.message, 
+          undefined, 
+          userData.role
+        );
         return { user: null, error: error.message };
       }
 
       if (!data.user) {
         console.error('❌ Пользователь не создан');
+        await authAuditService.logRegistrationAttempt(
+          userData.email, 
+          false, 
+          'Пользователь не создан', 
+          undefined, 
+          userData.role
+        );
         return { user: null, error: 'Не удалось создать пользователя' };
       }
 
@@ -77,10 +114,26 @@ class AuthService {
       });
 
       console.log('✅ Пользователь зарегистрирован:', user.email);
+      
+      // Логируем успешную регистрацию и сбрасываем rate limit
+      await authAuditService.logRegistrationAttempt(
+        user.email, 
+        true, 
+        undefined, 
+        user.id, 
+        user.role
+      );
+      await rateLimitService.recordAttempt('register', true, userData.email);
+      
       return { user, error: null };
 
     } catch (error: any) {
       console.error('💥 Критическая ошибка при регистрации:', error);
+      await authAuditService.logRegistrationAttempt(
+        userData.email, 
+        false, 
+        error.message
+      );
       return { user: null, error: error.message };
     }
   }
@@ -90,6 +143,18 @@ class AuthService {
     try {
       console.log('🔐 Начинаем процесс входа для:', credentials.email);
       
+      // Проверяем rate limiting
+      const rateLimitResult = await rateLimitService.checkRateLimit('login', credentials.email);
+      if (!rateLimitResult.allowed) {
+        await authAuditService.logLoginAttempt(credentials.email, false, 'Rate limit exceeded');
+        return {
+          user: null,
+          error: `Превышено количество попыток входа. Попробуйте через ${Math.ceil(rateLimitResult.retryAfter! / 60)} минут.`,
+          rateLimited: true,
+          retryAfter: rateLimitResult.retryAfter
+        };
+      }
+      
       // 1. Аутентификация в Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
@@ -98,6 +163,9 @@ class AuthService {
 
       if (error) {
         console.error('❌ Ошибка аутентификации Supabase:', error);
+        
+        // Логируем неудачную попытку входа
+        await authAuditService.logLoginAttempt(credentials.email, false, error.message);
         
         // Если это ошибка невалидных учетных данных, показываем более понятное сообщение
         if (error.message === 'Invalid login credentials') {
@@ -115,6 +183,7 @@ class AuthService {
 
       if (!data.user) {
         console.error('❌ Пользователь не получен после аутентификации');
+        await authAuditService.logLoginAttempt(credentials.email, false, 'Пользователь не получен');
         return { 
           user: null, 
           error: 'Не удалось получить данные пользователя' 
@@ -185,10 +254,16 @@ class AuthService {
       }
 
       console.log('✅ Вход выполнен успешно для пользователя:', user.email);
+      
+      // Логируем успешный вход и сбрасываем rate limit
+      await authAuditService.logLoginAttempt(credentials.email, true, undefined, user.id);
+      await rateLimitService.recordAttempt('login', true, credentials.email);
+      
       return { user, error: null };
 
     } catch (error: any) {
       console.error('💥 Критическая ошибка в процессе входа:', error);
+      await authAuditService.logLoginAttempt(credentials.email, false, error.message);
       return { 
         user: null, 
         error: `Произошла неожиданная ошибка: ${error.message}` 
@@ -199,7 +274,18 @@ class AuthService {
   // Выход из системы
   async logout(): Promise<{ error: string | null }> {
     try {
+      // Получаем данные пользователя перед выходом для логирования
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      const email = session?.user?.email;
+      
       const { error } = await supabase.auth.signOut();
+      
+      // Логируем выход
+      if (userId) {
+        await authAuditService.logLogout(userId, email);
+      }
+      
       return { error: error?.message || null };
     } catch (error: any) {
       console.error('Logout error:', error);
@@ -265,6 +351,15 @@ class AuthService {
         .update(profileUpdates)
         .eq('id', userId);
 
+      // Логируем обновление профиля
+      const changedFields = Object.keys(updates);
+      await authAuditService.logProfileUpdate(
+        userId, 
+        changedFields, 
+        !error, 
+        error?.message
+      );
+
       return { error: error?.message || null };
 
     } catch (error: any) {
@@ -274,16 +369,32 @@ class AuthService {
   }
 
   // Восстановление пароля
-  async resetPassword(email: string): Promise<{ error: string | null }> {
+  async resetPassword(email: string): Promise<{ error: string | null; rateLimited?: boolean; retryAfter?: number }> {
     try {
+      // Проверяем rate limiting
+      const rateLimitResult = await rateLimitService.checkRateLimit('passwordReset', email);
+      if (!rateLimitResult.allowed) {
+        await authAuditService.logPasswordReset(email, false, 'Rate limit exceeded');
+        return {
+          error: `Превышено количество попыток восстановления пароля. Попробуйте через ${Math.ceil(rateLimitResult.retryAfter! / 60)} минут.`,
+          rateLimited: true,
+          retryAfter: rateLimitResult.retryAfter
+        };
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`
       });
+
+      // Логируем запрос на восстановление пароля и обновляем rate limit
+      await authAuditService.logPasswordReset(email, !error, error?.message);
+      await rateLimitService.recordAttempt('passwordReset', !error, email);
 
       return { error: error?.message || null };
 
     } catch (error: any) {
       console.error('Reset password error:', error);
+      await authAuditService.logPasswordReset(email, false, error.message);
       return { error: error.message || 'Ошибка восстановления пароля' };
     }
   }
@@ -307,10 +418,26 @@ class AuthService {
         password: newPassword
       });
 
+      // Получаем ID пользователя для логирования
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      
+      if (userId) {
+        await authAuditService.logPasswordUpdate(userId, !error, error?.message);
+      }
+
       return { error: error?.message || null };
 
     } catch (error: any) {
       console.error('Update password error:', error);
+      
+      // Логируем ошибку обновления пароля
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (userId) {
+        await authAuditService.logPasswordUpdate(userId, false, error.message);
+      }
+      
       return { error: error.message || 'Ошибка обновления пароля' };
     }
   }
