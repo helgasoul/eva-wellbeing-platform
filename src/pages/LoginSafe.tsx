@@ -19,7 +19,7 @@ const LoginSafe = () => {
       
       // СОЗДАТЬ ТЕСТОВОГО ПОЛЬЗОВАТЕЛЯ
       const testUser = {
-        id: 'test_user_' + Date.now(),
+        id: 'secure_' + crypto.randomUUID(),
         email: email,
         firstName: 'Тест',
         lastName: 'Пользователь',
@@ -31,7 +31,7 @@ const LoginSafe = () => {
       localStorage.setItem('eva_user', JSON.stringify(testUser));
       localStorage.setItem('eva_auth_token', 'safe_token_' + Date.now());
 
-      console.log('✅ Safe login successful');
+      // Login successful
       
       // БЕЗОПАСНЫЙ РЕДИРЕКТ
       navigate('/patient/dashboard');
@@ -49,9 +49,11 @@ const LoginSafe = () => {
     setError('');
 
     try {
-      const testUsers = {
+        const generateSecureId = () => 'secure_' + crypto.randomUUID();
+        
+        const testUsers = {
         patient: {
-          id: 'test_patient_' + Date.now(),
+          id: generateSecureId(),
           email: 'test-patient@eva.com',
           firstName: 'Тест',
           lastName: 'Пациент',
@@ -59,7 +61,7 @@ const LoginSafe = () => {
           isVerified: true
         },
         doctor: {
-          id: 'test_doctor_' + Date.now(),
+          id: generateSecureId(),
           email: 'test-doctor@eva.com',
           firstName: 'Тест',
           lastName: 'Врач',
@@ -67,7 +69,7 @@ const LoginSafe = () => {
           isVerified: true
         },
         admin: {
-          id: 'test_admin_' + Date.now(),
+          id: generateSecureId(),
           email: 'test-admin@eva.com',
           firstName: 'Тест',
           lastName: 'Админ',
@@ -82,7 +84,7 @@ const LoginSafe = () => {
       localStorage.setItem('eva_user', JSON.stringify(testUser));
       localStorage.setItem('eva_auth_token', 'safe_token_' + Date.now());
 
-      console.log(`✅ Test ${role} login successful`);
+      // Test login successful
       
       // РЕДИРЕКТ В ЗАВИСИМОСТИ ОТ РОЛИ
       const redirectPaths = {

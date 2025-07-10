@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const AuthDebug = () => {
+  // Только показываем в development режиме
+  if (import.meta.env.PROD) {
+    return null;
+  }
   const [isVisible, setIsVisible] = useState(true);
   let authStatus = 'unknown';
   let authError = null;
