@@ -11,12 +11,7 @@ import { onboardingService } from '@/services/onboardingService';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthErrorBoundary } from '@/components/auth/AuthErrorBoundary';
 import { DataBridge } from '@/services/DataBridge';
-
-// Предустановленные админские credentials
-const ADMIN_CREDENTIALS = {
-  email: 'admin@eva-platform.com',
-  password: 'EvaAdmin2025!'
-};
+import { authConfig, isAdminLoginAvailable, generateSecureId } from '@/config/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -113,10 +108,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const recoveryData = checkEmergencyRecovery();
         
         if (!systemHealthy) {
-          // EMERGENCY MODE: Используем минимальный fallback
+          // ✅ EMERGENCY MODE: Используем безопасный fallback
           console.log('🚨 Activating emergency mode');
           const emergencyUser = {
-            id: 'emergency-' + Date.now(),
+            id: generateSecureId('emergency'),
             email: 'emergency@user.local',
             firstName: 'Emergency',
             lastName: 'User',
@@ -159,9 +154,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (localUser || evaUser) {
             try {
               const userData = JSON.parse(localUser || evaUser || '{}');
-              // Устанавливаем пользователя из localStorage как временного
+              // ✅ Устанавливаем пользователя из localStorage как временного с безопасным ID
               const tempUser = {
-                id: userData.id || 'temp-' + Date.now(),
+                id: userData.id || generateSecureId('temp'),
                 email: userData.email,
                 firstName: userData.first_name || userData.firstName || '',
                 lastName: userData.last_name || userData.lastName || '',
@@ -187,9 +182,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error('🚨 Auth initialization error:', error);
         localStorage.setItem('eva_last_error', Date.now().toString());
         
-        // CRITICAL FALLBACK: Даже при полном провале создаем emergency пользователя
+        // ✅ CRITICAL FALLBACK: Даже при полном провале создаем безопасного emergency пользователя
         const emergencyUser = {
-          id: 'critical-fallback-' + Date.now(),
+          id: generateSecureId('critical_fallback'),
           email: 'fallback@user.local',
           firstName: 'Recovery',
           lastName: 'Mode',
@@ -250,33 +245,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // ✅ НОВОЕ: Проверяем админские credentials для демо
-      if (credentials.email === ADMIN_CREDENTIALS.email && 
-          credentials.password === ADMIN_CREDENTIALS.password) {
-        const mockUser: User = {
-          id: 'admin-001',
-          email: ADMIN_CREDENTIALS.email,
-          firstName: 'Администратор',
-          lastName: 'Eva Platform',
-          role: UserRole.ADMIN,
-          createdAt: new Date(),
-          registrationCompleted: true,
-          onboardingCompleted: true
-        };
-
-        setUser(mockUser);
+      // ✅ БЕЗОПАСНО: Проверяем админский вход через конфигурацию
+      if (isAdminLoginAvailable() && authConfig.adminCredentials) {
+        const adminCreds = authConfig.adminCredentials;
         
-        if (credentials.rememberMe) {
-          localStorage.setItem('eva-user', JSON.stringify(mockUser));
+        if (credentials.email === adminCreds.email && 
+            credentials.password === adminCreds.password) {
+          const mockUser: User = {
+            id: generateSecureId('admin'),
+            email: adminCreds.email,
+            firstName: 'Администратор',
+            lastName: 'Eva Platform',
+            role: UserRole.ADMIN,
+            createdAt: new Date(),
+            registrationCompleted: true,
+            onboardingCompleted: true
+          };
+
+          setUser(mockUser);
+          
+          if (credentials.rememberMe) {
+            localStorage.setItem('eva-user', JSON.stringify(mockUser));
+          }
+
+          toast({
+            title: 'Добро пожаловать!',
+            description: 'Добро пожаловать в админ-панель Eva!',
+          });
+
+          navigate('/admin/dashboard');
+          return;
         }
-
-        toast({
-          title: 'Добро пожаловать!',
-          description: 'Добро пожаловать в админ-панель Eva!',
-        });
-
-        navigate('/admin/dashboard');
-        return;
       }
 
       // ✅ ОСНОВНОЙ ПОТОК: Аутентификация через Supabase

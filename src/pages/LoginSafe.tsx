@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { authConfig, generateSecureId } from '@/config/auth';
 
 const LoginSafe = () => {
   const [email, setEmail] = useState('');
@@ -17,9 +18,9 @@ const LoginSafe = () => {
       // БЕЗОПАСНАЯ ИМИТАЦИЯ ВХОДА
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // СОЗДАТЬ ТЕСТОВОГО ПОЛЬЗОВАТЕЛЯ
+      // ✅ БЕЗОПАСНО: Создать тестового пользователя
       const testUser = {
-        id: 'secure_' + crypto.randomUUID(),
+        id: generateSecureId('safe'),
         email: email,
         firstName: 'Тест',
         lastName: 'Пользователь',
@@ -49,30 +50,29 @@ const LoginSafe = () => {
     setError('');
 
     try {
-        const generateSecureId = () => 'secure_' + crypto.randomUUID();
-        
+        // ✅ БЕЗОПАСНО: Используем конфигурацию из authConfig
         const testUsers = {
         patient: {
-          id: generateSecureId(),
-          email: 'test-patient@eva.com',
-          firstName: 'Тест',
-          lastName: 'Пациент',
+          id: generateSecureId('test_patient'),
+          email: authConfig.testUsers.patient.email,
+          firstName: authConfig.testUsers.patient.name.first,
+          lastName: authConfig.testUsers.patient.name.last,
           role: 'patient' as const,
           isVerified: true
         },
         doctor: {
-          id: generateSecureId(),
-          email: 'test-doctor@eva.com',
-          firstName: 'Тест',
-          lastName: 'Врач',
+          id: generateSecureId('test_doctor'),
+          email: authConfig.testUsers.doctor.email,
+          firstName: authConfig.testUsers.doctor.name.first,
+          lastName: authConfig.testUsers.doctor.name.last,
           role: 'doctor' as const,
           isVerified: true
         },
         admin: {
-          id: generateSecureId(),
-          email: 'test-admin@eva.com',
-          firstName: 'Тест',
-          lastName: 'Админ',
+          id: generateSecureId('test_admin'),
+          email: authConfig.testUsers.admin.email,
+          firstName: authConfig.testUsers.admin.name.first,
+          lastName: authConfig.testUsers.admin.name.last,
           role: 'admin' as const,
           isVerified: true
         }
