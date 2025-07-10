@@ -30,7 +30,12 @@ import {
   Thermometer,
   AlertCircle,
   CheckCircle,
-  Award
+  Award,
+  // ✅ НОВЫЕ ИМПОРТЫ для рекомендаций Eva
+  Shield,
+  Clipboard,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -38,6 +43,8 @@ import { healthDataAggregator, HealthDataTimelineEntry } from '@/services/health
 import { wearableIntegration } from '@/services/wearableIntegration';
 // ✅ НОВЫЙ ИМПОРТ сервиса персонализации
 import { personalizationEngine, Recommendation, GoalProgress } from '@/services/personalizationService';
+// ✅ НОВЫЙ ИМПОРТ сервиса рекомендаций Eva
+import { evaRecommendationEngine, EvaRecommendation } from '@/services/evaRecommendationEngine';
 
 interface HealthStats {
   totalEntries: number;
@@ -56,6 +63,10 @@ const PatientDashboard = () => {
   const [recentEvents, setRecentEvents] = useState<HealthDataTimelineEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
+  // ✅ НОВЫЕ СОСТОЯНИЯ для рекомендаций Eva
+  const [evaRecommendations, setEvaRecommendations] = useState<EvaRecommendation[]>([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
+  
   // ✅ НОВОЕ: Получаем данные онбординга для персонализации
   const onboardingData = user?.onboardingData || 
                         JSON.parse(localStorage.getItem('onboardingData') || '{}');
@@ -70,9 +81,10 @@ const PatientDashboard = () => {
 
   useEffect(() => {
     loadHealthData();
+    loadEvaRecommendations();
     // Настраиваем автосинхронизацию устройств
     wearableIntegration.setupAutoSync();
-  }, []);
+  }, [user?.id]);
 
   const loadHealthData = async () => {
     try {
@@ -97,6 +109,23 @@ const PatientDashboard = () => {
       console.error('Error loading health data:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // ✅ НОВАЯ ФУНКЦИЯ загрузки рекомендаций Eva
+  const loadEvaRecommendations = async () => {
+    if (!user?.id) return;
+    
+    setIsLoadingRecommendations(true);
+    try {
+      const recommendations = await evaRecommendationEngine.analyzePatientData(user.id);
+      setEvaRecommendations(recommendations.slice(0, 6)); // Показываем топ-6 рекомендаций
+    } catch (error) {
+      console.error('Ошибка загрузки рекомендаций Eva:', error);
+      // Показываем базовые рекомендации как fallback
+      setEvaRecommendations([]);
+    } finally {
+      setIsLoadingRecommendations(false);
     }
   };
 
@@ -330,6 +359,212 @@ const PatientDashboard = () => {
           </div>
         </CardContent>
       </Card>
+    );
+  };
+
+  // ✅ НОВЫЙ РАЗДЕЛ "Рекомендации Eva"
+  const EvaRecommendationsSection = () => {
+    if (isLoadingRecommendations) {
+      return (
+        <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary animate-pulse" />
+              Рекомендации Eva
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Eva анализирует ваши данные...
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="animate-pulse">
+                  <div className="h-4 bg-muted rounded mb-2"></div>
+                  <div className="h-3 bg-muted rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    if (evaRecommendations.length === 0) {
+      return (
+        <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary" />
+              Рекомендации Eva
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              ИИ-помощник анализирует ваши данные для персональных советов
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <div className="text-muted-foreground mb-4">
+                <Database className="h-12 w-12 mx-auto mb-4 text-primary/50" />
+                <p className="text-sm mb-2">Собираем ваши данные для персональных рекомендаций</p>
+                <p className="text-xs text-muted-foreground">
+                  Добавьте несколько записей в трекер симптомов, чтобы Eva могла создать персональные рекомендации
+                </p>
+              </div>
+              <Button 
+                onClick={() => navigate('/patient/symptoms')}
+                className="mt-4"
+              >
+                Добавить симптомы
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+                <Brain className="h-5 w-5 text-primary" />
+                Рекомендации Eva
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Персональные советы на основе анализа ваших данных
+              </CardDescription>
+            </div>
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+              На основе ИИ-анализа
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {evaRecommendations.map((rec) => (
+              <RecommendationCard key={rec.id} recommendation={rec} />
+            ))}
+          </div>
+          
+          <div className="mt-6 text-center">
+            <Button 
+              variant="ghost"
+              onClick={() => navigate('/patient/insights')}
+              className="text-primary hover:text-primary/80"
+            >
+              Посмотреть все рекомендации →
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // ✅ КОМПОНЕНТ КАРТОЧКИ РЕКОМЕНДАЦИИ Eva
+  const RecommendationCard = ({ recommendation }: { recommendation: EvaRecommendation }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    
+    const getPriorityColor = (priority: string) => {
+      switch (priority) {
+        case 'critical': return { bg: 'bg-red-50 border-red-200', text: 'text-red-800', badge: 'bg-red-100 text-red-700' };
+        case 'high': return { bg: 'bg-orange-50 border-orange-200', text: 'text-orange-800', badge: 'bg-orange-100 text-orange-700' };
+        case 'medium': return { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-800', badge: 'bg-blue-100 text-blue-700' };
+        case 'low': return { bg: 'bg-green-50 border-green-200', text: 'text-green-800', badge: 'bg-green-100 text-green-700' };
+        default: return { bg: 'bg-muted border-border', text: 'text-foreground', badge: 'bg-muted text-muted-foreground' };
+      }
+    };
+    
+    const getTypeIcon = (type: string) => {
+      switch (type) {
+        case 'urgent': return <AlertCircle className="w-5 h-5" />;
+        case 'lifestyle': return <Leaf className="w-5 h-5" />;
+        case 'medical': return <Stethoscope className="w-5 h-5" />;
+        case 'prevention': return <Shield className="w-5 h-5" />;
+        case 'achievement': return <Award className="w-5 h-5" />;
+        default: return <Brain className="w-5 h-5" />;
+      }
+    };
+
+    const getPriorityText = (priority: string) => {
+      switch (priority) {
+        case 'critical': return 'Критично';
+        case 'high': return 'Важно';
+        case 'medium': return 'Средне';
+        case 'low': return 'Рекомендуется';
+        default: return 'Обычное';
+      }
+    };
+    
+    const colors = getPriorityColor(recommendation.priority);
+    
+    return (
+      <div className={`border-2 rounded-xl p-4 transition-all duration-300 hover:shadow-md ${colors.bg} ${recommendation.priority === 'critical' ? 'animate-pulse' : ''}`}>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`p-2 rounded-lg ${colors.badge}`}>
+                {getTypeIcon(recommendation.type)}
+              </div>
+              <div className="flex-1">
+                <h3 className={`font-semibold ${colors.text} mb-1`}>{recommendation.title}</h3>
+                <Badge variant="secondary" className={`text-xs ${colors.badge} border-0`}>
+                  {getPriorityText(recommendation.priority)}
+                </Badge>
+              </div>
+            </div>
+            
+            <p className={`text-sm mb-3 ${colors.text}`}>{recommendation.description}</p>
+            
+            <div className={`text-xs mb-3 p-2 bg-white/50 rounded-lg`}>
+              <strong>Почему Eva рекомендует:</strong>{' '}
+              <span className={colors.text}>{recommendation.reason}</span>
+            </div>
+            
+            {isExpanded && (
+              <div className="mt-4 space-y-3">
+                <div>
+                  <div className="text-xs font-semibold mb-2 text-foreground">Рекомендуемые действия:</div>
+                  <ul className="text-xs space-y-1">
+                    {recommendation.actionSteps.map((step, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span className={colors.text}>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="p-2 bg-white/50 rounded">
+                    <strong>На основе данных:</strong><br/>
+                    <span className={colors.text}>{recommendation.basedOnData.join(', ')}</span>
+                  </div>
+                  <div className="p-2 bg-white/50 rounded">
+                    <strong>Ожидаемый эффект:</strong><br/>
+                    <span className={colors.text}>{recommendation.estimatedImpact === 'high' ? 'Высокий' : recommendation.estimatedImpact === 'medium' ? 'Средний' : 'Низкий'}</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between text-xs p-2 bg-white/50 rounded">
+                  <span><strong>Уверенность ИИ:</strong> {recommendation.confidence}%</span>
+                  <span><strong>Временные рамки:</strong> {recommendation.timeframe}</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="ml-2 p-1 h-auto"
+          >
+            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </Button>
+        </div>
+      </div>
     );
   };
 
@@ -602,6 +837,9 @@ const PatientDashboard = () => {
         {/* ✅ НОВЫЕ ПЕРСОНАЛИЗИРОВАННЫЕ СЕКЦИИ */}
         <PhaseRecommendations />
         <GoalTracking />
+        
+        {/* ✅ НОВЫЙ РАЗДЕЛ "Рекомендации Eva" */}
+        <EvaRecommendationsSection />
 
         {/* Quick Actions */}
         <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
