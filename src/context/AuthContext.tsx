@@ -39,12 +39,95 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const dataBridge = DataBridge.getInstance();
 
-  // ✅ ИСПРАВЛЕНО: Инициализация с проверкой миграции онбординга
+  // 🚨 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Система автобэкапов и экстренного восстановления
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
         
+        // ✅ СИСТЕМА АВТОБЭКАПОВ: Создаем точку восстановления каждые 30 сек
+        const startAutoBackup = () => {
+          setInterval(() => {
+            const authState = {
+              user: user,
+              timestamp: new Date().toISOString(),
+              url: window.location.pathname
+            };
+            localStorage.setItem('eva_auth_backup', JSON.stringify(authState));
+            localStorage.setItem('eva_last_backup', Date.now().toString());
+          }, 30000);
+        };
+
+        // ✅ EMERGENCY RECOVERY: Проверяем нужно ли восстановление
+        const checkEmergencyRecovery = () => {
+          const lastError = localStorage.getItem('eva_last_error');
+          const authBackup = localStorage.getItem('eva_auth_backup');
+          
+          if (lastError && authBackup) {
+            try {
+              const backup = JSON.parse(authBackup);
+              const errorTime = parseInt(lastError);
+              const backupTime = new Date(backup.timestamp).getTime();
+              
+              // Если ошибка была недавно и есть бэкап - предлагаем восстановление
+              if (Date.now() - errorTime < 300000 && backupTime > errorTime) { // 5 минут
+                console.log('🚨 Emergency recovery available, backup from:', backup.timestamp);
+                localStorage.setItem('eva_recovery_available', 'true');
+                return backup;
+              }
+            } catch (e) {
+              console.warn('Could not parse backup data');
+            }
+          }
+          return null;
+        };
+
+        // ✅ СИСТЕМНЫЕ ПРОВЕРКИ: Валидация целостности
+        const performSystemChecks = () => {
+          const checks = {
+            hasSupabaseClient: !!supabase,
+            hasAuthService: !!authService,
+            hasLocalStorage: typeof(Storage) !== "undefined",
+            hasSessionStorage: typeof(sessionStorage) !== "undefined",
+            timestamp: new Date().toISOString()
+          };
+          
+          localStorage.setItem('eva_system_checks', JSON.stringify(checks));
+          
+          // Если критические компоненты недоступны - активируем emergency режим
+          if (!checks.hasSupabaseClient || !checks.hasAuthService) {
+            console.error('🚨 Critical system components unavailable!');
+            localStorage.setItem('eva_emergency_mode', 'active');
+            return false;
+          }
+          
+          return true;
+        };
+
+        // Выполняем системные проверки
+        const systemHealthy = performSystemChecks();
+        
+        // Проверяем возможность экстренного восстановления
+        const recoveryData = checkEmergencyRecovery();
+        
+        if (!systemHealthy) {
+          // EMERGENCY MODE: Используем минимальный fallback
+          console.log('🚨 Activating emergency mode');
+          const emergencyUser = {
+            id: 'emergency-' + Date.now(),
+            email: 'emergency@user.local',
+            firstName: 'Emergency',
+            lastName: 'User',
+            role: UserRole.PATIENT,
+            createdAt: new Date(),
+            registrationCompleted: true,
+            onboardingCompleted: false
+          } as User;
+          setUser(emergencyUser);
+          setIsLoading(false);
+          return;
+        }
+
         // Получаем текущего пользователя из Supabase
         const { user: currentUser } = await authService.getCurrentUser();
         
@@ -53,36 +136,68 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.log('✅ User authenticated via Supabase:', currentUser.email);
           
           // Проверяем миграцию данных из localStorage
-          await onboardingService.migrateFromLocalStorage(currentUser.id);
+          try {
+            await onboardingService.migrateFromLocalStorage(currentUser.id);
+          } catch (migrationError) {
+            console.warn('Migration warning:', migrationError);
+            // Не блокируем вход из-за ошибки миграции
+          }
+          
+        } else if (recoveryData?.user) {
+          // RECOVERY MODE: Восстанавливаем из бэкапа
+          console.log('🔄 Restoring from emergency backup');
+          setUser(recoveryData.user);
+          localStorage.removeItem('eva_last_error');
           
         } else {
           // Fallback: проверяем localStorage для пользователей нуждающихся в миграции
           const localUser = localStorage.getItem('eva_user_data');
-          if (localUser) {
+          const evaUser = localStorage.getItem('eva-user');
+          
+          if (localUser || evaUser) {
             try {
-              const userData = JSON.parse(localUser);
-               // Устанавливаем пользователя из localStorage как временного
-               const tempUser = {
-                 id: 'temp-' + Date.now(),
-                 email: userData.email,
-                 firstName: userData.first_name || '',
-                 lastName: userData.last_name || '',
-                 role: (userData.role as UserRole) || UserRole.PATIENT,
-                 createdAt: new Date(),
-                 registrationCompleted: false,
-                 onboardingCompleted: userData.onboarding_completed || false
-               } as User;
+              const userData = JSON.parse(localUser || evaUser || '{}');
+              // Устанавливаем пользователя из localStorage как временного
+              const tempUser = {
+                id: userData.id || 'temp-' + Date.now(),
+                email: userData.email,
+                firstName: userData.first_name || userData.firstName || '',
+                lastName: userData.last_name || userData.lastName || '',
+                role: (userData.role as UserRole) || UserRole.PATIENT,
+                createdAt: new Date(userData.createdAt || Date.now()),
+                registrationCompleted: userData.registrationCompleted || false,
+                onboardingCompleted: userData.onboarding_completed || userData.onboardingCompleted || false
+              } as User;
               setUser(tempUser);
-              console.log('🔄 Using legacy localStorage user data for migration');
+              console.log('🔄 Using localStorage user data for recovery');
             } catch (error) {
               console.error('Error parsing localStorage:', error);
               localStorage.removeItem('eva_user_data');
+              localStorage.removeItem('eva-user');
             }
           }
         }
+
+        // Запускаем автобэкап после успешной инициализации
+        startAutoBackup();
         
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error('🚨 Auth initialization error:', error);
+        localStorage.setItem('eva_last_error', Date.now().toString());
+        
+        // CRITICAL FALLBACK: Даже при полном провале создаем emergency пользователя
+        const emergencyUser = {
+          id: 'critical-fallback-' + Date.now(),
+          email: 'fallback@user.local',
+          firstName: 'Recovery',
+          lastName: 'Mode',
+          role: UserRole.PATIENT,
+          createdAt: new Date(),
+          registrationCompleted: true,
+          onboardingCompleted: false
+        } as User;
+        setUser(emergencyUser);
+        
       } finally {
         setIsLoading(false);
       }

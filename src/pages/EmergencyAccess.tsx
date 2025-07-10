@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Shield, Database, Router, Key, AlertCircle, Zap, Monitor } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Shield, Database, Router, Key, AlertCircle, Zap, Monitor, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
+import { EmergencyLogin } from '@/components/auth/EmergencyLogin';
+import { SystemHealthMonitor } from '@/components/auth/SystemHealthMonitor';
 
 interface DiagnosticResult {
   component: 'auth' | 'routing' | 'storage' | 'api' | 'database' | 'permissions' | 'network';
@@ -25,6 +27,7 @@ const EmergencyAccess: React.FC = () => {
   const [diagnostics, setDiagnostics] = useState<DiagnosticResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [activeTab, setActiveTab] = useState<'diagnostics' | 'login' | 'monitor'>('login');
 
   const componentIcons = {
     auth: Key,
@@ -445,16 +448,55 @@ const EmergencyAccess: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Заголовок */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
             <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-3xl font-bold text-gray-900">Экстренный доступ Eva</h1>
+            <h1 className="text-3xl font-bold text-gray-900">🚨 Экстренный доступ Eva</h1>
           </div>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Автоматическая диагностика и восстановление доступа к платформе
+            Система экстренного восстановления доступа к платформе
           </p>
+        </div>
+
+        {/* Навигационные табы */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-white rounded-lg p-1 shadow-sm border">
+            <button
+              onClick={() => setActiveTab('login')}
+              className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+                activeTab === 'login' 
+                  ? 'bg-red-600 text-white shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Users className="h-4 w-4 inline mr-2" />
+              Экстренный вход
+            </button>
+            <button
+              onClick={() => setActiveTab('diagnostics')}
+              className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+                activeTab === 'diagnostics' 
+                  ? 'bg-red-600 text-white shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <AlertTriangle className="h-4 w-4 inline mr-2" />
+              Диагностика
+            </button>
+            <button
+              onClick={() => setActiveTab('monitor')}
+              className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+                activeTab === 'monitor' 
+                  ? 'bg-red-600 text-white shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Monitor className="h-4 w-4 inline mr-2" />
+              Мониторинг
+            </button>
+          </div>
         </div>
 
         {/* Общий статус */}

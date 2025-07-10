@@ -245,6 +245,21 @@ export const LoginForm = () => {
         </div>
       )}
 
+      {/* 🚨 ЭКСТРЕННЫЙ ДОСТУП */}
+      <div className="mt-6 border-t pt-6">
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground mb-3">
+            Проблемы с входом? Используйте экстренный доступ:
+          </p>
+          <Link 
+            to="/emergency-access"
+            className="inline-flex items-center gap-1 text-xs bg-red-50 text-red-700 px-3 py-2 rounded-md hover:bg-red-100 transition-colors border border-red-200"
+          >
+            🚨 Экстренное восстановление
+          </Link>
+        </div>
+      </div>
+
       <div className="mt-6 text-center">
         <p className="text-muted-foreground">
           Нет аккаунта?{' '}
