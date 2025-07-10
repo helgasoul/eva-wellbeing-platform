@@ -565,5 +565,6 @@ class EvaRecommendationEngine {
   }
 }
 
-// Экспорт синглтона
+// Экспорт класса и синглтона
+export { EvaRecommendationEngine };
 export const evaRecommendationEngine = new EvaRecommendationEngine();

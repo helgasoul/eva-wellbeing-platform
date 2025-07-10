@@ -41,6 +41,7 @@ import Settings from "./pages/patient/Settings";
 import Documents from "./pages/patient/Documents";
 import DocumentPlatform from "./pages/patient/DocumentPlatform";
 import DataDiagnostics from "./pages/patient/DataDiagnostics";
+import PatientRecommendations from "./pages/patient/PatientRecommendations";
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -310,6 +311,14 @@ function App() {
       <ProtectedRoute allowedRoles={['patient']}>
         <OnboardingGuard>
           <Settings />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/recommendations" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <PatientRecommendations />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
