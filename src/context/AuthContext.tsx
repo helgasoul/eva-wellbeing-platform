@@ -37,125 +37,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const dataBridge = DataBridge.getInstance();
 
-  // 🚨 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Система автобэкапов и экстренного восстановления
+  // Simplified auth initialization
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
         
-        // ✅ СИСТЕМА АВТОБЭКАПОВ: Создаем точку восстановления каждые 30 сек
-        const startAutoBackup = () => {
-          setInterval(() => {
-            const authState = {
-              user: user,
-              timestamp: new Date().toISOString(),
-              url: window.location.pathname
-            };
-            localStorage.setItem('eva_auth_backup', JSON.stringify(authState));
-            localStorage.setItem('eva_last_backup', Date.now().toString());
-          }, 30000);
-        };
-
-        // ✅ EMERGENCY RECOVERY: Проверяем нужно ли восстановление
-        const checkEmergencyRecovery = () => {
-          const lastError = localStorage.getItem('eva_last_error');
-          const authBackup = localStorage.getItem('eva_auth_backup');
-          
-          if (lastError && authBackup) {
-            try {
-              const backup = JSON.parse(authBackup);
-              const errorTime = parseInt(lastError);
-              const backupTime = new Date(backup.timestamp).getTime();
-              
-              // Если ошибка была недавно и есть бэкап - предлагаем восстановление
-              if (Date.now() - errorTime < 300000 && backupTime > errorTime) { // 5 минут
-                logger.info('Emergency recovery available', { backupTimestamp: backup.timestamp });
-                localStorage.setItem('eva_recovery_available', 'true');
-                return backup;
-              }
-            } catch (e) {
-              console.warn('Could not parse backup data');
-            }
-          }
-          return null;
-        };
-
-        // ✅ СИСТЕМНЫЕ ПРОВЕРКИ: Валидация целостности
-        const performSystemChecks = () => {
-          const checks = {
-            hasSupabaseClient: !!supabase,
-            hasAuthService: !!authService,
-            hasLocalStorage: typeof(Storage) !== "undefined",
-            hasSessionStorage: typeof(sessionStorage) !== "undefined",
-            timestamp: new Date().toISOString()
-          };
-          
-          localStorage.setItem('eva_system_checks', JSON.stringify(checks));
-          
-          // Если критические компоненты недоступны - активируем emergency режим
-          if (!checks.hasSupabaseClient || !checks.hasAuthService) {
-            console.error('🚨 Critical system components unavailable!');
-            localStorage.setItem('eva_emergency_mode', 'active');
-            return false;
-          }
-          
-          return true;
-        };
-
-        // Выполняем системные проверки
-        const systemHealthy = performSystemChecks();
-        
-        // Проверяем возможность экстренного восстановления
-        const recoveryData = checkEmergencyRecovery();
-        
-        if (!systemHealthy) {
-          // ✅ EMERGENCY MODE: Используем безопасный fallback
-          logger.warn('Activating emergency mode');
-          const emergencyUser = {
-            id: generateSecureId('emergency'),
-            email: 'emergency@user.local',
-            firstName: 'Emergency',
-            lastName: 'User',
-            role: UserRole.PATIENT,
-            createdAt: new Date(),
-            registrationCompleted: true,
-            onboardingCompleted: false
-          } as User;
-          setUser(emergencyUser);
-          setIsLoading(false);
-          return;
-        }
-
-        // Получаем текущего пользователя из Supabase
+        // Get current user from Supabase
         const { user: currentUser } = await authService.getCurrentUser();
         
         if (currentUser) {
           setUser(currentUser);
           logger.info('User authenticated via Supabase', { email: currentUser.email });
-          
-          // Проверяем миграцию данных из localStorage
-          try {
-            await onboardingService.migrateFromLocalStorage(currentUser.id);
-          } catch (migrationError) {
-            console.warn('Migration warning:', migrationError);
-            // Не блокируем вход из-за ошибки миграции
-          }
-          
-        } else if (recoveryData?.user) {
-          // RECOVERY MODE: Восстанавливаем из бэкапа
-          logger.info('Restoring from emergency backup');
-          setUser(recoveryData.user);
-          localStorage.removeItem('eva_last_error');
-          
         } else {
-          // Fallback: проверяем localStorage для пользователей нуждающихся в миграции
+          // Check localStorage for migration candidates
           const localUser = localStorage.getItem('eva_user_data');
           const evaUser = localStorage.getItem('eva-user');
           
           if (localUser || evaUser) {
             try {
               const userData = JSON.parse(localUser || evaUser || '{}');
-              // ✅ Устанавливаем пользователя из localStorage как временного с безопасным ID
               const tempUser = {
                 id: userData.id || generateSecureId('temp'),
                 email: userData.email,
@@ -164,10 +65,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 role: (userData.role as UserRole) || UserRole.PATIENT,
                 createdAt: new Date(userData.createdAt || Date.now()),
                 registrationCompleted: userData.registrationCompleted || false,
-                onboardingCompleted: userData.onboarding_completed || userData.onboardingCompleted || false
+                onboardingCompleted: userData.onboarding_completed || userData.onboardingCompleted || false,
+                needsMigration: true
               } as User;
               setUser(tempUser);
-              logger.debug('Using localStorage user data for recovery');
+              logger.debug('Using localStorage user data for migration');
             } catch (error) {
               console.error('Error parsing localStorage:', error);
               localStorage.removeItem('eva_user_data');
@@ -175,27 +77,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
           }
         }
-
-        // Запускаем автобэкап после успешной инициализации
-        startAutoBackup();
         
       } catch (error) {
-        console.error('🚨 Auth initialization error:', error);
-        localStorage.setItem('eva_last_error', Date.now().toString());
-        
-        // ✅ CRITICAL FALLBACK: Даже при полном провале создаем безопасного emergency пользователя
-        const emergencyUser = {
-          id: generateSecureId('critical_fallback'),
-          email: 'fallback@user.local',
-          firstName: 'Recovery',
-          lastName: 'Mode',
-          role: UserRole.PATIENT,
-          createdAt: new Date(),
-          registrationCompleted: true,
-          onboardingCompleted: false
-        } as User;
-        setUser(emergencyUser);
-        
+        console.error('Auth initialization error:', error);
       } finally {
         setIsLoading(false);
       }
@@ -203,36 +87,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initializeAuth();
 
-    // ✅ Подписываемся на изменения аутентификации с миграцией
-    const { data: { subscription } } = authService.onAuthStateChange(async (authenticatedUser) => {
-      if (authenticatedUser && authenticatedUser.role === UserRole.PATIENT) {
-        // Импортируем функцию миграции динамически
-        const { migrateOnboardingData } = await import('@/utils/onboardingMigration');
-        
-        // Проверяем миграцию онбординга
-        const migrationResult = migrateOnboardingData();
-        
-        if (migrationResult.migrationPerformed && migrationResult.onboardingCompleted) {
-          // Обновляем пользователя с мигрированными данными
-          const updatedUser = {
-            ...authenticatedUser,
-            onboardingCompleted: true,
-            onboardingData: migrationResult.onboardingData
-          };
-          
-          setUser(updatedUser);
-          logger.debug('Auth state changed with onboarding migration');
-        } else {
-          setUser(authenticatedUser);
-          logger.info('User logged in', { email: authenticatedUser.email });
-        }
+    // Subscribe to auth state changes
+    const { data: { subscription } } = authService.onAuthStateChange((authenticatedUser) => {
+      setUser(authenticatedUser);
+      if (authenticatedUser) {
+        logger.info('User logged in', { email: authenticatedUser.email });
       } else {
-        setUser(authenticatedUser);
-        if (authenticatedUser) {
-          logger.info('User logged in', { email: authenticatedUser.email });
-        } else {
-          logger.info('User logged out');
-        }
+        logger.info('User logged out');
       }
     });
 

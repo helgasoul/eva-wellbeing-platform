@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AuthErrorBoundary } from '@/components/auth/AuthErrorBoundary';
 import { Link } from 'react-router-dom';
@@ -49,12 +48,11 @@ export const LoginForm = () => {
         rememberMe: data.rememberMe,
       });
     } catch (error: any) {
-      // Если ошибка входа, проверяем localStorage
+      // Check for localStorage data that needs migration
       const localUser = localStorage.getItem('eva_user_data');
       if (localUser && error.message === 'Invalid login credentials') {
         const userData = JSON.parse(localUser);
         if (userData.email === data.email) {
-          // Показываем форму миграции
           setShowMigrationForm(true);
           return;
         }
@@ -80,10 +78,8 @@ export const LoginForm = () => {
       const result = await migrateLocalStorageUser(formData.email, migrationPassword);
       
       if (result.success) {
-        // Очищаем localStorage
         clearLocalStorageUserData();
         
-        // Входим с новым паролем
         await login({
           email: formData.email,
           password: migrationPassword,
@@ -98,7 +94,7 @@ export const LoginForm = () => {
         throw new Error(result.error);
       }
     } catch (error: any) {
-      console.error('Ошибка миграции:', error);
+      console.error('Migration error:', error);
       toast({
         title: "Ошибка",
         description: "Ошибка обновления аккаунта",
@@ -246,21 +242,6 @@ export const LoginForm = () => {
           </div>
         </div>
       )}
-
-      {/* 🚨 ЭКСТРЕННЫЙ ДОСТУП */}
-      <div className="mt-6 border-t pt-6">
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground mb-3">
-            Проблемы с входом? Используйте экстренный доступ:
-          </p>
-          <Link 
-            to="/emergency-access"
-            className="inline-flex items-center gap-1 text-xs bg-red-50 text-red-700 px-3 py-2 rounded-md hover:bg-red-100 transition-colors border border-red-200"
-          >
-            🚨 Экстренное восстановление
-          </Link>
-        </div>
-      </div>
 
       <div className="mt-6 text-center">
         <p className="text-muted-foreground">

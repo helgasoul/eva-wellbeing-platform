@@ -26,26 +26,22 @@ export const Header = () => {
     { path: '/contact', label: 'Написать команде' }
   ];
 
-  // Умная навигация для кнопки "Мой Bloom"
-  const handleMyBloomClick = async () => {
-    if (authLoading) return;
-    
+  // Smart navigation for "Мой Bloom" button
+  const handleMyBloomClick = () => {
     setIsNavigating(true);
     
-    try {
-      if (user) {
-        // Пользователь авторизован - переходим в дашборд
-        const dashboardPath = user.role === 'doctor' ? '/doctor/dashboard' 
-                            : user.role === 'admin' ? '/admin/dashboard' 
-                            : '/patient/dashboard';
-        navigate(dashboardPath);
-      } else {
-        // Пользователь не авторизован - переходим на логин
-        navigate('/login');
-      }
-    } finally {
-      setTimeout(() => setIsNavigating(false), 500);
+    if (user) {
+      // User is authenticated - go to dashboard
+      const dashboardPath = user.role === 'doctor' ? '/doctor/dashboard' 
+                          : user.role === 'admin' ? '/admin/dashboard' 
+                          : '/patient/dashboard';
+      navigate(dashboardPath);
+    } else {
+      // User is not authenticated - go to registration for new users
+      navigate('/register');
     }
+    
+    setTimeout(() => setIsNavigating(false), 500);
   };
 
   return (
@@ -90,13 +86,11 @@ export const Header = () => {
           <div className="hidden md:flex items-center space-x-3">
             <Button 
               variant="ghost"
-              className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200 disabled:opacity-50"
+              className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
               onClick={handleMyBloomClick}
-              disabled={authLoading || isNavigating}
+              disabled={isNavigating}
             >
-              {authLoading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-              ) : user ? (
+              {user ? (
                 <User className="mr-2 h-4 w-4" />
               ) : null}
               {user ? 'Мой профиль' : 'Мой Bloom'}
@@ -156,16 +150,14 @@ export const Header = () => {
               <div className="flex flex-col space-y-3 pt-4 border-t border-border/30">
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-center py-3 font-medium rounded-xl disabled:opacity-50"
+                  className="w-full justify-center py-3 font-medium rounded-xl"
                   onClick={() => {
                     setIsMenuOpen(false);
                     handleMyBloomClick();
                   }}
-                  disabled={authLoading || isNavigating}
+                  disabled={isNavigating}
                 >
-                  {authLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                  ) : user ? (
+                  {user ? (
                     <User className="mr-2 h-4 w-4" />
                   ) : null}
                   {user ? 'Мой профиль' : 'Мой Bloom'}
