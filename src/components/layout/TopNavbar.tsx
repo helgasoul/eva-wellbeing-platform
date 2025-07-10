@@ -6,6 +6,7 @@ import { Bell, Search, User as UserIcon, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { RoleSwitcher } from './RoleSwitcher';
+import { BackButton } from './BackButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,8 +59,9 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
     <header className="bg-white/95 backdrop-blur-md border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Title */}
+          {/* Logo and Title with Back Button */}
           <div className="flex items-center space-x-4">
+            <BackButton />
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-eva-dusty-rose to-primary rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
