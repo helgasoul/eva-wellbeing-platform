@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import AuthDebug from "./components/debug/AuthDebug";
 import DatabaseCheck from "./components/debug/DatabaseCheck";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./components/ui/dialog";
+import PasswordResetDebug from "./components/debug/PasswordResetDebug";
 
 import { OnboardingGuard } from "./components/auth/OnboardingGuard";
 
@@ -65,6 +66,7 @@ const queryClient = new QueryClient();
 function App() {
   const [showDebug, setShowDebug] = useState(false);
   const [showDatabaseCheck, setShowDatabaseCheck] = useState(false);
+  const [showPasswordDebug, setShowPasswordDebug] = useState(false);
 
   // Добавляем обработчик для комбинации клавиш
   useEffect(() => {
@@ -74,6 +76,9 @@ function App() {
       }
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'B') {
         setShowDatabaseCheck(true);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+        setShowPasswordDebug(true);
       }
     };
     
@@ -373,6 +378,11 @@ function App() {
                       <DatabaseCheck />
                     </DialogContent>
                   </Dialog>
+                  
+                  {/* ДИАГНОСТИКА СБРОСА ПАРОЛЯ */}
+                  {showPasswordDebug && (
+                    <PasswordResetDebug onClose={() => setShowPasswordDebug(false)} />
+                  )}
                 </BasicNotificationProvider>
               </FoodDiaryProvider>
             </SubscriptionProvider>
