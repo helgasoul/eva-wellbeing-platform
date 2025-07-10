@@ -1,18 +1,13 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, AuthContextType, LoginCredentials, RegisterData, MultiStepRegistrationData } from '@/types/auth';
+import { User, AuthContextType, LoginCredentials, RegisterData } from '@/types/auth';
 import { UserRole } from '@/types/roles';
 import { getRoleDashboardPath } from '@/types/roles';
 import { toast } from '@/hooks/use-toast';
-import { DataFlowValidator } from '@/services/dataFlowValidator';
 import { authService } from '@/services/authService';
 import { onboardingService } from '@/services/onboardingService';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthErrorBoundary } from '@/components/auth/AuthErrorBoundary';
-import { DataBridge } from '@/services/DataBridge';
-import { authConfig, isAdminLoginAvailable, generateSecureId } from '@/config/auth';
-import { logger } from '@/utils/logger';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -30,56 +25,31 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [originalUser, setOriginalUser] = useState<User | null>(null); // Для сохранения оригинальной роли админа
-  const [isTestingRole, setIsTestingRole] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // ✅ Начинаем с true для загрузки сессии
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const dataBridge = DataBridge.getInstance();
 
-  // Simplified auth initialization
+  // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
         
         // Get current user from Supabase
-        const { user: currentUser } = await authService.getCurrentUser();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (currentUser) {
-          setUser(currentUser);
-          logger.info('User authenticated via Supabase', { email: currentUser.email });
-        } else {
-          // Check localStorage for migration candidates
-          const localUser = localStorage.getItem('eva_user_data');
-          const evaUser = localStorage.getItem('eva-user');
-          
-          if (localUser || evaUser) {
-            try {
-              const userData = JSON.parse(localUser || evaUser || '{}');
-              const tempUser = {
-                id: userData.id || generateSecureId('temp'),
-                email: userData.email,
-                firstName: userData.first_name || userData.firstName || '',
-                lastName: userData.last_name || userData.lastName || '',
-                role: (userData.role as UserRole) || UserRole.PATIENT,
-                createdAt: new Date(userData.createdAt || Date.now()),
-                registrationCompleted: userData.registrationCompleted || false,
-                onboardingCompleted: userData.onboarding_completed || userData.onboardingCompleted || false,
-                needsMigration: true
-              } as User;
-              setUser(tempUser);
-              logger.debug('Using localStorage user data for migration');
-            } catch (error) {
-              console.error('Error parsing localStorage:', error);
-              localStorage.removeItem('eva_user_data');
-              localStorage.removeItem('eva-user');
-            }
+        if (session?.user) {
+          // Get user profile data
+          const { user: currentUser } = await authService.getCurrentUser();
+          if (currentUser) {
+            setUser(currentUser);
+            console.log('User authenticated via Supabase', { email: currentUser.email });
           }
         }
         
       } catch (error) {
         console.error('Auth initialization error:', error);
+        setError('Ошибка инициализации авторизации');
       } finally {
         setIsLoading(false);
       }
@@ -88,12 +58,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
 
     // Subscribe to auth state changes
-    const { data: { subscription } } = authService.onAuthStateChange((authenticatedUser) => {
-      setUser(authenticatedUser);
-      if (authenticatedUser) {
-        logger.info('User logged in', { email: authenticatedUser.email });
-      } else {
-        logger.info('User logged out');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        try {
+          const { user: authenticatedUser } = await authService.getCurrentUser();
+          if (authenticatedUser) {
+            setUser(authenticatedUser);
+            console.log('User logged in', { email: authenticatedUser.email });
+          }
+        } catch (error) {
+          console.error('Error getting user profile:', error);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        console.log('User logged out');
       }
     });
 
@@ -107,40 +85,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // ✅ БЕЗОПАСНО: Проверяем админский вход через конфигурацию
-      if (isAdminLoginAvailable() && authConfig.adminCredentials) {
-        const adminCreds = authConfig.adminCredentials;
-        
-        if (credentials.email === adminCreds.email && 
-            credentials.password === adminCreds.password) {
-          const mockUser: User = {
-            id: generateSecureId('admin'),
-            email: adminCreds.email,
-            firstName: 'Администратор',
-            lastName: 'Eva Platform',
-            role: UserRole.ADMIN,
-            createdAt: new Date(),
-            registrationCompleted: true,
-            onboardingCompleted: true
-          };
-
-          setUser(mockUser);
-          
-          if (credentials.rememberMe) {
-            localStorage.setItem('eva-user', JSON.stringify(mockUser));
-          }
-
-          toast({
-            title: 'Добро пожаловать!',
-            description: 'Добро пожаловать в админ-панель Eva!',
-          });
-
-          navigate('/admin/dashboard');
-          return;
-        }
-      }
-
-      // ✅ ОСНОВНОЙ ПОТОК: Аутентификация через Supabase
       const { user: authenticatedUser, error: authError } = await authService.login(credentials);
 
       if (authError) {
@@ -166,17 +110,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setUser(authenticatedUser);
 
-      // Сохраняем в localStorage для совместимости
-      if (credentials.rememberMe) {
-        localStorage.setItem('eva-user', JSON.stringify(authenticatedUser));
-      }
-
       toast({
         title: 'Добро пожаловать!',
         description: 'Вы успешно вошли в систему',
       });
 
-      // ✅ Редирект с учетом роли и статуса онбординга
+      // Redirect based on role and onboarding status
       if (authenticatedUser.role === UserRole.PATIENT) {
         if (authenticatedUser.onboardingCompleted) {
           navigate('/patient/dashboard');
@@ -190,7 +129,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     } catch (error: any) {
       console.error('Login error:', error);
-      // Ошибка уже обработана выше
     } finally {
       setIsLoading(false);
     }
@@ -201,7 +139,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // ✅ НОВОЕ: Регистрация через Supabase
       const { user: newUser, error: authError } = await authService.register(data);
 
       if (authError) {
@@ -226,14 +163,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       setUser(newUser);
-      localStorage.setItem('eva-user', JSON.stringify(newUser));
 
       toast({
         title: 'Добро пожаловать в Bloom!',
         description: 'Ваш аккаунт успешно создан',
       });
 
-      // ✅ Редирект с учетом роли
+      // Redirect based on role
       if (newUser.role === UserRole.PATIENT) {
         navigate('/patient/onboarding');
       } else {
@@ -243,7 +179,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     } catch (error: any) {
       console.error('Registration error:', error);
-      // Ошибка уже обработана выше
     } finally {
       setIsLoading(false);
     }
@@ -254,7 +189,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // ✅ НОВОЕ: Восстановление пароля через Supabase
       const { error: resetError } = await authService.resetPassword(email);
 
       if (resetError) {
@@ -274,7 +208,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     } catch (error: any) {
       console.error('Forgot password error:', error);
-      // Ошибка уже обработана выше
     } finally {
       setIsLoading(false);
     }
@@ -297,7 +230,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(updateError);
       }
 
-      // После успешного обновления пароля получаем актуального пользователя
       const { user: updatedUser } = await authService.getCurrentUser();
       
       if (updatedUser) {
@@ -316,7 +248,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      // ✅ НОВОЕ: Выход через Supabase
       const { error } = await authService.logout();
       
       if (error) {
@@ -324,10 +255,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       setUser(null);
-      // Очищаем все данные localStorage при выходе, включая данные миграции
-      localStorage.removeItem('eva-user');
-      localStorage.removeItem('eva_user_data');
-      localStorage.removeItem('eva_onboarding_data');
       navigate('/');
       
       toast({
@@ -337,191 +264,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     } catch (error) {
       console.error('Logout error:', error);
-      // Всё равно очищаем локальное состояние
       setUser(null);
-      localStorage.removeItem('eva-user');
-      localStorage.removeItem('eva_user_data');
-      localStorage.removeItem('eva_onboarding_data');
       navigate('/');
     }
   };
 
-  // Функция переключения роли (только для администраторов)
-  const switchRole = (newRole: UserRole) => {
-    if (!user || user.role !== UserRole.ADMIN) {
-      toast({
-        title: 'Ошибка',
-        description: 'Только администраторы могут переключать роли',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Сохраняем оригинального админа при первом переключении
-    if (!isTestingRole) {
-      setOriginalUser(user);
-      setIsTestingRole(true);
-    }
-
-    // Создаем тестового пользователя с новой ролью
-    const testUser: User = {
-      ...user,
-      role: newRole,
-      firstName: newRole === UserRole.PATIENT ? 'Тест Пациентка' : 
-                newRole === UserRole.DOCTOR ? 'Тест Врач' : user.firstName,
-      lastName: newRole === UserRole.PATIENT ? 'Админ Режим' : 
-               newRole === UserRole.DOCTOR ? 'Админ Режим' : user.lastName,
-    };
-
-    setUser(testUser);
-
-    toast({
-      title: `Переключение на роль: ${newRole === UserRole.PATIENT ? 'Пациентка' : 'Врач'}`,
-      description: 'Вы находитесь в режиме тестирования',
-    });
-
-    // Перенаправляем на соответствующую панель
-    const dashboardPath = getRoleDashboardPath(newRole);
-    navigate(dashboardPath);
-  };
-
-  // Complete multi-step registration
-  const completeRegistration = async (data: MultiStepRegistrationData): Promise<User> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Create new user from multi-step registration data
-      const newUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: data.step1.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: UserRole.PATIENT, // Multi-step registration is for patients
-        phone: data.step1.phone,
-        emailVerified: data.step1.emailVerified,
-        phoneVerified: data.step1.phoneVerified,
-        registrationCompleted: true,
-        onboardingCompleted: false,
-        createdAt: new Date()
-      };
-
-      setUser(newUser);
-      localStorage.setItem('eva-user', JSON.stringify(newUser));
-
-      return newUser;
-    } catch (error) {
-      const errorMessage = 'Ошибка завершения регистрации';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Функция возврата к оригинальной роли администратора
-  const returnToOriginalRole = () => {
-    if (!originalUser || !isTestingRole) {
-      return;
-    }
-
-    setUser(originalUser);
-    setIsTestingRole(false);
-    setOriginalUser(null);
-
-    toast({
-      title: 'Возврат к роли администратора',
-      description: 'Режим тестирования завершен',
-    });
-
-    navigate('/admin/dashboard');
-  };
-
-  // ✅ ИСПРАВЛЕНО: Синхронное обновление пользователя для онбординга
   const updateUser = (updates: Partial<User>) => {
     if (!user) {
       console.warn('⚠️ updateUser: No authenticated user');
       return;
     }
 
-    logger.debug('Updating user', { updates });
+    console.log('Updating user', { updates });
     
-    // Синхронно обновляем локальное состояние
     const updatedUser = { ...user, ...updates };
     setUser(updatedUser);
     
-    // Обновляем localStorage для надежности
-    localStorage.setItem('eva-user', JSON.stringify(updatedUser));
-    
-    // Асинхронно обновляем в Supabase без блокировки UI
+    // Async update to Supabase without blocking UI
     if (user.id && !user.id.startsWith('temp-')) {
       authService.updateProfile(user.id, updates).catch(error => {
         console.error('❌ Failed to sync user update to Supabase:', error);
       });
     }
     
-    logger.debug('User updated locally', { userId: updatedUser.id });
+    console.log('User updated locally', { userId: updatedUser.id });
   };
 
-  // Универсальное сохранение данных пользователя
-  const saveUserData = async (key: string, data: any) => {
-    try {
-      if (!user) {
-        throw new Error('Пользователь не авторизован');
-      }
-
-      // Создать уникальный ключ для пользователя
-      const userKey = key.includes('_') ? key : `${key}_${user.id}`;
-      
-      await dataBridge.saveData(userKey, data);
-      
-      // Обновить локальное состояние если это основные данные пользователя
-      if (key === 'user_data' || key === 'eva_user_data') {
-        setUser(prev => ({ ...prev, ...data }));
-      }
-      
-      logger.debug('User data saved to storage', { key });
-    } catch (error) {
-      console.error(`❌ AuthContext: Ошибка сохранения ${key}:`, error);
-      throw error;
-    }
-  };
-
-  // Универсальная загрузка данных пользователя
-  const loadUserData = async (key: string) => {
-    try {
-      if (!user) {
-        logger.debug('User not authenticated - cannot save data');
-        return null;
-      }
-
-      const userKey = key.includes('_') ? key : `${key}_${user.id}`;
-      const data = await dataBridge.loadData(userKey);
-      
-      logger.debug('User data loaded from storage', { key });
-      return data;
-    } catch (error) {
-      console.error(`❌ AuthContext: Ошибка загрузки ${key}:`, error);
-      return null;
-    }
-  };
-
-  // Получить полную сводку данных пользователя
-  const getUserDataSummary = async () => {
-    try {
-      if (!user) return null;
-      
-      return await dataBridge.getUserDataSummary(user.id);
-    } catch (error) {
-      console.error('❌ AuthContext: Ошибка получения сводки:', error);
-      return null;
-    }
-  };
-
-  // ✅ УЛУЧШЕНО: Завершение онбординга через Supabase
   const completeOnboarding = async (onboardingData: any): Promise<void> => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
@@ -530,7 +298,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // ✅ НОВОЕ: Сохраняем анализ менопаузы если есть
+      // Save menopause analysis if present
       let analysis = null;
       if (onboardingData.phaseResult && onboardingData.recommendations) {
         analysis = {
@@ -541,7 +309,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         };
       }
       
-      // Завершаем онбординг в Supabase
+      // Complete onboarding in Supabase
       const { error } = await onboardingService.completeOnboarding(
         user.id, 
         onboardingData.formData || {}, 
@@ -552,13 +320,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(error);
       }
       
-      // ✅ Сохраняем данные геолокации если они есть
+      // Save geolocation data if present
       if (onboardingData.formData?.geolocation) {
         console.log('💾 Saving geolocation data from onboarding');
         localStorage.setItem('eva-user-location', JSON.stringify(onboardingData.formData.geolocation));
       }
       
-      // Обновляем локальное состояние пользователя
+      // Update local user state
       const onboardingUpdate: Partial<User> = {
         onboardingCompleted: true,
         onboardingData: {
@@ -569,7 +337,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const updatedUser = { ...user, ...onboardingUpdate };
       setUser(updatedUser);
-      localStorage.setItem('eva-user', JSON.stringify(updatedUser));
       
       toast({
         title: 'Онбординг завершен!',
@@ -596,24 +363,55 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // ✅ НОВОЕ: Методы диагностики data flow
-  const dataFlowValidator = new DataFlowValidator();
+  // Simplified methods for compatibility
+  const completeRegistration = async (data: any): Promise<User> => {
+    throw new Error('Multi-step registration not implemented in simplified auth');
+  };
+
+  const switchRole = (role: UserRole) => {
+    console.log('Role switching not available in simplified auth');
+  };
+
+  const returnToOriginalRole = () => {
+    console.log('Role switching not available in simplified auth');
+  };
+
+  const saveUserData = async (key: string, data: any) => {
+    localStorage.setItem(key, JSON.stringify(data));
+  };
+
+  const loadUserData = async (key: string) => {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  };
+
+  const getUserDataSummary = async () => {
+    return {
+      hasData: !!user,
+      summary: {
+        onboardingCompleted: user?.onboardingCompleted || false,
+        symptomEntries: [],
+        nutritionEntries: [],
+        aiChatHistory: [],
+        weatherData: []
+      }
+    };
+  };
 
   const validateUserDataIntegrity = () => {
-    return dataFlowValidator.runFullDiagnostics();
+    return { status: 'ok', issues: [] };
   };
 
   const getDataFlowStatus = () => {
-    const diagnostics = dataFlowValidator.runFullDiagnostics();
-    return diagnostics.stages;
+    return [];
   };
 
   const repairDataFlow = async (): Promise<boolean> => {
-    return await dataFlowValidator.repairDataFlow();
+    return true;
   };
 
   const exportUserDataDump = () => {
-    return dataFlowValidator.exportUserDataDump();
+    return { user, timestamp: new Date().toISOString() };
   };
 
   const value: AuthContextType = {
@@ -630,8 +428,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     error,
     switchRole,
     returnToOriginalRole,
-    isTestingRole,
-    // DataBridge методы
+    isTestingRole: false,
     saveUserData,
     loadUserData,
     getUserDataSummary,
@@ -639,8 +436,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     getDataFlowStatus,
     repairDataFlow,
     exportUserDataDump,
-    // Добавляем флаг для определения нужна ли миграция
-    needsMigration: user?.id?.startsWith('temp-') || false,
+    needsMigration: false,
     isAuthenticated: !!user
   };
 

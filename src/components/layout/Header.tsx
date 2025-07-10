@@ -27,22 +27,34 @@ export const Header = () => {
   ];
 
   // Smart navigation for "Мой Bloom" button
-  const handleMyBloomClick = () => {
-    setIsNavigating(true);
-    
-    if (user) {
-      // User is authenticated - go to dashboard
-      const dashboardPath = user.role === 'doctor' ? '/doctor/dashboard' 
-                          : user.role === 'admin' ? '/admin/dashboard' 
-                          : '/patient/dashboard';
-      navigate(dashboardPath);
-    } else {
-      // User is not authenticated - go to registration for new users
-      navigate('/register');
+  const handleMyBloomClick = React.useCallback(() => {
+    if (isNavigating || authLoading) {
+      return; // Prevent multiple clicks during navigation or loading
     }
     
-    setTimeout(() => setIsNavigating(false), 500);
-  };
+    setIsNavigating(true);
+    
+    try {
+      if (user) {
+        // User is authenticated - go to dashboard
+        const dashboardPath = user.role === 'doctor' ? '/doctor/dashboard' 
+                            : user.role === 'admin' ? '/admin/dashboard' 
+                            : '/patient/dashboard';
+        console.log('Navigating authenticated user to:', dashboardPath);
+        navigate(dashboardPath);
+      } else {
+        // User is not authenticated - go to registration for new users
+        console.log('Navigating unauthenticated user to registration');
+        navigate('/register');
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback navigation
+      navigate('/register');
+    } finally {
+      setTimeout(() => setIsNavigating(false), 500);
+    }
+  }, [user, navigate, isNavigating, authLoading]);
 
   return (
     <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-50 shadow-elegant">
