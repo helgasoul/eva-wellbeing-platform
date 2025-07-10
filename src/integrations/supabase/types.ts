@@ -391,6 +391,39 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_verification_log: {
+        Row: {
+          backup_date: string
+          backup_size_bytes: number | null
+          backup_type: string
+          created_at: string | null
+          id: string
+          recovery_test_passed: boolean | null
+          verification_details: Json | null
+          verification_status: string
+        }
+        Insert: {
+          backup_date: string
+          backup_size_bytes?: number | null
+          backup_type: string
+          created_at?: string | null
+          id?: string
+          recovery_test_passed?: boolean | null
+          verification_details?: Json | null
+          verification_status: string
+        }
+        Update: {
+          backup_date?: string
+          backup_size_bytes?: number | null
+          backup_type?: string
+          created_at?: string | null
+          id?: string
+          recovery_test_passed?: boolean | null
+          verification_details?: Json | null
+          verification_status?: string
+        }
+        Relationships: []
+      }
       blog_comments: {
         Row: {
           author_avatar: string | null
@@ -694,6 +727,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      compliance_log: {
+        Row: {
+          action: string
+          automated: boolean | null
+          compliance_type: string
+          created_at: string | null
+          data_types: string[] | null
+          details: Json | null
+          id: string
+          processing_basis: string | null
+          retention_period_days: number | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          automated?: boolean | null
+          compliance_type: string
+          created_at?: string | null
+          data_types?: string[] | null
+          details?: Json | null
+          id?: string
+          processing_basis?: string | null
+          retention_period_days?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          automated?: boolean | null
+          compliance_type?: string
+          created_at?: string | null
+          data_types?: string[] | null
+          details?: Json | null
+          id?: string
+          processing_basis?: string | null
+          retention_period_days?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       consultation_bookings: {
         Row: {
@@ -1081,6 +1153,39 @@ export type Database = {
           secondary_id?: string
           secondary_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      data_retention_policies: {
+        Row: {
+          created_at: string | null
+          deletion_strategy: string | null
+          id: string
+          is_active: boolean | null
+          last_cleanup_at: string | null
+          retention_period_days: number
+          table_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deletion_strategy?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_cleanup_at?: string | null
+          retention_period_days: number
+          table_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deletion_strategy?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_cleanup_at?: string | null
+          retention_period_days?: number
+          table_name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -5588,6 +5693,48 @@ export type Database = {
         }
         Relationships: []
       }
+      security_audit_log: {
+        Row: {
+          action: string
+          audit_type: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          policy_name: string | null
+          severity: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          audit_type: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          policy_name?: string | null
+          severity?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          audit_type?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          policy_name?: string | null
+          severity?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       security_settings: {
         Row: {
           created_at: string
@@ -5959,6 +6106,36 @@ export type Database = {
           severity?: string
           title?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      system_health_checks: {
+        Row: {
+          check_type: string
+          checked_at: string | null
+          details: Json | null
+          error_message: string | null
+          id: string
+          response_time_ms: number | null
+          status: string
+        }
+        Insert: {
+          check_type: string
+          checked_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          response_time_ms?: number | null
+          status: string
+        }
+        Update: {
+          check_type?: string
+          checked_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          response_time_ms?: number | null
+          status?: string
         }
         Relationships: []
       }
