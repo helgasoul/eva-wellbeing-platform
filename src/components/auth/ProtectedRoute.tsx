@@ -3,6 +3,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '@/types/roles';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,11 +22,57 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, isLoading } = useAuth();
 
-  // Показываем загрузку пока проверяем аутентификацию
-  if (isLoading) {
+  // Улучшенная загрузка с таймаутом для предотвращения бесконечной загрузки
+  const [loadingTimeout, setLoadingTimeout] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        setLoadingTimeout(true);
+      }
+    }, 10000); // 10 секунд максимум для загрузки
+
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  // Показываем улучшенную загрузку
+  if (isLoading && !loadingTimeout) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <div className="min-h-screen bloom-gradient flex items-center justify-center">
+        <div className="bloom-card p-8 text-center">
+          <LoadingSpinner size="lg" className="mx-auto mb-4" />
+          <h2 className="text-xl font-playfair font-semibold text-foreground mb-2">
+            Проверяем авторизацию...
+          </h2>
+          <p className="text-muted-foreground">
+            Подождите несколько секунд
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Если загрузка зависла, показываем ошибку с возможностью перезагрузки
+  if (loadingTimeout) {
+    return (
+      <div className="min-h-screen bloom-gradient flex items-center justify-center">
+        <div className="bloom-card p-8 text-center">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">⚠️</span>
+          </div>
+          <h2 className="text-xl font-playfair font-semibold text-foreground mb-2">
+            Проблема с подключением
+          </h2>
+          <p className="text-muted-foreground mb-4">
+            Не удается загрузить данные авторизации
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Перезагрузить страницу
+          </button>
+        </div>
       </div>
     );
   }
@@ -61,17 +108,20 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const rolesToCheck = allowedRoles || (requiredRole ? [requiredRole] : undefined);
   if (rolesToCheck && !rolesToCheck.includes(user.role)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
+      <div className="min-h-screen bloom-gradient flex items-center justify-center">
+        <div className="bloom-card p-8 text-center">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">🚫</span>
+          </div>
+          <h1 className="text-2xl font-playfair font-semibold text-destructive mb-4">
             Доступ запрещен
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-muted-foreground mb-6">
             У вас нет прав для доступа к этой странице
           </p>
           <button
             onClick={() => window.history.back()}
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors font-medium"
           >
             Вернуться назад
           </button>

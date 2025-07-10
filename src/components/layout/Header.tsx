@@ -1,13 +1,17 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart, Cloud } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Heart, Cloud, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BackButton } from './BackButton';
+import { useAuth } from '@/context/AuthContext';
 import bloomLogo from '@/assets/bloom-logo-white-bg.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isNavigating, setIsNavigating] = React.useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isLoading: authLoading } = useAuth();
 
   // Проверяем, нужно ли показывать кнопку "Назад" в хедере
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/login-safe', '/emergency-access'].includes(location.pathname);
@@ -21,6 +25,28 @@ export const Header = () => {
     { path: '/how-we-help', label: 'Как мы помогаем' },
     { path: '/contact', label: 'Написать команде' }
   ];
+
+  // Умная навигация для кнопки "Мой Bloom"
+  const handleMyBloomClick = async () => {
+    if (authLoading) return;
+    
+    setIsNavigating(true);
+    
+    try {
+      if (user) {
+        // Пользователь авторизован - переходим в дашборд
+        const dashboardPath = user.role === 'doctor' ? '/doctor/dashboard' 
+                            : user.role === 'admin' ? '/admin/dashboard' 
+                            : '/patient/dashboard';
+        navigate(dashboardPath);
+      } else {
+        // Пользователь не авторизован - переходим на логин
+        navigate('/login');
+      }
+    } finally {
+      setTimeout(() => setIsNavigating(false), 500);
+    }
+  };
 
   return (
     <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-50 shadow-elegant">
@@ -62,27 +88,35 @@ export const Header = () => {
 
           {/* Кнопки действий */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link to="/login">
-              <Button 
-                variant="ghost"
-                className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
-              >
-                Мой Bloom
-              </Button>
-            </Link>
-            <div className="flex flex-col items-center">
-              <Link to="/register">
-                <Button 
-                  className="bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground font-semibold px-8 py-3 rounded-2xl transition-all duration-300 shadow-elegant hover:shadow-soft hover:scale-105 group border border-primary/20"
-                >
-                  <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
-                  С заботой о себе
-                </Button>
-              </Link>
-              <p className="text-xs text-muted-foreground mt-1 italic">
-                Сделайте шаг к спокойствию
-              </p>
-            </div>
+            <Button 
+              variant="ghost"
+              className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200 disabled:opacity-50"
+              onClick={handleMyBloomClick}
+              disabled={authLoading || isNavigating}
+            >
+              {authLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+              ) : user ? (
+                <User className="mr-2 h-4 w-4" />
+              ) : null}
+              {user ? 'Мой профиль' : 'Мой Bloom'}
+            </Button>
+            
+            {!user && (
+              <div className="flex flex-col items-center">
+                <Link to="/register">
+                  <Button 
+                    className="bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground font-semibold px-8 py-3 rounded-2xl transition-all duration-300 shadow-elegant hover:shadow-soft hover:scale-105 group border border-primary/20"
+                  >
+                    <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
+                    С заботой о себе
+                  </Button>
+                </Link>
+                <p className="text-xs text-muted-foreground mt-1 italic">
+                  Сделайте шаг к спокойствию
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Мобильное меню */}
@@ -120,25 +154,36 @@ export const Header = () => {
               ))}
               
               <div className="flex flex-col space-y-3 pt-4 border-t border-border/30">
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-center py-3 font-medium rounded-xl"
-                  >
-                    Мой Bloom
-                  </Button>
-                </Link>
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-center py-3 font-medium rounded-xl disabled:opacity-50"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleMyBloomClick();
+                  }}
+                  disabled={authLoading || isNavigating}
+                >
+                  {authLoading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                  ) : user ? (
+                    <User className="mr-2 h-4 w-4" />
+                  ) : null}
+                  {user ? 'Мой профиль' : 'Мой Bloom'}
+                </Button>
+                
+                {!user && (
                   <div className="flex flex-col items-center">
-                    <Button className="w-full bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground py-3 font-semibold group rounded-2xl border border-primary/20">
-                      <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
-                      С заботой о себе
-                    </Button>
+                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground py-3 font-semibold group rounded-2xl border border-primary/20">
+                        <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
+                        С заботой о себе
+                      </Button>
+                    </Link>
                     <p className="text-xs text-muted-foreground mt-1 italic">
                       Сделайте шаг к спокойствию
                     </p>
                   </div>
-                </Link>
+                )}
               </div>
             </nav>
           </div>
