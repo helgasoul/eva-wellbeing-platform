@@ -13,7 +13,7 @@ import type {
 import { ANALYTICS_EVENTS } from '@/types/analytics';
 
 class AnalyticsService {
-  private sessionId: string;
+  public sessionId: string;
   private userId: string | null = null;
   private isOnline: boolean = navigator.onLine;
 

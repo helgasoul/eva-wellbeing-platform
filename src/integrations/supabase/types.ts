@@ -6883,6 +6883,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      audit_rls_policies: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          table_name: string
+          policy_name: string
+          policy_command: string
+          policy_permissive: string
+          policy_using: string
+          policy_check: string
+        }[]
+      }
+      cleanup_old_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_ticket_number: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -6906,6 +6921,10 @@ export type Database = {
       increment_post_views: {
         Args: { post_id: string }
         Returns: undefined
+      }
+      perform_health_check: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
     }
     Enums: {
