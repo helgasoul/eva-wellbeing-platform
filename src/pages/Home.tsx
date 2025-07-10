@@ -79,12 +79,14 @@ const Home = () => {
       {/* Показатели доверия */}
       <TrustIndicatorsSection />
 
-      {/* Демонстрация онбординга */}
-      <section className="py-16 px-6 bg-slate-50">
-        <div className="container mx-auto">
-          <OnboardingDemo />
-        </div>
-      </section>
+      {/* Демонстрация онбординга - только для администраторов */}
+      {user?.role === UserRole.ADMIN && (
+        <section className="py-16 px-6 bg-slate-50">
+          <div className="container mx-auto">
+            <OnboardingDemo />
+          </div>
+        </section>
+      )}
 
       {/* Empathetic Support Section */}
       <section className="py-20 px-6 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-rose-50/20 relative overflow-hidden">
