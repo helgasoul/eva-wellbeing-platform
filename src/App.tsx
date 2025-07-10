@@ -7,6 +7,8 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { useState, useEffect } from "react";
 import AuthDebug from "./components/debug/AuthDebug";
+import DatabaseCheck from "./components/debug/DatabaseCheck";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./components/ui/dialog";
 
 import { OnboardingGuard } from "./components/auth/OnboardingGuard";
 
@@ -61,12 +63,16 @@ const queryClient = new QueryClient();
 
 function App() {
   const [showDebug, setShowDebug] = useState(false);
+  const [showDatabaseCheck, setShowDatabaseCheck] = useState(false);
 
-  // Добавляем обработчик для комбинации клавиш Ctrl+Shift+D (Windows/Linux) или Cmd+Shift+D (Mac)
+  // Добавляем обработчик для комбинации клавиш
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
         setShowDebug(true);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'B') {
+        setShowDatabaseCheck(true);
       }
     };
     
@@ -347,6 +353,16 @@ function App() {
                   
                   {/* ОТЛАДОЧНЫЙ КОМПОНЕНТ */}
                   {showDebug && <AuthDebug />}
+                  
+                  {/* МОДАЛЬНОЕ ОКНО ПРОВЕРКИ БАЗЫ ДАННЫХ */}
+                  <Dialog open={showDatabaseCheck} onOpenChange={setShowDatabaseCheck}>
+                    <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Проверка базы данных</DialogTitle>
+                      </DialogHeader>
+                      <DatabaseCheck />
+                    </DialogContent>
+                  </Dialog>
                 </BasicNotificationProvider>
               </FoodDiaryProvider>
             </SubscriptionProvider>
