@@ -31,12 +31,24 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       const hasCompletedOnboarding = Boolean(user.onboardingCompleted);
       const hasOnboardingData = Boolean(user.onboardingData);
       
+      // Проверяем, является ли это recovery-ссылкой (сброс пароля)
+      const urlParams = new URLSearchParams(window.location.search);
+      const isPasswordRecovery = urlParams.get('type') === 'recovery';
+      
+      // Если это восстановление пароля и у пользователя есть хотя бы базовые данные,
+      // считаем онбординг завершенным и не редиректим
+      if (isPasswordRecovery && user.registrationCompleted) {
+        console.log('🔓 OnboardingGuard: Password recovery for registered user, allowing access');
+        return;
+      }
+      
       if (!hasCompletedOnboarding) {
         console.log('🔒 OnboardingGuard: Redirecting to onboarding', {
           userId: user.id,
           hasCompletedOnboarding,
           hasOnboardingData,
-          registrationCompleted: user.registrationCompleted
+          registrationCompleted: user.registrationCompleted,
+          isPasswordRecovery
         });
         navigate('/patient/onboarding', { replace: true });
         return;

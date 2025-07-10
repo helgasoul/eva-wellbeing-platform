@@ -65,6 +65,16 @@ export const getGeolocationData = () => {
  */
 export const shouldRedirectToOnboarding = (user: any): boolean => {
   if (!user || user.role !== 'patient') return false;
+  
+  // Если это восстановление пароля и у пользователя есть базовые данные,
+  // не требуем онбординг
+  const urlParams = new URLSearchParams(window.location.search);
+  const isPasswordRecovery = urlParams.get('type') === 'recovery';
+  
+  if (isPasswordRecovery && user.registrationCompleted) {
+    return false;
+  }
+  
   return !Boolean(user.onboardingCompleted);
 };
 

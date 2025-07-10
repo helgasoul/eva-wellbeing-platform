@@ -97,6 +97,15 @@ class AuthService {
 
       if (error) {
         console.error('❌ Ошибка аутентификации Supabase:', error);
+        
+        // Если это ошибка невалидных учетных данных, показываем более понятное сообщение
+        if (error.message === 'Invalid login credentials') {
+          return { 
+            user: null, 
+            error: 'Неверный email или пароль. Проверьте данные или восстановите пароль.' 
+          };
+        }
+        
         return { 
           user: null, 
           error: `Ошибка входа: ${error.message}` 
@@ -166,6 +175,13 @@ class AuthService {
 
       // 3. Формируем объект пользователя
       const user = this.transformSupabaseUser(data.user, finalProfileData);
+
+      // 4. Проверяем и корректируем статус регистрации для старых пользователей
+      if (!user.registrationCompleted && user.email && user.firstName) {
+        console.log('🔧 Обновляем статус регистрации для существующего пользователя');
+        await this.updateProfile(user.id, { registrationCompleted: true });
+        user.registrationCompleted = true;
+      }
 
       console.log('✅ Вход выполнен успешно для пользователя:', user.email);
       return { user, error: null };
