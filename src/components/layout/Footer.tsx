@@ -21,7 +21,7 @@ export const Footer = () => {
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-lg scale-150"></div>
             </div>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed text-lg">
-              bloom — пространство поддержки и заботы для женщин в период перемен. 
+              bloom — пространство поддержки и заботы для женщин в период менопаузы.
               Мы рядом, чтобы помочь принять и понять все изменения, делиться знаниями 
               и теплом, и быть вместе в сообществе, где важна каждая история.
             </p>

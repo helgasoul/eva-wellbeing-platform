@@ -15,7 +15,7 @@ const UserPersonasSection: React.FC = () => {
 
   const personas = [
     {
-      title: "Начало перемен",
+      title: "Начало менопаузы",
       subtitle: "Замечаете изменения в цикле?",
       description: "Почувствуйте уверенность на этом этапе",
       Icon: Sprout,
@@ -33,7 +33,7 @@ const UserPersonasSection: React.FC = () => {
       ctaText: "Посмотреть решения"
     },
     {
-      title: "После перемен",
+      title: "После менопаузы",
       subtitle: "Поддержите здоровье и качество жизни в новом этапе",
       description: "Ваша забота о себе — в приоритете",
       Icon: Gem,
@@ -76,7 +76,7 @@ const UserPersonasSection: React.FC = () => {
                     </div>
                     <img 
                       src={beginningChangesImage} 
-                      alt="Поддержка для женщин на старте перемен"
+                      alt="Поддержка для женщин на старте менопаузы"
                       className="w-full h-48 object-cover"
                     />
                   </div>
@@ -96,7 +96,7 @@ const UserPersonasSection: React.FC = () => {
                     </div>
                     <img 
                       src={activePhaseImage} 
-                      alt="Поддержка и решения для женщин в активной фазе перемен"
+                      alt="Поддержка и решения для женщин в активной фазе менопаузы"
                       className="w-full h-48 object-cover"
                     />
                   </div>
