@@ -4948,7 +4948,7 @@ export type Database = {
           id: string
           step_data: Json
           step_name: string
-          step_number: number
+          step_number: number | null
           user_id: string | null
         }
         Insert: {
@@ -4956,7 +4956,7 @@ export type Database = {
           id?: string
           step_data: Json
           step_name: string
-          step_number: number
+          step_number?: number | null
           user_id?: string | null
         }
         Update: {
@@ -4964,7 +4964,7 @@ export type Database = {
           id?: string
           step_data?: Json
           step_name?: string
-          step_number?: number
+          step_number?: number | null
           user_id?: string | null
         }
         Relationships: []
@@ -6574,6 +6574,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string | null
+          email: string | null
           email_verified: boolean | null
           first_name: string | null
           id: string
@@ -6583,12 +6584,14 @@ export type Database = {
           phone: string | null
           phone_verified: boolean | null
           registration_completed: boolean | null
+          role: string | null
           updated_at: string | null
           user_role: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
+          email?: string | null
           email_verified?: boolean | null
           first_name?: string | null
           id: string
@@ -6598,12 +6601,14 @@ export type Database = {
           phone?: string | null
           phone_verified?: boolean | null
           registration_completed?: boolean | null
+          role?: string | null
           updated_at?: string | null
           user_role?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
+          email?: string | null
           email_verified?: boolean | null
           first_name?: string | null
           id?: string
@@ -6613,6 +6618,7 @@ export type Database = {
           phone?: string | null
           phone_verified?: boolean | null
           registration_completed?: boolean | null
+          role?: string | null
           updated_at?: string | null
           user_role?: string | null
         }
