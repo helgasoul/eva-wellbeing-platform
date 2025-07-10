@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
@@ -20,6 +20,7 @@ interface OnboardingGuardProps {
 export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Проверяем только после загрузки пользователя
@@ -27,9 +28,13 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
 
     // Проверка только для пациенток
     if (user.role === 'patient') {
-      // ✅ УЛУЧШЕНО: Более детальная проверка статуса онбординга
+      // ✅ ИСПРАВЛЕНО: Проверяем текущий маршрут - не редиректим если уже на онбординге
+      if (location.pathname === '/patient/onboarding') {
+        console.log('🔄 OnboardingGuard: Already on onboarding page, no redirect needed');
+        return;
+      }
+
       const hasCompletedOnboarding = Boolean(user.onboardingCompleted);
-      const hasOnboardingData = Boolean(user.onboardingData);
       
       // Проверяем, является ли это recovery-ссылкой (сброс пароля)
       const urlParams = new URLSearchParams(window.location.search);
@@ -45,8 +50,8 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       if (!hasCompletedOnboarding) {
         console.log('🔒 OnboardingGuard: Redirecting to onboarding', {
           userId: user.id,
+          currentPath: location.pathname,
           hasCompletedOnboarding,
-          hasOnboardingData,
           registrationCompleted: user.registrationCompleted,
           isPasswordRecovery
         });
@@ -56,10 +61,10 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       
       console.log('✅ OnboardingGuard: Onboarding completed, allowing access', {
         userId: user.id,
-        onboardingCompletedAt: user.onboardingData?.completedAt
+        currentPath: location.pathname
       });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, location.pathname]);
 
   // Показываем загрузку пока проверяем статус
   if (isLoading) {
@@ -78,9 +83,14 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
     return null;
   }
 
-  // Для пациенток проверяем завершение онбординга
+  // ✅ ИСПРАВЛЕНО: Убрана вторая проверка которая создавала петлю
+  // Если мы на странице онбординга, всегда показываем контент
+  if (location.pathname === '/patient/onboarding') {
+    return <>{children}</>;
+  }
+
+  // Для пациенток на других страницах проверяем завершение онбординга
   if (user.role === 'patient' && !user.onboardingCompleted) {
-    // Редирект уже произошел в useEffect, показываем загрузку
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

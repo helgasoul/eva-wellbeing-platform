@@ -10,7 +10,7 @@ import { UserRole } from '@/types/auth';
  * - Если пользователь авторизован И завершил онбординг → редирект на дашборд
  * - Если пользователь авторизован НО не завершил онбординг → редирект на онбординг
  * - Для других ролей (doctor, admin) → проверка не нужна
- * - Исключение: не редиректим если пользователь на странице сброса пароля
+ * - Исключение: не редиректим если пользователь на странице сброса пароля или уже на онбординге
  */
 export const useOnboardingCheck = () => {
   const { user, isLoading } = useAuth();
@@ -21,8 +21,8 @@ export const useOnboardingCheck = () => {
     // Ждем загрузки пользователя
     if (isLoading || !user) return;
 
-    // Не редиректим если пользователь на странице сброса пароля
-    if (location.pathname === '/reset-password') return;
+    // Не редиректим если пользователь на странице сброса пароля или уже на онбординге
+    if (location.pathname === '/reset-password' || location.pathname === '/patient/onboarding') return;
 
     // Проверяем только пациенток
     if (user.role === UserRole.PATIENT) {
