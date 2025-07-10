@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/utils/logger';
 
 interface BackButtonProps {
   className?: string;
@@ -52,7 +53,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
   ];
   
   if (hideOnPages.includes(location.pathname)) {
-    console.log('🔍 BackButton: Hidden on page:', location.pathname);
+    logger.debug('BackButton: Hidden on page', { pathname: location.pathname });
     return null;
   }
 

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/utils/logger';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PhaseResult, PersonalizedRecommendations, OnboardingData } from '@/types/onboarding';
@@ -42,7 +43,7 @@ export const OnboardingResults: React.FC<OnboardingResultsProps> = ({
   };
 
   const handleRecommendationAction = (recommendationId: string, actionType: string, provider?: any) => {
-    console.log('Recommendation action:', { recommendationId, actionType, provider });
+    logger.debug('Recommendation action', { recommendationId, actionType, provider });
     // Здесь будет логика обработки действий (запись в календарь, запись к врачу и т.д.)
   };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { environmentalService } from '../../services/environmentalService';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/utils/logger';
 
 interface LocationSettingsProps {
   currentLocation: { lat: number; lon: number; city: string } | null;
@@ -24,7 +25,7 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
         throw new Error('Геолокация не поддерживается вашим браузером');
       }
 
-      console.log('🌍 Запрашиваем геолокацию...');
+      logger.debug('Requesting geolocation...');
 
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         const timeoutId = setTimeout(() => {
@@ -49,11 +50,11 @@ export const LocationSettings: React.FC<LocationSettingsProps> = ({
       });
 
       const { latitude, longitude } = position.coords;
-      console.log(`📍 Координаты получены: ${latitude}, ${longitude}`);
+      logger.debug('Coordinates received', { latitude, longitude });
       
       // Получаем название города через reverse geocoding
       const city = await environmentalService.getCityName(latitude, longitude);
-      console.log(`🏙️ Город определен: ${city}`);
+      logger.debug('City determined', { city });
       
       onLocationUpdate({ lat: latitude, lon: longitude, city });
       

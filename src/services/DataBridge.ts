@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger';
+
 interface UserDataState {
   registration: {
     completed: boolean;
@@ -44,7 +46,7 @@ export class DataBridge {
       };
       
       localStorage.setItem(`${this.storagePrefix}${key}`, JSON.stringify(dataWithMeta));
-      console.log(`✅ DataBridge: Сохранены данные для ключа: ${key}`);
+      logger.debug('DataBridge: Data saved', { key });
     } catch (error) {
       console.error(`❌ DataBridge: Ошибка сохранения ${key}:`, error);
       throw error;
@@ -56,12 +58,12 @@ export class DataBridge {
     try {
       const storedData = localStorage.getItem(`${this.storagePrefix}${key}`);
       if (!storedData) {
-        console.log(`📥 DataBridge: Данные не найдены для ключа: ${key}`);
+        logger.debug('DataBridge: No data found', { key });
         return null;
       }
 
       const parsed = JSON.parse(storedData);
-      console.log(`📥 DataBridge: Загружены данные для ключа: ${key}`);
+      logger.debug('DataBridge: Data loaded', { key });
       return parsed.data;
     } catch (error) {
       console.error(`❌ DataBridge: Ошибка загрузки ${key}:`, error);
@@ -110,7 +112,7 @@ export class DataBridge {
         timestamp: new Date().toISOString()
       };
 
-      console.log('📊 DataBridge: Сводка данных пользователя:', summary);
+      logger.debug('DataBridge: User data summary', { summary });
       return {
         hasData: true,
         summary: {
@@ -172,7 +174,7 @@ export class DataBridge {
 
       result.success = result.errors.length === 0;
       
-      console.log('✅ DataBridge: Registration data transferred successfully', result);
+      logger.info('DataBridge: Registration data transferred successfully', { userId: transferMetadata.userId });
       return result;
 
     } catch (error) {
@@ -261,7 +263,7 @@ export class DataBridge {
     try {
       const presets = this.getStorageItem('onboarding_presets');
       if (presets && this.isValidPresets(presets)) {
-        console.log('📋 DataBridge: Onboarding presets loaded successfully');
+        logger.debug('DataBridge: Onboarding presets loaded successfully');
         return presets;
       }
       return null;
@@ -296,7 +298,7 @@ export class DataBridge {
         localStorage.removeItem(`${this.storagePrefix}${key}`);
       });
 
-      console.log('🧹 DataBridge: Transfer data cleaned up successfully');
+      logger.debug('DataBridge: Transfer data cleaned up successfully');
     } catch (error) {
       console.error('❌ DataBridge: Cleanup failed', error);
     }

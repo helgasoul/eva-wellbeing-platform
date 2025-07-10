@@ -11,6 +11,8 @@ import type {
   AnalyticsEventType
 } from '@/types/analytics';
 import { ANALYTICS_EVENTS } from '@/types/analytics';
+import { aiAnalyticsService } from './aiAnalyticsService';
+import { logger } from '@/utils/logger';
 
 class AnalyticsService {
   public sessionId: string;
@@ -194,7 +196,7 @@ class AnalyticsService {
       // Store in localStorage for offline support
       this.storeEventOffline(event);
       
-      console.log('Analytics event tracked:', event);
+      logger.debug('Analytics event tracked', { event });
     } catch (error) {
       console.error('Failed to track analytics event:', error);
       this.storeEventOffline(event);
@@ -243,7 +245,7 @@ class AnalyticsService {
         .insert(events);
 
       localStorage.removeItem('offline_analytics');
-      console.log(`Synced ${events.length} offline analytics events`);
+      logger.info('Offline analytics events synced', { count: events.length });
     } catch (error) {
       console.error('Failed to sync offline analytics events:', error);
     }

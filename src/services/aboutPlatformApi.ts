@@ -1,4 +1,5 @@
 import { AboutPlatformData } from '@/hooks/useAboutPlatformData';
+import { logger } from '@/utils/logger';
 
 class AboutPlatformApi {
   private storageKey = 'about-platform-data';
@@ -16,7 +17,7 @@ class AboutPlatformApi {
   async saveData(data: AboutPlatformData): Promise<void> {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(data));
-      console.log('Данные сохранены');
+      logger.info('About platform data saved');
     } catch (error) {
       console.error('Ошибка сохранения данных:', error);
       throw error;

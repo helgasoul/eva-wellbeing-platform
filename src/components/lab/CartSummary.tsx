@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { LabTest } from '@/services/labRecommendationService';
+import { logger } from '@/utils/logger';
 
 interface CartSummaryProps {
   cart: LabTest[];
@@ -119,7 +120,7 @@ export const CartSummary: React.FC<CartSummaryProps> = ({
           onClose={() => setShowCheckout(false)}
           onConfirm={(orderData) => {
             // Обработка заказа
-            console.log('Заказ оформлен:', orderData);
+            logger.info('Order placed', { orderId: orderData.id });
             setShowCheckout(false);
             onClearCart();
           }}

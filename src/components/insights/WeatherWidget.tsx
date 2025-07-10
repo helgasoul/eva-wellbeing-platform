@@ -12,6 +12,7 @@ import {
 import { climateDataService } from '../../services/climateDataService';
 import { environmentalService } from '../../services/environmentalService';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/utils/logger';
 
 interface WeatherWidgetProps {
   userId: string;
@@ -54,7 +55,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
     setError('');
 
     try {
-      console.log('🌤️ Обновление погодных данных...');
+      logger.debug('Updating weather data...');
       
       // Получить экологические данные
       const environmentalData = await environmentalService.getCurrentEnvironmentalData(
@@ -106,7 +107,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({
         description: `Данные для ${location.city} успешно получены`,
       });
 
-      console.log('✅ Погодные данные обновлены успешно');
+      logger.success('Weather data updated successfully');
       
     } catch (error) {
       console.error('❌ Ошибка обновления погодных данных:', error);

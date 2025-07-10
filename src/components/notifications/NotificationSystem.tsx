@@ -3,6 +3,7 @@ import { NotificationButton } from './NotificationButton';
 import { NotificationCenter } from './NotificationCenter';
 import { SimpleNotification } from './SimpleNotification';
 import { AdvancedRecommendationEngine, AdvancedRecommendation } from '../../services/advancedRecommendationEngine';
+import { logger } from '@/utils/logger';
 
 export const NotificationSystem: React.FC = () => {
   const [notifications, setNotifications] = useState<AdvancedRecommendation[]>([]);
@@ -43,14 +44,14 @@ export const NotificationSystem: React.FC = () => {
   };
 
   const handleNotificationClick = (notification: AdvancedRecommendation) => {
-    console.log('Clicked notification:', notification.title);
+    logger.debug('Notification clicked', { title: notification.title });
     setCurrentNotification(notification);
     setShowCurrentNotification(true);
     setShowNotificationCenter(false);
   };
 
   const handleNotificationAction = (action: string) => {
-    console.log('Action performed:', action);
+    logger.debug('Notification action performed', { action });
     setShowCurrentNotification(false);
   };
 

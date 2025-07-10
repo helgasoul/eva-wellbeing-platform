@@ -5,6 +5,7 @@ import { UserRole } from '@/types/roles';
 import { TopNavbar } from './TopNavbar';
 import { Breadcrumbs, BreadcrumbItem } from './Breadcrumbs';
 import { QuickActions } from './QuickActions';
+import { logger } from '@/utils/logger';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -46,13 +47,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           window.location.href = '/doctor/search';
           break;
         case 'critical-alerts':
-          console.log('Показать критические уведомления');
+          logger.debug('Show critical notifications');
           break;
         case 'system-alerts':
-          console.log('Показать системные алерты');
+          logger.debug('Show system alerts');
           break;
         default:
-          console.log('Неизвестное действие:', actionType);
+          logger.warn('Unknown action type', { actionType });
       }
     }
   };
