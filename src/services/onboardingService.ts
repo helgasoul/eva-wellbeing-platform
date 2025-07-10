@@ -100,22 +100,27 @@ class OnboardingService {
   // Сохранение анализа менопаузы
   async saveAnalysis(userId: string, analysis: MenopauseAnalysisResult): Promise<{ error: string | null }> {
     try {
+      // Ensure phase_confidence is a valid number between 0 and 1
+      const validatedConfidence = Math.max(0, Math.min(1, Number(analysis.phase_confidence) || 0));
+      
       const { error } = await supabase
         .from('menopause_analysis')
-        .insert({
+        .upsert({
           user_id: userId,
           menopause_phase: analysis.menopause_phase,
-          phase_confidence: analysis.phase_confidence,
+          phase_confidence: validatedConfidence,
           risk_factors: analysis.risk_factors,
           recommendations: analysis.recommendations
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) {
         console.error('Save analysis error:', error);
-        return { error: error.message };
+        return { error: `Ошибка сохранения анализа: ${error.message}` };
       }
 
-      console.log(`✅ Menopause analysis saved for user ${userId}`);
+      console.log(`✅ Menopause analysis saved for user ${userId} with confidence ${validatedConfidence}`);
       return { error: null };
 
     } catch (error: any) {
@@ -129,31 +134,64 @@ class OnboardingService {
     try {
       // 1. Сохраняем анализ, если предоставлен
       if (analysis) {
+        console.log('🔄 Saving menopause analysis...', { 
+          phase: analysis.menopause_phase, 
+          confidence: analysis.phase_confidence 
+        });
+        
         const { error: analysisError } = await this.saveAnalysis(userId, analysis);
         if (analysisError) {
-          return { error: analysisError };
+          console.error('❌ Analysis save failed:', analysisError);
+          return { error: `Не удалось сохранить анализ: ${analysisError}` };
         }
+        
+        console.log('✅ Analysis saved successfully');
       }
 
       // 2. Обновляем статус онбординга в профиле
+      console.log('🔄 Updating user profile completion status...');
+      
       const { error: profileError } = await supabase
         .from('user_profiles')
         .update({
           onboarding_completed: true,
-          menopause_phase: analysis?.menopause_phase
+          registration_completed: true, // Also ensure registration is marked complete
+          menopause_phase: analysis?.menopause_phase,
+          updated_at: new Date().toISOString()
         })
         .eq('id', userId);
 
       if (profileError) {
-        console.error('Complete onboarding error:', profileError);
-        return { error: profileError.message };
+        console.error('❌ Profile update failed:', profileError);
+        return { error: `Ошибка обновления профиля: ${profileError.message}` };
       }
 
-      console.log(`✅ Onboarding completed for user ${userId}`);
+      // 3. Verify the update was successful
+      const { data: updatedProfile, error: verifyError } = await supabase
+        .from('user_profiles')
+        .select('onboarding_completed, registration_completed')
+        .eq('id', userId)
+        .single();
+
+      if (verifyError) {
+        console.error('❌ Profile verification failed:', verifyError);
+        return { error: 'Не удалось подтвердить завершение онбординга' };
+      }
+
+      if (!updatedProfile?.onboarding_completed) {
+        console.error('❌ Onboarding completion flag not set');
+        return { error: 'Статус онбординга не был обновлен' };
+      }
+
+      console.log(`✅ Onboarding completed successfully for user ${userId}`, {
+        onboarding_completed: updatedProfile.onboarding_completed,
+        registration_completed: updatedProfile.registration_completed
+      });
+      
       return { error: null };
 
     } catch (error: any) {
-      console.error('Complete onboarding error:', error);
+      console.error('❌ Complete onboarding error:', error);
       return { error: error.message || 'Ошибка завершения онбординга' };
     }
   }
