@@ -857,82 +857,82 @@ const PatientDashboard = () => {
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('symptoms')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Plus className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Сегодняшнее самочувствие</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Сегодняшнее самочувствие</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('cycle')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Calendar className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Мой цикл и гормоны</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Мой цикл и гормоны</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('nutrition')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Utensils className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Дневник питания</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Дневник питания</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('sleep')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Moon className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Анализ сна</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Анализ сна</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('data-sources')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Database className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Мои данные</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Мои данные</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('insights')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Brain className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Мои открытия</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Мои открытия</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('ai-chat')}  
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <MessageSquare className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Спросить совет у ассистента Eva</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Спросить совет у ассистента</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('community')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Users className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Поддержка от женщин</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Поддержка от женщин</span>
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => handleQuickAction('doctors')}
-                className="h-auto py-6 px-3 flex flex-col items-center space-y-3 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[120px]"
+                className="h-auto py-4 px-2 flex flex-col items-center justify-center space-y-2 border-primary/20 bg-gradient-to-b from-card to-accent/10 hover:bg-gradient-to-b hover:from-primary/10 hover:to-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-soft rounded-2xl min-h-[110px] max-h-[130px]"
               >
                 <Stethoscope className="h-6 w-6 text-primary flex-shrink-0" />
-                <span className="text-xs text-center leading-tight break-words hyphens-auto">Задать вопрос врачу</span>
+                <span className="text-xs text-center leading-relaxed break-words w-full px-1 overflow-hidden">Задать вопрос врачу</span>
               </Button>
             </div>
           </CardContent>
