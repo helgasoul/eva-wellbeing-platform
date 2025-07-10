@@ -7,7 +7,7 @@ export const generateId = (): string => {
 
 // Система уведомлений
 export const showNotification = (message: string, type: 'success' | 'error' | 'warning' | 'info') => {
-  console.log(`${type.toUpperCase()}: ${message}`);
+  // Only log in development - production uses UI notifications only
   
   // Здесь можно добавить реальную систему уведомлений
   // Например, интеграцию с toast системой

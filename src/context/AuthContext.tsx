@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AuthErrorBoundary } from '@/components/auth/AuthErrorBoundary';
 import { DataBridge } from '@/services/DataBridge';
 import { authConfig, isAdminLoginAvailable, generateSecureId } from '@/config/auth';
+import { logger } from '@/utils/logger';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -68,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               
               // Если ошибка была недавно и есть бэкап - предлагаем восстановление
               if (Date.now() - errorTime < 300000 && backupTime > errorTime) { // 5 минут
-                console.log('🚨 Emergency recovery available, backup from:', backup.timestamp);
+                logger.info('Emergency recovery available', { backupTimestamp: backup.timestamp });
                 localStorage.setItem('eva_recovery_available', 'true');
                 return backup;
               }
@@ -109,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         if (!systemHealthy) {
           // ✅ EMERGENCY MODE: Используем безопасный fallback
-          console.log('🚨 Activating emergency mode');
+          logger.warn('Activating emergency mode');
           const emergencyUser = {
             id: generateSecureId('emergency'),
             email: 'emergency@user.local',
@@ -130,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         if (currentUser) {
           setUser(currentUser);
-          console.log('✅ User authenticated via Supabase:', currentUser.email);
+          logger.info('User authenticated via Supabase', { email: currentUser.email });
           
           // Проверяем миграцию данных из localStorage
           try {
@@ -142,7 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
         } else if (recoveryData?.user) {
           // RECOVERY MODE: Восстанавливаем из бэкапа
-          console.log('🔄 Restoring from emergency backup');
+          logger.info('Restoring from emergency backup');
           setUser(recoveryData.user);
           localStorage.removeItem('eva_last_error');
           
@@ -166,7 +167,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 onboardingCompleted: userData.onboarding_completed || userData.onboardingCompleted || false
               } as User;
               setUser(tempUser);
-              console.log('🔄 Using localStorage user data for recovery');
+              logger.debug('Using localStorage user data for recovery');
             } catch (error) {
               console.error('Error parsing localStorage:', error);
               localStorage.removeItem('eva_user_data');
@@ -220,17 +221,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           };
           
           setUser(updatedUser);
-          console.log('✅ Auth state changed with onboarding migration');
+          logger.debug('Auth state changed with onboarding migration');
         } else {
           setUser(authenticatedUser);
-          console.log('✅ Auth state changed - user logged in:', authenticatedUser.email);
+          logger.info('User logged in', { email: authenticatedUser.email });
         }
       } else {
         setUser(authenticatedUser);
         if (authenticatedUser) {
-          console.log('✅ Auth state changed - user logged in:', authenticatedUser.email);
+          logger.info('User logged in', { email: authenticatedUser.email });
         } else {
-          console.log('🔄 Auth state changed - user logged out');
+          logger.info('User logged out');
         }
       }
     });
@@ -585,7 +586,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    console.log('🔄 Updating user with:', updates);
+    logger.debug('Updating user', { updates });
     
     // Синхронно обновляем локальное состояние
     const updatedUser = { ...user, ...updates };
@@ -601,7 +602,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
     }
     
-    console.log('✅ User updated locally:', updatedUser);
+    logger.debug('User updated locally', { userId: updatedUser.id });
   };
 
   // Универсальное сохранение данных пользователя
@@ -621,7 +622,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(prev => ({ ...prev, ...data }));
       }
       
-      console.log(`✅ AuthContext: Сохранены данные пользователя: ${key}`);
+      logger.debug('User data saved to storage', { key });
     } catch (error) {
       console.error(`❌ AuthContext: Ошибка сохранения ${key}:`, error);
       throw error;
@@ -632,14 +633,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loadUserData = async (key: string) => {
     try {
       if (!user) {
-        console.log('AuthContext: Пользователь не авторизован');
+        logger.debug('User not authenticated - cannot save data');
         return null;
       }
 
       const userKey = key.includes('_') ? key : `${key}_${user.id}`;
       const data = await dataBridge.loadData(userKey);
       
-      console.log(`📥 AuthContext: Загружены данные пользователя: ${key}`);
+      logger.debug('User data loaded from storage', { key });
       return data;
     } catch (error) {
       console.error(`❌ AuthContext: Ошибка загрузки ${key}:`, error);

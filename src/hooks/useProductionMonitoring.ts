@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { productionMonitoringService } from '@/services/productionMonitoringService';
 import { analyticsService } from '@/services/analyticsService';
+import { logger } from '@/utils/logger';
 
 export const useProductionMonitoring = () => {
   const { user } = useAuth();
@@ -51,9 +52,9 @@ export const useProductionMonitoring = () => {
         productionMonitoringService.performHealthCheck().catch(console.error);
       }, 5 * 60 * 1000);
 
-      console.log('Production monitoring initialized');
+      logger.info('Production monitoring initialized');
     } catch (error) {
-      console.error('Failed to initialize production monitoring:', error);
+      logger.error('Failed to initialize production monitoring', error);
     }
   };
 

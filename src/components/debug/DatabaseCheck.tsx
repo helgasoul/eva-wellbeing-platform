@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 const DatabaseCheck = () => {
   const [checks, setChecks] = useState({
@@ -10,7 +11,7 @@ const DatabaseCheck = () => {
   });
 
   const runChecks = async () => {
-    console.log('🔍 Запуск проверок базы данных...');
+    logger.info('Starting database checks...');
 
     // 1. Проверка текущего пользователя
     try {
@@ -117,7 +118,7 @@ const DatabaseCheck = () => {
   const fixCurrentUserProfile = async () => {
     const session = checks.currentUser.data;
     if (!session?.user) {
-      console.error('❌ Нет активной сессии');
+      logger.error('No active session');
       return;
     }
 
@@ -132,12 +133,12 @@ const DatabaseCheck = () => {
       });
 
       if (error) {
-        console.error(`❌ Ошибка создания профиля:`, error);
+        logger.error('Profile creation error', error);
       } else {
-        console.log(`✅ Создан профиль для ${session.user.email}`);
+        logger.info('Profile created for user', { email: session.user.email });
       }
     } catch (error) {
-      console.error(`❌ Критическая ошибка создания профиля:`, error);
+      logger.error('Critical profile creation error', error);
     }
     
     // Перезапускаем проверки

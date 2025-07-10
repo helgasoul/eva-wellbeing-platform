@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { logger } from '@/utils/logger';
 
 const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
   const location = useLocation();
@@ -27,7 +28,7 @@ const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
     
     // Отслеживаем изменения auth состояния
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('🔄 Auth State Change:', { event, session });
+      logger.debug('Auth state change', { event, sessionExists: !!session });
       setDebugInfo(prev => ({
         ...prev,
         authEvents: [...prev.authEvents, { 
@@ -46,9 +47,10 @@ const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
   }, [location]);
 
   const runPasswordResetDiagnostics = async () => {
-    console.log('🔍 ДИАГНОСТИКА СБРОСА ПАРОЛЯ');
-    console.log('📍 Текущий URL:', window.location.href);
-    console.log('📍 Location object:', location);
+    logger.debug('Password reset diagnostics', {
+      currentUrl: window.location.href,
+      location: location
+    });
 
     // 1. Анализ URL параметров
     const urlParams = new URLSearchParams(window.location.search);
@@ -114,12 +116,12 @@ const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
       } : null
     });
 
-    console.log('📊 Результаты диагностики:', {
+    logger.debug('Diagnostics results', {
       urlAnalysis,
-      session,
-      userProfile,
-      currentLocation: location,
-      authContextUser: user
+      sessionExists: !!session,
+      userProfileExists: !!userProfile,
+      currentLocation: location.pathname,
+      authContextUserExists: !!user
     });
   };
 
@@ -129,7 +131,7 @@ const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
       return;
     }
 
-    console.log('🧪 ТЕСТИРОВАНИЕ СБРОСА ПАРОЛЯ для:', testEmail);
+    logger.debug('Testing password reset', { email: testEmail });
     
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(testEmail, {
@@ -137,13 +139,13 @@ const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
       });
 
       if (error) {
-        console.error('❌ Ошибка сброса пароля:', error);
+        logger.error('Password reset error', error);
         setResetTestResult({
           success: false,
           error: error.message
         });
       } else {
-        console.log('✅ Сброс пароля инициирован:', data);
+        logger.info('Password reset initiated', { data });
         setResetTestResult({
           success: true,
           message: 'Письмо отправлено! Проверьте почту и перейдите по ссылке.',
@@ -151,7 +153,7 @@ const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
         });
       }
     } catch (e) {
-      console.error('💥 Критическая ошибка:', e);
+      logger.error('Critical password reset error', e);
       setResetTestResult({
         error: e.message
       });
@@ -333,10 +335,11 @@ const PasswordResetDebug = ({ onClose }: { onClose?: () => void }) => {
           </button>
           <button
             onClick={() => {
-              console.log('📋 ПОЛНЫЙ ОТЧЕТ ДИАГНОСТИКИ СБРОСА ПАРОЛЯ:');
-              console.log('URL Analysis:', urlAnalysis);
-              console.log('Auth Flow:', authFlow);
-              console.log('Debug Info:', debugInfo);
+              logger.debug('Password reset diagnostic report', {
+                urlAnalysis,
+                authFlow,
+                debugInfo
+              });
               alert('Полный отчет сохранен в консоль браузера (F12)');
             }}
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"

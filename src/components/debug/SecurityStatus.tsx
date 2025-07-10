@@ -1,9 +1,10 @@
-// ✅ ЭТАП 2: Компонент для отображения статуса безопасности
-
 import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { authConfig } from '@/config/auth';
+import { logger } from '@/utils/logger';
 import { verifyAuthSecurity, quickAuthCheck, testAuthFlow } from '@/utils/authVerification';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
 interface SecurityStatusProps {
   className?: string;
@@ -28,7 +29,7 @@ export const SecurityStatus: React.FC<SecurityStatusProps> = ({ className = '' }
   }, [isVisible]);
 
   const handleRunTest = async () => {
-    console.log('🧪 Running security test...');
+    logger.debug('Running security test...');
     const result = await testAuthFlow();
     setTestResult(result);
     

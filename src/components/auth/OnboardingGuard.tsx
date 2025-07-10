@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { logger } from '@/utils/logger';
 
 interface OnboardingGuardProps {
   children: React.ReactNode;
@@ -30,7 +31,7 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
     if (user.role === 'patient') {
       // ✅ ИСПРАВЛЕНО: Проверяем текущий маршрут - не редиректим если уже на онбординге
       if (location.pathname === '/patient/onboarding') {
-        console.log('🔄 OnboardingGuard: Already on onboarding page, no redirect needed');
+        logger.debug('OnboardingGuard: Already on onboarding page');
         return;
       }
 
@@ -43,12 +44,12 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       // Если это восстановление пароля и у пользователя есть хотя бы базовые данные,
       // считаем онбординг завершенным и не редиректим
       if (isPasswordRecovery && user.registrationCompleted) {
-        console.log('🔓 OnboardingGuard: Password recovery for registered user, allowing access');
+        logger.debug('OnboardingGuard: Password recovery for registered user, allowing access');
         return;
       }
       
       if (!hasCompletedOnboarding) {
-        console.log('🔒 OnboardingGuard: Redirecting to onboarding', {
+        logger.info('OnboardingGuard: Redirecting to onboarding', {
           userId: user.id,
           currentPath: location.pathname,
           hasCompletedOnboarding,
@@ -59,7 +60,7 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
         return;
       }
       
-      console.log('✅ OnboardingGuard: Onboarding completed, allowing access', {
+      logger.debug('OnboardingGuard: Onboarding completed, allowing access', {
         userId: user.id,
         currentPath: location.pathname
       });

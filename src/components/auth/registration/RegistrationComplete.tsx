@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { CheckCircle, Sparkles, Heart, Shield, ArrowRight, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DataBridge } from '@/services/DataBridge';
+import { logger } from '@/utils/logger';
 
 const menopausePersonas = {
   first_signs: {
@@ -77,7 +78,7 @@ export const RegistrationComplete: React.FC = () => {
           
           // Логируем успешную передачу с аналитикой
           const analytics = dataBridge.getTransferAnalytics();
-          console.log('✅ DataBridge analytics:', analytics);
+          logger.debug('DataBridge analytics processed', { analyticsGenerated: !!analytics });
         } else {
           console.error('❌ DataBridge transfer failed:', result.errors);
           // Fallback to old method
@@ -107,7 +108,7 @@ export const RegistrationComplete: React.FC = () => {
           description: `Добро пожаловать, ${createdUser.firstName}!`,
         });
 
-        console.log('✅ Registration data successfully transferred and saved');
+        logger.info('Registration data successfully transferred and saved');
         
       } catch (error) {
         console.error('❌ Error completing registration:', error);

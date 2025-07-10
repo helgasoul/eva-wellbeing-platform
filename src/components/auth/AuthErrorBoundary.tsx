@@ -2,6 +2,7 @@ import React, { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, RefreshCw, Home, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/utils/logger';
 
 interface Props {
   children: ReactNode;
@@ -70,7 +71,7 @@ export class AuthErrorBoundary extends Component<Props, State> {
         }
       });
 
-      console.log('✅ Emergency auth recovery completed');
+      logger.info('Emergency auth recovery completed');
     } catch (recoveryError) {
       console.error('❌ Emergency recovery failed:', recoveryError);
     }
