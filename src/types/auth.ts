@@ -28,6 +28,17 @@ export interface User {
   menopausePhase?: string;
 }
 
+export interface UserDataSummary {
+  hasData: boolean;
+  summary: {
+    onboardingCompleted: boolean;
+    symptomEntries: any[];
+    nutritionEntries: any[];
+    aiChatHistory: any[];
+    weatherData: any[];
+  };
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -145,7 +156,7 @@ export interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   completeRegistration: (data: MultiStepRegistrationData) => Promise<User>;
-  updateUser: (updates: Partial<User>) => void; // ✅ ИСПРАВЛЕНО: Синхронная функция
+  updateUser: (updates: Partial<User>) => void;
   completeOnboarding: (onboardingData: any) => Promise<void>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
@@ -155,6 +166,11 @@ export interface AuthContextType {
   switchRole: (role: UserRole) => void;
   returnToOriginalRole: () => void;
   isTestingRole: boolean;
+  
+  // DataBridge методы
+  saveUserData: (key: string, data: any) => Promise<void>;
+  loadUserData: (key: string) => Promise<any>;
+  getUserDataSummary: () => Promise<any>;
   
   // Методы диагностики data flow
   validateUserDataIntegrity: () => any;

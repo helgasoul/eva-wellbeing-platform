@@ -21,7 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { detectMenopausePhase } from '@/utils/menopausePhaseDetector';
 import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
-import { dataBridge, OnboardingPresets } from '@/services/dataBridge';
+import { DataBridge, OnboardingPresets } from '@/services/DataBridge';
 import { onboardingService } from '@/services/onboardingService';
 import { migrateOnboardingData } from '@/utils/onboardingMigration';
 
@@ -175,6 +175,7 @@ const PatientOnboarding = () => {
           });
         } else {
           // 3. Fallback: пытаемся загрузить данные через DataBridge
+          const dataBridge = DataBridge.getInstance();
           const presets = dataBridge.getOnboardingPresets();
           
           if (presets) {
@@ -459,6 +460,7 @@ const PatientOnboarding = () => {
       }
       
       // 5. Очищаем временные данные
+      const dataBridge = DataBridge.getInstance();
       dataBridge.cleanupTransferData();
       await saveUserData('onboarding_progress', null); // Очищаем прогресс
       localStorage.removeItem(STORAGE_KEY);

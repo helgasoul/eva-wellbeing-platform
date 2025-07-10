@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Clock, CheckCircle, ArrowRight } from 'lucide-react';
-import { dataBridge } from '@/services/dataBridge';
+import { DataBridge } from '@/services/DataBridge';
 
 interface WelcomeStepProps {
   onNext?: () => void;
@@ -11,6 +11,7 @@ interface WelcomeStepProps {
 
 export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext }) => {
   // ✅ НОВОЕ: Получаем данные персонализации
+  const dataBridge = DataBridge.getInstance();
   const presets = dataBridge.getOnboardingPresets();
   const analytics = dataBridge.getTransferAnalytics();
   

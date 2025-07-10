@@ -5,7 +5,7 @@ import { useRegistration } from '@/context/RegistrationContext';
 import { useAuth } from '@/context/AuthContext';
 import { CheckCircle, Sparkles, Heart, Shield, ArrowRight, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { dataBridge } from '@/services/dataBridge';
+import { DataBridge } from '@/services/DataBridge';
 
 const menopausePersonas = {
   first_signs: {
@@ -63,6 +63,7 @@ export const RegistrationComplete: React.FC = () => {
         setNewUser(createdUser);
         
         // ✅ НОВОЕ: Используем DataBridge для безопасной передачи данных
+        const dataBridge = DataBridge.getInstance();
         const result = dataBridge.transferRegistrationToOnboarding(createdUser, {
           step1: state.step1Data,
           step2: state.step2Data,

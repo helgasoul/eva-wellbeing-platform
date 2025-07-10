@@ -34,10 +34,9 @@ export class DataBridge {
     return DataBridge.instance;
   }
 
-  // Универсальное сохранение данных
+  // Сохранение данных
   async saveData(key: string, data: any): Promise<void> {
     try {
-      // 1. Сохранить в localStorage с метаданными
       const dataWithMeta = {
         data,
         timestamp: new Date().toISOString(),
@@ -45,24 +44,14 @@ export class DataBridge {
       };
       
       localStorage.setItem(`${this.storagePrefix}${key}`, JSON.stringify(dataWithMeta));
-      
-      // 2. Логирование для отладки
       console.log(`✅ DataBridge: Сохранены данные для ключа: ${key}`);
-      
-      // 3. Валидация сохранения
-      const saved = localStorage.getItem(`${this.storagePrefix}${key}`);
-      if (!saved) {
-        throw new Error(`Не удалось сохранить данные для ключа: ${key}`);
-      }
-      
-      return Promise.resolve();
     } catch (error) {
       console.error(`❌ DataBridge: Ошибка сохранения ${key}:`, error);
       throw error;
     }
   }
 
-  // Универсальная загрузка данных
+  // Загрузка данных
   async loadData(key: string): Promise<any> {
     try {
       const storedData = localStorage.getItem(`${this.storagePrefix}${key}`);
@@ -84,33 +73,31 @@ export class DataBridge {
   async validateDataIntegrity(): Promise<{ valid: boolean; errors: string[]; warnings: string[] }> {
     const report = {
       valid: true,
-      errors: [],
-      warnings: []
+      errors: [] as string[],
+      warnings: [] as string[]
     };
 
     try {
-      // Проверить основные данные
       const userData = await this.loadData('user_data');
       if (!userData) {
         report.errors.push('Отсутствуют данные пользователя');
         report.valid = false;
       }
 
-      // Проверить онбординг
       const onboardingData = await this.loadData('onboarding_data');
       if (!onboardingData && userData?.role === 'patient') {
         report.warnings.push('Отсутствуют данные онбординга');
       }
 
       return report;
-    } catch (error) {
+    } catch (error: any) {
       report.valid = false;
       report.errors.push(`Ошибка валидации: ${error.message}`);
       return report;
     }
   }
 
-  // Получить сводку всех данных пользователя
+  // Получить сводку данных пользователя
   async getUserDataSummary(userId: string): Promise<any> {
     try {
       const summary = {
@@ -124,10 +111,22 @@ export class DataBridge {
       };
 
       console.log('📊 DataBridge: Сводка данных пользователя:', summary);
-      return summary;
+      return {
+        hasData: true,
+        summary: {
+          onboardingCompleted: summary.userData?.onboardingCompleted || false,
+          symptomEntries: summary.symptomEntries,
+          nutritionEntries: summary.nutritionEntries,
+          aiChatHistory: summary.aiChatHistory,
+          weatherData: summary.weatherData
+        }
+      };
     } catch (error) {
       console.error('❌ DataBridge: Ошибка получения сводки:', error);
-      return null;
+      return {
+        hasData: false,
+        summary: {}
+      };
     }
   }
 

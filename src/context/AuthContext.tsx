@@ -8,7 +8,7 @@ import { DataFlowValidator } from '@/services/dataFlowValidator';
 import { authService } from '@/services/authService';
 import { onboardingService } from '@/services/onboardingService';
 import { supabase } from '@/integrations/supabase/client';
-import { DataBridge } from '@/services/dataBridge';
+import { DataBridge } from '@/services/DataBridge';
 
 // Предустановленные админские credentials
 const ADMIN_CREDENTIALS = {
@@ -653,6 +653,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     switchRole,
     returnToOriginalRole,
     isTestingRole,
+    // DataBridge методы
+    saveUserData,
+    loadUserData,
+    getUserDataSummary,
     validateUserDataIntegrity,
     getDataFlowStatus,
     repairDataFlow,

@@ -1,5 +1,5 @@
 import { DataFlowCheck, DataFlowDiagnostics, UserValidation } from '@/types/dataFlow';
-import { useDataBridge } from '@/services/dataBridge';
+import { DataBridge } from '@/services/DataBridge';
 
 export class DataFlowValidator {
   private getStorageItem(key: string): any | null {
@@ -386,7 +386,7 @@ export class DataFlowValidator {
       if (registrationStage?.missing_fields.includes('onboarding_presets')) {
         const userData = this.getStorageItem('eva_user_data');
         if (userData) {
-          const dataBridge = useDataBridge();
+          const dataBridge = DataBridge.getInstance();
           // Пересоздаем presets на основе существующих данных
           // dataBridge.transferData(userData, userData); // Если нужно
         }
