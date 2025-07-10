@@ -12,10 +12,16 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ErrorMessage } from '@/components/ui/error-message';
 import { useAuth } from '@/context/AuthContext';
 import { LoginFormData, loginSchema } from '@/types/auth';
+import { migrateLocalStorageUser, clearLocalStorageUserData } from '@/utils/userMigration';
+import { useToast } from '@/hooks/use-toast';
 
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showMigrationForm, setShowMigrationForm] = useState(false);
+  const [migrationPassword, setMigrationPassword] = useState('');
+  const [isMigrating, setIsMigrating] = useState(false);
   const { login, isLoading, error } = useAuth();
+  const { toast } = useToast();
 
   const {
     register,
@@ -41,10 +47,64 @@ export const LoginForm = () => {
         password: data.password,
         rememberMe: data.rememberMe,
       });
-    } catch (error) {
-      // Error handling is done in AuthContext
+    } catch (error: any) {
+      // Если ошибка входа, проверяем localStorage
+      const localUser = localStorage.getItem('eva_user_data');
+      if (localUser && error.message === 'Invalid login credentials') {
+        const userData = JSON.parse(localUser);
+        if (userData.email === data.email) {
+          // Показываем форму миграции
+          setShowMigrationForm(true);
+          return;
+        }
+      }
       console.error('Login error:', error);
     }
+  };
+
+  const handleMigration = async () => {
+    const formData = watch();
+    
+    if (!formData.email || !migrationPassword) {
+      toast({
+        title: "Ошибка",
+        description: "Введите email и новый пароль",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsMigrating(true);
+    try {
+      const result = await migrateLocalStorageUser(formData.email, migrationPassword);
+      
+      if (result.success) {
+        // Очищаем localStorage
+        clearLocalStorageUserData();
+        
+        // Входим с новым паролем
+        await login({
+          email: formData.email,
+          password: migrationPassword,
+          rememberMe: formData.rememberMe,
+        });
+        
+        toast({
+          title: "Успешно!",
+          description: "Аккаунт успешно обновлен!",
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      console.error('Ошибка миграции:', error);
+      toast({
+        title: "Ошибка",
+        description: "Ошибка обновления аккаунта",
+        variant: "destructive",
+      });
+    }
+    setIsMigrating(false);
   };
 
   return (
@@ -136,6 +196,54 @@ export const LoginForm = () => {
           <span>{isLoading ? 'Входим...' : 'Войти'}</span>
         </Button>
       </form>
+
+      {showMigrationForm && (
+        <div className="migration-form mt-6 p-6 bloom-card-secondary rounded-lg border border-primary/20">
+          <h3 className="text-lg font-playfair font-semibold text-primary mb-2">
+            Обновление аккаунта
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            Ваш аккаунт нужно обновить для работы с новой системой. 
+            Придумайте новый пароль:
+          </p>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="migrationPassword" className="block text-sm font-medium text-foreground mb-2">
+                Новый пароль
+              </Label>
+              <Input
+                id="migrationPassword"
+                type="password"
+                value={migrationPassword}
+                onChange={(e) => setMigrationPassword(e.target.value)}
+                className="bloom-input"
+                placeholder="Введите новый пароль"
+                minLength={6}
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <Button
+                onClick={handleMigration}
+                disabled={isMigrating}
+                className="bloom-button flex-1"
+              >
+                {isMigrating && <LoadingSpinner size="sm" className="mr-2" />}
+                {isMigrating ? 'Обновляем...' : 'Обновить аккаунт'}
+              </Button>
+              
+              <Button
+                onClick={() => setShowMigrationForm(false)}
+                variant="outline"
+                className="px-4"
+              >
+                Отмена
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 text-center">
         <p className="text-muted-foreground">
