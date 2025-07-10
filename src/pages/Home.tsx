@@ -17,18 +17,7 @@ const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ НОВОЕ: Проверка статуса онбординга при входе на главную страницу
-  useEffect(() => {
-    if (user && user.role === UserRole.PATIENT) {
-      if (user.onboardingCompleted) {
-        console.log('🔄 Redirecting authenticated user with completed onboarding to dashboard');
-        navigate('/patient/dashboard');
-      } else {
-        console.log('🔄 Redirecting authenticated user without completed onboarding to onboarding');
-        navigate('/patient/onboarding');
-      }
-    }
-  }, [user, navigate]);
+  // Removed automatic redirect - users can now visit home page regardless of auth status
 
   const benefits = [
     {
