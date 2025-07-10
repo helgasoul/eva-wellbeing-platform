@@ -4445,6 +4445,39 @@ export type Database = {
           },
         ]
       }
+      menopause_analysis: {
+        Row: {
+          created_at: string | null
+          id: string
+          menopause_phase: string
+          phase_confidence: number | null
+          recommendations: Json | null
+          risk_factors: Json | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          menopause_phase: string
+          phase_confidence?: number | null
+          recommendations?: Json | null
+          risk_factors?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          menopause_phase?: string
+          phase_confidence?: number | null
+          recommendations?: Json | null
+          risk_factors?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       menstrual_cycles: {
         Row: {
           basal_temperature: number | null
@@ -4629,6 +4662,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      onboarding_data: {
+        Row: {
+          completed_at: string | null
+          id: string
+          step_data: Json
+          step_name: string
+          step_number: number
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          step_data: Json
+          step_name: string
+          step_number: number
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          step_data?: Json
+          step_name?: string
+          step_number?: number
+          user_id?: string | null
+        }
+        Relationships: []
       }
       orders: {
         Row: {
@@ -5967,6 +6027,54 @@ export type Database = {
           location_data?: Json
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email_verified: boolean | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          menopause_phase: string | null
+          onboarding_completed: boolean | null
+          phone: string | null
+          phone_verified: boolean | null
+          registration_completed: boolean | null
+          updated_at: string | null
+          user_role: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email_verified?: boolean | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          menopause_phase?: string | null
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          phone_verified?: boolean | null
+          registration_completed?: boolean | null
+          updated_at?: string | null
+          user_role?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email_verified?: boolean | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          menopause_phase?: string | null
+          onboarding_completed?: boolean | null
+          phone?: string | null
+          phone_verified?: boolean | null
+          registration_completed?: boolean | null
+          updated_at?: string | null
+          user_role?: string | null
         }
         Relationships: []
       }
