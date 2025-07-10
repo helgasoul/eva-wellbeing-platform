@@ -5,6 +5,7 @@ import { User, LoginCredentials, RegisterData } from '@/types/auth';
 import { UserRole } from '@/types/roles';
 import { authAuditService } from './authAuditService';
 import { rateLimitService } from './rateLimitService';
+import { passwordPolicyService } from './passwordPolicyService';
 
 export interface AuthResponse {
   user: User | null;
@@ -36,6 +37,20 @@ class AuthService {
   async register(userData: RegisterData): Promise<AuthResponse> {
     try {
       console.log('📝 Начинаем регистрацию для:', userData.email);
+
+      // Validate password against policy
+      const passwordValidation = await passwordPolicyService.validatePassword(userData.password, {
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName
+      });
+
+      if (!passwordValidation.isValid) {
+        return {
+          user: null,
+          error: passwordValidation.errors[0] || 'Пароль не соответствует требованиям безопасности'
+        };
+      }
 
       // Проверяем rate limiting
       const rateLimitResult = await rateLimitService.checkRateLimit('register', userData.email);

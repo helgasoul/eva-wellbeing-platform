@@ -75,7 +75,12 @@ export const RegisterForm = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <PersonalInfoFields register={register} errors={errors} />
 
-        <PasswordFields register={register} errors={errors} />
+        <PasswordFields 
+          register={register} 
+          errors={errors} 
+          watch={watch}
+          setValue={setValue}
+        />
 
         <div className="space-y-2">
           <RoleSelector

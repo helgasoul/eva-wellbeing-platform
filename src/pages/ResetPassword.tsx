@@ -1,28 +1,48 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { EnhancedPasswordField } from '@/components/auth/EnhancedPasswordField';
+import { resetPasswordSchema } from '@/types/auth';
+import { passwordPolicyService } from '@/services/passwordPolicyService';
+
+type ResetPasswordFormData = {
+  password: string;
+  confirmPassword: string;
+};
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { updatePassword } = useAuth();
   
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const accessToken = searchParams.get('access_token');
   const refreshToken = searchParams.get('refresh_token');
+
+  const {
+    setValue,
+    watch,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      password: '',
+      confirmPassword: '',
+    },
+  });
+
+  const password = watch('password');
+  const confirmPassword = watch('confirmPassword');
 
   useEffect(() => {
     if (!accessToken || !refreshToken) {
@@ -30,29 +50,26 @@ export default function ResetPassword() {
     }
   }, [accessToken, refreshToken]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: ResetPasswordFormData) => {
     setError('');
-
-    if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
-      return;
-    }
-
-    if (!accessToken || !refreshToken) {
-      setError('Недействительная ссылка для сброса пароля');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      const { user: updatedUser } = await updatePassword(password, accessToken, refreshToken);
+      // Validate password against policy before submitting
+      const validation = await passwordPolicyService.validatePassword(data.password);
+      
+      if (!validation.isValid) {
+        setError(validation.errors[0] || 'Пароль не соответствует требованиям безопасности');
+        return;
+      }
+
+      if (!accessToken || !refreshToken) {
+        setError('Недействительная ссылка для сброса пароля');
+        return;
+      }
+
+      const { user: updatedUser } = await updatePassword(data.password, accessToken, refreshToken);
+      
       toast({
         title: 'Пароль обновлен',
         description: 'Ваш пароль был успешно изменен',
@@ -109,70 +126,35 @@ export default function ResetPassword() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Новый пароль</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Введите новый пароль"
-                  disabled={isLoading}
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
+            <EnhancedPasswordField
+              id="password"
+              label="Новый пароль"
+              placeholder="Создайте надежный пароль"
+              value={password || ''}
+              onChange={(value) => setValue('password', value)}
+              error={errors.password?.message}
+              disabled={isLoading}
+              showStrengthIndicator={true}
+              showGenerateButton={true}
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Подтвердите новый пароль"
-                  disabled={isLoading}
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  disabled={isLoading}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
+            <EnhancedPasswordField
+              id="confirmPassword"
+              label="Подтвердите новый пароль"
+              placeholder="Повторите новый пароль"
+              value={confirmPassword || ''}
+              onChange={(value) => setValue('confirmPassword', value)}
+              error={errors.confirmPassword?.message}
+              disabled={isLoading}
+              showStrengthIndicator={false}
+            />
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

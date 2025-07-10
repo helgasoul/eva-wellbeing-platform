@@ -55,6 +55,23 @@ export interface ForgotPasswordData {
   email: string;
 }
 
+// Enhanced password validation function that will be used in schemas
+const createPasswordValidator = (fieldName: string = 'password') => {
+  return z.string()
+    .min(1, `${fieldName} обязателен`)
+    .refine(async (password) => {
+      // Basic validation for immediate feedback
+      if (password.length < 8) return false;
+      if (!/[A-Z]/.test(password)) return false;
+      if (!/[a-z]/.test(password)) return false;
+      if (!/\d/.test(password)) return false;
+      if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false;
+      return true;
+    }, {
+      message: 'Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы, цифры и специальные символы'
+    });
+};
+
 // Схемы валидации Zod
 export const loginSchema = z.object({
   email: z
@@ -63,7 +80,7 @@ export const loginSchema = z.object({
     .email('Введите корректный email'),
   password: z
     .string()
-    .min(6, 'Пароль должен содержать минимум 6 символов'),
+    .min(1, 'Пароль обязателен'),
   rememberMe: z.boolean().default(false),
 });
 
@@ -80,9 +97,7 @@ export const registerSchema = z.object({
     .string()
     .min(1, 'Email обязателен')
     .email('Введите корректный email'),
-  password: z
-    .string()
-    .min(6, 'Пароль должен содержать минимум 6 символов'),
+  password: createPasswordValidator(),
   confirmPassword: z
     .string()
     .min(1, 'Подтвердите пароль'),
@@ -98,6 +113,34 @@ export const registerSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Пароли не совпадают',
   path: ['confirmPassword'],
+});
+
+// Schema for password reset
+export const resetPasswordSchema = z.object({
+  password: createPasswordValidator('Новый пароль'),
+  confirmPassword: z
+    .string()
+    .min(1, 'Подтвердите новый пароль'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Пароли не совпадают',
+  path: ['confirmPassword'],
+});
+
+// Schema for password change
+export const changePasswordSchema = z.object({
+  currentPassword: z
+    .string()
+    .min(1, 'Введите текущий пароль'),
+  newPassword: createPasswordValidator('Новый пароль'),
+  confirmPassword: z
+    .string()
+    .min(1, 'Подтвердите новый пароль'),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: 'Пароли не совпадают',
+  path: ['confirmPassword'],
+}).refine((data) => data.currentPassword !== data.newPassword, {
+  message: 'Новый пароль должен отличаться от текущего',
+  path: ['newPassword'],
 });
 
 // Выведенные типы из схем Zod

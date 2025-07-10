@@ -183,6 +183,22 @@ export class AuthAuditService {
       }
     });
   }
+
+  async logPasswordPolicyEvent(action: string, success: boolean, details: Record<string, any>, severity: 'low' | 'medium' | 'high' = 'medium'): Promise<void> {
+    await this.logAuthEvent({
+      action: `password_policy_${action}`,
+      success,
+      metadata: details
+    });
+
+    // Логируем как событие безопасности
+    await productionMonitoringService.logSecurityEvent(
+      'password_policy',
+      action,
+      details,
+      severity
+    );
+  }
 }
 
 export const authAuditService = new AuthAuditService();
