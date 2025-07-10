@@ -31,11 +31,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // ЛОГИКА ДЛЯ requireGuest (регистрация/вход)
   if (requireGuest) {
-    // Если пользователь уже авторизован, редиректим
+    // Проверяем, является ли это recovery-ссылкой (сброс пароля)
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPasswordRecovery = urlParams.get('type') === 'recovery' && urlParams.has('access_token');
+    
+    // Если это recovery-ссылка, пропускаем пользователя независимо от статуса авторизации
+    if (isPasswordRecovery) {
+      return <>{children}</>;
+    }
+    
+    // Если пользователь уже авторизован (НЕ recovery), редиректим
     if (user) {
       const defaultRedirect = getDashboardByRole(user.role);
       return <Navigate to={redirectTo || defaultRedirect} replace />;
     }
+    
     // Если не авторизован, показываем страницу (регистрацию/вход)
     return <>{children}</>;
   }
