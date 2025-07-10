@@ -5,6 +5,8 @@ import { User, AuthContextType, LoginCredentials, RegisterData, UserRole, MultiS
 import { getRoleDashboardPath } from '@/types/roles';
 import { toast } from '@/hooks/use-toast';
 import { DataFlowValidator } from '@/services/dataFlowValidator';
+import { authService } from '@/services/authService';
+import { onboardingService } from '@/services/onboardingService';
 
 // Предустановленные админские credentials
 const ADMIN_CREDENTIALS = {
@@ -30,35 +32,63 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [originalUser, setOriginalUser] = useState<User | null>(null); // Для сохранения оригинальной роли админа
   const [isTestingRole, setIsTestingRole] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // ✅ Начинаем с true для загрузки сессии
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Check for existing user on mount and redirect based on onboarding status
+  // ✅ НОВОЕ: Инициализация с Supabase Auth
   useEffect(() => {
-    const savedUser = localStorage.getItem('eva-user');
-    if (savedUser) {
+    const initializeAuth = async () => {
       try {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
+        setIsLoading(true);
         
-        // ✅ НОВОЕ: Проверка статуса онбординга при входе в приложение
-        if (parsedUser.role === UserRole.PATIENT) {
-          if (parsedUser.onboardingCompleted) {
-            console.log('✅ User authenticated with completed onboarding - redirecting to dashboard');
-            // Пользователь завершил онбординг, можем редиректить на дашборд
-            // Редирект будет происходить через компоненты, здесь только логирование
-          } else {
-            console.log('🔄 User authenticated but onboarding not completed - need onboarding');
-            // Пользователь не завершил онбординг, нужно показать онбординг
-            // Это будет обработано в OnboardingGuard
+        // Получаем текущего пользователя из Supabase
+        const { user: currentUser } = await authService.getCurrentUser();
+        
+        if (currentUser) {
+          setUser(currentUser);
+          console.log('✅ User authenticated via Supabase:', currentUser.email);
+          
+          // Проверяем миграцию данных из localStorage
+          await onboardingService.migrateFromLocalStorage(currentUser.id);
+          
+        } else {
+          // Fallback: проверяем localStorage для совместимости
+          const savedUser = localStorage.getItem('eva-user');
+          if (savedUser) {
+            try {
+              const parsedUser = JSON.parse(savedUser);
+              setUser(parsedUser);
+              console.log('🔄 Using legacy localStorage user data');
+            } catch (error) {
+              console.error('Error parsing saved user:', error);
+              localStorage.removeItem('eva-user');
+            }
           }
         }
+        
       } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('eva-user');
+        console.error('Auth initialization error:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    initializeAuth();
+
+    // ✅ Подписываемся на изменения аутентификации
+    const { data: { subscription } } = authService.onAuthStateChange((user) => {
+      setUser(user);
+      if (user) {
+        console.log('✅ Auth state changed - user logged in:', user.email);
+      } else {
+        console.log('🔄 Auth state changed - user logged out');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
@@ -66,71 +96,86 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      let mockUser: User;
-
-      // Проверяем админские credentials
+      // ✅ НОВОЕ: Проверяем админские credentials для демо
       if (credentials.email === ADMIN_CREDENTIALS.email && 
           credentials.password === ADMIN_CREDENTIALS.password) {
-        mockUser = {
+        const mockUser: User = {
           id: 'admin-001',
           email: ADMIN_CREDENTIALS.email,
           firstName: 'Администратор',
           lastName: 'Eva Platform',
           role: UserRole.ADMIN,
-          createdAt: new Date()
-        };
-      } else {
-        // Mock обычный login
-        mockUser = {
-          id: Math.random().toString(36).substr(2, 9),
-          email: credentials.email,
-          firstName: credentials.email.includes('doctor') ? 'Доктор' : 'Анна',
-          lastName: credentials.email.includes('doctor') ? 'Петрова' : 'Иванова',
-          role: credentials.email.includes('doctor') ? UserRole.DOCTOR : UserRole.PATIENT,
           createdAt: new Date(),
-          // ✅ НОВОЕ: Симулируем статус онбординга для демонстрации
-          onboardingCompleted: credentials.email.includes('completed'),
-          registrationCompleted: true
+          registrationCompleted: true,
+          onboardingCompleted: true
         };
+
+        setUser(mockUser);
+        
+        if (credentials.rememberMe) {
+          localStorage.setItem('eva-user', JSON.stringify(mockUser));
+        }
+
+        toast({
+          title: 'Добро пожаловать!',
+          description: 'Добро пожаловать в админ-панель Eva!',
+        });
+
+        navigate('/admin/dashboard');
+        return;
       }
 
-      setUser(mockUser);
-      
-      // Save to localStorage if remember me is checked
+      // ✅ ОСНОВНОЙ ПОТОК: Аутентификация через Supabase
+      const { user: authenticatedUser, error: authError } = await authService.login(credentials);
+
+      if (authError) {
+        setError(authError);
+        toast({
+          title: 'Ошибка входа',
+          description: authError,
+          variant: 'destructive',
+        });
+        throw new Error(authError);
+      }
+
+      if (!authenticatedUser) {
+        const errorMessage = 'Не удалось войти в систему';
+        setError(errorMessage);
+        toast({
+          title: 'Ошибка',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw new Error(errorMessage);
+      }
+
+      setUser(authenticatedUser);
+
+      // Сохраняем в localStorage для совместимости
       if (credentials.rememberMe) {
-        localStorage.setItem('eva-user', JSON.stringify(mockUser));
+        localStorage.setItem('eva-user', JSON.stringify(authenticatedUser));
       }
 
       toast({
         title: 'Добро пожаловать!',
-        description: mockUser.role === UserRole.ADMIN ? 
-          'Добро пожаловать в админ-панель Eva!' : 
-          'Вы успешно вошли в систему',
+        description: 'Вы успешно вошли в систему',
       });
 
-      // ✅ УЛУЧШЕНО: Редирект с учетом статуса онбординга
-      if (mockUser.role === UserRole.PATIENT) {
-        if (mockUser.onboardingCompleted) {
+      // ✅ Редирект с учетом роли и статуса онбординга
+      if (authenticatedUser.role === UserRole.PATIENT) {
+        if (authenticatedUser.onboardingCompleted) {
           navigate('/patient/dashboard');
         } else {
           navigate('/patient/onboarding');
         }
       } else {
-        const dashboardPath = getRoleDashboardPath(mockUser.role);
+        const dashboardPath = getRoleDashboardPath(authenticatedUser.role);
         navigate(dashboardPath);
       }
-    } catch (error) {
-      const errorMessage = 'Ошибка входа в систему';
-      setError(errorMessage);
-      toast({
-        title: 'Ошибка',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw error;
+
+    } catch (error: any) {
+      console.error('Login error:', error);
+      // Ошибка уже обработана выше
     } finally {
       setIsLoading(false);
     }
@@ -141,47 +186,49 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      // ✅ НОВОЕ: Регистрация через Supabase
+      const { user: newUser, error: authError } = await authService.register(data);
 
-      // Mock successful registration
-      const mockUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        createdAt: new Date(),
-        // ✅ НОВОЕ: Устанавливаем статус регистрации и онбординга
-        registrationCompleted: true,
-        onboardingCompleted: false // Новые пользователи должны пройти онбординг
-      };
+      if (authError) {
+        setError(authError);
+        toast({
+          title: 'Ошибка регистрации',
+          description: authError,
+          variant: 'destructive',
+        });
+        throw new Error(authError);
+      }
 
-      setUser(mockUser);
-      localStorage.setItem('eva-user', JSON.stringify(mockUser));
+      if (!newUser) {
+        const errorMessage = 'Не удалось создать аккаунт';
+        setError(errorMessage);
+        toast({
+          title: 'Ошибка',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw new Error(errorMessage);
+      }
+
+      setUser(newUser);
+      localStorage.setItem('eva-user', JSON.stringify(newUser));
 
       toast({
-        title: 'Добро пожаловать в Eva!',
+        title: 'Добро пожаловать в Bloom!',
         description: 'Ваш аккаунт успешно создан',
       });
 
-      // ✅ УЛУЧШЕНО: Редирект с учетом статуса онбординга для новых пользователей
-      if (mockUser.role === UserRole.PATIENT) {
-        // Новые пациентки должны пройти онбординг
+      // ✅ Редирект с учетом роли
+      if (newUser.role === UserRole.PATIENT) {
         navigate('/patient/onboarding');
       } else {
-        const dashboardPath = getRoleDashboardPath(mockUser.role);
+        const dashboardPath = getRoleDashboardPath(newUser.role);
         navigate(dashboardPath);
       }
-    } catch (error) {
-      const errorMessage = 'Ошибка создания аккаунта';
-      setError(errorMessage);
-      toast({
-        title: 'Ошибка',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw error;
+
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      // Ошибка уже обработана выше
     } finally {
       setIsLoading(false);
     }
@@ -192,35 +239,57 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // ✅ НОВОЕ: Восстановление пароля через Supabase
+      const { error: resetError } = await authService.resetPassword(email);
+
+      if (resetError) {
+        setError(resetError);
+        toast({
+          title: 'Ошибка',
+          description: resetError,
+          variant: 'destructive',
+        });
+        throw new Error(resetError);
+      }
 
       toast({
         title: 'Письмо отправлено',
         description: `Инструкции по восстановлению пароля отправлены на ${email}`,
       });
-    } catch (error) {
-      const errorMessage = 'Ошибка отправки письма';
-      setError(errorMessage);
-      toast({
-        title: 'Ошибка',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw error;
+
+    } catch (error: any) {
+      console.error('Forgot password error:', error);
+      // Ошибка уже обработана выше
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('eva-user');
-    navigate('/');
-    toast({
-      title: 'До свидания!',
-      description: 'Вы успешно вышли из системы',
-    });
+  const logout = async () => {
+    try {
+      // ✅ НОВОЕ: Выход через Supabase
+      const { error } = await authService.logout();
+      
+      if (error) {
+        console.error('Logout error:', error);
+      }
+
+      setUser(null);
+      localStorage.removeItem('eva-user');
+      navigate('/');
+      
+      toast({
+        title: 'До свидания!',
+        description: 'Вы успешно вышли из системы',
+      });
+
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Всё равно очищаем локальное состояние
+      setUser(null);
+      localStorage.removeItem('eva-user');
+      navigate('/');
+    }
   };
 
   // Функция переключения роли (только для администраторов)
@@ -317,7 +386,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     navigate('/admin/dashboard');
   };
 
-  // ✅ НОВОЕ: Обновление пользователя
+  // ✅ НОВОЕ: Обновление пользователя через Supabase
   const updateUser = async (updates: Partial<User>): Promise<void> => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
@@ -326,16 +395,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // Обновляем пользователя в состоянии
+      // ✅ Обновляем в Supabase
+      const { error } = await authService.updateProfile(user.id, updates);
+      
+      if (error) {
+        throw new Error(error);
+      }
+      
+      // Обновляем локальное состояние
       const updatedUser = { ...user, ...updates };
       setUser(updatedUser);
       
-      // Сохраняем в localStorage
+      // Обновляем localStorage для совместимости
       localStorage.setItem('eva-user', JSON.stringify(updatedUser));
       
       console.log('✅ User updated successfully:', updates);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error updating user:', error);
       throw error;
     } finally {
@@ -343,7 +419,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // ✅ УЛУЧШЕНО: Завершение онбординга с сохранением геолокации
+  // ✅ УЛУЧШЕНО: Завершение онбординга через Supabase
   const completeOnboarding = async (onboardingData: any): Promise<void> => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
@@ -352,7 +428,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // Сохраняем дополнительные данные из онбординга
+      // ✅ НОВОЕ: Сохраняем анализ менопаузы если есть
+      let analysis = null;
+      if (onboardingData.phaseResult && onboardingData.recommendations) {
+        analysis = {
+          menopause_phase: onboardingData.phaseResult.phase,
+          phase_confidence: onboardingData.phaseResult.confidence || 0.8,
+          risk_factors: onboardingData.phaseResult.riskFactors || {},
+          recommendations: onboardingData.recommendations
+        };
+      }
+      
+      // Завершаем онбординг в Supabase
+      const { error } = await onboardingService.completeOnboarding(
+        user.id, 
+        onboardingData.formData || {}, 
+        analysis || undefined
+      );
+      
+      if (error) {
+        throw new Error(error);
+      }
+      
+      // ✅ Сохраняем данные геолокации если они есть
+      if (onboardingData.formData?.geolocation) {
+        console.log('💾 Saving geolocation data from onboarding');
+        localStorage.setItem('eva-user-location', JSON.stringify(onboardingData.formData.geolocation));
+      }
+      
+      // Обновляем локальное состояние пользователя
       const onboardingUpdate: Partial<User> = {
         onboardingCompleted: true,
         onboardingData: {
@@ -361,27 +465,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       };
       
-      // ✅ НОВОЕ: Сохраняем данные геолокации если они есть
-      if (onboardingData.formData?.geolocation) {
-        console.log('💾 Saving geolocation data from onboarding');
-        localStorage.setItem('eva-user-location', JSON.stringify(onboardingData.formData.geolocation));
-      }
-      
-      // Обновляем статус онбординга
-      await updateUser(onboardingUpdate);
+      const updatedUser = { ...user, ...onboardingUpdate };
+      setUser(updatedUser);
+      localStorage.setItem('eva-user', JSON.stringify(updatedUser));
       
       toast({
         title: 'Онбординг завершен!',
-        description: 'Добро пожаловать в Eva! Теперь у вас есть доступ ко всем функциям платформы.',
+        description: 'Добро пожаловать в Bloom! Теперь у вас есть доступ ко всем функциям платформы.',
       });
       
       console.log('✅ Onboarding completed successfully', {
         userId: user.id,
         hasGeolocation: !!onboardingData.formData?.geolocation,
+        hasAnalysis: !!analysis,
         timestamp: new Date().toISOString()
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error completing onboarding:', error);
       toast({
         title: 'Ошибка',

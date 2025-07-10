@@ -21,6 +21,7 @@ import { detectMenopausePhase } from '@/utils/menopausePhaseDetector';
 import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
 import { dataBridge, OnboardingPresets } from '@/services/dataBridge';
+import { onboardingService } from '@/services/onboardingService';
 
 // ✅ ИСПРАВЛЕНО: Правильная 7-шаговая структура онбординга
 const TOTAL_STEPS = 7;
@@ -100,91 +101,68 @@ const PatientOnboarding = () => {
   const { user, completeOnboarding } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ ИСПРАВЛЕНИЕ: Загружаем данные через DataBridge
+  // ✅ НОВОЕ: Загружаем данные из Supabase и DataBridge
   useEffect(() => {
     const loadOnboardingData = async () => {
+      if (!user?.id) return;
+      
       try {
-        // 1. Пытаемся загрузить данные через DataBridge
-        const presets = dataBridge.getOnboardingPresets();
+        // 1. Сначала загружаем данные из Supabase
+        const { data: supabaseData } = await onboardingService.loadUserOnboarding(user.id);
         
-        if (presets) {
-          console.log('✅ Loading data via DataBridge:', presets);
-          setOnboardingPresets(presets);
-          
-          // Предзаполняем данные из DataBridge
-          const presetsFormData = {
-            basicInfo: {
-              age: 0,
-              height: 0,
-              weight: 0,
-              location: '',
-              occupation: '',
-              hasChildren: false,
-              ...presets.prefills.basicInfo
-            },
-            registrationPersona: presets.persona.id,
-            fromRegistration: true,
-            expectedPath: presets.persona.onboardingPath,
-            onboardingConfig: presets.onboardingConfig
-          };
-          
-          setFormData(presetsFormData);
-          setDataLoadingStatus(prev => ({ ...prev, dataBridge: true }));
+        if (supabaseData && Object.keys(supabaseData).length > 0) {
+          console.log('✅ Loading onboarding data from Supabase:', Object.keys(supabaseData));
+          setFormData(supabaseData);
+          setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
           
           toast({
-            title: 'Персональная анкета готова!',
-            description: `Анкета адаптирована для профиля "${getPersonaTitle(presets.persona.id)}" • ${presets.onboardingConfig.estimatedDuration}`,
+            title: 'Прогресс восстановлен',
+            description: 'Ваши данные онбординга загружены из облака',
           });
-          
         } else {
-          console.log('⚠️ No DataBridge presets found, falling back to legacy method');
+          // 2. Fallback: пытаемся загрузить данные через DataBridge
+          const presets = dataBridge.getOnboardingPresets();
           
-          // 2. Fallback: проверяем старый метод
-          const legacyPresets = localStorage.getItem('eva_onboarding_presets');
-          if (legacyPresets) {
-            try {
-              const presets = JSON.parse(legacyPresets);
-              console.log('✅ Loading legacy registration presets:', presets);
-              
-              const presetsFormData = {
-                basicInfo: {
-                  age: 0,
-                  height: 0,
-                  weight: 0,
-                  location: '',
-                  occupation: '',
-                  hasChildren: false,
-                  ...presets.basicInfo
-                },
-                registrationPersona: presets.personaId,
-                fromRegistration: true,
-                expectedPath: presets.expectedOnboardingPath
-              };
-              
-              setFormData(presetsFormData);
-              setDataLoadingStatus(prev => ({ ...prev, registration: true }));
-              
-              toast({
-                title: 'Добро пожаловать!',
-                description: `Анкета подготовлена для профиля "${getPersonaTitle(presets.personaId)}"`,
-              });
-              
-            } catch (error) {
-              console.error('Failed to load registration presets:', error);
+          if (presets) {
+            console.log('✅ Loading data via DataBridge:', presets);
+            setOnboardingPresets(presets);
+            
+            const presetsFormData = {
+              basicInfo: {
+                age: 0,
+                height: 0,
+                weight: 0,
+                location: '',
+                occupation: '',
+                hasChildren: false,
+                ...presets.prefills.basicInfo
+              },
+              registrationPersona: presets.persona.id,
+              fromRegistration: true,
+              expectedPath: presets.persona.onboardingPath,
+              onboardingConfig: presets.onboardingConfig
+            };
+            
+            setFormData(presetsFormData);
+            setDataLoadingStatus(prev => ({ ...prev, dataBridge: true }));
+            
+            toast({
+              title: 'Персональная анкета готова!',
+              description: `Анкета адаптирована для профиля "${getPersonaTitle(presets.persona.id)}" • ${presets.onboardingConfig.estimatedDuration}`,
+            });
+          } else {
+            // 3. Последний fallback: localStorage
+            const savedOnboardingData = localStorage.getItem(STORAGE_KEY);
+            if (savedOnboardingData) {
+              try {
+                const saved = JSON.parse(savedOnboardingData);
+                setFormData(saved);
+                setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
+                console.log('✅ Loading saved onboarding progress from localStorage');
+              } catch (error) {
+                console.error('Failed to load saved onboarding data:', error);
+              }
             }
-          }
-        }
-        
-        // 3. Загружаем сохраненный прогресс онбординга
-        const savedOnboardingData = localStorage.getItem(STORAGE_KEY);
-        if (savedOnboardingData) {
-          try {
-            const saved = JSON.parse(savedOnboardingData);
-            setFormData(prev => ({ ...prev, ...saved }));
-            setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
-            console.log('✅ Loading saved onboarding progress');
-          } catch (error) {
-            console.error('Failed to load saved onboarding data:', error);
           }
         }
         
@@ -194,19 +172,54 @@ const PatientOnboarding = () => {
     };
     
     loadOnboardingData();
-  }, []);
+  }, [user?.id]);
 
-  // ✅ ИСПРАВЛЕНО: Улучшенное автосохранение данных с отладкой
+  // ✅ НОВОЕ: Автосохранение в Supabase и localStorage
   useEffect(() => {
-    if (Object.keys(formData).length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-      console.log('💾 Onboarding data saved:', {
-        step: currentStep,
-        dataKeys: Object.keys(formData),
-        timestamp: new Date().toISOString()
-      });
-    }
-  }, [formData, currentStep]);
+    const saveOnboardingData = async () => {
+      if (!user?.id || Object.keys(formData).length === 0) return;
+      
+      try {
+        // Сохраняем в localStorage для оффлайн работы
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+        
+        // Определяем какой шаг сохранять
+        const stepMapping = [
+          { key: 'basicInfo', stepNumber: 2, stepName: 'basicInfo' },
+          { key: 'menstrualHistory', stepNumber: 3, stepName: 'menstrualHistory' },
+          { key: 'symptoms', stepNumber: 4, stepName: 'symptoms' },
+          { key: 'medicalHistory', stepNumber: 5, stepName: 'medicalHistory' },
+          { key: 'lifestyle', stepNumber: 6, stepName: 'lifestyle' },
+          { key: 'goals', stepNumber: 7, stepName: 'goals' }
+        ];
+        
+        // Сохраняем текущий шаг в Supabase
+        const currentStepData = stepMapping.find(s => s.stepNumber === currentStep);
+        if (currentStepData && formData[currentStepData.key]) {
+          await onboardingService.saveStep(
+            user.id,
+            currentStepData.stepNumber,
+            currentStepData.stepName,
+            formData[currentStepData.key]
+          );
+        }
+        
+        console.log('💾 Onboarding data saved:', {
+          step: currentStep,
+          dataKeys: Object.keys(formData),
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (error) {
+        console.error('Error saving onboarding data:', error);
+        // Не показываем ошибку пользователю, так как данные сохраняются в localStorage
+      }
+    };
+    
+    // Дебаунсим сохранение для избежания избыточных запросов
+    const timeoutId = setTimeout(saveOnboardingData, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [formData, currentStep, user?.id]);
 
   // ✅ ИСПРАВЛЕНО: Улучшенная функция обновления данных с валидацией
   const updateFormData = (stepData: Partial<OnboardingData>) => {
