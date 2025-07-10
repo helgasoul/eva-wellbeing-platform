@@ -14,6 +14,8 @@ interface OnboardingGuardProps {
  * - Если пациентка не завершила онбординг → редирект на /patient/onboarding
  * - Если онбординг завершен → показать компонент
  * - Для других ролей (doctor, admin) → пропустить проверку
+ * 
+ * ✅ ОБНОВЛЕНО: Улучшенная логика проверки статуса онбординга
  */
 export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -25,14 +27,25 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
 
     // Проверка только для пациенток
     if (user.role === 'patient') {
-      // Если онбординг не завершен - редирект на онбординг
-      if (!user.onboardingCompleted) {
-        console.log('🔒 OnboardingGuard: Redirecting to onboarding - not completed');
+      // ✅ УЛУЧШЕНО: Более детальная проверка статуса онбординга
+      const hasCompletedOnboarding = Boolean(user.onboardingCompleted);
+      const hasOnboardingData = Boolean(user.onboardingData);
+      
+      if (!hasCompletedOnboarding) {
+        console.log('🔒 OnboardingGuard: Redirecting to onboarding', {
+          userId: user.id,
+          hasCompletedOnboarding,
+          hasOnboardingData,
+          registrationCompleted: user.registrationCompleted
+        });
         navigate('/patient/onboarding', { replace: true });
         return;
       }
       
-      console.log('✅ OnboardingGuard: Onboarding completed, allowing access');
+      console.log('✅ OnboardingGuard: Onboarding completed, allowing access', {
+        userId: user.id,
+        onboardingCompletedAt: user.onboardingData?.completedAt
+      });
     }
   }, [user, isLoading, navigate]);
 

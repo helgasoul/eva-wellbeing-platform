@@ -336,6 +336,14 @@ const PatientOnboarding = () => {
 
   const handleOnboardingComplete = async () => {
     try {
+      console.log('🎯 Starting onboarding completion process', {
+        userId: user?.id,
+        hasPhaseResult: !!phaseResult,
+        hasRecommendations: !!recommendations,
+        hasFormData: !!formData,
+        hasGeolocation: !!formData.geolocation
+      });
+
       // ✅ ИСПРАВЛЕНИЕ: Используем AuthContext для завершения онбординга
       // Подготавливаем данные онбординга для сохранения
       const onboardingSummary = {
@@ -354,11 +362,13 @@ const PatientOnboarding = () => {
       // Очищаем локальные данные онбординга
       localStorage.removeItem(STORAGE_KEY);
       
+      console.log('✅ Onboarding completion successful, navigating to dashboard');
+      
       // Navigate to patient dashboard
       navigate('/patient/dashboard');
       
     } catch (error) {
-      console.error('Error completing onboarding:', error);
+      console.error('❌ Error completing onboarding:', error);
       toast({
         title: 'Ошибка',
         description: 'Произошла ошибка при завершении онбординга. Попробуйте еще раз.',

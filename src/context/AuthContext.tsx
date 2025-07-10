@@ -34,13 +34,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Check for existing user on mount
+  // Check for existing user on mount and redirect based on onboarding status
   useEffect(() => {
     const savedUser = localStorage.getItem('eva-user');
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
+        
+        // ✅ НОВОЕ: Проверка статуса онбординга при входе в приложение
+        if (parsedUser.role === UserRole.PATIENT) {
+          if (parsedUser.onboardingCompleted) {
+            console.log('✅ User authenticated with completed onboarding - redirecting to dashboard');
+            // Пользователь завершил онбординг, можем редиректить на дашборд
+            // Редирект будет происходить через компоненты, здесь только логирование
+          } else {
+            console.log('🔄 User authenticated but onboarding not completed - need onboarding');
+            // Пользователь не завершил онбординг, нужно показать онбординг
+            // Это будет обработано в OnboardingGuard
+          }
+        }
       } catch (error) {
         console.error('Error parsing saved user:', error);
         localStorage.removeItem('eva-user');
@@ -77,7 +90,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           firstName: credentials.email.includes('doctor') ? 'Доктор' : 'Анна',
           lastName: credentials.email.includes('doctor') ? 'Петрова' : 'Иванова',
           role: credentials.email.includes('doctor') ? UserRole.DOCTOR : UserRole.PATIENT,
-          createdAt: new Date()
+          createdAt: new Date(),
+          // ✅ НОВОЕ: Симулируем статус онбординга для демонстрации
+          onboardingCompleted: credentials.email.includes('completed'),
+          registrationCompleted: true
         };
       }
 
@@ -95,9 +111,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           'Вы успешно вошли в систему',
       });
 
-      // Redirect to role-specific dashboard
-      const dashboardPath = getRoleDashboardPath(mockUser.role);
-      navigate(dashboardPath);
+      // ✅ УЛУЧШЕНО: Редирект с учетом статуса онбординга
+      if (mockUser.role === UserRole.PATIENT) {
+        if (mockUser.onboardingCompleted) {
+          navigate('/patient/dashboard');
+        } else {
+          navigate('/patient/onboarding');
+        }
+      } else {
+        const dashboardPath = getRoleDashboardPath(mockUser.role);
+        navigate(dashboardPath);
+      }
     } catch (error) {
       const errorMessage = 'Ошибка входа в систему';
       setError(errorMessage);
@@ -127,7 +151,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         firstName: data.firstName,
         lastName: data.lastName,
         role: data.role,
-        createdAt: new Date()
+        createdAt: new Date(),
+        // ✅ НОВОЕ: Устанавливаем статус регистрации и онбординга
+        registrationCompleted: true,
+        onboardingCompleted: false // Новые пользователи должны пройти онбординг
       };
 
       setUser(mockUser);
@@ -138,9 +165,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         description: 'Ваш аккаунт успешно создан',
       });
 
-      // Redirect to role-specific dashboard
-      const dashboardPath = getRoleDashboardPath(mockUser.role);
-      navigate(dashboardPath);
+      // ✅ УЛУЧШЕНО: Редирект с учетом статуса онбординга для новых пользователей
+      if (mockUser.role === UserRole.PATIENT) {
+        // Новые пациентки должны пройти онбординг
+        navigate('/patient/onboarding');
+      } else {
+        const dashboardPath = getRoleDashboardPath(mockUser.role);
+        navigate(dashboardPath);
+      }
     } catch (error) {
       const errorMessage = 'Ошибка создания аккаунта';
       setError(errorMessage);
@@ -311,7 +343,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // ✅ НОВОЕ: Завершение онбординга
+  // ✅ УЛУЧШЕНО: Завершение онбординга с сохранением геолокации
   const completeOnboarding = async (onboardingData: any): Promise<void> => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
@@ -320,18 +352,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // Обновляем статус онбординга
-      await updateUser({
+      // Сохраняем дополнительные данные из онбординга
+      const onboardingUpdate: Partial<User> = {
         onboardingCompleted: true,
-        onboardingData
-      });
+        onboardingData: {
+          ...onboardingData,
+          completedAt: new Date().toISOString()
+        }
+      };
+      
+      // ✅ НОВОЕ: Сохраняем данные геолокации если они есть
+      if (onboardingData.formData?.geolocation) {
+        console.log('💾 Saving geolocation data from onboarding');
+        localStorage.setItem('eva-user-location', JSON.stringify(onboardingData.formData.geolocation));
+      }
+      
+      // Обновляем статус онбординга
+      await updateUser(onboardingUpdate);
       
       toast({
         title: 'Онбординг завершен!',
         description: 'Добро пожаловать в Eva! Теперь у вас есть доступ ко всем функциям платформы.',
       });
       
-      console.log('✅ Onboarding completed successfully');
+      console.log('✅ Onboarding completed successfully', {
+        userId: user.id,
+        hasGeolocation: !!onboardingData.formData?.geolocation,
+        timestamp: new Date().toISOString()
+      });
       
     } catch (error) {
       console.error('❌ Error completing onboarding:', error);

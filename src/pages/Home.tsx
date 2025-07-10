@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/layout/Header';
@@ -9,8 +9,27 @@ import HeroSection from '@/components/landing/HeroSection';
 import ValuePropositionSection from '@/components/landing/ValuePropositionSection';
 import UserPersonasSection from '@/components/landing/UserPersonasSection';
 import TrustIndicatorsSection from '@/components/landing/TrustIndicatorsSection';
+import { useAuth } from '@/context/AuthContext';
+import { UserRole } from '@/types/auth';
+import { OnboardingDemo } from '@/components/demo/OnboardingDemo';
 
 const Home = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // ✅ НОВОЕ: Проверка статуса онбординга при входе на главную страницу
+  useEffect(() => {
+    if (user && user.role === UserRole.PATIENT) {
+      if (user.onboardingCompleted) {
+        console.log('🔄 Redirecting authenticated user with completed onboarding to dashboard');
+        navigate('/patient/dashboard');
+      } else {
+        console.log('🔄 Redirecting authenticated user without completed onboarding to onboarding');
+        navigate('/patient/onboarding');
+      }
+    }
+  }, [user, navigate]);
+
   const benefits = [
     {
       emoji: '💜',
@@ -59,6 +78,13 @@ const Home = () => {
       
       {/* Показатели доверия */}
       <TrustIndicatorsSection />
+
+      {/* Демонстрация онбординга */}
+      <section className="py-16 px-6 bg-slate-50">
+        <div className="container mx-auto">
+          <OnboardingDemo />
+        </div>
+      </section>
 
       {/* Empathetic Support Section */}
       <section className="py-20 px-6 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-rose-50/20 relative overflow-hidden">
