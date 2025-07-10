@@ -9,6 +9,8 @@ import { RecentEntries } from '@/components/symptom-tracker/RecentEntries';
 import { healthDataService } from '@/services/healthDataService';
 import type { SymptomEntry } from '@/types/healthData';
 import { useToast } from '@/hooks/use-toast';
+import { SupabaseErrorBoundary } from '@/components/error/SupabaseErrorBoundary';
+import { useSupabaseErrorHandler } from '@/hooks/useSupabaseErrorHandler';
 
 const SymptomTracker: React.FC = () => {
   const { user, saveUserData, loadUserData } = useAuth();
