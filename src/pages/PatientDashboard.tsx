@@ -24,12 +24,20 @@ import {
   BarChart3,
   Utensils,
   Moon,
-  Smartphone
+  Smartphone,
+  // ✅ НОВЫЕ ИМПОРТЫ для персонализации
+  Target,
+  Thermometer,
+  AlertCircle,
+  CheckCircle,
+  Award
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { healthDataAggregator, HealthDataTimelineEntry } from '@/services/healthDataAggregator';
 import { wearableIntegration } from '@/services/wearableIntegration';
+// ✅ НОВЫЙ ИМПОРТ сервиса персонализации
+import { personalizationEngine, Recommendation, GoalProgress } from '@/services/personalizationService';
 
 interface HealthStats {
   totalEntries: number;
@@ -166,6 +174,165 @@ const PatientDashboard = () => {
     }
   };
 
+  // ✅ НОВЫЕ КОМПОНЕНТЫ ПЕРСОНАЛИЗАЦИИ
+
+  // Призыв к прохождению онбординга для пользователей без данных
+  const OnboardingPrompt = () => {
+    if (onboardingData && Object.keys(onboardingData).length > 0) return null;
+    
+    return (
+      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-elegant">
+        <CardContent className="p-6">
+          <div className="flex items-center">
+            <AlertCircle className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-blue-900 mb-1">Персонализируйте ваш опыт</h3>
+              <p className="text-blue-700 text-sm">
+                Пройдите онбординг, чтобы получить персональные рекомендации и адаптированную панель под вашу фазу менопаузы
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate('/patient/onboarding')}
+              className="ml-4 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Начать
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Фазо-специфичные рекомендации
+  const PhaseRecommendations = () => {
+    if (!onboardingData || Object.keys(onboardingData).length === 0) return null;
+    
+    const userProfile = personalizationEngine.analyzeUserProfile(onboardingData);
+    const recommendations = personalizationEngine.generatePhaseRecommendations(userProfile);
+    
+    if (recommendations.length === 0) return null;
+    
+    const getIconComponent = (iconName: string) => {
+      switch (iconName) {
+        case 'thermometer': return <Thermometer className="w-5 h-5" />;
+        case 'heart': return <Heart className="w-5 h-5" />;
+        case 'calendar': return <Calendar className="w-5 h-5" />;
+        case 'stethoscope': return <Stethoscope className="w-5 h-5" />;
+        case 'activity': return <Activity className="w-5 h-5" />;
+        default: return <Target className="w-5 h-5" />;
+      }
+    };
+    
+    return (
+      <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+            <Target className="h-5 w-5 text-primary" />
+            Рекомендации для вашей фазы
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Персонализированные советы на основе {userProfile.phase} и ваших симптомов
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4">
+            {recommendations.map((rec) => (
+              <div key={rec.id} className="p-4 bg-primary/5 border border-primary/20 rounded-xl hover:bg-primary/10 transition-colors">
+                <div className="flex items-center mb-3">
+                  <div className="p-2 bg-primary/20 rounded-lg mr-3">
+                    {getIconComponent(rec.icon || 'target')}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-foreground">{rec.title}</h4>
+                    <Badge variant="outline" className={
+                      rec.priority === 'high' ? 'border-red-300 text-red-700' :
+                      rec.priority === 'medium' ? 'border-yellow-300 text-yellow-700' :
+                      'border-green-300 text-green-700'
+                    }>
+                      {rec.priority === 'high' ? 'Важно' : rec.priority === 'medium' ? 'Средний' : 'Низкий'} приоритет
+                    </Badge>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-3">{rec.description}</p>
+                <div className="text-xs text-primary font-medium">
+                  На основе: {rec.basedOn.join(', ')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Отслеживание целей пользователя
+  const GoalTracking = () => {
+    if (!onboardingData?.goals?.goals || onboardingData.goals.goals.length === 0) return null;
+    
+    const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${user?.id}`) || '[]');
+    const goalProgress = personalizationEngine.calculateGoalProgress(onboardingData.goals.goals, symptomEntries);
+    
+    if (goalProgress.length === 0) return null;
+    
+    const getIconComponent = (iconName: string) => {
+      switch (iconName) {
+        case 'thermometer': return <Thermometer className="w-4 h-4" />;
+        case 'moon': return <Moon className="w-4 h-4" />;
+        case 'heart': return <Heart className="w-4 h-4" />;
+        case 'activity': return <Activity className="w-4 h-4" />;
+        default: return <Target className="w-4 h-4" />;
+      }
+    };
+    
+    return (
+      <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
+            <Award className="h-5 w-5 text-primary" />
+            Прогресс по вашим целям
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Отслеживание ваших личных целей в области здоровья
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-4">
+            {goalProgress.map((goal, idx) => (
+              <div key={idx} className="p-4 border border-primary/20 rounded-xl bg-gradient-to-br from-card to-accent/5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-primary/20 rounded-lg mr-2">
+                      {getIconComponent(goal.icon || 'target')}
+                    </div>
+                    <span className="font-medium text-sm">{goal.name}</span>
+                  </div>
+                  <TrendingUp className={`w-4 h-4 ${
+                    goal.trend === 'improving' ? 'text-green-500' : 
+                    goal.trend === 'stable' ? 'text-yellow-500' : 'text-red-500'
+                  }`} />
+                </div>
+                <div className="space-y-2">
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${goal.progress}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{goal.progress}% к цели</span>
+                    <span className="text-primary font-medium">
+                      {goal.trend === 'improving' ? '📈' : goal.trend === 'stable' ? '➡️' : '📉'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <PatientLayout breadcrumbs={breadcrumbs}>
       <div className="space-y-8 bg-gradient-to-br from-background via-accent/5 to-muted/20 min-h-screen -m-6 p-6">
@@ -207,6 +374,9 @@ const PatientDashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* ✅ НОВАЯ СЕКЦИЯ: Призыв к онбордингу для пользователей без данных */}
+        <OnboardingPrompt />
 
         {/* Health Data Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -428,6 +598,10 @@ const PatientDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* ✅ НОВЫЕ ПЕРСОНАЛИЗИРОВАННЫЕ СЕКЦИИ */}
+        <PhaseRecommendations />
+        <GoalTracking />
 
         {/* Quick Actions */}
         <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
