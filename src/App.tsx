@@ -23,8 +23,16 @@ import SymptomTracker from "./pages/patient/SymptomTracker";
 import PatientInsights from "./pages/patient/PatientInsights";
 import AIChat from "./pages/patient/AIChat";
 import FoodDiary from "./pages/patient/FoodDiary";
+import NutritionAnalysis from "./pages/patient/NutritionAnalysis";
+import NutritionPlan from "./pages/patient/NutritionPlan";
+import NutritionTracker from "./pages/patient/NutritionTracker";
+import CycleTracker from "./pages/patient/CycleTracker";
+import WearableDevices from "./pages/patient/WearableDevices";
+import LabTests from "./pages/patient/LabTests";
 import DoctorBooking from "./pages/patient/DoctorBooking";
 import Community from "./pages/patient/Community";
+import Settings from "./pages/patient/Settings";
+import Documents from "./pages/patient/Documents";
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -34,6 +42,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 // Landing and other pages
 import Home from "./pages/Home";
+import AboutPlatform from "./pages/AboutPlatform";
+import HowWeHelp from "./pages/HowWeHelp";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 // Dev pages for testing
@@ -58,8 +69,11 @@ function App() {
               <FoodDiaryProvider>
                 <BasicNotificationProvider>
                   <Routes>
-                    {/* PUBLIC ROUTES */}
+                     {/* PUBLIC ROUTES */}
                     <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<AboutPlatform />} />
+                    <Route path="/how-we-help" element={<HowWeHelp />} />
+                    <Route path="/contact" element={<Contact />} />
                     
                     {/* LEGAL ROUTES */}
                     <Route path="/privacy" element={
@@ -164,6 +178,14 @@ function App() {
       </ProtectedRoute>
     } />
     
+    <Route path="/patient/ai-chat" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <AIChat />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
     <Route path="/patient/nutrition" element={
       <ProtectedRoute allowedRoles={['patient']}>
         <OnboardingGuard>
@@ -180,10 +202,82 @@ function App() {
       </ProtectedRoute>
     } />
     
+    <Route path="/patient/doctors" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <DoctorBooking />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
     <Route path="/patient/community" element={
       <ProtectedRoute allowedRoles={['patient']}>
         <OnboardingGuard>
           <Community />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/nutrition-analysis" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <NutritionAnalysis />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/nutrition-plan" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <NutritionPlan />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/nutrition-tracker" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <NutritionTracker />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/cycle" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <CycleTracker />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/wearables" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <WearableDevices />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/lab-tests" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <LabTests />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/settings" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <Settings />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/documents" element={
+      <ProtectedRoute allowedRoles={['patient']}>
+        <OnboardingGuard>
+          <Documents />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
