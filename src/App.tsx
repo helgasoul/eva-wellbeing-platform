@@ -62,10 +62,10 @@ const queryClient = new QueryClient();
 function App() {
   const [showDebug, setShowDebug] = useState(false);
 
-  // Добавляем обработчик для комбинации клавиш Ctrl+Shift+D
+  // Добавляем обработчик для комбинации клавиш Ctrl+Shift+D (Windows/Linux) или Cmd+Shift+D (Mac)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
         setShowDebug(true);
       }
     };

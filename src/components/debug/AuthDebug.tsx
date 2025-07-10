@@ -15,6 +15,7 @@ const AuthDebug = () => {
   const [testEmail, setTestEmail] = useState('');
   const [testPassword, setTestPassword] = useState('');
   const [testResults, setTestResults] = useState(null);
+  const [checkEmailInput, setCheckEmailInput] = useState('');
 
   useEffect(() => {
     runDiagnostics();
@@ -223,6 +224,75 @@ const AuthDebug = () => {
     }
   };
 
+  const checkUserByEmail = async () => {
+    if (!checkEmailInput) {
+      setTestResults({ error: 'Введите email для проверки' });
+      return;
+    }
+
+    console.log('🔍 ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ ПО EMAIL:', { email: checkEmailInput });
+    
+    try {
+      const { data, error } = await supabase.rpc('check_user_exists', {
+        user_email: checkEmailInput
+      });
+
+      if (error) {
+        console.error('❌ Ошибка проверки пользователя:', error);
+        setTestResults({
+          checkUserError: error.message,
+          checkUserSuccess: false
+        });
+      } else {
+        console.log('✅ Результат проверки пользователя:', data);
+        setTestResults({
+          checkUserSuccess: true,
+          userExists: data.length > 0 ? data[0].user_exists : false,
+          userInfo: data.length > 0 ? data[0] : null
+        });
+      }
+    } catch (e) {
+      console.error('💥 Критическая ошибка проверки пользователя:', e);
+      setTestResults({
+        criticalError: e.message
+      });
+    }
+  };
+
+  const testPasswordReset = async () => {
+    if (!testEmail) {
+      setTestResults({ error: 'Введите email для сброса пароля' });
+      return;
+    }
+
+    console.log('🔐 ТЕСТИРОВАНИЕ СБРОСА ПАРОЛЯ:', { email: testEmail });
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(testEmail, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+
+      if (error) {
+        console.error('❌ Ошибка сброса пароля:', error);
+        setTestResults({
+          passwordResetError: error.message,
+          passwordResetSuccess: false
+        });
+      } else {
+        console.log('✅ Письмо для сброса пароля отправлено');
+        setTestResults({
+          passwordResetSuccess: true,
+          passwordResetMessage: 'Письмо для сброса пароля отправлено на указанный email'
+        });
+      }
+    } catch (e) {
+      console.error('💥 Критическая ошибка сброса пароля:', e);
+      setTestResults({
+        criticalError: e.message
+      });
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-full overflow-auto">
@@ -255,16 +325,37 @@ const AuthDebug = () => {
               className="flex-1 p-2 border rounded"
             />
           </div>
-          <div className="flex gap-2">
-            <button onClick={testLogin} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          <div className="flex gap-2 mb-2">
+            <button onClick={testLogin} className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
               Тест входа
             </button>
-            <button onClick={testRegistration} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+            <button onClick={testRegistration} className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
               Тест регистрации
             </button>
+            <button onClick={testPasswordReset} className="px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm">
+              Сброс пароля
+            </button>
           </div>
+          
+          {/* Проверка существования пользователя */}
+          <div className="mt-3 pt-3 border-t">
+            <h4 className="font-semibold text-sm mb-2">🔍 Проверка пользователя</h4>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                placeholder="Введите email для проверки"
+                value={checkEmailInput}
+                onChange={(e) => setCheckEmailInput(e.target.value)}
+                className="flex-1 p-2 border rounded text-sm"
+              />
+              <button onClick={checkUserByEmail} className="px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm">
+                Проверить
+              </button>
+            </div>
+          </div>
+          
           {testResults && (
-            <div className="mt-2">
+            <div className="mt-3">
               <h4 className="font-semibold text-sm mb-1">Результаты тестирования:</h4>
               <pre className="p-2 bg-gray-100 rounded text-xs overflow-auto max-h-32">
                 {JSON.stringify(testResults, null, 2)}
