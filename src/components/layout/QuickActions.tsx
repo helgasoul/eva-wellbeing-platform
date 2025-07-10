@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { Button } from '@/components/ui/button';
 import { 
   Plus, 

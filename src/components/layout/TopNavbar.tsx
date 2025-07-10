@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { User } from '@/types/auth';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { Bell, Search, User as UserIcon, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

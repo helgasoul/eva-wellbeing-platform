@@ -10,7 +10,7 @@ import ValuePropositionSection from '@/components/landing/ValuePropositionSectio
 import UserPersonasSection from '@/components/landing/UserPersonasSection';
 import TrustIndicatorsSection from '@/components/landing/TrustIndicatorsSection';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { OnboardingDemo } from '@/components/demo/OnboardingDemo';
 
 const Home = () => {

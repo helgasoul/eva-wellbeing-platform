@@ -1,7 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, AuthContextType, LoginCredentials, RegisterData, UserRole, MultiStepRegistrationData } from '@/types/auth';
+import { User, AuthContextType, LoginCredentials, RegisterData, MultiStepRegistrationData } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { getRoleDashboardPath } from '@/types/roles';
 import { toast } from '@/hooks/use-toast';
 import { DataFlowValidator } from '@/services/dataFlowValidator';

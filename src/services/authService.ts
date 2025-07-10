@@ -1,7 +1,8 @@
 // ✅ ЭТАП 3: Сервис аутентификации с Supabase
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser } from '@supabase/supabase-js';
-import { User, LoginCredentials, RegisterData, UserRole } from '@/types/auth';
+import { User, LoginCredentials, RegisterData } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 
 export interface AuthResponse {
   user: User | null;

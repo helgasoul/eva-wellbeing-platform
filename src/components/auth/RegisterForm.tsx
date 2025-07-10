@@ -11,7 +11,7 @@ import { RegisterFormHeader } from './register/RegisterFormHeader';
 import { PersonalInfoFields } from './register/PersonalInfoFields';
 import { PasswordFields } from './register/PasswordFields';
 import { AgreementCheckboxes } from './register/AgreementCheckboxes';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { useAuth } from '@/context/AuthContext';
 import { RegisterFormData, registerSchema } from '@/types/auth';
 

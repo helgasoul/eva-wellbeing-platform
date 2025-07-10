@@ -1,11 +1,6 @@
 
 import { z } from 'zod';
-
-export enum UserRole {
-  PATIENT = 'patient',
-  DOCTOR = 'doctor',
-  ADMIN = 'admin'
-}
+import { UserRole } from '@/types/roles';
 
 export interface User {
   id: string;

@@ -16,7 +16,7 @@ import {
   Users,
   UserCheck
 } from 'lucide-react';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 
 export const EmergencyLogin: React.FC = () => {
   const [isActivating, setIsActivating] = useState(false);

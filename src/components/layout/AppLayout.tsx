@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { TopNavbar } from './TopNavbar';
 import { Breadcrumbs, BreadcrumbItem } from './Breadcrumbs';
 import { QuickActions } from './QuickActions';

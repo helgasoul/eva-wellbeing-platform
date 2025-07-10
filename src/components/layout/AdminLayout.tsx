@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { AppLayout } from './AppLayout';
 import { Sidebar } from './Sidebar';
 import { RoleSwitcher } from './RoleSwitcher';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { BreadcrumbItem } from './Breadcrumbs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { UserRole } from "@/types/roles";
 import { useState, useEffect } from "react";
 import AuthDebug from "./components/debug/AuthDebug";
 import DatabaseCheck from "./components/debug/DatabaseCheck";
@@ -196,7 +197,7 @@ function App() {
 
                     {/* PATIENT ROUTES - с OnboardingGuard */}
                     <Route path="/patient/dashboard" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
+                      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
                         <OnboardingGuard>
                           <PatientDashboard />
                         </OnboardingGuard>
@@ -205,13 +206,13 @@ function App() {
                     
                     {/* Онбординг БЕЗ OnboardingGuard */}
                     <Route path="/patient/onboarding" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
+                      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
                         <PatientOnboarding />
                       </ProtectedRoute>
                     } />
                     
                     <Route path="/patient/symptoms" element={
-                      <ProtectedRoute allowedRoles={['patient']}>
+                      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
                         <OnboardingGuard>
                           <SymptomTracker />
                         </OnboardingGuard>
@@ -219,7 +220,7 @@ function App() {
                     } />
                     
                     <Route path="/patient/insights" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <PatientInsights />
         </OnboardingGuard>
@@ -229,7 +230,7 @@ function App() {
     {/* Removed duplicate /patient/chat route - use /patient/ai-chat instead */}
     
     <Route path="/patient/ai-chat" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <AIChat />
         </OnboardingGuard>
@@ -237,7 +238,7 @@ function App() {
     } />
     
     <Route path="/patient/nutrition" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <FoodDiary />
         </OnboardingGuard>
@@ -245,7 +246,7 @@ function App() {
     } />
     
     <Route path="/patient/doctor-booking" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <DoctorBooking />
         </OnboardingGuard>
@@ -253,7 +254,7 @@ function App() {
     } />
     
     <Route path="/patient/doctors" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <DoctorBooking />
         </OnboardingGuard>
@@ -261,7 +262,7 @@ function App() {
     } />
     
     <Route path="/patient/community" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <Community />
         </OnboardingGuard>
@@ -269,7 +270,7 @@ function App() {
     } />
     
     <Route path="/patient/nutrition-analysis" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <NutritionAnalysis />
         </OnboardingGuard>
@@ -277,7 +278,7 @@ function App() {
     } />
     
     <Route path="/patient/nutrition-plan" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <NutritionPlan />
         </OnboardingGuard>
@@ -285,7 +286,7 @@ function App() {
     } />
     
     <Route path="/patient/nutrition-tracker" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <NutritionTracker />
         </OnboardingGuard>
@@ -293,7 +294,7 @@ function App() {
     } />
     
     <Route path="/patient/cycle" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <CycleTracker />
         </OnboardingGuard>
@@ -301,7 +302,7 @@ function App() {
     } />
     
     <Route path="/patient/wearables" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <WearableDevices />
         </OnboardingGuard>
@@ -309,7 +310,7 @@ function App() {
     } />
     
     <Route path="/patient/lab-tests" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <LabTests />
         </OnboardingGuard>
@@ -317,7 +318,7 @@ function App() {
     } />
     
     <Route path="/patient/settings" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <Settings />
         </OnboardingGuard>
@@ -325,7 +326,7 @@ function App() {
     } />
     
     <Route path="/patient/recommendations" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <PatientRecommendations />
         </OnboardingGuard>
@@ -333,7 +334,7 @@ function App() {
     } />
     
     <Route path="/patient/documents" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <Documents />
         </OnboardingGuard>
@@ -341,7 +342,7 @@ function App() {
     } />
     
     <Route path="/patient/document-platform" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <DocumentPlatform />
         </OnboardingGuard>
@@ -349,7 +350,7 @@ function App() {
     } />
     
     <Route path="/patient/sleep-dashboard" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <div className="p-6">
             <div className="mb-4">
@@ -362,7 +363,7 @@ function App() {
     } />
     
     <Route path="/patient/data-sources" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <div className="p-6">
             <div className="mb-4">
@@ -375,7 +376,7 @@ function App() {
     } />
     
     <Route path="/patient/diagnostics" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <DataDiagnostics />
         </OnboardingGuard>
@@ -383,7 +384,7 @@ function App() {
     } />
     
     <Route path="/patient/calendar" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <Calendar />
         </OnboardingGuard>
@@ -391,7 +392,7 @@ function App() {
     } />
     
     <Route path="/patient/advanced-recommendations" element={
-      <ProtectedRoute allowedRoles={['patient']}>
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <AdvancedRecommendations />
         </OnboardingGuard>
@@ -400,14 +401,14 @@ function App() {
 
                     {/* DOCTOR ROUTES */}
                     <Route path="/doctor/dashboard" element={
-                      <ProtectedRoute allowedRoles={['doctor']}>
+                      <ProtectedRoute allowedRoles={[UserRole.DOCTOR]}>
                         <DoctorDashboard />
                       </ProtectedRoute>
                     } />
 
                     {/* ADMIN ROUTES */}
                     <Route path="/admin/dashboard" element={
-                      <ProtectedRoute allowedRoles={['admin']}>
+                      <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
                         <AdminDashboard />
                       </ProtectedRoute>
                     } />

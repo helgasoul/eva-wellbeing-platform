@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 
 export const OnboardingDemo: React.FC = () => {
   const { login } = useAuth();

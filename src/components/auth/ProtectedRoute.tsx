@@ -2,11 +2,12 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { UserRole } from '@/types/roles';
 
 export interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: ('patient' | 'doctor' | 'admin')[];
-  requiredRole?: ('patient' | 'doctor' | 'admin'); // Backward compatibility
+  allowedRoles?: UserRole[];
+  requiredRole?: UserRole; // Backward compatibility
   requireGuest?: boolean; // НОВЫЙ ПРОП: для защиты от авторизованных пользователей
   redirectTo?: string;
 }

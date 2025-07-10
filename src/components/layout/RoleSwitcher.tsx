@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 import { 
   DropdownMenu,
   DropdownMenuContent,
