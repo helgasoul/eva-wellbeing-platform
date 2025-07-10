@@ -271,6 +271,33 @@ class AuthService {
     }
   }
 
+  // Обновление пароля
+  async updatePassword(newPassword: string, accessToken?: string, refreshToken?: string): Promise<{ error: string | null }> {
+    try {
+      // Если переданы токены (из ссылки сброса), устанавливаем сессию
+      if (accessToken && refreshToken) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (sessionError) {
+          return { error: sessionError.message };
+        }
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      return { error: error?.message || null };
+
+    } catch (error: any) {
+      console.error('Update password error:', error);
+      return { error: error.message || 'Ошибка обновления пароля' };
+    }
+  }
+
   // Подписка на изменения аутентификации
   onAuthStateChange(callback: (user: User | null) => void) {
     return supabase.auth.onAuthStateChange(async (event, session) => {

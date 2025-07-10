@@ -277,6 +277,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updatePassword = async (newPassword: string, accessToken?: string, refreshToken?: string): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error: updateError } = await authService.updatePassword(newPassword, accessToken, refreshToken);
+
+      if (updateError) {
+        setError(updateError);
+        toast({
+          title: 'Ошибка',
+          description: updateError,
+          variant: 'destructive',
+        });
+        throw new Error(updateError);
+      }
+
+      toast({
+        title: 'Пароль обновлен',
+        description: 'Ваш пароль был успешно изменен',
+      });
+
+    } catch (error: any) {
+      console.error('Update password error:', error);
+      // Ошибка уже обработана выше
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       // ✅ НОВОЕ: Выход через Supabase
@@ -540,6 +570,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     completeOnboarding,
     logout,
     forgotPassword,
+    updatePassword,
     isLoading,
     error,
     switchRole,

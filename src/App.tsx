@@ -16,6 +16,7 @@ import { OnboardingGuard } from "./components/auth/OnboardingGuard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // NEW: Multi-step registration
 import MultiStepRegistration from "./pages/auth/MultiStepRegistration";
@@ -149,6 +150,15 @@ function App() {
                       element={
                         <ProtectedRoute requireGuest={true}>
                           <ForgotPassword />
+                        </ProtectedRoute>
+                      }
+                    />
+                    
+                    <Route
+                      path="/reset-password"
+                      element={
+                        <ProtectedRoute requireGuest={true}>
+                          <ResetPassword />
                         </ProtectedRoute>
                       }
                     />
