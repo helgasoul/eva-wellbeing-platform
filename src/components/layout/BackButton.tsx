@@ -37,9 +37,22 @@ export const BackButton: React.FC<BackButtonProps> = ({
     }
   };
 
-  // Не показываем кнопку "Назад" на главных страницах
-  const hideOnPages = ['/', '/patient/dashboard', '/doctor/dashboard', '/admin/dashboard'];
+  // Не показываем кнопку "Назад" на главных страницах и страницах аутентификации
+  const hideOnPages = [
+    '/', 
+    '/patient/dashboard', 
+    '/doctor/dashboard', 
+    '/admin/dashboard',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/login-safe',
+    '/emergency-access'
+  ];
+  
   if (hideOnPages.includes(location.pathname)) {
+    console.log('🔍 BackButton: Hidden on page:', location.pathname);
     return null;
   }
 

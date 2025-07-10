@@ -9,6 +9,10 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
 
+  // Проверяем, нужно ли показывать кнопку "Назад" в хедере
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/login-safe', '/emergency-access'].includes(location.pathname);
+  const shouldShowBackButton = !isAuthPage;
+
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
@@ -24,7 +28,7 @@ export const Header = () => {
         <div className="flex items-center justify-between h-20">
           {/* Кнопка назад и логотип */}
           <div className="flex items-center gap-4">
-            <BackButton />
+            {shouldShowBackButton && <BackButton />}
             <Link to="/" className="flex items-center group hover:scale-105 transition-transform duration-200">
               <div className="flex items-center relative">
                 <img 
