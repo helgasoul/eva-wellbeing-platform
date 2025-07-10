@@ -211,6 +211,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_insights: {
+        Row: {
+          actionable_recommendations: Json | null
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          insight_data: Json
+          insight_type: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          actionable_recommendations?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          insight_data: Json
+          insight_type: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          actionable_recommendations?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          insight_data?: Json
+          insight_type?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       automation_user_settings: {
         Row: {
           automation_enabled: boolean | null
@@ -730,6 +763,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      correlation_analysis: {
+        Row: {
+          analysis_type: string
+          correlation_strength: number | null
+          created_at: string | null
+          id: string
+          insights: Json
+          recommendations: Json | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          analysis_type: string
+          correlation_strength?: number | null
+          created_at?: string | null
+          id?: string
+          insights: Json
+          recommendations?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          analysis_type?: string
+          correlation_strength?: number | null
+          created_at?: string | null
+          id?: string
+          insights?: Json
+          recommendations?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       crc_pro_assessments: {
         Row: {
@@ -5776,6 +5842,45 @@ export type Database = {
           symptoms?: string[] | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      symptom_predictions: {
+        Row: {
+          actual_symptoms: Json | null
+          based_on_factors: Json | null
+          confidence_level: number | null
+          created_at: string | null
+          id: string
+          predicted_symptoms: Json
+          prediction_accuracy: number | null
+          prediction_date: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          actual_symptoms?: Json | null
+          based_on_factors?: Json | null
+          confidence_level?: number | null
+          created_at?: string | null
+          id?: string
+          predicted_symptoms: Json
+          prediction_accuracy?: number | null
+          prediction_date: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          actual_symptoms?: Json | null
+          based_on_factors?: Json | null
+          confidence_level?: number | null
+          created_at?: string | null
+          id?: string
+          predicted_symptoms?: Json
+          prediction_accuracy?: number | null
+          prediction_date?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
