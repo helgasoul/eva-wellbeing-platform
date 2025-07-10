@@ -57,6 +57,7 @@ import NotFound from "./pages/NotFound";
 
 // Dev pages for testing
 import DataFlowTestPage from "./pages/dev/DataFlowTestPage";
+import EmergencyAccess from "./pages/EmergencyAccess";
 
 // Providers
 import { SubscriptionProvider } from "./context/SubscriptionContext";
@@ -376,6 +377,9 @@ function App() {
                         <AdminDashboard />
                       </ProtectedRoute>
                     } />
+
+                    {/* EMERGENCY ACCESS - всегда доступен */}
+                    <Route path="/emergency-access" element={<EmergencyAccess />} />
 
                     {/* DEV ROUTES - для тестирования */}
                     <Route path="/dev/data-flow-test" element={<DataFlowTestPage />} />
