@@ -15,6 +15,7 @@ import { OnboardingGuard } from "./components/auth/OnboardingGuard";
 
 // Auth pages
 import Login from "./pages/Login";
+import LoginSafe from "./pages/LoginSafe";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -133,6 +134,18 @@ function App() {
                           <Login />
                         </ProtectedRoute>
                       }
+                    />
+                    
+                    {/* EMERGENCY LOGIN ROUTE */}
+                    <Route
+                      path="/login-safe"
+                      element={<LoginSafe />}
+                    />
+                    
+                    {/* LOGIN DEBUG ROUTE */}
+                    <Route
+                      path="/login-debug"
+                      element={<Login />}
                     />
                     
                     <Route
