@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Upload, FileText, AlertTriangle, Bot, CheckCircle, Clock, Calendar, Eye, Download, Trash2, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PatientLayout } from '@/components/layout/PatientLayout';
+import { useEvaAI, DocumentUtils } from '@/services/evaAIService';
 
 const Documents = () => {
   const { toast } = useToast();
+  const { analyzeDocument, analyzeCSV, isAnalyzing: aiAnalyzing, error: aiError } = useEvaAI();
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [userTier, setUserTier] = useState('plus'); // 'basic' или 'plus'
@@ -60,8 +62,8 @@ const Documents = () => {
     setDocuments(mockDocuments);
   }, []);
 
-  // Симуляция анализа документа ИИ
-  const analyzeDocument = async (docId) => {
+  // Анализ документа с помощью ИИ
+  const analyzeDocumentById = async (docId: number | string) => {
     setAnalyzingDoc(docId);
     
     toast({
@@ -70,29 +72,27 @@ const Documents = () => {
     });
 
     try {
-      // Симуляция API запроса
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      const mockAnalysis = {
-        summary: 'Документ содержит важную медицинскую информацию, которая требует внимания специалиста',
-        insights: [
-          'Обнаружены показатели, требующие дополнительного изучения',
-          'Рекомендуется повторное обследование',
-          'Необходимо обратить внимание на динамику изменений'
-        ],
-        recommendations: [
-          'Обратитесь к лечащему врачу для интерпретации результатов',
-          'Рассмотрите возможность дополнительных обследований',
-          'Ведите дневник симптомов для отслеживания изменений'
-        ],
-        riskLevel: 'medium',
-        disclaimer: 'Данный анализ предоставлен ИИ помощником Eva и не заменяет профессиональную медицинскую консультацию. Обязательно обратитесь к врачу для получения персонализированных рекомендаций.'
-      };
+      // Найти документ
+      const doc = documents.find(d => d.id === docId);
+      if (!doc) {
+        throw new Error('Документ не найден');
+      }
 
-      setDocuments(prev => prev.map(doc => 
-        doc.id === docId 
-          ? { ...doc, status: 'analyzed', aiAnalysis: mockAnalysis }
-          : doc
+      // Для демонстрации используем mock контент
+      // В реальном приложении здесь будет извлечение текста из файла
+      const mockContent = `Медицинский документ: ${doc.name}
+        Тип: ${doc.type}
+        Категория: ${doc.category}
+        Размер: ${doc.size}
+        Дата: ${doc.uploadedAt}`;
+
+      const documentType = DocumentUtils.getDocumentType({ name: doc.name } as File);
+      const analysis = await analyzeDocument(mockContent, documentType);
+
+      setDocuments(prev => prev.map(document => 
+        document.id === docId 
+          ? { ...document, status: 'analyzed', aiAnalysis: analysis }
+          : document
       ));
 
       toast({
@@ -101,9 +101,56 @@ const Documents = () => {
       });
     } catch (error) {
       console.error('Ошибка анализа:', error);
+      setDocuments(prev => prev.map(document => 
+        document.id === docId 
+          ? { ...document, status: 'uploaded' }
+          : document
+      ));
       toast({
         title: "Ошибка анализа",
         description: "Произошла ошибка при анализе документа. Попробуйте еще раз.",
+        variant: "destructive",
+      });
+    } finally {
+      setAnalyzingDoc(null);
+    }
+  };
+
+  // Анализ документа с реальным содержимым файла
+  const analyzeDocumentWithContent = async (docId: number | string, content: string, file: File) => {
+    setAnalyzingDoc(docId);
+    
+    try {
+      const documentType = DocumentUtils.getDocumentType(file);
+      let analysis;
+
+      // Проверяем, является ли файл CSV
+      if (documentType === 'csv') {
+        analysis = await analyzeCSV(content);
+      } else {
+        analysis = await analyzeDocument(content, documentType);
+      }
+
+      setDocuments(prev => prev.map(document => 
+        document.id === docId 
+          ? { ...document, status: 'analyzed', aiAnalysis: analysis }
+          : document
+      ));
+
+      toast({
+        title: "Анализ завершен",
+        description: "ИИ помощник Eva успешно проанализировал содержимое вашего документа",
+      });
+    } catch (error) {
+      console.error('Ошибка анализа содержимого:', error);
+      setDocuments(prev => prev.map(document => 
+        document.id === docId 
+          ? { ...document, status: 'uploaded' }
+          : document
+      ));
+      toast({
+        title: "Ошибка анализа",
+        description: "Произошла ошибка при анализе содержимого документа. Попробуйте еще раз.",
         variant: "destructive",
       });
     } finally {
@@ -115,11 +162,20 @@ const Documents = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Проверка размера файла
-    if (file.size > 10 * 1024 * 1024) { // 10MB
+    // Валидация файла
+    if (!DocumentUtils.validateFileSize(file, 10)) {
       toast({
         title: "Файл слишком большой",
         description: "Максимальный размер файла: 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!DocumentUtils.validateFileType(file)) {
+      toast({
+        title: "Неподдерживаемый тип файла",
+        description: "Поддерживаются файлы: PDF, DOC, DOCX, TXT, CSV",
         variant: "destructive",
       });
       return;
@@ -134,16 +190,17 @@ const Documents = () => {
     
     try {
       // Симуляция загрузки файла
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       const newDoc = {
         id: Date.now(),
         name: file.name,
         type: file.type || 'unknown',
-        size: (file.size / 1024).toFixed(1) + ' KB',
+        size: DocumentUtils.formatFileSize(file.size),
         uploadedAt: new Date().toISOString(),
         status: userTier === 'plus' ? 'analyzing' : 'uploaded',
-        category: 'Загруженный документ'
+        category: 'Загруженный документ',
+        fileContent: null // Будет заполнено при анализе
       };
 
       setDocuments(prev => [newDoc, ...prev]);
@@ -155,7 +212,24 @@ const Documents = () => {
 
       // Автоматический анализ для Plus пользователей
       if (userTier === 'plus') {
-        setTimeout(() => analyzeDocument(newDoc.id), 1000);
+        try {
+          // Попытка извлечь текст из файла
+          const fileContent = await DocumentUtils.readFileAsText(file);
+          
+          // Обновляем документ с содержимым
+          setDocuments(prev => prev.map(doc => 
+            doc.id === newDoc.id 
+              ? { ...doc, fileContent }
+              : doc
+          ));
+          
+          // Анализируем содержимое
+          setTimeout(() => analyzeDocumentWithContent(newDoc.id, fileContent, file), 500);
+        } catch (error) {
+          console.error('Ошибка чтения файла:', error);
+          // Если не удалось прочитать файл, анализируем мета-данные
+          setTimeout(() => analyzeDocumentById(newDoc.id), 500);
+        }
       }
 
     } catch (error) {
@@ -414,7 +488,7 @@ const Documents = () => {
                   </button>
                   {userTier === 'plus' && doc.status === 'uploaded' && (
                     <button 
-                      onClick={() => analyzeDocument(doc.id)}
+                      onClick={() => analyzeDocumentById(doc.id)}
                       className="p-2 text-purple-600 hover:text-purple-700 transition-colors"
                       disabled={analyzingDoc === doc.id}
                     >
