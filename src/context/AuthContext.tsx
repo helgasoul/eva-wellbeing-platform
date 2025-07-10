@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // ✅ НОВОЕ: Инициализация с Supabase Auth
+  // ✅ ИСПРАВЛЕНО: Инициализация с проверкой миграции онбординга
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -88,13 +88,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initializeAuth();
 
-    // ✅ Подписываемся на изменения аутентификации
-    const { data: { subscription } } = authService.onAuthStateChange((user) => {
-      setUser(user);
-      if (user) {
-        console.log('✅ Auth state changed - user logged in:', user.email);
+    // ✅ Подписываемся на изменения аутентификации с миграцией
+    const { data: { subscription } } = authService.onAuthStateChange(async (authenticatedUser) => {
+      if (authenticatedUser && authenticatedUser.role === UserRole.PATIENT) {
+        // Импортируем функцию миграции динамически
+        const { migrateOnboardingData } = await import('@/utils/onboardingMigration');
+        
+        // Проверяем миграцию онбординга
+        const migrationResult = migrateOnboardingData();
+        
+        if (migrationResult.migrationPerformed && migrationResult.onboardingCompleted) {
+          // Обновляем пользователя с мигрированными данными
+          const updatedUser = {
+            ...authenticatedUser,
+            onboardingCompleted: true,
+            onboardingData: migrationResult.onboardingData
+          };
+          
+          setUser(updatedUser);
+          console.log('✅ Auth state changed with onboarding migration');
+        } else {
+          setUser(authenticatedUser);
+          console.log('✅ Auth state changed - user logged in:', authenticatedUser.email);
+        }
       } else {
-        console.log('🔄 Auth state changed - user logged out');
+        setUser(authenticatedUser);
+        if (authenticatedUser) {
+          console.log('✅ Auth state changed - user logged in:', authenticatedUser.email);
+        } else {
+          console.log('🔄 Auth state changed - user logged out');
+        }
       }
     });
 
@@ -437,37 +460,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     navigate('/admin/dashboard');
   };
 
-  // ✅ НОВОЕ: Обновление пользователя через Supabase
-  const updateUser = async (updates: Partial<User>): Promise<void> => {
+  // ✅ ИСПРАВЛЕНО: Синхронное обновление пользователя для онбординга
+  const updateUser = (updates: Partial<User>) => {
     if (!user) {
-      throw new Error('Пользователь не авторизован');
+      console.warn('⚠️ updateUser: No authenticated user');
+      return;
     }
 
-    try {
-      setIsLoading(true);
-      
-      // ✅ Обновляем в Supabase
-      const { error } = await authService.updateProfile(user.id, updates);
-      
-      if (error) {
-        throw new Error(error);
-      }
-      
-      // Обновляем локальное состояние
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      
-      // Обновляем localStorage для совместимости
-      localStorage.setItem('eva-user', JSON.stringify(updatedUser));
-      
-      console.log('✅ User updated successfully:', updates);
-      
-    } catch (error: any) {
-      console.error('❌ Error updating user:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+    console.log('🔄 Updating user with:', updates);
+    
+    // Синхронно обновляем локальное состояние
+    const updatedUser = { ...user, ...updates };
+    setUser(updatedUser);
+    
+    // Обновляем localStorage для надежности
+    localStorage.setItem('eva-user', JSON.stringify(updatedUser));
+    
+    // Асинхронно обновляем в Supabase без блокировки UI
+    if (user.id && !user.id.startsWith('temp-')) {
+      authService.updateProfile(user.id, updates).catch(error => {
+        console.error('❌ Failed to sync user update to Supabase:', error);
+      });
     }
+    
+    console.log('✅ User updated locally:', updatedUser);
   };
 
   // ✅ УЛУЧШЕНО: Завершение онбординга через Supabase

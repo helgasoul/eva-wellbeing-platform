@@ -23,6 +23,9 @@ export interface User {
   phoneVerified?: boolean;
   registrationCompleted?: boolean;
   onboardingCompleted?: boolean;
+  
+  // ✅ ДОБАВЛЕНО: Поле для фазы менопаузы
+  menopausePhase?: string;
 }
 
 export interface LoginCredentials {
@@ -142,7 +145,7 @@ export interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   completeRegistration: (data: MultiStepRegistrationData) => Promise<User>;
-  updateUser: (updates: Partial<User>) => Promise<void>;
+  updateUser: (updates: Partial<User>) => void; // ✅ ИСПРАВЛЕНО: Синхронная функция
   completeOnboarding: (onboardingData: any) => Promise<void>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;

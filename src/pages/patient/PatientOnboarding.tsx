@@ -22,6 +22,7 @@ import { generateRecommendations } from '@/utils/personalizedRecommendations';
 import { toast } from '@/hooks/use-toast';
 import { dataBridge, OnboardingPresets } from '@/services/dataBridge';
 import { onboardingService } from '@/services/onboardingService';
+import { migrateOnboardingData } from '@/utils/onboardingMigration';
 
 // ✅ ИСПРАВЛЕНО: Правильная 7-шаговая структура онбординга
 const TOTAL_STEPS = 7;
@@ -98,8 +99,43 @@ const PatientOnboarding = () => {
     geolocation: false // ✅ НОВОЕ: статус геолокации
   });
   
-  const { user, completeOnboarding } = useAuth();
+  const { user, completeOnboarding, updateUser } = useAuth();
   const navigate = useNavigate();
+
+  // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Проверка статуса онбординга при загрузке
+  useEffect(() => {
+    if (!user) return;
+
+    // Проверяем, завершен ли онбординг в профиле пользователя
+    if (user.onboardingCompleted) {
+      console.log('✅ User has already completed onboarding, redirecting to dashboard');
+      navigate('/patient/dashboard', { replace: true });
+      return;
+    }
+
+    // Проверяем миграцию данных из localStorage
+    const migrationResult = migrateOnboardingData();
+    if (migrationResult.migrationPerformed && migrationResult.onboardingCompleted) {
+      console.log('✅ Migrated onboarding completion from localStorage');
+      
+      // Обновляем пользователя через AuthContext
+      updateUser({ 
+        onboardingCompleted: true,
+        onboardingData: migrationResult.onboardingData
+      });
+      
+      // Показываем уведомление и перенаправляем
+      toast({
+        title: 'Добро пожаловать обратно!',
+        description: 'Ваши данные онбординга восстановлены',
+      });
+      
+      navigate('/patient/dashboard', { replace: true });
+      return;
+    }
+
+    console.log('🔄 User needs to complete onboarding');
+  }, [user, navigate, updateUser]);
 
   // ✅ НОВОЕ: Загружаем данные из Supabase и DataBridge
   useEffect(() => {
@@ -357,8 +393,7 @@ const PatientOnboarding = () => {
         hasGeolocation: !!formData.geolocation
       });
 
-      // ✅ ИСПРАВЛЕНИЕ: Используем AuthContext для завершения онбординга
-      // Подготавливаем данные онбординга для сохранения
+      // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Сначала обновляем статус в AuthContext
       const onboardingSummary = {
         phaseResult,
         recommendations,
@@ -366,19 +401,32 @@ const PatientOnboarding = () => {
         completedAt: new Date().toISOString()
       };
       
-      // Завершаем онбординг через AuthContext
-      await completeOnboarding(onboardingSummary);
+      // 1. Обновляем пользователя локально для немедленного эффекта
+      updateUser({ 
+        onboardingCompleted: true,
+        onboardingData: onboardingSummary
+      });
       
-      // ✅ Используем DataBridge для безопасной очистки
+      // 2. Сохраняем в localStorage для надежности
+      localStorage.setItem('onboardingCompleted', 'true');
+      localStorage.setItem('onboardingData', JSON.stringify(onboardingSummary));
+      
+      // 3. Асинхронно завершаем онбординг в Supabase
+      try {
+        await completeOnboarding(onboardingSummary);
+        console.log('✅ Onboarding saved to Supabase');
+      } catch (supabaseError) {
+        console.warn('⚠️ Failed to save onboarding to Supabase, but user updated locally:', supabaseError);
+      }
+      
+      // 4. Очищаем временные данные
       dataBridge.cleanupTransferData();
-      
-      // Очищаем локальные данные онбординга
       localStorage.removeItem(STORAGE_KEY);
       
       console.log('✅ Onboarding completion successful, navigating to dashboard');
       
-      // Navigate to patient dashboard
-      navigate('/patient/dashboard');
+      // 5. Перенаправляем на dashboard
+      navigate('/patient/dashboard', { replace: true });
       
     } catch (error) {
       console.error('❌ Error completing onboarding:', error);

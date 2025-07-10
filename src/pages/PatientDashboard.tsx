@@ -48,6 +48,14 @@ const PatientDashboard = () => {
   const [recentEvents, setRecentEvents] = useState<HealthDataTimelineEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
+  // ✅ НОВОЕ: Получаем данные онбординга для персонализации
+  const onboardingData = user?.onboardingData || 
+                        JSON.parse(localStorage.getItem('onboardingData') || '{}');
+  
+  const menopausePhase = onboardingData?.phaseResult?.phase || 
+                        onboardingData?.formData?.menopausePhase ||
+                        user?.menopausePhase;
+  
   const breadcrumbs = [
     { label: 'Главная' }
   ];
@@ -174,10 +182,25 @@ const PatientDashboard = () => {
               <Heart className="h-10 w-10 text-white animate-pulse" />
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">Добро пожаловать в bloom! 🌸</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                Добро пожаловать в bloom, {user?.firstName || 'дорогая'}! 🌸
+              </h1>
               <p className="text-white/95 text-lg leading-relaxed">
                 Сегодня — идеальный день для заботы о себе
               </p>
+              
+              {/* ✅ НОВОЕ: Персонализированное сообщение на основе онбординга */}
+              {menopausePhase && (
+                <div className="mt-3 p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                  <p className="text-white/90 text-sm font-medium">
+                    🎯 Ваша текущая фаза: {menopausePhase}
+                  </p>
+                  <p className="text-white/80 text-xs mt-1">
+                    Ваша панель адаптирована под ваши потребности
+                  </p>
+                </div>
+              )}
+              
               <p className="text-white/80 text-sm mt-2 italic">
                 Мы рядом с вами на каждом шаге вашего пути к здоровью
               </p>
