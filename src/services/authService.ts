@@ -30,8 +30,9 @@ class AuthService {
   // Регистрация пользователя
   async register(userData: RegisterData): Promise<AuthResponse> {
     try {
-      // 1. Регистрируем пользователя в Supabase Auth
-      const { data, error: authError } = await supabase.auth.signUp({
+      console.log('📝 Начинаем регистрацию для:', userData.email);
+
+      const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
         options: {
@@ -39,90 +40,142 @@ class AuthService {
           data: {
             first_name: userData.firstName,
             last_name: userData.lastName,
-            user_role: userData.role
-          }
-        }
+            role: userData.role,
+          },
+        },
       });
 
-      if (authError) {
-        return { user: null, error: authError.message };
+      if (error) {
+        console.error('❌ Ошибка регистрации:', error);
+        return { user: null, error: error.message };
       }
 
       if (!data.user) {
+        console.error('❌ Пользователь не создан');
         return { user: null, error: 'Не удалось создать пользователя' };
       }
 
-      // 2. Профиль создается автоматически через триггер handle_new_user()
-      // Но мы можем обновить его дополнительными данными
-      const { error: profileError } = await supabase
+      console.log('✅ Регистрация успешна, ID:', data.user.id);
+
+      // Профиль должен создаться автоматически через триггер
+      // Но на всякий случай проверим через небольшую задержку
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const { data: profileData } = await supabase
         .from('user_profiles')
-        .update({
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          user_role: userData.role,
-          registration_completed: true
-        })
-        .eq('id', data.user.id);
+        .select('*')
+        .eq('id', data.user.id)
+        .maybeSingle();
 
-      if (profileError) {
-        console.error('Profile update error:', profileError);
-        // Не возвращаем ошибку, так как основная регистрация прошла успешно
-      }
-
-      // 3. Возвращаем пользователя
       const user = this.transformSupabaseUser(data.user, {
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        user_role: userData.role,
-        registration_completed: true,
-        onboarding_completed: false
+        first_name: profileData?.first_name || userData.firstName,
+        last_name: profileData?.last_name || userData.lastName,
+        role: profileData?.role || userData.role,
+        onboarding_completed: profileData?.onboarding_completed || false,
+        registration_completed: true
       });
 
+      console.log('✅ Пользователь зарегистрирован:', user.email);
       return { user, error: null };
 
     } catch (error: any) {
-      console.error('Registration error:', error);
-      return { user: null, error: error.message || 'Ошибка регистрации' };
+      console.error('💥 Критическая ошибка при регистрации:', error);
+      return { user: null, error: error.message };
     }
   }
 
   // Вход в систему
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      // 1. Аутентификация через Supabase
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      console.log('🔐 Начинаем процесс входа для:', credentials.email);
+      
+      // 1. Аутентификация в Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
-        password: credentials.password
+        password: credentials.password,
       });
 
-      if (authError) {
-        return { user: null, error: authError.message };
+      if (error) {
+        console.error('❌ Ошибка аутентификации Supabase:', error);
+        return { 
+          user: null, 
+          error: `Ошибка входа: ${error.message}` 
+        };
       }
 
       if (!data.user) {
-        return { user: null, error: 'Не удалось войти в систему' };
+        console.error('❌ Пользователь не получен после аутентификации');
+        return { 
+          user: null, 
+          error: 'Не удалось получить данные пользователя' 
+        };
       }
 
+      console.log('✅ Аутентификация успешна, ID пользователя:', data.user.id);
+
       // 2. Загружаем профиль пользователя
+      console.log('📋 Загружаем профиль пользователя...');
+      
       const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle(); // Используем maybeSingle вместо single для лучшей обработки
 
       if (profileError) {
-        console.error('Profile fetch error:', profileError);
-        return { user: null, error: 'Ошибка загрузки профиля пользователя' };
+        console.error('❌ Ошибка загрузки профиля:', profileError);
+        return { 
+          user: null, 
+          error: `Ошибка загрузки профиля: ${profileError.message}` 
+        };
       }
 
-      // 3. Формируем объект пользователя
-      const user = this.transformSupabaseUser(data.user, profileData);
+      let finalProfileData = profileData;
 
+      if (!profileData) {
+        console.error('❌ Профиль пользователя не найден в базе данных');
+        console.log('🔧 Попытка создать профиль автоматически...');
+        
+        // Попытка создать профиль автоматически
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            first_name: data.user.user_metadata?.first_name || '',
+            last_name: data.user.user_metadata?.last_name || '',
+            role: data.user.user_metadata?.role || 'patient',
+            onboarding_completed: false
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('❌ Не удалось создать профиль:', createError);
+          return { 
+            user: null, 
+            error: 'Профиль пользователя не найден и не может быть создан автоматически. Обратитесь к администратору.' 
+          };
+        }
+
+        console.log('✅ Профиль создан автоматически:', newProfile);
+        finalProfileData = newProfile;
+      }
+
+      console.log('✅ Профиль загружен:', finalProfileData);
+
+      // 3. Формируем объект пользователя
+      const user = this.transformSupabaseUser(data.user, finalProfileData);
+
+      console.log('✅ Вход выполнен успешно для пользователя:', user.email);
       return { user, error: null };
 
     } catch (error: any) {
-      console.error('Login error:', error);
-      return { user: null, error: error.message || 'Ошибка входа в систему' };
+      console.error('💥 Критическая ошибка в процессе входа:', error);
+      return { 
+        user: null, 
+        error: `Произошла неожиданная ошибка: ${error.message}` 
+      };
     }
   }
 
