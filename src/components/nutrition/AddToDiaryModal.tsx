@@ -254,7 +254,7 @@ export const AddToDiaryModal: React.FC<AddToDiaryModalProps> = ({
               className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Добавить в дневник
+              Сохранить
             </Button>
           </div>
         </CardContent>
