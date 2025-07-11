@@ -228,33 +228,54 @@ const HowWeHelp: React.FC = () => {
                                 <span className="text-muted-foreground">Готовы вкладываться в здоровье, чтобы сохранить гармонию и радость жизни</span>
                               </li>
                             </>
-                          ) : plan.id === 'optimum' ? (
-                            <>
-                              <li className="flex items-start">
-                                <span className="text-success mr-2 mt-1">🤍</span>
-                                <span className="text-muted-foreground">Заботиться о себе и близких с максимальным вниманием</span>
-                              </li>
-                              <li className="flex items-start">
-                                <span className="text-success mr-2 mt-1">🤍</span>
-                                <span className="text-muted-foreground">Получать экспертную поддержку и профилактику</span>
-                              </li>
-                              <li className="flex items-start">
-                                <span className="text-success mr-2 mt-1">🤍</span>
-                                <span className="text-muted-foreground">Управлять семейными рисками и быть спокойной за будущее</span>
-                              </li>
-                              <li className="flex items-start">
-                                <span className="text-success mr-2 mt-1">🤍</span>
-                                <span className="text-muted-foreground">Быть на связи с лучшими врачами и доступом к самым современным решениям</span>
-                              </li>
-                            </>
-                          ) : null}
+                           ) : plan.id === 'optimum' ? (
+                             <>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🤍</span>
+                                 <span className="text-muted-foreground">Заботиться о себе и близких с максимальным вниманием</span>
+                               </li>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🤍</span>
+                                 <span className="text-muted-foreground">Получать экспертную поддержку и профилактику</span>
+                               </li>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🤍</span>
+                                 <span className="text-muted-foreground">Управлять семейными рисками и быть спокойной за будущее</span>
+                               </li>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🤍</span>
+                                 <span className="text-muted-foreground">Быть на связи с лучшими врачами и доступом к самым современным решениям</span>
+                               </li>
+                             </>
+                           ) : plan.id === 'digital_twin' ? (
+                             <>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🚀</span>
+                                 <span className="text-muted-foreground">Визионер здоровья с высоким доходом (₽500k+ в месяц)</span>
+                               </li>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🚀</span>
+                                 <span className="text-muted-foreground">Tech-предприниматель или топ-менеджер</span>
+                               </li>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🚀</span>
+                                 <span className="text-muted-foreground">Биохакер и энтузиаст longevity</span>
+                               </li>
+                               <li className="flex items-start">
+                                 <span className="text-success mr-2 mt-1">🚀</span>
+                                 <span className="text-muted-foreground">Готовы инвестировать в технологии будущего</span>
+                               </li>
+                             </>
+                           ) : null}
                         </ul>
                         
-                        {(plan.id === 'plus' || plan.id === 'optimum') && (
+                        {(plan.id === 'plus' || plan.id === 'optimum' || plan.id === 'digital_twin') && (
                           <div className="mt-4 p-4 bg-gradient-to-r from-accent/10 to-primary/10 rounded-xl border border-accent/20">
                             <p className="text-sm text-muted-foreground italic text-center">
                               {plan.id === 'plus' ? 
                                 'Каждая женщина заслуживает поддержки на своём уникальном пути. Мы рядом, когда это важно.' :
+                                plan.id === 'optimum' ? 'С заботой о вашем здоровье — команда Bloom' :
+                                plan.id === 'digital_twin' ? 'Революционные технологии для вашего персонального долголетия' :
                                 'С заботой о вашем здоровье — команда Bloom'
                               }
                             </p>
