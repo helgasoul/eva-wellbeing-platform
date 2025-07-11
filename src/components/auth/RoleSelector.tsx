@@ -16,7 +16,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
   const roles = [
     {
       value: UserRole.PATIENT,
-      label: ROLE_LABELS[UserRole.PATIENT],
+      label: '',
       description: ROLE_DESCRIPTIONS[UserRole.PATIENT],
       icon: 'bloom',
       color: 'from-eva-dusty-rose to-primary'
@@ -24,7 +24,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
     {
       value: UserRole.DOCTOR,
       label: 'Врач',
-      description: 'Врач',
+      description: '',
       icon: Stethoscope,
       color: 'from-eva-mauve to-eva-taupe'
     }
@@ -59,17 +59,19 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
                   <role.icon className="h-6 w-6 text-white" />
                 )}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2">
-                  <h3 className="font-medium text-foreground">{role.label}</h3>
-                  {isSelected && (
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {role.description}
-                </p>
-              </div>
+               <div className="flex-1">
+                 <div className="flex items-center space-x-2">
+                   {role.label && <h3 className="font-medium text-foreground">{role.label}</h3>}
+                   {isSelected && (
+                     <div className="w-2 h-2 bg-primary rounded-full"></div>
+                   )}
+                 </div>
+                 {role.description && (
+                   <p className="text-sm text-muted-foreground mt-1">
+                     {role.description}
+                   </p>
+                 )}
+               </div>
               <input
                 type="radio"
                 name="role"
