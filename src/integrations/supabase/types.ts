@@ -6891,6 +6891,7 @@ export type Database = {
           created_at: string | null
           energy_level: number | null
           entry_date: string
+          entry_time: string | null
           hot_flashes: Json | null
           id: string
           mood_data: Json | null
@@ -6905,6 +6906,7 @@ export type Database = {
           created_at?: string | null
           energy_level?: number | null
           entry_date: string
+          entry_time?: string | null
           hot_flashes?: Json | null
           id?: string
           mood_data?: Json | null
@@ -6919,6 +6921,7 @@ export type Database = {
           created_at?: string | null
           energy_level?: number | null
           entry_date?: string
+          entry_time?: string | null
           hot_flashes?: Json | null
           id?: string
           mood_data?: Json | null

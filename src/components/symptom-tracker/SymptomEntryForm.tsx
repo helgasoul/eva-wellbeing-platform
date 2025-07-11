@@ -38,7 +38,8 @@ export const SymptomEntryForm: React.FC<SymptomEntryFormProps> = ({
     },
     physicalSymptoms: [] as string[],
     energy: 3,
-    notes: ''
+    notes: '',
+    time: new Date().toTimeString().split(' ')[0].substring(0, 5) // HH:MM
   });
 
   useEffect(() => {
@@ -50,7 +51,8 @@ export const SymptomEntryForm: React.FC<SymptomEntryFormProps> = ({
         mood: entry.mood || { overall: 3, anxiety: 1, irritability: 1 },
         physicalSymptoms: entry.physicalSymptoms || [],
         energy: entry.energy || 3,
-        notes: entry.notes || ''
+        notes: entry.notes || '',
+        time: entry.time || new Date().toTimeString().split(' ')[0].substring(0, 5)
       });
     }
   }, [entry]);
@@ -111,6 +113,35 @@ export const SymptomEntryForm: React.FC<SymptomEntryFormProps> = ({
       </div>
 
       <div className="space-y-8">
+        {/* Время записи */}
+        <div>
+          <h3 className="text-lg font-semibold text-foreground mb-4">🕐 Время записи</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Время
+              </label>
+              <input
+                type="time"
+                value={formData.time}
+                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                className="w-full p-2 border border-border rounded-lg bg-background"
+              />
+            </div>
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={() => setFormData({ 
+                  ...formData, 
+                  time: new Date().toTimeString().split(' ')[0].substring(0, 5) 
+                })}
+                className="px-4 py-2 text-sm text-muted-foreground bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+              >
+                Сейчас
+              </button>
+            </div>
+          </div>
+        </div>
         {/* Приливы */}
         <div>
           <h3 className="text-lg font-semibold text-foreground mb-4">🔥 Приливы</h3>

@@ -106,14 +106,22 @@ const SymptomTracker: React.FC = () => {
     if (!user?.id) return;
     
     try {
-      const entry = await healthDataService.getSymptomEntry(user.id, selectedDate);
-      setCurrentEntry(entry);
+      // Загружаем все записи за выбранную дату
+      const entriesForDate = entries.filter(e => e.entry_date === selectedDate);
+      
+      if (entriesForDate.length > 0) {
+        // Берем последнюю запись за день для редактирования
+        const latestEntry = entriesForDate.sort((a, b) => 
+          (b.entry_time || '00:00:00').localeCompare(a.entry_time || '00:00:00')
+        )[0];
+        setCurrentEntry(latestEntry);
+      } else {
+        setCurrentEntry(null);
+      }
       setIsEditing(false);
     } catch (error) {
       console.error('Error loading current entry:', error);
-      // Fallback к поиску в уже загруженных данных
-      const entry = entries.find(e => e.entry_date === selectedDate);
-      setCurrentEntry(entry || null);
+      setCurrentEntry(null);
     }
   };
 
@@ -127,6 +135,7 @@ const SymptomTracker: React.FC = () => {
       // Преобразуем данные формы в формат базы данных
       const entryData = {
         entry_date: formData.date,
+        entry_time: formData.time || new Date().toTimeString().split(' ')[0].substring(0, 5) + ':00',
         hot_flashes: formData.hotFlashes,
         night_sweats: formData.nightSweats,
         sleep_data: formData.sleep,
@@ -146,9 +155,16 @@ const SymptomTracker: React.FC = () => {
       }
 
       // Обновляем локальное состояние с данными из Supabase
-      const updatedEntries = entries.filter(e => e.entry_date !== savedEntry.entry_date);
+      const updatedEntries = entries.filter(e => 
+        !(e.entry_date === savedEntry.entry_date && 
+          e.entry_time === savedEntry.entry_time)
+      );
       updatedEntries.push(savedEntry);
-      updatedEntries.sort((a, b) => b.entry_date.localeCompare(a.entry_date));
+      updatedEntries.sort((a, b) => {
+        const dateCompare = b.entry_date.localeCompare(a.entry_date);
+        if (dateCompare !== 0) return dateCompare;
+        return (b.entry_time || '00:00:00').localeCompare(a.entry_time || '00:00:00');
+      });
       
       setEntries(updatedEntries);
       setCurrentEntry(savedEntry);
@@ -260,6 +276,7 @@ const SymptomTracker: React.FC = () => {
         ) : (
           <SymptomEntryView
             entry={currentEntry}
+            entries={entries}
             date={selectedDate}
             onEdit={() => setIsEditing(true)}
           />

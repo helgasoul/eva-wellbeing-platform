@@ -2,6 +2,7 @@ export interface SymptomEntry {
   id: string;
   user_id: string;
   entry_date: string; // YYYY-MM-DD
+  entry_time?: string; // HH:MM:SS format
   hot_flashes?: {
     count: number;
     severity: number; // 1-5
