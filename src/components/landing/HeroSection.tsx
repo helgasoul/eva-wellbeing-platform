@@ -66,7 +66,7 @@ const HeroSection: React.FC = () => {
             
             <div className="bg-gradient-to-r from-accent/20 via-background to-muted/30 rounded-2xl px-6 py-3 border border-border/30">
               <p className="text-muted-foreground text-sm">
-                Качественная забота без переплат • Доступно каждой женщине
+                Доступно каждой женщине
               </p>
             </div>
           </div>
