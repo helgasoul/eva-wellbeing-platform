@@ -44,15 +44,9 @@ export function AddIntegrationModal({ open, onOpenChange, providers, onSuccess }
       const { error } = await supabase
         .from('health_app_integrations')
         .insert({
-          provider_name: selectedProvider,
-          integration_type: 'oauth',
-          integration_status: 'pending',
-          sync_frequency: syncFrequency,
-          scopes_granted: selectedDataTypes,
-          sync_settings: {
-            auto_sync: true,
-            data_types: selectedDataTypes
-          }
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          app_name: selectedProvider,
+          integration_status: 'pending'
         });
 
       if (error) throw error;

@@ -12,12 +12,9 @@ import { IntegrationSettings } from "@/components/health/IntegrationSettings";
 
 interface HealthIntegration {
   id: string;
-  provider_name: string;
+  app_name: string;
   integration_status: string;
   last_sync_at: string | null;
-  sync_frequency: string;
-  scopes_granted: string[] | null;
-  error_details: any;
   created_at: string;
 }
 
@@ -98,8 +95,8 @@ export default function HealthDataIntegrations() {
       const { data, error } = await supabase.functions.invoke('health-data-sync', {
         body: {
           integration_id: integration.id,
-          provider: integration.provider_name,
-          data_types: integration.scopes_granted || []
+          provider: integration.app_name,
+          data_types: []
         }
       });
 
@@ -107,7 +104,7 @@ export default function HealthDataIntegrations() {
 
       toast({
         title: "Sync Started",
-        description: `Health data sync initiated for ${integration.provider_name}`,
+        description: `Health data sync initiated for ${integration.app_name}`,
       });
 
       // Reload integrations to get updated sync status
@@ -129,7 +126,7 @@ export default function HealthDataIntegrations() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'success';
+      case 'active': return 'default';
       case 'pending': return 'secondary';
       case 'error': return 'destructive';
       case 'revoked': return 'outline';
@@ -175,7 +172,7 @@ export default function HealthDataIntegrations() {
           <h2 className="text-lg font-semibold">Connected Apps</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {integrations.map((integration) => {
-              const provider = SUPPORTED_PROVIDERS.find(p => p.id === integration.provider_name);
+              const provider = SUPPORTED_PROVIDERS.find(p => p.id === integration.app_name);
               return (
                 <Card key={integration.id} className="p-4">
                   <div className="flex items-center justify-between mb-3">
@@ -218,19 +215,8 @@ export default function HealthDataIntegrations() {
                         ? new Date(integration.last_sync_at).toLocaleDateString() 
                         : 'Never'}
                     </div>
-                    <div>Frequency: {integration.sync_frequency}</div>
-                    {integration.scopes_granted && (
-                      <div>
-                        Data types: {integration.scopes_granted.join(', ')}
-                      </div>
-                    )}
+                    <div>Status: {integration.integration_status}</div>
                   </div>
-
-                  {integration.error_details && (
-                    <div className="mt-3 p-2 bg-destructive/10 rounded text-sm text-destructive">
-                      Error: {integration.error_details.error}
-                    </div>
-                  )}
                 </Card>
               );
             })}
@@ -243,7 +229,7 @@ export default function HealthDataIntegrations() {
         <h2 className="text-lg font-semibold">Available Integrations</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {SUPPORTED_PROVIDERS
-            .filter(provider => !integrations.some(i => i.provider_name === provider.id))
+            .filter(provider => !integrations.some(i => i.app_name === provider.id))
             .map((provider) => (
               <HealthProviderCard
                 key={provider.id}

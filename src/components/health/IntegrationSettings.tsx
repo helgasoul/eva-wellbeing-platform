@@ -15,11 +15,9 @@ interface IntegrationSettingsProps {
 
 interface Integration {
   id: string;
-  provider_name: string;
-  sync_frequency: string;
-  scopes_granted: string[] | null;
-  sync_settings: any;
+  app_name: string;
   integration_status: string;
+  sync_settings: any;
 }
 
 export function IntegrationSettings({ integrationId, onClose, onUpdate }: IntegrationSettingsProps) {
@@ -46,8 +44,8 @@ export function IntegrationSettings({ integrationId, onClose, onUpdate }: Integr
       if (error) throw error;
       
       setIntegration(data);
-      setSyncFrequency(data.sync_frequency || 'daily');
-      setAutoSync(data.sync_settings?.auto_sync !== false);
+      setSyncFrequency('daily');
+      setAutoSync(true);
     } catch (error) {
       console.error('Error loading integration:', error);
       toast({
@@ -66,9 +64,7 @@ export function IntegrationSettings({ integrationId, onClose, onUpdate }: Integr
       const { error } = await supabase
         .from('health_app_integrations')
         .update({
-          sync_frequency: syncFrequency,
           sync_settings: {
-            ...integration?.sync_settings,
             auto_sync: autoSync
           }
         })
@@ -145,7 +141,7 @@ export function IntegrationSettings({ integrationId, onClose, onUpdate }: Integr
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {integration.provider_name.charAt(0).toUpperCase() + integration.provider_name.slice(1)} Settings
+            {integration.app_name.charAt(0).toUpperCase() + integration.app_name.slice(1)} Settings
           </DialogTitle>
         </DialogHeader>
 
@@ -185,19 +181,6 @@ export function IntegrationSettings({ integrationId, onClose, onUpdate }: Integr
             </div>
           </div>
 
-          {/* Data Types */}
-          {integration.scopes_granted && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Synced Data Types</label>
-              <div className="flex flex-wrap gap-1">
-                {integration.scopes_granted.map((scope) => (
-                  <span key={scope} className="bg-muted px-2 py-1 rounded text-xs">
-                    {scope.replace('_', ' ')}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Actions */}
           <div className="flex justify-between pt-4">
