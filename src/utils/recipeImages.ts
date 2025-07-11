@@ -7,7 +7,7 @@ export const recipeImages = {
   'pre_dinner_1': '/recipe-baked-fish-vegetables.jpg',
   
   // Perimenopause recipes
-  'peri_breakfast_1': '/recipe-omelet.jpg',
+  'peri_breakfast_1': '/recipe-omelet-avocado-spinach.jpg',
   'peri_breakfast_2': '/recipe-quinoa.jpg',
   'peri_lunch_1': '/recipe-tofu-vegetables.jpg',
   'peri_dinner_1': '/recipe-tofu-vegetables.jpg',
@@ -21,7 +21,7 @@ export const recipeImages = {
   // Postmenopause recipes
   'post_breakfast_1': '/recipe-oatmeal-berries-nuts.jpg',
   'post_lunch_1': '/recipe-chicken-avocado-salad.jpg',
-  'post_dinner_1': '/recipe-omelet.jpg',
+  'post_dinner_1': '/recipe-omelet-avocado-spinach.jpg',
   'post_snack_1': '/recipe-green-smoothie-fruits.jpg',
 };
 
