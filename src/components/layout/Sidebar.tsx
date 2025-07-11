@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           { name: 'Календарь здоровья', href: '/patient/calendar', icon: Calendar },
           { name: 'Анализ сна', href: '/patient/sleep-dashboard', icon: Brain },
           { name: 'Источники данных', href: '/patient/data-sources', icon: Database },
-          { name: 'Устройства', href: '/patient/wearables', icon: Brain },
+          
           { name: 'Интеграции данных', href: '/patient/health-data-integrations', icon: LinkIcon },
           { name: 'Запись к врачу', href: '/patient/doctor-booking', icon: Stethoscope },
           { name: 'Анализы', href: '/patient/lab-tests', icon: FileText },

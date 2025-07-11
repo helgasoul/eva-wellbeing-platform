@@ -26,7 +26,7 @@ import {
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { healthDataAggregator } from '@/services/healthDataAggregator';
-import { wearableIntegration } from '@/services/wearableIntegration';
+
 import { environmentalService } from '@/services/environmentalService';
 
 interface DataSource {
@@ -65,9 +65,9 @@ export const DataSourcesDashboard: React.FC = () => {
 
   const loadDataSources = async () => {
     try {
-      // Получаем данные устройств
-      const devices = wearableIntegration.getConnectedDevices();
-      const deviceStats = wearableIntegration.getDeviceStats();
+      // Получаем данные устройств (заглушка после удаления wearable)
+      const devices = [];
+      const deviceStats = null;
       
       // Получаем статистику данных
       const healthStats = healthDataAggregator.getDataStats();

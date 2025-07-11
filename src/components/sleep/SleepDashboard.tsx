@@ -24,7 +24,7 @@ import {
 import { format, parseISO, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { healthDataAggregator, WearableData } from '@/services/healthDataAggregator';
-import { wearableIntegration } from '@/services/wearableIntegration';
+
 
 interface SleepPhase {
   phase: 'light' | 'deep' | 'rem' | 'awake';
@@ -76,9 +76,9 @@ export const SleepDashboard: React.FC = () => {
   const loadSleepData = async () => {
     setIsLoading(true);
     try {
-      // Получаем данные носимых устройств
+      // Получаем данные о сне (заглушка после удаления wearable)
       const days = selectedPeriod === 'week' ? 7 : 30;
-      const wearableData = wearableIntegration.getLatestData(days);
+      const wearableData = [];
       
       // Генерируем детальные данные о сне
       const sleepDataArray = await Promise.all(

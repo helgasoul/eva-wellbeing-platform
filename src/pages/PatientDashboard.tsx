@@ -41,7 +41,7 @@ import {
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { healthDataAggregator, HealthDataTimelineEntry } from '@/services/healthDataAggregator';
-import { wearableIntegration } from '@/services/wearableIntegration';
+
 // ✅ НОВЫЙ ИМПОРТ сервиса персонализации
 import { personalizationEngine, Recommendation, GoalProgress } from '@/services/personalizationService';
 // ✅ НОВЫЙ ИМПОРТ сервиса рекомендаций Eva
@@ -83,8 +83,7 @@ const PatientDashboard = () => {
   useEffect(() => {
     loadHealthData();
     loadEvaRecommendations();
-    // Настраиваем автосинхронизацию устройств
-    wearableIntegration.setupAutoSync();
+    // Инициализация завершена (автосинхронизация wearable удалена)
   }, [user?.id]);
 
   const loadHealthData = async () => {
