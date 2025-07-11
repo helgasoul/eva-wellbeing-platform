@@ -1,8 +1,10 @@
 import React, { Component, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, RefreshCw, Home, Shield } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home, Shield, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/utils/logger';
+import { networkDiagnosticsService } from '@/services/networkDiagnosticsService';
+import { NetworkDiagnosticsPanel } from '@/components/diagnostics/NetworkDiagnosticsPanel';
 
 interface Props {
   children: ReactNode;
@@ -13,6 +15,8 @@ interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: any;
+  showDiagnostics: boolean;
+  diagnosticsResults: any[] | null;
 }
 
 export class AuthErrorBoundary extends Component<Props, State> {
@@ -21,7 +25,9 @@ export class AuthErrorBoundary extends Component<Props, State> {
     this.state = {
       hasError: false,
       error: null,
-      errorInfo: null
+      errorInfo: null,
+      showDiagnostics: false,
+      diagnosticsResults: null
     };
   }
 
@@ -29,7 +35,9 @@ export class AuthErrorBoundary extends Component<Props, State> {
     return {
       hasError: true,
       error,
-      errorInfo: null
+      errorInfo: null,
+      showDiagnostics: false,
+      diagnosticsResults: null
     };
   }
 
@@ -43,6 +51,9 @@ export class AuthErrorBoundary extends Component<Props, State> {
 
     // ✅ Восстанавливаем состояние auth при критических ошибках
     this.fallbackToEmergencyMode();
+    
+    // 🔬 Автоматически запускаем диагностику сети при auth ошибках
+    this.runAutomaticDiagnostics(error);
   }
 
   fallbackToEmergencyMode = () => {
@@ -77,11 +88,38 @@ export class AuthErrorBoundary extends Component<Props, State> {
     }
   };
 
+  runAutomaticDiagnostics = async (error: Error) => {
+    try {
+      console.log('🔬 Running automatic network diagnostics for auth error...');
+      const results = await networkDiagnosticsService.diagnoseAuthFailure(error);
+      
+      this.setState({
+        diagnosticsResults: results
+      });
+      
+      // Log critical issues
+      const criticalIssues = results.filter(r => r.status === 'error');
+      if (criticalIssues.length > 0) {
+        console.error('🚨 Critical network issues detected:', criticalIssues);
+      }
+    } catch (diagnosticsError) {
+      console.error('❌ Failed to run diagnostics:', diagnosticsError);
+    }
+  };
+
+  handleShowDiagnostics = () => {
+    this.setState({
+      showDiagnostics: !this.state.showDiagnostics
+    });
+  };
+
   handleRetry = () => {
     this.setState({
       hasError: false,
       error: null,
-      errorInfo: null
+      errorInfo: null,
+      showDiagnostics: false,
+      diagnosticsResults: null
     });
   };
 
@@ -131,6 +169,48 @@ export class AuthErrorBoundary extends Component<Props, State> {
                         {this.state.errorInfo.componentStack}
                       </pre>
                     </details>
+                  )}
+                </div>
+              )}
+
+              {/* Диагностика сети */}
+              {this.state.diagnosticsResults && (
+                <div className="mb-6">
+                  <Button
+                    onClick={this.handleShowDiagnostics}
+                    variant="outline"
+                    size="sm"
+                    className="w-full flex items-center justify-center gap-2"
+                  >
+                    <Activity className="w-4 h-4" />
+                    {this.state.showDiagnostics ? 'Скрыть диагностику' : 'Показать диагностику сети'}
+                  </Button>
+                  
+                  {this.state.showDiagnostics && (
+                    <div className="mt-4">
+                      <div className="bg-muted rounded-lg p-4 text-left">
+                        <h4 className="font-semibold mb-3">Результаты диагностики:</h4>
+                        <div className="space-y-2">
+                          {this.state.diagnosticsResults.map((result, index) => (
+                            <div key={index} className="flex items-start space-x-2 text-sm">
+                              <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                                result.status === 'success' ? 'bg-green-500' :
+                                result.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+                              }`} />
+                              <div>
+                                <div className="font-medium">{result.test}</div>
+                                <div className="text-muted-foreground">{result.message}</div>
+                                {result.duration && (
+                                  <div className="text-xs text-muted-foreground">
+                                    Время: {result.duration}ms
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
