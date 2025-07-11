@@ -3397,6 +3397,56 @@ export type Database = {
           },
         ]
       }
+      health_data_sync_logs: {
+        Row: {
+          created_at: string | null
+          data_types_synced: string[] | null
+          error_details: Json | null
+          id: string
+          integration_id: string
+          records_failed: number | null
+          records_synced: number | null
+          sync_completed_at: string | null
+          sync_duration_ms: number | null
+          sync_started_at: string | null
+          sync_status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_types_synced?: string[] | null
+          error_details?: Json | null
+          id?: string
+          integration_id: string
+          records_failed?: number | null
+          records_synced?: number | null
+          sync_completed_at?: string | null
+          sync_duration_ms?: number | null
+          sync_started_at?: string | null
+          sync_status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_types_synced?: string[] | null
+          error_details?: Json | null
+          id?: string
+          integration_id?: string
+          records_failed?: number | null
+          records_synced?: number | null
+          sync_completed_at?: string | null
+          sync_duration_ms?: number | null
+          sync_started_at?: string | null
+          sync_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_data_sync_logs_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "health_app_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       health_device_data: {
         Row: {
           created_at: string
@@ -6692,6 +6742,42 @@ export type Database = {
           sync_frequency_minutes?: number | null
           token_expires_at?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_health_preferences: {
+        Row: {
+          created_at: string | null
+          data_retention_days: number | null
+          data_sharing_settings: Json | null
+          id: string
+          notification_settings: Json | null
+          preferred_units: Json | null
+          sync_preferences: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data_retention_days?: number | null
+          data_sharing_settings?: Json | null
+          id?: string
+          notification_settings?: Json | null
+          preferred_units?: Json | null
+          sync_preferences?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data_retention_days?: number | null
+          data_sharing_settings?: Json | null
+          id?: string
+          notification_settings?: Json | null
+          preferred_units?: Json | null
+          sync_preferences?: Json | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
