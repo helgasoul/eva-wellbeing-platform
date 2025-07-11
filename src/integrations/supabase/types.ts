@@ -7263,6 +7263,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notification_preferences: {
+        Row: {
+          created_at: string | null
+          daily_insights_enabled: boolean | null
+          email_notifications_enabled: boolean | null
+          id: string
+          notification_time: string | null
+          push_notifications_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          timezone: string | null
+          updated_at: string | null
+          user_id: string
+          weekend_notifications: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          daily_insights_enabled?: boolean | null
+          email_notifications_enabled?: boolean | null
+          id?: string
+          notification_time?: string | null
+          push_notifications_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id: string
+          weekend_notifications?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          daily_insights_enabled?: boolean | null
+          email_notifications_enabled?: boolean | null
+          id?: string
+          notification_time?: string | null
+          push_notifications_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string
+          weekend_notifications?: boolean | null
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           avatar_url: string | null
