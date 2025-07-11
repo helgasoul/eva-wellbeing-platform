@@ -81,7 +81,13 @@ import { SubscriptionProvider } from "./context/SubscriptionContext";
 import { FoodDiaryProvider } from "./contexts/FoodDiaryContext";
 import { BasicNotificationProvider } from "./contexts/BasicNotificationContext";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 function App() {
   const [showDebug, setShowDebug] = useState(false);
