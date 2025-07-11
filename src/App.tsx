@@ -62,6 +62,14 @@ import HowWeHelp from "./pages/HowWeHelp";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
+// Legal pages
+import { PrivacyPolicy } from "./pages/PrivacyPolicy";
+import { TermsOfService } from "./pages/TermsOfService";
+
+// Components
+import { SleepDashboard } from "./components/sleep/SleepDashboard";
+import { DataSourcesDashboard } from "./components/data/DataSourcesDashboard";
+
 // Dev pages for testing
 import DataFlowTestPage from "./pages/dev/DataFlowTestPage";
 import EmergencyAccess from "./pages/EmergencyAccess";
@@ -114,22 +122,8 @@ function App() {
                     <Route path="/contact" element={<Contact />} />
                     
                     {/* LEGAL ROUTES */}
-                    <Route path="/privacy" element={
-                      <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                        <div className="bloom-card p-8 text-center">
-                          <h1 className="text-2xl font-playfair font-bold mb-4">Политика конфиденциальности</h1>
-                          <p className="text-muted-foreground">Эта страница в разработке</p>
-                        </div>
-                      </div>
-                    } />
-                    <Route path="/terms" element={
-                      <div className="min-h-screen bloom-gradient flex items-center justify-center">
-                        <div className="bloom-card p-8 text-center">
-                          <h1 className="text-2xl font-playfair font-bold mb-4">Условия использования</h1>
-                          <p className="text-muted-foreground">Эта страница в разработке</p>
-                        </div>
-                      </div>
-                    } />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/terms" element={<TermsOfService />} />
 
                     {/* GUEST-ONLY ROUTES (для незарегистрированных) */}
                     <Route
@@ -342,12 +336,7 @@ function App() {
     <Route path="/patient/sleep-dashboard" element={
       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
-          <div className="p-6">
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold">Анализ сна</h1>
-            </div>
-            <div>Компонент SleepDashboard будет загружен здесь</div>
-          </div>
+          <SleepDashboard />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
@@ -355,12 +344,7 @@ function App() {
     <Route path="/patient/data-sources" element={
       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
-          <div className="p-6">
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold">Источники данных</h1>
-            </div>
-            <div>Компонент DataSourcesDashboard будет загружен здесь</div>
-          </div>
+          <DataSourcesDashboard />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
