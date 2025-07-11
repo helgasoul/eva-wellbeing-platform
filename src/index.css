@@ -499,6 +499,54 @@ p {
   border-radius: calc(var(--radius) * 1.5);
 }
 
+/* Z-index utilities for proper layering */
+.z-overlay {
+  z-index: 100;
+}
+
+.z-dropdown {
+  z-index: 50;
+}
+
+.z-content {
+  z-index: 10;
+}
+
+.z-background {
+  z-index: 0;
+}
+
+/* Layout fixes */
+.layout-container {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Prevent layout shifts */
+.stable-layout {
+  contain: layout style;
+}
+
+/* Responsive spacing fixes */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .section-spacing {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .section-spacing {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
 /* Bloom gradient background */
 .bloom-gradient {
   background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);

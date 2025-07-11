@@ -6,14 +6,14 @@ import heroWomenIllustration from '@/assets/hero-women-illustration.jpg';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-background via-accent/5 to-muted/20 py-20">
+    <section className="relative z-10 overflow-hidden bg-gradient-to-br from-background via-accent/5 to-muted/20 py-20">
       {/* Мягкие декоративные элементы */}
-      <div className="absolute inset-0 opacity-30">
+      <div className="absolute inset-0 opacity-30 z-0">
         <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl"></div>
       </div>
       
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           {/* Иконка */}
           <div className="flex justify-center mb-8 animate-fade-in">

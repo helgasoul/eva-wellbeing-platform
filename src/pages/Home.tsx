@@ -53,9 +53,9 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative layout-container">
       <Header />
-      <div className="bg-background flex-1">
+      <div className="bg-background flex-1 relative z-background stable-layout">
       {/* Новая героическая секция */}
       <HeroSection />
       
@@ -70,7 +70,7 @@ const Home = () => {
 
       {/* Демонстрация онбординга - только для администраторов */}
       {user?.role === UserRole.ADMIN && (
-        <section className="py-16 px-6 bg-slate-50">
+        <section className="py-16 px-6 bg-slate-50 relative z-10">
           <div className="container mx-auto">
             <OnboardingDemo />
           </div>
@@ -78,14 +78,14 @@ const Home = () => {
       )}
 
       {/* Empathetic Support Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-rose-50/20 relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-rose-50/20 relative z-10 overflow-hidden">
         {/* Subtle decorative elements */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-10 w-32 h-32 bg-purple-200/30 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-40 h-40 bg-pink-200/30 rounded-full blur-3xl"></div>
         </div>
         
-        <div className="container mx-auto relative z-10">
+        <div className="container mx-auto relative z-20">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight animate-fade-in">
               Вы не одна: забота и помощь рядом
@@ -146,11 +146,11 @@ const Home = () => {
       </section>
 
       {/* Gentle CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-purple-100/60 via-pink-100/40 to-rose-100/30 relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-purple-100/60 via-pink-100/40 to-rose-100/30 relative z-10 overflow-hidden">
         {/* Gentle gradient animation */}
         <div className="absolute inset-0 bg-gradient-to-r from-purple-200/20 via-pink-200/20 to-purple-200/20 animate-pulse opacity-50"></div>
         
-        <div className="container mx-auto text-center relative z-10">
+        <div className="container mx-auto text-center relative z-20">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6 animate-fade-in">
               <Heart className="h-8 w-8 text-primary mr-4 animate-pulse" />

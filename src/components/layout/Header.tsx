@@ -80,7 +80,7 @@ export const Header = () => {
   }, [user, navigate, isNavigating, authLoading, location.pathname]);
 
   return (
-    <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-50 shadow-elegant">
+    <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-[100] shadow-elegant">
       <div className="container mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Кнопка назад и логотип */}
@@ -164,7 +164,7 @@ export const Header = () => {
 
         {/* Мобильная навигация */}
         {isMenuOpen && (
-          <div className="md:hidden py-6 border-t border-border/30 animate-fade-in bg-card/95 backdrop-blur-sm rounded-b-xl">
+          <div className="md:hidden py-6 border-t border-border/30 animate-fade-in bg-card/95 backdrop-blur-sm rounded-b-xl relative z-50">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
                 <div key={item.path} className="relative">
