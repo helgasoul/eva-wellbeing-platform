@@ -70,6 +70,26 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
   const plans = SUBSCRIPTION_PLANS;
   const currentPlan = subscription?.plan || null;
 
+  // Initialize with basic Essential subscription for new users
+  React.useEffect(() => {
+    if (!subscription) {
+      const essentialPlan = plans.find(p => p.id === 'essential');
+      if (essentialPlan) {
+        const defaultSubscription: UserSubscription = {
+          id: 'default-essential',
+          user_id: 'current-user-id',
+          plan_id: 'essential',
+          plan: essentialPlan,
+          status: 'active',
+          current_period_start: new Date().toISOString(),
+          current_period_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date().toISOString()
+        };
+        setSubscription(defaultSubscription);
+      }
+    }
+  }, [subscription, plans]);
+
   const hasFeatureAccess = (feature: string): boolean => {
     if (!subscription || subscription.status !== 'active') {
       return false;

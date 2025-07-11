@@ -8,7 +8,10 @@ export const FEATURES = {
   GENETIC_TESTING: 'genetic_testing',
   PRIORITY_SUPPORT: 'priority_support',
   PERSONAL_COORDINATOR: 'personal_coordinator',
-  WEARABLE_INTEGRATION: 'wearable_integration'
+  WEARABLE_INTEGRATION: 'wearable_integration',
+  BASIC_NUTRITION: 'basic_nutrition',
+  FULL_NUTRITION: 'full_nutrition',
+  PREMIUM_NUTRITION: 'premium_nutrition'
 } as const;
 
 export const hasFeatureAccess = (
@@ -38,6 +41,12 @@ export const hasFeatureAccess = (
       return plan.limitations.personal_coordinator;
     case FEATURES.WEARABLE_INTEGRATION:
       return ['plus', 'optimum'].includes(plan.id);
+    case FEATURES.BASIC_NUTRITION:
+      return true; // All plans have basic nutrition access
+    case FEATURES.FULL_NUTRITION:
+      return ['plus', 'optimum'].includes(plan.id);
+    case FEATURES.PREMIUM_NUTRITION:
+      return plan.id === 'optimum';
     default:
       return true;
   }
@@ -84,4 +93,14 @@ export const formatPrice = (price: number, currency: string = 'RUB'): string => 
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price);
+};
+
+export const canAccessRecipe = (
+  userSubscription: 'essential' | 'plus' | 'optimum',
+  recipeMinLevel: 'essential' | 'plus' | 'optimum'
+): boolean => {
+  const hierarchyMap = { essential: 1, plus: 2, optimum: 3 };
+  const userLevel = hierarchyMap[userSubscription];
+  const requiredLevel = hierarchyMap[recipeMinLevel];
+  return userLevel >= requiredLevel;
 };

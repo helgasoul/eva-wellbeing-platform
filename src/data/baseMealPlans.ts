@@ -14,6 +14,7 @@ interface BasicMealPlan {
   difficulty: 'easy' | 'medium' | 'hard';
   prepTime: number;
   cookTime: number;
+  minAccessLevel: 'essential' | 'plus' | 'optimum';
 }
 
 export const baseMealPlans = {
@@ -22,7 +23,7 @@ export const baseMealPlans = {
       id: 'pre_breakfast_1',
       name: 'Овсянка с ягодами и орехами',
       description: 'Поддержка энергии и регулярности циклов',
-  mealType: 'breakfast' as const,
+      mealType: 'breakfast' as const,
       time: '08:00',
       ingredients: ['овсяные хлопья 60г', 'черника 100г', 'грецкие орехи 30г', 'семена льна 10г'],
       calories: 380,
@@ -33,7 +34,8 @@ export const baseMealPlans = {
       benefits: ['Поддержка энергии', 'Регулярность циклов', 'Антиоксиданты'],
       difficulty: 'easy' as const,
       prepTime: 10,
-      cookTime: 5
+      cookTime: 5,
+      minAccessLevel: 'essential' as const
     },
     {
       id: 'pre_breakfast_2',
@@ -50,7 +52,8 @@ export const baseMealPlans = {
       benefits: ['Детокс', 'Витамины', 'Энергия'],
       difficulty: 'easy' as const,
       prepTime: 5,
-      cookTime: 0
+      cookTime: 0,
+      minAccessLevel: 'essential' as const
     },
     {
       id: 'pre_lunch_1',
@@ -67,7 +70,8 @@ export const baseMealPlans = {
       benefits: ['Стабилизация гормонов', 'Белок', 'Полезные жиры'],
       difficulty: 'easy' as const,
       prepTime: 15,
-      cookTime: 10
+      cookTime: 10,
+      minAccessLevel: 'plus' as const
     },
     {
       id: 'pre_dinner_1',
@@ -84,7 +88,8 @@ export const baseMealPlans = {
       benefits: ['Омега-3', 'Легкое пищеварение', 'Качественный белок'],
       difficulty: 'medium' as const,
       prepTime: 10,
-      cookTime: 25
+      cookTime: 25,
+      minAccessLevel: 'essential' as const
     }
   ],
   perimenopause: [
@@ -103,7 +108,8 @@ export const baseMealPlans = {
       benefits: ['Снижение приливов', 'Гормональный баланс', 'Здоровые жиры'],
       difficulty: 'easy' as const,
       prepTime: 5,
-      cookTime: 10
+      cookTime: 10,
+      minAccessLevel: 'essential' as const
     },
     {
       id: 'peri_breakfast_2',
@@ -120,7 +126,8 @@ export const baseMealPlans = {
       benefits: ['Стабилизация сахара', 'Магний', 'Антиоксиданты'],
       difficulty: 'easy' as const,
       prepTime: 5,
-      cookTime: 15
+      cookTime: 15,
+      minAccessLevel: 'plus' as const
     },
     {
       id: 'peri_lunch_1',
@@ -137,7 +144,8 @@ export const baseMealPlans = {
       benefits: ['Фитоэстрогены', 'Клетчатка', 'Стабилизация гормонов'],
       difficulty: 'medium' as const,
       prepTime: 15,
-      cookTime: 20
+      cookTime: 20,
+      minAccessLevel: 'plus' as const
     },
     {
       id: 'peri_dinner_1',
@@ -154,7 +162,8 @@ export const baseMealPlans = {
       benefits: ['Легкое пищеварение', 'Изофлавоны', 'Кальций'],
       difficulty: 'medium' as const,
       prepTime: 10,
-      cookTime: 15
+      cookTime: 15,
+      minAccessLevel: 'essential' as const
     }
   ],
   menopause: [
@@ -173,7 +182,8 @@ export const baseMealPlans = {
       benefits: ['Омега-3', 'Антиоксиданты', 'Долгое насыщение'],
       difficulty: 'easy' as const,
       prepTime: 10,
-      cookTime: 0
+      cookTime: 0,
+      minAccessLevel: 'essential' as const
     },
     {
       id: 'meno_lunch_1',
@@ -190,7 +200,8 @@ export const baseMealPlans = {
       benefits: ['Сильные фитоэстрогены', 'Омега-3', 'Противовоспалительное'],
       difficulty: 'medium' as const,
       prepTime: 15,
-      cookTime: 20
+      cookTime: 20,
+      minAccessLevel: 'plus' as const
     },
     {
       id: 'meno_lunch_2',
@@ -207,7 +218,8 @@ export const baseMealPlans = {
       benefits: ['Противовоспалительное', 'Куркумин', 'Белок'],
       difficulty: 'medium' as const,
       prepTime: 10,
-      cookTime: 25
+      cookTime: 25,
+      minAccessLevel: 'optimum' as const
     },
     {
       id: 'meno_dinner_1',
@@ -224,7 +236,8 @@ export const baseMealPlans = {
       benefits: ['Омега-3', 'Витамин D', 'Качественный белок'],
       difficulty: 'medium' as const,
       prepTime: 10,
-      cookTime: 30
+      cookTime: 30,
+      minAccessLevel: 'plus' as const
     }
   ],
   postmenopause: [
@@ -243,7 +256,8 @@ export const baseMealPlans = {
       benefits: ['Кальций', 'Белок', 'Здоровье костей'],
       difficulty: 'easy' as const,
       prepTime: 5,
-      cookTime: 0
+      cookTime: 0,
+      minAccessLevel: 'essential' as const
     },
     {
       id: 'post_lunch_1',
@@ -260,7 +274,8 @@ export const baseMealPlans = {
       benefits: ['Кальций', 'Витамин D', 'Омега-3'],
       difficulty: 'easy' as const,
       prepTime: 10,
-      cookTime: 0
+      cookTime: 0,
+      minAccessLevel: 'plus' as const
     },
     {
       id: 'post_dinner_1',
@@ -277,7 +292,8 @@ export const baseMealPlans = {
       benefits: ['Здоровье костей', 'Кальций', 'Профилактика остеопороза'],
       difficulty: 'medium' as const,
       prepTime: 10,
-      cookTime: 30
+      cookTime: 30,
+      minAccessLevel: 'optimum' as const
     },
     {
       id: 'post_snack_1',
@@ -294,7 +310,8 @@ export const baseMealPlans = {
       benefits: ['Кальций', 'Магний', 'Пробиотики'],
       difficulty: 'easy' as const,
       prepTime: 5,
-      cookTime: 0
+      cookTime: 0,
+      minAccessLevel: 'essential' as const
     }
   ]
 };

@@ -58,7 +58,15 @@ export const MealCard: React.FC<MealCardProps> = ({
     }
   };
 
-  const canViewFullRecipe = userSubscription === 'plus' || userSubscription === 'optimum';
+  // Check access based on recipe's minimum access level
+  const hasRequiredAccess = () => {
+    const hierarchyMap = { 'essential': 1, 'plus': 2, 'optimum': 3 };
+    const userLevel = hierarchyMap[userSubscription];
+    const requiredLevel = hierarchyMap[meal.minAccessLevel];
+    return userLevel >= requiredLevel;
+  };
+
+  const canViewFullRecipe = hasRequiredAccess();
   const canViewPremiumDetails = userSubscription === 'optimum';
 
   return (
@@ -112,14 +120,19 @@ export const MealCard: React.FC<MealCardProps> = ({
         </div>
 
         {/* Контент в зависимости от подписки */}
-        {userSubscription === 'essential' && (
+        {!canViewFullRecipe && (
           <div className="bg-gradient-to-r from-primary/10 to-accent/10 p-4 rounded-2xl border border-primary/20">
             <div className="flex items-center gap-2 mb-2">
               <Lock className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Для полного доступа</span>
+              <span className="text-sm font-medium text-foreground">
+                {meal.minAccessLevel === 'plus' ? 'Доступно в Plus' : 'Доступно в Optimum'}
+              </span>
             </div>
             <p className="text-xs text-muted-foreground mb-3">
-              Получите полный рецепт, список ингредиентов и КБЖУ в Plus подписке
+              {meal.minAccessLevel === 'plus' 
+                ? 'Получите полный рецепт, список ингредиентов и КБЖУ в Plus подписке'
+                : 'Этот премиальный рецепт доступен только в Optimum подписке'
+              }
             </p>
             <Button
               onClick={onUpgrade}
@@ -127,7 +140,7 @@ export const MealCard: React.FC<MealCardProps> = ({
               className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
             >
               <Crown className="h-4 w-4 mr-2" />
-              Перейти на Plus
+              {meal.minAccessLevel === 'plus' ? 'Перейти на Plus' : 'Перейти на Optimum'}
             </Button>
           </div>
         )}
@@ -209,7 +222,7 @@ export const MealCard: React.FC<MealCardProps> = ({
               disabled={!canViewFullRecipe}
             >
               <Plus className="h-4 w-4 mr-2" />
-              {canViewFullRecipe ? 'Добавить в дневник' : 'Дневник в Plus'}
+              {canViewFullRecipe ? 'Добавить в дневник' : `Доступно в ${meal.minAccessLevel === 'plus' ? 'Plus' : 'Optimum'}`}
             </Button>
           )}
           <Button
@@ -218,7 +231,7 @@ export const MealCard: React.FC<MealCardProps> = ({
             className="flex-1 border-primary/20 hover:bg-primary/10"
             disabled={!canViewFullRecipe}
           >
-            {canViewFullRecipe ? 'Посмотреть рецепт' : 'Рецепт в Plus'}
+            {canViewFullRecipe ? 'Посмотреть рецепт' : `Рецепт в ${meal.minAccessLevel === 'plus' ? 'Plus' : 'Optimum'}`}
           </Button>
           {canViewFullRecipe && (
             <Button
