@@ -37,17 +37,17 @@
 
 @layer base {
   :root {
-    /* Теплая и заботливая палитра для женского здоровья */
-    --background: 351 100% 99%;
-    --foreground: 220 15% 25%;
+    /* Улучшенная палитра для лучшей видимости текста */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 15%;
     
     /* Primary - мягкий сливовый цвет */
     --primary: 310 45% 45%;
     --primary-foreground: 0 0% 100%;
     
     /* Теплые вторичные цвета */
-    --secondary: 166 50% 70%;
-    --secondary-foreground: 220 20% 25%;
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 240 10% 20%;
     
     /* Safe area for mobile devices */
     --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
@@ -58,25 +58,25 @@
   }
     
     /* Мягкие приглушенные тона */
-    --muted: 345 30% 94%;
-    --muted-foreground: 310 15% 55%;
+    --muted: 210 15% 95%;
+    --muted-foreground: 240 10% 50%;
     
     /* UI элементы */
-    --border: 345 20% 88%;
-    --input: 345 25% 92%;
+    --border: 210 15% 87%;
+    --input: 210 15% 87%;
     --ring: 310 45% 45%;
     
-    /* Карточки и поверхности - теплее */
-    --card: 345 57% 97%;
-    --card-foreground: 220 15% 25%;
+    /* Карточки и поверхности */
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 15%;
     
     /* Поповеры */
-    --popover: 345 57% 97%;
-    --popover-foreground: 220 15% 25%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 15%;
     
     /* Акцентные цвета - персиковый */
-    --accent: 24 95% 83%;
-    --accent-foreground: 220 20% 25%;
+    --accent: 24 85% 90%;
+    --accent-foreground: 240 10% 20%;
     
     /* Заботливые цвета для дневника питания */
     --caring-peach: 24 95% 83%;

@@ -12,6 +12,7 @@ import {
   Plus
 } from 'lucide-react';
 import { BasicMealPlan } from '@/data/baseMealPlans';
+import { getRecipeImage } from '@/utils/recipeImages';
 
 interface RecipeCardProps {
   recipe: BasicMealPlan;
@@ -65,10 +66,10 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
   return (
     <Card className="group h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-card to-accent/5 border-primary/10 max-w-sm">
       {/* Recipe Image */}
-      {recipe.imageUrl && (
+      {(recipe.imageUrl || getRecipeImage(recipe.id)) && (
         <div className="w-full h-48 overflow-hidden rounded-t-lg">
           <img 
-            src={recipe.imageUrl} 
+            src={getRecipeImage(recipe.id) || recipe.imageUrl} 
             alt={recipe.name}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />

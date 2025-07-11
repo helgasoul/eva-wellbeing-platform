@@ -38,7 +38,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 5,
       minAccessLevel: 'essential' as const,
-      imageUrl: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=400&h=300',
+      imageUrl: '/src/assets/recipe-oatmeal-berries.jpg',
       instructions: [
         'Залейте овсяные хлопья кипятком и дайте настояться 5 минут',
         'Добавьте чернику и тщательно перемешайте',
@@ -63,7 +63,7 @@ export const baseMealPlans = {
       prepTime: 5,
       cookTime: 0,
       minAccessLevel: 'essential' as const,
-      imageUrl: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=400&h=300',
+      imageUrl: '/src/assets/recipe-green-smoothie.jpg',
       instructions: [
         'Очистите банан и киви, нарежьте крупными кусками',
         'Промойте шпинат',
@@ -89,7 +89,7 @@ export const baseMealPlans = {
       prepTime: 15,
       cookTime: 10,
       minAccessLevel: 'plus' as const,
-      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&h=300',
+      imageUrl: '/src/assets/recipe-chicken-salad.jpg',
       instructions: [
         'Отварите куриную грудку в подсоленной воде 10 минут',
         'Нарежьте курицу кубиками',
