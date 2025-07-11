@@ -36,8 +36,8 @@ export const validateHealthDataPayload = (
 
   // Check if provider supports this data type
   if (provider && PROVIDER_DATA_TYPES[provider as keyof typeof PROVIDER_DATA_TYPES]) {
-    const supportedTypes = PROVIDER_DATA_TYPES[provider as keyof typeof PROVIDER_DATA_TYPES];
-    if (!supportedTypes.includes(dataType as any)) {
+    const supportedTypes = PROVIDER_DATA_TYPES[provider as keyof typeof PROVIDER_DATA_TYPES] as readonly string[];
+    if (!supportedTypes.includes(dataType)) {
       result.warnings.push(`Data type '${dataType}' is not typically supported by ${provider}`);
     }
   }
@@ -80,6 +80,63 @@ export const validateHealthDataPayload = (
         result.isValid = false;
       } else if (payload < 0 || payload > 100) {
         result.warnings.push(`${dataType} value should typically be between 0-100`);
+      }
+      break;
+
+    case 'weight':
+      if (typeof payload !== 'number') {
+        result.errors.push('Weight data must be a number');
+        result.isValid = false;
+      } else if (payload < 20 || payload > 300) {
+        result.warnings.push('Weight value seems unusual (expected range: 20-300 kg)');
+      }
+      break;
+
+    case 'bmi':
+      if (typeof payload !== 'number') {
+        result.errors.push('BMI data must be a number');
+        result.isValid = false;
+      } else if (payload < 10 || payload > 50) {
+        result.warnings.push('BMI value seems unusual (expected range: 10-50)');
+      }
+      break;
+
+    case 'body_fat':
+    case 'body_water':
+    case 'protein':
+      if (typeof payload !== 'number') {
+        result.errors.push(`${dataType} data must be a number`);
+        result.isValid = false;
+      } else if (payload < 0 || payload > 100) {
+        result.warnings.push(`${dataType} value should be a percentage between 0-100`);
+      }
+      break;
+
+    case 'muscle_mass':
+    case 'bone_mass':
+      if (typeof payload !== 'number') {
+        result.errors.push(`${dataType} data must be a number`);
+        result.isValid = false;
+      } else if (payload < 1 || payload > 100) {
+        result.warnings.push(`${dataType} value seems unusual (expected range: 1-100 kg)`);
+      }
+      break;
+
+    case 'visceral_fat':
+      if (typeof payload !== 'number') {
+        result.errors.push('Visceral fat data must be a number');
+        result.isValid = false;
+      } else if (payload < 1 || payload > 30) {
+        result.warnings.push('Visceral fat value seems unusual (expected range: 1-30)');
+      }
+      break;
+
+    case 'bmr':
+      if (typeof payload !== 'number') {
+        result.errors.push('BMR data must be a number');
+        result.isValid = false;
+      } else if (payload < 800 || payload > 4000) {
+        result.warnings.push('BMR value seems unusual (expected range: 800-4000 kcal)');
       }
       break;
 

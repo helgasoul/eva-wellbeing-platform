@@ -58,6 +58,13 @@ const SUPPORTED_PROVIDERS = [
     description: 'Connect Garmin devices for workout and health tracking data',
     icon: '🏃',
     dataTypes: ['workouts', 'heart_rate', 'stress', 'body_battery']
+  },
+  {
+    id: 'xiaomi_scale',
+    name: 'Xiaomi Mi Scale',
+    description: 'Smart body composition analysis with weight, BMI, body fat and more',
+    icon: '⚖️',
+    dataTypes: ['weight', 'bmi', 'body_fat', 'muscle_mass', 'bone_mass', 'visceral_fat', 'body_water', 'bmr', 'protein']
   }
 ];
 

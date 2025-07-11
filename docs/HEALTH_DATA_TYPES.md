@@ -25,18 +25,30 @@ The platform now supports the following health data types:
 ### Body Metrics
 - **temperature**: Body temperature (unit: °C)
 
+### Body Composition (Smart Scale Metrics)
+- **weight**: Body weight (unit: kg)
+- **bmi**: Body Mass Index (unit: none)
+- **body_fat**: Body fat percentage (unit: %)
+- **muscle_mass**: Muscle mass (unit: kg)
+- **bone_mass**: Bone mass (unit: kg)
+- **visceral_fat**: Visceral fat rating (unit: rating)
+- **body_water**: Body water percentage (unit: %)
+- **bmr**: Basal Metabolic Rate (unit: kcal)
+- **protein**: Protein percentage (unit: %)
+
 ### Nutrition
 - **nutrition**: Nutrition entries and data (unit: entries)
 
 ## Provider Support Matrix
 
-| Provider     | Steps | Heart Rate | Sleep | Workouts | Strain | Recovery | Readiness | Temperature | Nutrition | Calories |
-|--------------|-------|------------|-------|-----------|---------|----------|-----------|-------------|-----------|----------|
-| Apple Health | ✅    | ✅         | ✅    | ✅        | ❌      | ❌       | ❌        | ❌          | ✅        | ❌       |
-| Whoop        | ❌    | ✅         | ✅    | ❌        | ✅      | ✅       | ❌        | ❌          | ❌        | ❌       |
-| Oura Ring    | ❌    | ✅         | ✅    | ❌        | ❌      | ❌       | ✅        | ✅          | ❌        | ❌       |
-| Fitbit       | ✅    | ✅         | ✅    | ✅        | ❌      | ❌       | ❌        | ❌          | ❌        | ✅       |
-| Garmin       | ❌    | ✅         | ✅    | ✅        | ❌      | ❌       | ❌        | ❌          | ❌        | ✅       |
+| Provider        | Steps | Heart Rate | Sleep | Workouts | Strain | Recovery | Readiness | Temperature | Nutrition | Calories | Weight | BMI | Body Fat | Muscle Mass | Body Composition |
+|-----------------|-------|------------|-------|-----------|---------|----------|-----------|-------------|-----------|----------|--------|-----|----------|-------------|------------------|
+| Apple Health    | ✅    | ✅         | ✅    | ✅        | ❌      | ❌       | ❌        | ❌          | ✅        | ❌       | ❌     | ❌  | ❌       | ❌          | ❌               |
+| Whoop           | ❌    | ✅         | ✅    | ❌        | ✅      | ✅       | ❌        | ❌          | ❌        | ❌       | ❌     | ❌  | ❌       | ❌          | ❌               |
+| Oura Ring       | ❌    | ✅         | ✅    | ❌        | ❌      | ❌       | ✅        | ✅          | ❌        | ❌       | ❌     | ❌  | ❌       | ❌          | ❌               |
+| Fitbit          | ✅    | ✅         | ✅    | ✅        | ❌      | ❌       | ❌        | ❌          | ❌        | ✅       | ❌     | ❌  | ❌       | ❌          | ❌               |
+| Garmin          | ❌    | ✅         | ✅    | ✅        | ❌      | ❌       | ❌        | ❌          | ❌        | ✅       | ❌     | ❌  | ❌       | ❌          | ❌               |
+| **Xiaomi Mi Scale** | ❌    | ❌         | ❌    | ❌        | ❌      | ❌       | ❌        | ❌          | ❌        | ❌       | ✅     | ✅  | ✅       | ✅          | ✅               |
 
 ## Implementation Details
 

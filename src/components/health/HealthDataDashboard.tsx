@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Activity, Heart, Moon, Footprints, Thermometer, Target, Dumbbell, Utensils, Zap } from "lucide-react";
+import { Loader2, Activity, Heart, Moon, Footprints, Thermometer, Target, Dumbbell, Utensils, Zap, Scale, Users, Droplets } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,6 +34,17 @@ const DATA_TYPE_CONFIG = {
   // Body Metrics
   temperature: { icon: Thermometer, label: 'Temperature', unit: '°C', color: 'bg-cyan-500' },
   
+  // Body Composition (Smart Scale Metrics)
+  weight: { icon: Scale, label: 'Weight', unit: 'kg', color: 'bg-slate-600' },
+  bmi: { icon: Users, label: 'BMI', unit: '', color: 'bg-violet-500' },
+  body_fat: { icon: Users, label: 'Body Fat', unit: '%', color: 'bg-rose-500' },
+  muscle_mass: { icon: Dumbbell, label: 'Muscle Mass', unit: 'kg', color: 'bg-lime-600' },
+  bone_mass: { icon: Users, label: 'Bone Mass', unit: 'kg', color: 'bg-stone-500' },
+  visceral_fat: { icon: Activity, label: 'Visceral Fat', unit: '', color: 'bg-red-600' },
+  body_water: { icon: Droplets, label: 'Body Water', unit: '%', color: 'bg-sky-500' },
+  bmr: { icon: Zap, label: 'BMR', unit: 'kcal', color: 'bg-orange-600' },
+  protein: { icon: Utensils, label: 'Protein', unit: '%', color: 'bg-green-600' },
+  
   // Nutrition
   nutrition: { icon: Utensils, label: 'Nutrition', unit: 'entries', color: 'bg-amber-500' },
 };
@@ -53,6 +64,7 @@ export const PROVIDER_DATA_TYPES = {
   oura: ['sleep', 'readiness', 'temperature', 'heart_rate'],
   fitbit: ['steps', 'workouts', 'sleep', 'heart_rate', 'calories'],
   garmin: ['workouts', 'heart_rate', 'calories', 'sleep'],
+  xiaomi_scale: ['weight', 'bmi', 'body_fat', 'muscle_mass', 'bone_mass', 'visceral_fat', 'body_water', 'bmr', 'protein'],
 } as const;
 
 export function HealthDataDashboard() {
@@ -160,9 +172,22 @@ export function HealthDataDashboard() {
       case 'steps':
         return value.toLocaleString();
       case 'calories':
+      case 'bmr':
         return Math.round(value).toLocaleString();
       case 'temperature':
         return `${typeof value === 'number' ? value.toFixed(1) : value}°C`;
+      case 'weight':
+      case 'muscle_mass':
+      case 'bone_mass':
+        return `${typeof value === 'number' ? value.toFixed(1) : value} kg`;
+      case 'bmi':
+        return `${typeof value === 'number' ? value.toFixed(1) : value}`;
+      case 'body_fat':
+      case 'body_water':
+      case 'protein':
+        return `${Math.round(value)}%`;
+      case 'visceral_fat':
+        return `${Math.round(value)}`;
       case 'readiness':
       case 'recovery':
       case 'strain':
