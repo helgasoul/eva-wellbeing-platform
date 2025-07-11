@@ -15,7 +15,7 @@ export const Footer = () => {
               <img 
                 src={bloomLogo} 
                 alt="Bloom"
-                className="h-20 w-auto object-contain animate-petal-dance group-hover:animate-bloom-glow transition-all duration-300"
+                className="h-40 w-auto object-contain animate-petal-dance group-hover:animate-bloom-glow transition-all duration-300"
               />
               {/* Декоративная аура при hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-lg scale-150"></div>
