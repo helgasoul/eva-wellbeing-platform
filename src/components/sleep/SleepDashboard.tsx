@@ -4,6 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { 
   Moon, 
   Sun, 
@@ -222,35 +223,28 @@ export const SleepDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Moon className="h-6 w-6 text-primary" />
-            Анализ сна
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            Детальная аналитика качества сна и влияния на симптомы менопаузы
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button
-            variant={selectedPeriod === 'week' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedPeriod('week')}
-          >
-            Неделя
-          </Button>
-          <Button
-            variant={selectedPeriod === 'month' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedPeriod('month')}
-          >
-            Месяц
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Анализ сна"
+        description="Детальная аналитика качества сна и влияния на симптомы менопаузы"
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant={selectedPeriod === 'week' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedPeriod('week')}
+            >
+              Неделя
+            </Button>
+            <Button
+              variant={selectedPeriod === 'month' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedPeriod('month')}
+            >
+              Месяц
+            </Button>
+          </div>
+        }
+      />
 
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
