@@ -11,7 +11,7 @@ export const RegisterFormHeader = () => {
       </div>
       
       <h2 className="text-2xl font-playfair font-semibold text-foreground mb-2">
-        Создать аккаунт в Eva
+        Создать аккаунт в Bloom
       </h2>
       
       <p className="text-muted-foreground">
