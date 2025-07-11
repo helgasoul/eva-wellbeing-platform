@@ -89,7 +89,7 @@ export const AppointmentBookingStep: React.FC<AppointmentBookingStepProps> = ({
       {/* Информация о враче и клинике */}
       <div className="bloom-card bg-white/90 backdrop-blur-sm p-6">
         <div className="flex items-center space-x-4 mb-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-white text-lg font-bold">
+          <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-primary-foreground text-lg font-bold">
             {doctor.name.split(' ').map(n => n[0]).join('')}
           </div>
           <div>
@@ -231,7 +231,7 @@ export const AppointmentBookingStep: React.FC<AppointmentBookingStepProps> = ({
         <Button
           onClick={onNext}
           disabled={!selectedSlot}
-          className="bg-primary hover:bg-primary/90 text-white"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           Подтвердить запись →
         </Button>

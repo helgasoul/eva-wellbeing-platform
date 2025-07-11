@@ -311,7 +311,7 @@ export const AddDeviceModal: React.FC<AddDeviceModalProps> = ({
                 <button
                   onClick={() => setStep('permissions')}
                   disabled={selectedDataTypes.length === 0}
-                  className="flex-1 bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 interactive-hover"
+                  className="flex-1 bg-primary text-primary-foreground py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 interactive-hover"
                 >
                   Далее →
                 </button>
@@ -374,7 +374,7 @@ export const AddDeviceModal: React.FC<AddDeviceModalProps> = ({
                 </button>
                 <button
                   onClick={connectDevice}
-                  className="flex-1 bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors interactive-hover"
+                  className="flex-1 bg-primary text-primary-foreground py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors interactive-hover"
                 >
                   🔗 Подключить устройство
                 </button>

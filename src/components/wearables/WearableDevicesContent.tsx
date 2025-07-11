@@ -85,7 +85,7 @@ export const WearableDevicesContent: React.FC<WearableDevicesContentProps> = ({
           <h2 className="text-xl font-playfair font-bold gentle-text">Мои устройства</h2>
           <button
             onClick={() => setShowAddDevice(true)}
-            className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2 interactive-hover"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2 interactive-hover"
           >
             <span>➕</span>
             <span>Добавить устройство</span>
@@ -148,7 +148,7 @@ const NoDevicesState = ({ onAddDevice }: { onAddDevice: () => void }) => (
     </p>
     <button
       onClick={onAddDevice}
-      className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors interactive-hover"
+      className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors interactive-hover"
     >
       🔗 Подключить первое устройство
     </button>
@@ -295,14 +295,14 @@ const DeviceCard = ({
         <button
           onClick={syncDevice}
           disabled={isSyncing}
-          className="flex-1 bg-primary text-white py-2 px-3 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 text-sm interactive-hover"
+          className="flex-1 bg-primary text-primary-foreground py-2 px-3 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 text-sm interactive-hover"
         >
           {isSyncing ? 'Синхронизация...' : '🔄 Синхронизировать'}
         </button>
         
         <button
           onClick={() => onDeviceRemove(device.id)}
-          className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors interactive-hover"
+          className="bg-destructive text-destructive-foreground p-2 rounded-lg hover:bg-destructive/90 transition-colors interactive-hover"
         >
           🗑️
         </button>

@@ -121,7 +121,7 @@ const EmptyFeedState = ({ selectedCategory }: { selectedCategory: string }) => (
     <p className="soft-text mb-6">
       Станьте первой, кто поделится своим опытом и поддержит других женщин
     </p>
-    <button className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+    <button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
       ✍️ Создать первый пост
     </button>
   </div>

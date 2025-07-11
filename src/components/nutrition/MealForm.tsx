@@ -117,8 +117,8 @@ export const MealForm: React.FC<MealFormProps> = ({
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id as MealData['category'])}
                 className={cn(
-                  "p-2 rounded-lg text-sm border",
-                  selectedCategory === category.id ? "bg-primary text-white" : "bg-bloom-vanilla"
+                  "p-2 rounded-lg text-sm border transition-colors",
+                  selectedCategory === category.id ? "bg-primary text-primary-foreground" : "bg-background text-foreground border-input hover:bg-accent"
                 )}
               >
                 {category.icon} {category.label}
@@ -129,7 +129,7 @@ export const MealForm: React.FC<MealFormProps> = ({
           <button
             onClick={addFood}
             disabled={!newFoodName.trim()}
-            className="w-full bg-gradient-to-r from-primary to-primary-glow text-white py-2 rounded-lg disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-primary to-primary-glow text-primary-foreground py-2 rounded-lg disabled:opacity-50 transition-colors hover:opacity-90"
           >
             Добавить
           </button>
@@ -146,8 +146,8 @@ const MoodSelector = ({ value, onChange }: { value: number; onChange: (value: nu
         key={mood}
         onClick={() => onChange(mood)}
         className={cn(
-          "flex-1 p-2 rounded-lg text-center",
-          value === mood ? "bg-primary text-white" : "bg-white"
+          "flex-1 p-2 rounded-lg text-center transition-colors",
+          value === mood ? "bg-primary text-primary-foreground" : "bg-background text-foreground border border-input hover:bg-accent"
         )}
       >
         {mood === 1 ? '😢' : mood === 2 ? '😕' : mood === 3 ? '😐' : mood === 4 ? '😊' : '😍'}

@@ -221,7 +221,7 @@ export const SymptomsSelectionStep: React.FC<SymptomsSelectionStepProps> = ({
           <Button
             onClick={onNext}
             disabled={selectedSymptoms.length === 0 || isLoading}
-            className="bg-primary hover:bg-primary/90 text-white px-6 py-3"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3"
           >
             {isLoading ? (
               <>

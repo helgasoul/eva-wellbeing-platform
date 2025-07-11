@@ -89,7 +89,7 @@ const CommentsSection = ({
           <button
             onClick={handleAddComment}
             disabled={!newComment.trim()}
-            className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
             Комментировать
           </button>
@@ -101,7 +101,7 @@ const CommentsSection = ({
         {comments.map(comment => (
           <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm">
                 {comment.is_anonymous ? '🌸' : comment.author_name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1">
@@ -205,7 +205,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onPostUpdate }) => {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start space-x-3">
           {/* Аватар автора */}
-          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-primary-foreground font-bold">
             {post.author_avatar ? (
               <img src={post.author_avatar} alt={post.author_name} className="w-full h-full rounded-full object-cover" />
             ) : (

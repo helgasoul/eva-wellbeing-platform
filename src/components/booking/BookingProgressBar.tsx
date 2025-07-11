@@ -24,7 +24,7 @@ export const BookingProgressBar: React.FC<BookingProgressBarProps> = ({ currentS
             <div className={cn(
               "flex items-center justify-center w-10 h-10 rounded-full border-2 text-sm font-medium transition-all duration-200",
               index <= currentStepIndex
-                ? "bg-primary text-white border-primary"
+                ? "bg-primary text-primary-foreground border-primary"
                 : "bg-white text-gray-400 border-gray-300"
             )}>
               <span>{step.icon}</span>

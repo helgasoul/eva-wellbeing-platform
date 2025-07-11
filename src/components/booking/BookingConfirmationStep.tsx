@@ -101,7 +101,7 @@ export const BookingConfirmationStep: React.FC<BookingConfirmationStepProps> = (
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-white text-lg font-bold">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-primary-foreground text-lg font-bold">
                 {doctor.name.split(' ').map(n => n[0]).join('')}
               </div>
               <div>
@@ -251,7 +251,7 @@ export const BookingConfirmationStep: React.FC<BookingConfirmationStepProps> = (
         </Button>
         <Button
           onClick={onConfirm}
-          className="bg-primary hover:bg-primary/90 text-white px-8"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
         >
           Подтвердить запись
         </Button>

@@ -129,7 +129,7 @@ export default function WearableDevices() {
                 className={cn(
                   "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   activeTab === tab
-                    ? "bg-primary text-white shadow-md"
+                    ? "bg-primary text-primary-foreground shadow-md"
                     : "text-gentle hover:bg-bloom-vanilla"
                 )}
               >

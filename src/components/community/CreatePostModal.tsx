@@ -223,7 +223,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 <button
                   onClick={() => setStep('settings')}
                   disabled={!postData.title || !postData.content}
-                  className="flex-1 bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center"
+                  className="flex-1 bg-primary text-primary-foreground py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center"
                 >
                   Далее
                   <ArrowRight className="h-4 w-4 ml-2" />
@@ -296,7 +296,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 </button>
                 <button
                   onClick={handleCreatePost}
-                  className="flex-1 bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center"
+                  className="flex-1 bg-primary text-primary-foreground py-3 px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Опубликовать пост

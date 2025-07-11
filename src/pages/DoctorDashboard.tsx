@@ -126,7 +126,7 @@ const DoctorDashboard = () => {
                 ].map((patient, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-blue-50/50 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-medium">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-primary-foreground font-medium">
                         {patient.name.split(' ')[0][0]}
                       </div>
                       <div>

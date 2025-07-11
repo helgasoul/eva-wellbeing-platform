@@ -153,7 +153,7 @@ const Calendar: React.FC = () => {
                       onClick={() => setSelectedDate(dayData.date)}
                       className={`w-full h-full p-1 rounded-lg text-sm border transition-all duration-200 ${
                         dayData.isToday
-                          ? 'bg-eva-dusty-rose text-white border-eva-dusty-rose'
+                          ? 'bg-eva-dusty-rose text-primary-foreground border-eva-dusty-rose'
                           : selectedDate?.toDateString() === dayData.date.toDateString()
                           ? 'bg-eva-soft-pink border-eva-dusty-rose'
                           : 'border-transparent hover:bg-muted'

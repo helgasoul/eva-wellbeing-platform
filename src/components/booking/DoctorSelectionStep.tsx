@@ -252,7 +252,7 @@ const DoctorCard = ({
         
         {/* Фото врача */}
         <div className="flex-shrink-0 mb-4 lg:mb-0">
-          <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+          <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold">
             {doctor.photo_url ? (
               <img src={doctor.photo_url} alt={doctor.name} className="w-full h-full rounded-full object-cover" />
             ) : (
@@ -343,7 +343,7 @@ const DoctorCard = ({
           {/* Кнопка записи */}
           <Button
             onClick={onSelect}
-            className="w-full bg-primary hover:bg-primary/90 text-white"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             Записаться на прием
           </Button>

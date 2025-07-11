@@ -21,7 +21,7 @@ export const ComfortLevelSelector: React.FC<ComfortLevelSelectorProps> = ({
           className={cn(
             "flex-1 p-2 rounded-lg text-center transition-colors text-xs",
             value === level 
-              ? "bg-primary text-white shadow-warm" 
+              ? "bg-primary text-primary-foreground shadow-warm" 
               : "bg-white gentle-text interactive-hover"
           )}
         >

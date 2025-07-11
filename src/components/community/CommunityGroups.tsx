@@ -41,7 +41,7 @@ const RecommendedGroupCard = ({
   return (
     <div className="bg-gradient-to-br from-primary/10 to-purple-100 rounded-xl p-4 border border-primary/20">
       <div className="flex items-start space-x-3">
-        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white text-xl">
+        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-xl">
           {group.icon}
         </div>
         <div className="flex-1">
@@ -56,7 +56,7 @@ const RecommendedGroupCard = ({
                 "px-3 py-1 rounded-lg text-xs font-medium transition-colors",
                 isJoined
                   ? "bg-green-100 text-green-700"
-                  : "bg-primary text-white hover:bg-primary/90"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90"
               )}
             >
               {isJoined ? '✓ Присоединились' : 'Присоединиться'}
@@ -139,7 +139,7 @@ const GroupCard = ({
             "w-full py-2 px-3 rounded-lg text-sm font-medium transition-colors",
             isJoined
               ? "bg-green-100 text-green-700"
-              : "bg-primary text-white hover:bg-primary/90"
+              : "bg-primary text-primary-foreground hover:bg-primary/90"
           )}
         >
           {isJoined ? '✓ Присоединились' : 'Присоединиться'}
@@ -236,7 +236,7 @@ export const CommunityGroups: React.FC<CommunityGroupsProps> = ({
           <p className="soft-text mb-4">
             Создайте собственную группу поддержки для женщин с похожими интересами
           </p>
-          <button className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+          <button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
             Создать группу
           </button>
         </div>

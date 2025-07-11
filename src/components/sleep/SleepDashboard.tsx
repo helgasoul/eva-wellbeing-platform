@@ -527,7 +527,7 @@ export const SleepDashboard: React.FC = () => {
                   <div className="space-y-4">
                     {insights.recommendations.map((recommendation, index) => (
                       <div key={index} className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                        <div className="w-6 h-6 bg-blue-500 text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
                           {index + 1}
                         </div>
                         <p className="text-sm">{recommendation}</p>

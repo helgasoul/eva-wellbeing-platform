@@ -130,7 +130,7 @@ const Home = () => {
                   Вы не одна — вместе уже столько удивительных женщин
                 </p>
                 <Link to="/register">
-                  <Button className="w-full text-lg py-4 bg-gradient-to-r from-purple-500/90 via-primary to-pink-500/85 text-white font-semibold rounded-3xl transition-all duration-300 shadow-elegant hover:shadow-glow hover:scale-105 group border border-primary/20 mb-4">
+                  <Button className="w-full text-lg py-4 bg-gradient-to-r from-purple-500/90 via-primary to-pink-500/85 text-primary-foreground font-semibold rounded-3xl transition-all duration-300 shadow-elegant hover:shadow-glow hover:scale-105 group border border-primary/20 mb-4">
                     <Heart className="mr-3 h-5 w-5 group-hover:animate-pulse transition-all duration-300" />
                     Стать частью сообщества
                   </Button>
@@ -166,7 +166,7 @@ const Home = () => {
             
             <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <Link to="/register">
-                <Button className="bg-gradient-to-r from-purple-500/90 via-primary to-pink-500/85 text-white hover:shadow-glow text-xl px-12 py-6 font-semibold rounded-3xl transition-all duration-300 hover:scale-105 group border border-primary/20 mb-4">
+                <Button className="bg-gradient-to-r from-purple-500/90 via-primary to-pink-500/85 text-primary-foreground hover:shadow-glow text-xl px-12 py-6 font-semibold rounded-3xl transition-all duration-300 hover:scale-105 group border border-primary/20 mb-4">
                   <Heart className="mr-3 h-6 w-6 group-hover:animate-pulse transition-all duration-300" />
                   Присоединиться с заботой
                 </Button>

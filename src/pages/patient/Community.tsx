@@ -236,7 +236,7 @@ export default function Community() {
                 className={cn(
                   "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2",
                   activeTab === tab.key
-                    ? "bg-primary text-white"
+                    ? "bg-primary text-primary-foreground"
                     : "text-gray-600 hover:bg-gray-100"
                 )}
               >
