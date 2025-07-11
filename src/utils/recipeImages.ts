@@ -15,7 +15,7 @@ export const recipeImages = {
   // Menopause recipes
   'meno_breakfast_1': '/recipe-chia-pudding-berries.jpg',
   'meno_lunch_1': '/recipe-chicken-avocado-salad.jpg',
-  'meno_lunch_2': '/recipe-salmon-quinoa-salad.jpg',
+  'meno_lunch_2': '/recipe-lentil-soup-turmeric.jpg',
   'meno_dinner_1': '/recipe-baked-fish-vegetables.jpg',
   
   // Postmenopause recipes
