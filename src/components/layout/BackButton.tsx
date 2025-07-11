@@ -49,7 +49,10 @@ export const BackButton: React.FC<BackButtonProps> = ({
     '/forgot-password',
     '/reset-password',
     '/login-safe',
-    '/emergency-access'
+    '/emergency-access',
+    '/about',
+    '/how-we-help',
+    '/contact'
   ];
   
   if (hideOnPages.includes(location.pathname)) {

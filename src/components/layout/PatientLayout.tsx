@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { AppLayout } from './AppLayout';
 import { Sidebar } from './Sidebar';
 import { TestModeIndicator } from './TestModeIndicator';
+import { MobileNavigation } from './MobileNavigation';
 import { UserRole } from '@/types/roles';
 import { BreadcrumbItem } from './Breadcrumbs';
 
@@ -40,13 +41,16 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
 
         {/* Main Content */}
         <div className="flex flex-col flex-1">
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-6 pb-20 md:pb-6">
             <div className="max-w-7xl mx-auto">
               {children}
             </div>
           </main>
         </div>
       </div>
+      
+      {/* Mobile Navigation */}
+      <MobileNavigation role={UserRole.PATIENT} />
       </AppLayout>
     </>
   );

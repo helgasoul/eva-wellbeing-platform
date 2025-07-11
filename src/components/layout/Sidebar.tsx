@@ -96,6 +96,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
   const navigation = getNavigationForRole(role);
   const isActive = (path: string) => location.pathname === path;
 
+  // Hide dev pages in production
+  const filteredNavigation = navigation.filter(item => {
+    if (process.env.NODE_ENV === 'production') {
+      const devPaths = ['/dev/', '/diagnostics', '/data-sources'];
+      return !devPaths.some(devPath => item.href.includes(devPath));
+    }
+    return true;
+  });
+
   const getRoleStyles = (userRole: UserRole) => {
     switch (userRole) {
       case UserRole.PATIENT:
@@ -135,14 +144,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
 
   const styles = getRoleStyles(role);
 
-  if (navigation.length === 0) return null;
+  if (filteredNavigation.length === 0) return null;
 
   return (
     <aside className={`${isCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 hidden md:flex md:flex-col`}>
       <div className={`flex flex-col flex-grow pt-5 overflow-y-auto ${styles.bg} border-r`}>
         <div className="mt-8 flex-grow flex flex-col">
           <nav className="flex-1 px-2 space-y-2">
-            {navigation.map((item) => {
+            {filteredNavigation.map((item) => {
               const Icon = item.icon;
               return (
                 <Link

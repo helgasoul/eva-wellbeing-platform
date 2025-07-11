@@ -49,6 +49,14 @@
     --secondary: 166 50% 70%;
     --secondary-foreground: 220 20% 25%;
     
+    /* Safe area for mobile devices */
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  
+  .safe-area-pb {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+    
     /* Мягкие приглушенные тона */
     --muted: 345 30% 94%;
     --muted-foreground: 310 15% 55%;

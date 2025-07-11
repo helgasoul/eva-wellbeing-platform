@@ -41,18 +41,26 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       const urlParams = new URLSearchParams(window.location.search);
       const isPasswordRecovery = urlParams.get('type') === 'recovery';
       
+      // Проверяем, есть ли у пользователя критически важные данные
+      const hasEssentialData = user.registrationCompleted || 
+                              user.onboardingData || 
+                              Boolean(user.menopausePhase);
+      
       // Если это восстановление пароля и у пользователя есть хотя бы базовые данные,
       // считаем онбординг завершенным и не редиректим
-      if (isPasswordRecovery && user.registrationCompleted) {
+      if (isPasswordRecovery && hasEssentialData) {
         logger.debug('OnboardingGuard: Password recovery for registered user, allowing access');
         return;
       }
       
-      if (!hasCompletedOnboarding) {
+      // Улучшенная логика: проверяем наличие базовых данных онбординга
+      if (!hasCompletedOnboarding && !hasEssentialData) {
+      
         logger.info('OnboardingGuard: Redirecting to onboarding', {
           userId: user.id,
           currentPath: location.pathname,
           hasCompletedOnboarding,
+          hasEssentialData,
           registrationCompleted: user.registrationCompleted,
           isPasswordRecovery
         });
@@ -91,7 +99,11 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
   }
 
   // Для пациенток на других страницах проверяем завершение онбординга
-  if (user.role === 'patient' && !user.onboardingCompleted) {
+  const hasEssentialData = user.registrationCompleted || 
+                          user.onboardingData || 
+                          Boolean(user.menopausePhase);
+                          
+  if (user.role === 'patient' && !user.onboardingCompleted && !hasEssentialData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
