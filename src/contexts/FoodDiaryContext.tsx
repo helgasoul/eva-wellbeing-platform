@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { DiaryEntry } from '@/components/nutrition/AddToDiaryModal';
+import { nutritionDiaryService } from '@/services/nutritionDiaryService';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface NutrientSummary {
   calories: number;
@@ -30,44 +33,150 @@ export const useFoodDiary = () => {
 
 export const FoodDiaryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  // Загрузить записи из localStorage при инициализации
+  // Load entries from Supabase when user is available
   useEffect(() => {
-    const savedEntries = localStorage.getItem('foodDiaryEntries');
-    if (savedEntries) {
-      try {
-        const parsedEntries = JSON.parse(savedEntries);
-        // Преобразовать строки дат обратно в Date объекты
-        const entriesWithDates = parsedEntries.map((entry: any) => ({
-          ...entry,
-          addedAt: new Date(entry.addedAt)
-        }));
-        setDiaryEntries(entriesWithDates);
-      } catch (error) {
-        console.error('Error parsing saved diary entries:', error);
-      }
+    if (user?.id) {
+      loadEntriesFromDatabase();
     }
-  }, []);
+  }, [user?.id]);
 
-  // Сохранить записи в localStorage при изменении
+  // Also save to localStorage as backup
   useEffect(() => {
-    localStorage.setItem('foodDiaryEntries', JSON.stringify(diaryEntries));
+    if (diaryEntries.length > 0) {
+      localStorage.setItem('foodDiaryEntries', JSON.stringify(diaryEntries));
+    }
   }, [diaryEntries]);
 
-  const addDiaryEntry = (entry: DiaryEntry) => {
-    setDiaryEntries(prev => [...prev, entry]);
+  const loadEntriesFromDatabase = async () => {
+    if (!user?.id) return;
+
+    try {
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const endDate = new Date().toISOString().split('T')[0];
+      
+      const entries = await nutritionDiaryService.getDiaryEntries(user.id, startDate, endDate);
+      setDiaryEntries(entries);
+    } catch (error) {
+      console.error('Error loading entries from database:', error);
+      
+      // Fallback to localStorage
+      const savedEntries = localStorage.getItem('foodDiaryEntries');
+      if (savedEntries) {
+        try {
+          const parsedEntries = JSON.parse(savedEntries);
+          const entriesWithDates = parsedEntries.map((entry: any) => ({
+            ...entry,
+            addedAt: new Date(entry.addedAt)
+          }));
+          setDiaryEntries(entriesWithDates);
+        } catch (parseError) {
+          console.error('Error parsing local entries:', parseError);
+        }
+      }
+      
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить данные. Используются локальные данные.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const removeDiaryEntry = (id: string) => {
-    setDiaryEntries(prev => prev.filter(entry => entry.id !== id));
+  const addDiaryEntry = async (entry: DiaryEntry) => {
+    if (!user?.id) {
+      toast({
+        title: "Ошибка",
+        description: "Необходимо войти в систему для сохранения записей.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Save to Supabase
+      await nutritionDiaryService.saveDiaryEntry(user.id, entry);
+      
+      // Update local state
+      setDiaryEntries(prev => [...prev, entry]);
+      
+      toast({
+        title: "Запись добавлена",
+        description: "Рецепт успешно добавлен в дневник питания.",
+      });
+    } catch (error) {
+      console.error('Error saving diary entry:', error);
+      
+      // Fallback to local storage
+      setDiaryEntries(prev => [...prev, entry]);
+      
+      toast({
+        title: "Сохранено локально",
+        description: "Запись сохранена на устройстве и будет синхронизирована позже.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const updateDiaryEntry = (id: string, updates: Partial<DiaryEntry>) => {
-    setDiaryEntries(prev => 
-      prev.map(entry => 
-        entry.id === id ? { ...entry, ...updates } : entry
-      )
-    );
+  const removeDiaryEntry = async (id: string) => {
+    if (!user?.id) return;
+
+    try {
+      await nutritionDiaryService.deleteDiaryEntry(user.id, id);
+      setDiaryEntries(prev => prev.filter(entry => entry.id !== id));
+      
+      toast({
+        title: "Запись удалена",
+        description: "Запись успешно удалена из дневника.",
+      });
+    } catch (error) {
+      console.error('Error deleting diary entry:', error);
+      
+      // Still remove from local state
+      setDiaryEntries(prev => prev.filter(entry => entry.id !== id));
+      
+      toast({
+        title: "Удалено локально",
+        description: "Запись удалена локально. Изменения будут синхронизированы позже.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateDiaryEntry = async (id: string, updates: Partial<DiaryEntry>) => {
+    if (!user?.id) return;
+
+    try {
+      await nutritionDiaryService.updateDiaryEntry(user.id, id, updates);
+      
+      setDiaryEntries(prev => 
+        prev.map(entry => 
+          entry.id === id ? { ...entry, ...updates } : entry
+        )
+      );
+      
+      toast({
+        title: "Запись обновлена",
+        description: "Изменения успешно сохранены.",
+      });
+    } catch (error) {
+      console.error('Error updating diary entry:', error);
+      
+      // Still update local state
+      setDiaryEntries(prev => 
+        prev.map(entry => 
+          entry.id === id ? { ...entry, ...updates } : entry
+        )
+      );
+      
+      toast({
+        title: "Обновлено локально",
+        description: "Изменения сохранены локально и будут синхронизированы позже.",
+        variant: "destructive"
+      });
+    }
   };
 
   const getEntriesForDate = (date: string) => {

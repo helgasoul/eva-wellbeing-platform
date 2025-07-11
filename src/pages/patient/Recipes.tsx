@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecipeFilters } from '@/components/nutrition/RecipeFilters';
 import { RecipeCard } from '@/components/nutrition/RecipeCard';
 import { AddToDiaryModal } from '@/components/nutrition/AddToDiaryModal';
+import { RecipeDetailModal } from '@/components/nutrition/RecipeDetailModal';
 import { baseMealPlans, BasicMealPlan } from '@/data/baseMealPlans';
 import { useFoodDiary } from '@/contexts/FoodDiaryContext';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +15,7 @@ const Recipes: React.FC = () => {
   const [selectedMealType, setSelectedMealType] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [selectedMealForDiary, setSelectedMealForDiary] = useState<BasicMealPlan | null>(null);
+  const [selectedRecipeForDetail, setSelectedRecipeForDetail] = useState<BasicMealPlan | null>(null);
 
   const { addDiaryEntry } = useFoodDiary();
   const { toast } = useToast();
@@ -75,11 +77,12 @@ const Recipes: React.FC = () => {
   };
 
   const handleViewRecipe = (recipe: BasicMealPlan) => {
-    // For now, just show a toast - in the future this could open a detailed modal
-    toast({
-      title: recipe.name,
-      description: `Ингредиенты: ${recipe.ingredients.slice(0, 3).join(', ')}${recipe.ingredients.length > 3 ? '...' : ''}`,
-    });
+    setSelectedRecipeForDetail(recipe);
+  };
+
+  const handleAddToDiaryFromDetail = (recipe: BasicMealPlan) => {
+    setSelectedRecipeForDetail(null);
+    setSelectedMealForDiary(recipe);
   };
 
   return (
@@ -192,15 +195,21 @@ const Recipes: React.FC = () => {
         </div>
       </div>
 
+      {/* Recipe Detail Modal */}
+      <RecipeDetailModal
+        recipe={selectedRecipeForDetail}
+        isOpen={!!selectedRecipeForDetail}
+        onClose={() => setSelectedRecipeForDetail(null)}
+        onAddToDiary={handleAddToDiaryFromDetail}
+      />
+
       {/* Add to Diary Modal */}
-      {selectedMealForDiary && (
-        <AddToDiaryModal
-          isOpen={!!selectedMealForDiary}
-          meal={selectedMealForDiary}
-          onClose={() => setSelectedMealForDiary(null)}
-          onConfirm={handleConfirmAddToDiary}
-        />
-      )}
+      <AddToDiaryModal
+        isOpen={!!selectedMealForDiary}
+        meal={selectedMealForDiary}
+        onClose={() => setSelectedMealForDiary(null)}
+        onConfirm={handleConfirmAddToDiary}
+      />
     </PatientLayout>
   );
 };
