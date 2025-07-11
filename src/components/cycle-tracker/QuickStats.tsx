@@ -104,8 +104,8 @@ export const QuickStats: React.FC<QuickStatsProps> = ({ cycleAnalysis }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-2">
-            <Badge className={getPhaseColor(cycleAnalysis.current_cycle.phase)}>
+          <div className="flex items-center gap-2 min-w-0">
+            <Badge className={`${getPhaseColor(cycleAnalysis.current_cycle.phase)} text-xs break-words max-w-full whitespace-normal`}>
               {getPhaseLabel(cycleAnalysis.current_cycle.phase)}
             </Badge>
           </div>
@@ -165,12 +165,14 @@ export const QuickStats: React.FC<QuickStatsProps> = ({ cycleAnalysis }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Badge className={getStageColor(cycleAnalysis.perimenopause_indicators.probable_stage)}>
-            {cycleAnalysis.perimenopause_indicators.probable_stage === 'premenopause' ? 'Пременопауза' :
-             cycleAnalysis.perimenopause_indicators.probable_stage === 'early_perimenopause' ? 'Ранняя перименопауза' :
-             cycleAnalysis.perimenopause_indicators.probable_stage === 'late_perimenopause' ? 'Поздняя перименопауза' :
-             'Менопауза'}
-          </Badge>
+          <div className="min-w-0">
+            <Badge className={`${getStageColor(cycleAnalysis.perimenopause_indicators.probable_stage)} text-xs break-words max-w-full whitespace-normal`}>
+              {cycleAnalysis.perimenopause_indicators.probable_stage === 'premenopause' ? 'Пременопауза' :
+               cycleAnalysis.perimenopause_indicators.probable_stage === 'early_perimenopause' ? 'Ранняя перименопауза' :
+               cycleAnalysis.perimenopause_indicators.probable_stage === 'late_perimenopause' ? 'Поздняя перименопауза' :
+               'Менопауза'}
+            </Badge>
+          </div>
           <p className="text-xs text-gray-500 mt-2">
             Пропущено циклов: {cycleAnalysis.perimenopause_indicators.missed_periods_count}
           </p>
