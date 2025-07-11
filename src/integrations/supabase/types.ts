@@ -615,6 +615,30 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: number
+          role: string
+          text: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          role: string
+          text: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          role?: string
+          text?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       clinic_profiles: {
         Row: {
           address: string | null
@@ -1564,6 +1588,36 @@ export type Database = {
           verification_date?: string | null
           verification_status?: string
           verified_by?: string | null
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          created_at: string
+          date: string
+          documentType: string
+          id: number
+          keyMetrics: Json | null
+          summary: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          documentType: string
+          id?: never
+          keyMetrics?: Json | null
+          summary?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          documentType?: string
+          id?: never
+          keyMetrics?: Json | null
+          summary?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -3918,6 +3972,39 @@ export type Database = {
         }
         Relationships: []
       }
+      meals: {
+        Row: {
+          calories: number
+          created_at: string
+          id: number
+          ingredients: string[] | null
+          macros: Json | null
+          menopauseInsights: string | null
+          recipeName: string
+          user_id: string | null
+        }
+        Insert: {
+          calories: number
+          created_at?: string
+          id?: never
+          ingredients?: string[] | null
+          macros?: Json | null
+          menopauseInsights?: string | null
+          recipeName: string
+          user_id?: string | null
+        }
+        Update: {
+          calories?: number
+          created_at?: string
+          id?: never
+          ingredients?: string[] | null
+          macros?: Json | null
+          menopauseInsights?: string | null
+          recipeName?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       medical_appointments: {
         Row: {
           appointment_date: string
@@ -6024,6 +6111,36 @@ export type Database = {
           physical_symptoms?: string[] | null
           sleep_data?: Json | null
           updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      symptom_logs: {
+        Row: {
+          created_at: string
+          energyLevel: number
+          hotFlashes: number
+          id: number
+          mood: number
+          sleepQuality: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          energyLevel: number
+          hotFlashes: number
+          id?: never
+          mood: number
+          sleepQuality: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          energyLevel?: number
+          hotFlashes?: number
+          id?: never
+          mood?: number
+          sleepQuality?: number
           user_id?: string | null
         }
         Relationships: []
