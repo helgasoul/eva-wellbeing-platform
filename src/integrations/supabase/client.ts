@@ -5,20 +5,88 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://wbydubxjcdhoinhrozwx.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieWR1YnhqY2Rob2luaHJvend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNjI2MjgsImV4cCI6MjA2NTYzODYyOH0.A_n3yGRvALma5H9LTY6Cl1DLwgLg-xgwIP2slREkgy4";
 
+// Environment and connection monitoring
+const isProduction = window.location.hostname !== 'localhost';
+const isDevelopment = !isProduction;
+
+console.log('🚀 Supabase Client Initialization:', {
+  url: SUPABASE_URL,
+  environment: isProduction ? 'production' : 'development',
+  hostname: window.location.hostname
+});
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    storage: typeof window !== 'undefined' ? localStorage : undefined,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce'
+    flowType: 'pkce',
+    debug: isDevelopment
   },
   global: {
     headers: {
-      'apikey': SUPABASE_PUBLISHABLE_KEY
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
+      'X-Client-Info': `bloom-app-${isProduction ? 'prod' : 'dev'}`
+    },
+    fetch: (url, options = {}) => {
+      const startTime = Date.now();
+      return fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(15000) // 15 second timeout
+      }).then(response => {
+        const duration = Date.now() - startTime;
+        if (isDevelopment) {
+          console.log(`🌐 Supabase Request: ${url} (${duration}ms)`, {
+            status: response.status,
+            ok: response.ok
+          });
+        }
+        return response;
+      }).catch(error => {
+        const duration = Date.now() - startTime;
+        console.error(`❌ Supabase Request Failed: ${url} (${duration}ms)`, error);
+        throw error;
+      });
+    }
+  },
+  db: {
+    schema: 'public'
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
     }
   }
 });
+
+// Connection health monitoring
+let connectionCheckInterval: NodeJS.Timeout;
+
+export const initializeSupabaseMonitoring = () => {
+  if (connectionCheckInterval) {
+    clearInterval(connectionCheckInterval);
+  }
+
+  // Check connection health every 30 seconds in production
+  if (isProduction) {
+    connectionCheckInterval = setInterval(async () => {
+      try {
+        const { data, error } = await supabase.from('user_profiles').select('id').limit(1);
+        if (error) {
+          console.warn('⚠️ Supabase health check failed:', error.message);
+        }
+      } catch (error) {
+        console.error('❌ Supabase connection error:', error);
+      }
+    }, 30000);
+  }
+};
+
+// Initialize monitoring when client is created
+if (typeof window !== 'undefined') {
+  initializeSupabaseMonitoring();
+}

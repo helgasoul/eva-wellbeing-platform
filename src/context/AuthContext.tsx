@@ -29,53 +29,98 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Initialize auth state
+  // Initialize auth state with enhanced monitoring
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
+        console.log('🔐 Initializing authentication...');
         
-        // Get current user from Supabase
-        const { data: { session } } = await supabase.auth.getSession();
+        // Get current user from Supabase with timeout
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session timeout')), 10000)
+        );
+        
+        const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
+        
+        console.log('📊 Session status:', { 
+          hasSession: !!session, 
+          hasUser: !!session?.user,
+          userEmail: session?.user?.email,
+          environment: window.location.hostname
+        });
         
         if (session?.user) {
           // Get user profile data
+          console.log('👤 Fetching user profile...');
           const { user: currentUser } = await authService.getCurrentUser();
           if (currentUser) {
             setUser(currentUser);
-            console.log('User authenticated via Supabase', { email: currentUser.email });
+            console.log('✅ User authenticated via Supabase', { 
+              email: currentUser.email,
+              role: currentUser.role,
+              id: currentUser.id
+            });
           }
+        } else {
+          console.log('ℹ️ No active session found');
         }
         
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error('❌ Auth initialization error:', error);
         setError('Ошибка инициализации авторизации');
+        
+        // Try to clear potentially corrupted session data
+        try {
+          await supabase.auth.signOut();
+        } catch (signOutError) {
+          console.error('Failed to clear session:', signOutError);
+        }
       } finally {
         setIsLoading(false);
+        console.log('🏁 Auth initialization complete');
       }
     };
 
     initializeAuth();
 
-    // Subscribe to auth state changes
+    // Subscribe to auth state changes with enhanced logging
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔄 Auth state change:', { 
+        event, 
+        hasSession: !!session, 
+        userEmail: session?.user?.email,
+        timestamp: new Date().toISOString()
+      });
+      
       if (event === 'SIGNED_IN' && session?.user) {
         try {
+          console.log('👤 Processing sign in...');
           const { user: authenticatedUser } = await authService.getCurrentUser();
           if (authenticatedUser) {
             setUser(authenticatedUser);
-            console.log('User logged in', { email: authenticatedUser.email });
+            setError(null); // Clear any previous errors
+            console.log('✅ User logged in successfully', { 
+              email: authenticatedUser.email,
+              role: authenticatedUser.role
+            });
           }
         } catch (error) {
-          console.error('Error getting user profile:', error);
+          console.error('❌ Error getting user profile after sign in:', error);
+          setError('Ошибка получения профиля пользователя');
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
-        console.log('User logged out');
+        setError(null);
+        console.log('👋 User logged out');
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('🔄 Token refreshed successfully');
       }
     });
 
     return () => {
+      console.log('🧹 Cleaning up auth subscription');
       subscription.unsubscribe();
     };
   }, []);

@@ -26,35 +26,58 @@ export const Header = () => {
     { path: '/contact', label: 'Написать команде' }
   ];
 
-  // Smart navigation for "Мой Bloom" button
-  const handleMyBloomClick = React.useCallback(() => {
+  // Smart navigation for "Мой Bloom" button with enhanced error handling
+  const handleMyBloomClick = React.useCallback(async () => {
     if (isNavigating || authLoading) {
-      return; // Prevent multiple clicks during navigation or loading
+      console.log('🔄 Navigation blocked: already navigating or loading auth');
+      return;
     }
     
     setIsNavigating(true);
+    console.log('🚀 Starting navigation:', { user: !!user, userRole: user?.role, currentPath: location.pathname });
     
     try {
+      // Add a small delay to ensure auth state is stable
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       if (user) {
         // User is authenticated - go to dashboard
         const dashboardPath = user.role === 'doctor' ? '/doctor/dashboard' 
                             : user.role === 'admin' ? '/admin/dashboard' 
                             : '/patient/dashboard';
-        console.log('Navigating authenticated user to:', dashboardPath);
+        
+        console.log('✅ Navigating authenticated user:', { 
+          userId: user.id, 
+          role: user.role, 
+          path: dashboardPath 
+        });
+        
         navigate(dashboardPath);
       } else {
         // User is not authenticated - go to registration for new users
-        console.log('Navigating unauthenticated user to registration');
+        console.log('➡️ Navigating unauthenticated user to registration');
         navigate('/register');
       }
     } catch (error) {
-      console.error('Navigation error:', error);
-      // Fallback navigation
-      navigate('/register');
+      console.error('❌ Navigation error:', error);
+      
+      // Enhanced fallback with user feedback
+      try {
+        console.log('🔄 Attempting fallback navigation');
+        navigate('/register');
+      } catch (fallbackError) {
+        console.error('❌ Fallback navigation also failed:', fallbackError);
+        // Force page reload as last resort
+        window.location.href = '/register';
+      }
     } finally {
-      setTimeout(() => setIsNavigating(false), 500);
+      // Reset navigation state after a reasonable delay
+      setTimeout(() => {
+        setIsNavigating(false);
+        console.log('🏁 Navigation state reset');
+      }, 1000);
     }
-  }, [user, navigate, isNavigating, authLoading]);
+  }, [user, navigate, isNavigating, authLoading, location.pathname]);
 
   return (
     <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-50 shadow-elegant">
