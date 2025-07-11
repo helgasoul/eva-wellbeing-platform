@@ -47,6 +47,8 @@ import { healthDataAggregator, HealthDataTimelineEntry } from '@/services/health
 import { personalizationEngine, Recommendation, GoalProgress } from '@/services/personalizationService';
 // ✅ НОВЫЙ ИМПОРТ сервиса рекомендаций Eva
 import { evaRecommendationEngine, EvaRecommendation } from '@/services/evaRecommendationEngine';
+// ✅ ИМПОРТ ДЛЯ ТЕСТИРОВАНИЯ
+import { TestEvaRecommendations } from '@/components/testing/TestEvaRecommendations';
 
 interface HealthStats {
   totalEntries: number;
@@ -948,6 +950,9 @@ const PatientDashboard = () => {
         {/* ✅ НОВЫЕ ПЕРСОНАЛИЗИРОВАННЫЕ СЕКЦИИ */}
         <PhaseRecommendations />
         <GoalTracking />
+        
+        {/* ✅ КОМПОНЕНТ ТЕСТИРОВАНИЯ интеграции Claude -> Eva */}
+        <TestEvaRecommendations />
         
         {/* ✅ НОВЫЙ РАЗДЕЛ "Рекомендации Eva" */}
         <EvaRecommendationsSection />

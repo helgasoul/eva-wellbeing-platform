@@ -30,6 +30,8 @@ interface PatientDataAnalysis {
   weatherCorrelations?: any[];
   userProfile?: any;
   menopausePhase?: string;
+  aiInsights?: any[];
+  correlations?: any[];
 }
 
 interface SymptomPattern {
@@ -57,32 +59,88 @@ class EvaRecommendationEngine {
   }
 
   /**
-   * Сбор всех данных пациента
+   * Сбор всех данных пациента из Supabase
    */
   private async gatherPatientData(userId: string): Promise<PatientDataAnalysis> {
-    // Данные онбординга
-    const onboardingData = JSON.parse(localStorage.getItem('onboardingData') || '{}');
-    
-    // Записи симптомов
-    const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${userId}`) || '[]');
-    
-    // История чата с ИИ
-    const chatHistory = await this.getChatHistory(userId);
-    
-    // Данные о питании
-    const nutritionData = JSON.parse(localStorage.getItem(`nutrition_entries_${userId}`) || '[]');
-    
-    // Данные носимых устройств
-    const wearableData = JSON.parse(localStorage.getItem(`wearable_data_${userId}`) || '[]');
+    try {
+      // Получаем профиль пользователя
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    return {
-      onboardingData,
-      symptomEntries,
-      chatHistory,
-      nutritionData,
-      wearableData,
-      menopausePhase: onboardingData?.phaseResult?.phase || 'неопределена'
-    };
+      // Получаем записи симптомов из Supabase
+      const { data: symptomEntries } = await supabase
+        .from('symptom_entries')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+      // Получаем данные о питании из Supabase
+      const { data: nutritionData } = await supabase
+        .from('nutrition_entries')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+      // История чата с ИИ
+      const chatHistory = await this.getChatHistory(userId);
+
+      // Получаем последние ИИ-инсайты от Claude
+      const { data: aiInsights } = await supabase
+        .from('ai_insights')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('insight_type', 'daily_analysis')
+        .order('created_at', { ascending: false })
+        .limit(7);
+
+      // Получаем корреляционный анализ
+      const { data: correlations } = await supabase
+        .from('correlation_analysis')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      // Fallback к localStorage для данных онбординга если они не в профиле
+      const onboardingData = (userProfile as any)?.onboarding_data || 
+                           JSON.parse(localStorage.getItem('onboardingData') || '{}');
+
+      return {
+        onboardingData,
+        symptomEntries: symptomEntries || [],
+        chatHistory,
+        nutritionData: nutritionData || [],
+        wearableData: [], // Пока нет интеграции с носимыми устройствами
+        userProfile,
+        menopausePhase: userProfile?.menopause_phase || onboardingData?.phaseResult?.phase || 'неопределена',
+        aiInsights: aiInsights || [],
+        correlations: correlations || []
+      };
+    } catch (error) {
+      console.error('Error gathering patient data from Supabase:', error);
+      
+      // Fallback к localStorage в случае ошибки
+      const onboardingData = JSON.parse(localStorage.getItem('onboardingData') || '{}');
+      const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${userId}`) || '[]');
+      const nutritionData = JSON.parse(localStorage.getItem(`nutrition_entries_${userId}`) || '[]');
+      const chatHistory = await this.getChatHistory(userId);
+
+      return {
+        onboardingData,
+        symptomEntries,
+        chatHistory,
+        nutritionData,
+        wearableData: [],
+        menopausePhase: onboardingData?.phaseResult?.phase || 'неопределена',
+        aiInsights: [],
+        correlations: []
+      };
+    }
   }
 
   /**
@@ -300,6 +358,9 @@ class EvaRecommendationEngine {
   private generateRecommendations(analysis: any, patientData: PatientDataAnalysis): EvaRecommendation[] {
     const recommendations: EvaRecommendation[] = [];
     
+    // ✅ НОВОЕ: Генерируем рекомендации на основе ИИ-инсайтов от Claude
+    recommendations.push(...this.generateClaudeBasedRecommendations(patientData));
+    
     // Срочные рекомендации
     recommendations.push(...this.generateUrgentRecommendations(analysis, patientData));
     
@@ -319,6 +380,109 @@ class EvaRecommendationEngine {
     return recommendations
       .sort((a, b) => this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority))
       .slice(0, 6);
+  }
+
+  /**
+   * ✅ НОВОЕ: Генерация рекомендаций на основе ИИ-инсайтов от Claude
+   */
+  private generateClaudeBasedRecommendations(data: PatientDataAnalysis): EvaRecommendation[] {
+    const claudeRecommendations: EvaRecommendation[] = [];
+    
+    if (!data.aiInsights || data.aiInsights.length === 0) {
+      return claudeRecommendations;
+    }
+
+    // Берем последние 3 анализа от Claude
+    const recentInsights = data.aiInsights.slice(0, 3);
+    
+    recentInsights.forEach((insight, index) => {
+      const insightData = insight.insight_data || {};
+      const recommendations = insight.actionable_recommendations || {};
+      
+      // Создаем рекомендации на основе ключевых находок Claude
+      if (insightData.key_findings && insightData.key_findings.length > 0) {
+        const mainFinding = insightData.key_findings[0];
+        
+        claudeRecommendations.push({
+          id: `claude-insight-${insight.id}-${index}`,
+          type: 'medical',
+          priority: insight.confidence_score > 0.8 ? 'high' : 'medium',
+          category: this.determineRecommendationCategory(mainFinding),
+          title: `Инсайт от Claude: ${insightData.title || 'Персональный анализ'}`,
+          description: mainFinding.length > 150 ? mainFinding.substring(0, 150) + '...' : mainFinding,
+          reason: `Claude проанализировал ваши данные за ${insightData.description ? 'последний период' : 'сегодня'} и выявил важные паттерны`,
+          actionSteps: recommendations.immediate_actions?.slice(0, 3) || [
+            'Обратите внимание на выявленные паттерны',
+            'Продолжайте отслеживание данных',
+            'При необходимости обратитесь к врачу'
+          ],
+          basedOnData: insightData.data_sources || ['AI Analysis', 'Health Data'],
+          confidence: Math.round((insight.confidence_score || 0.7) * 100),
+          estimatedImpact: recommendations.immediate_actions?.length > 2 ? 'high' : 'medium',
+          timeframe: 'следуйте рекомендациям',
+          icon: 'brain',
+          urgencyLevel: insight.confidence_score > 0.8 ? 'soon' : 'routine'
+        });
+      }
+
+      // Добавляем рекомендации по корреляциям от Claude
+      if (data.correlations && data.correlations.length > 0) {
+        const correlation = data.correlations[0]; // Берем самую свежую корреляцию
+        const correlationInsights = correlation.insights || {};
+        const correlationRecs = correlation.recommendations || {};
+        
+        if (correlationInsights.pattern_description) {
+          claudeRecommendations.push({
+            id: `claude-correlation-${correlation.id}`,
+            type: 'lifestyle',
+            priority: correlation.correlation_strength > 0.7 ? 'high' : 'medium',
+            category: 'symptoms',
+            title: 'Обнаружена важная связь между симптомами',
+            description: correlationInsights.pattern_description.length > 150 
+              ? correlationInsights.pattern_description.substring(0, 150) + '...'
+              : correlationInsights.pattern_description,
+            reason: `Claude выявил связь силой ${Math.round((correlation.correlation_strength || 0.5) * 100)}% между различными факторами`,
+            actionSteps: correlationRecs.actions?.slice(0, 3) || [
+              'Обратите внимание на выявленную связь',
+              'Отслеживайте связанные факторы',
+              'Используйте эту информацию для управления симптомами'
+            ],
+            basedOnData: ['Correlation Analysis', 'AI Pattern Recognition'],
+            confidence: Math.round((correlation.correlation_strength || 0.5) * 100),
+            estimatedImpact: correlationRecs.expected_impact === 'High' ? 'high' : 'medium',
+            timeframe: 'применяйте постоянно',
+            icon: 'trending-up'
+          });
+        }
+      }
+    });
+
+    return claudeRecommendations.slice(0, 3); // Ограничиваем количество рекомендаций от Claude
+  }
+
+  /**
+   * Определение категории рекомендации на основе текста
+   */
+  private determineRecommendationCategory(text: string): RecommendationCategory {
+    const lowerText = text.toLowerCase();
+    
+    if (lowerText.includes('питание') || lowerText.includes('еда') || lowerText.includes('диета')) {
+      return 'nutrition';
+    }
+    if (lowerText.includes('сон') || lowerText.includes('отдых')) {
+      return 'sleep';
+    }
+    if (lowerText.includes('упражнения') || lowerText.includes('физическ') || lowerText.includes('активность')) {
+      return 'exercise';
+    }
+    if (lowerText.includes('стресс') || lowerText.includes('расслабление') || lowerText.includes('медитация')) {
+      return 'stress';
+    }
+    if (lowerText.includes('врач') || lowerText.includes('лечение') || lowerText.includes('медицин')) {
+      return 'medical';
+    }
+    
+    return 'symptoms'; // По умолчанию
   }
 
   /**
