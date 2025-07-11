@@ -4793,6 +4793,51 @@ export type Database = {
         }
         Relationships: []
       }
+      migration_audit_log: {
+        Row: {
+          created_at: string
+          email: string
+          error_details: string | null
+          id: string
+          ip_address: string | null
+          legacy_user_id: string | null
+          metadata: Json | null
+          migration_status: string
+          migration_timestamp: string
+          migration_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          error_details?: string | null
+          id?: string
+          ip_address?: string | null
+          legacy_user_id?: string | null
+          metadata?: Json | null
+          migration_status: string
+          migration_timestamp?: string
+          migration_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          error_details?: string | null
+          id?: string
+          ip_address?: string | null
+          legacy_user_id?: string | null
+          metadata?: Json | null
+          migration_status?: string
+          migration_timestamp?: string
+          migration_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       mission_images: {
         Row: {
           created_at: string

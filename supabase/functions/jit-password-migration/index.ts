@@ -145,6 +145,28 @@ serve(async (req) => {
     // 5. Логируем успешную миграцию
     console.log(`🎉 JIT Migration: Migration completed successfully for ${email}`);
     
+    const { error: migrationAuditError } = await supabase
+      .from('migration_audit_log')
+      .insert({
+        user_id: newUser.user.id,
+        email: email,
+        legacy_user_id: legacyUserData.id,
+        migration_type: 'jit_password_migration',
+        migration_status: 'success',
+        ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+        user_agent: req.headers.get('user-agent') || 'unknown',
+        metadata: {
+          onboarding_migrated: !!legacyUserData.profile_data,
+          profile_data_size: legacyUserData.profile_data ? Object.keys(legacyUserData.profile_data).length : 0,
+          migration_timestamp: new Date().toISOString()
+        }
+      });
+
+    if (migrationAuditError) {
+      console.error(`⚠️ JIT Migration: Migration audit log failed: ${migrationAuditError.message}`);
+    }
+
+    // Дополнительно логируем в основной аудит лог для совместимости
     const { error: auditError } = await supabase
       .from('security_audit_log')
       .insert({
@@ -162,7 +184,7 @@ serve(async (req) => {
       });
 
     if (auditError) {
-      console.error(`⚠️ JIT Migration: Audit log failed: ${auditError.message}`);
+      console.error(`⚠️ JIT Migration: Security audit log failed: ${auditError.message}`);
     }
 
     // 6. Возвращаем успешный результат
@@ -184,6 +206,29 @@ serve(async (req) => {
 
   } catch (error: any) {
     console.error('❌ JIT Migration: Migration failed:', error);
+    
+    // Логируем неудачную миграцию
+    try {
+      const { email, legacyUserData } = await req.json().catch(() => ({ email: 'unknown', legacyUserData: null }));
+      
+      await supabase
+        .from('migration_audit_log')
+        .insert({
+          email: email || 'unknown',
+          legacy_user_id: legacyUserData?.id || 'unknown',
+          migration_type: 'jit_password_migration',
+          migration_status: 'failed',
+          error_details: error.message,
+          ip_address: req.headers.get('x-forwarded-for') || 'unknown',
+          user_agent: req.headers.get('user-agent') || 'unknown',
+          metadata: {
+            error_type: error.name || 'UnknownError',
+            migration_timestamp: new Date().toISOString()
+          }
+        });
+    } catch (logError) {
+      console.error('Failed to log migration failure:', logError);
+    }
     
     return new Response(
       JSON.stringify({
