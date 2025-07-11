@@ -10,6 +10,8 @@ import { HealthDataDashboard } from "@/components/health/HealthDataDashboard";
 import { AddIntegrationModal } from "@/components/health/AddIntegrationModal";
 import { IntegrationSettings } from "@/components/health/IntegrationSettings";
 import { GeminiIntegrationDashboard } from "@/components/health/GeminiIntegrationDashboard";
+import { PatientLayout } from "@/components/layout/PatientLayout";
+import { cn } from "@/lib/utils";
 
 interface HealthIntegration {
   id: string;
@@ -156,141 +158,164 @@ export default function HealthDataIntegrations() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
+      <PatientLayout 
+        title="Интеграции с приложениями | Eva"
+        breadcrumbs={[
+          { label: 'Главная', href: '/patient/dashboard' },
+          { label: 'Интеграции с приложениями', href: '/patient/health-data-integrations' }
+        ]}
+      >
+        <div className="flex items-center justify-center p-8">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      </PatientLayout>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Health Data Integrations</h1>
-          <p className="text-muted-foreground">
-            Connect your health apps and devices to sync data automatically
-          </p>
-        </div>
-        <Button onClick={() => setShowAddModal(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Integration
-        </Button>
-      </div>
-
-      {/* Active Integrations */}
-      {integrations.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Connected Apps</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {integrations.map((integration) => {
-              const provider = SUPPORTED_PROVIDERS.find(p => p.id === (integration.provider_name || integration.app_name));
-              return (
-                <Card key={integration.id} className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{provider?.icon}</span>
-                      <div>
-                        <h3 className="font-semibold">{provider?.name}</h3>
-                        <Badge variant={getStatusColor(integration.integration_status)}>
-                          {getStatusIcon(integration.integration_status)}
-                          <span className="ml-1 capitalize">{integration.integration_status}</span>
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => syncIntegration(integration)}
-                        disabled={syncing === integration.id}
-                      >
-                        {syncing === integration.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <RefreshCw className="w-4 h-4" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowSettings(integration.id)}
-                      >
-                        <Settings className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <div>
-                      Last sync: {integration.last_sync_at 
-                        ? new Date(integration.last_sync_at).toLocaleDateString() 
-                        : 'Never'}
-                    </div>
-                    <div>Frequency: {integration.sync_frequency || 'daily'}</div>
-                    {integration.scopes_granted && (
-                      <div>
-                        Data types: {integration.scopes_granted.join(', ')}
-                      </div>
-                    )}
-                  </div>
-
-                  {integration.error_details && (
-                    <div className="mt-3 p-2 bg-destructive/10 rounded text-sm text-destructive">
-                      Error: {integration.error_details.error}
-                    </div>
-                  )}
-                </Card>
-              );
-            })}
+    <PatientLayout 
+      title="Интеграции с приложениями | Eva"
+      breadcrumbs={[
+        { label: 'Главная', href: '/patient/dashboard' },
+        { label: 'Интеграции с приложениями', href: '/patient/health-data-integrations' }
+      ]}
+    >
+      <div className="space-y-6">
+        
+        {/* Заголовок */}
+        <div className="bloom-card bg-white/90 backdrop-blur-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-playfair font-bold gentle-text flex items-center mb-2">
+                📱 Интеграции с приложениями
+              </h1>
+              <p className="soft-text">
+                Подключите ваши приложения для здоровья и автоматически синхронизируйте данные
+              </p>
+            </div>
+            <Button onClick={() => setShowAddModal(true)} className="bloom-button">
+              <Plus className="w-4 h-4 mr-2" />
+              Добавить интеграцию
+            </Button>
           </div>
         </div>
-      )}
 
-      {/* Available Providers */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Available Integrations</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {SUPPORTED_PROVIDERS
-            .filter(provider => !integrations.some(i => (i.provider_name || i.app_name) === provider.id))
-            .map((provider) => (
-              <HealthProviderCard
-                key={provider.id}
-                provider={provider}
-                onConnect={() => setShowAddModal(true)}
-              />
-            ))}
+        {/* Активные интеграции */}
+        {integrations.length > 0 && (
+          <div className="bloom-card bg-white/90 backdrop-blur-sm p-6 space-y-4">
+            <h2 className="text-xl font-playfair font-semibold gentle-text">📲 Подключенные приложения</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {integrations.map((integration) => {
+                const provider = SUPPORTED_PROVIDERS.find(p => p.id === (integration.provider_name || integration.app_name));
+                return (
+                  <Card key={integration.id} className="bloom-card bg-gradient-to-br from-bloom-vanilla to-white border-bloom-sage/20 p-4 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{provider?.icon}</span>
+                        <div>
+                          <h3 className="font-semibold gentle-text">{provider?.name}</h3>
+                          <Badge variant={getStatusColor(integration.integration_status)} className="text-xs">
+                            {getStatusIcon(integration.integration_status)}
+                            <span className="ml-1 capitalize">{integration.integration_status}</span>
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => syncIntegration(integration)}
+                          disabled={syncing === integration.id}
+                          className="border-bloom-sage/30 hover:bg-bloom-sage/10"
+                        >
+                          {syncing === integration.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="w-4 h-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowSettings(integration.id)}
+                          className="border-bloom-sage/30 hover:bg-bloom-sage/10"
+                        >
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="text-sm soft-text space-y-1">
+                      <div>
+                        Последняя синхронизация: {integration.last_sync_at 
+                          ? new Date(integration.last_sync_at).toLocaleDateString('ru-RU') 
+                          : 'Никогда'}
+                      </div>
+                      <div>Частота: {integration.sync_frequency || 'ежедневно'}</div>
+                      {integration.scopes_granted && (
+                        <div>
+                          Типы данных: {integration.scopes_granted.join(', ')}
+                        </div>
+                      )}
+                    </div>
+
+                    {integration.error_details && (
+                      <div className="mt-3 p-2 bg-destructive/10 rounded text-sm text-destructive">
+                        Ошибка: {integration.error_details.error}
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Доступные провайдеры */}
+        <div className="bloom-card bg-white/90 backdrop-blur-sm p-6 space-y-4">
+          <h2 className="text-xl font-playfair font-semibold gentle-text">🔗 Доступные интеграции</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {SUPPORTED_PROVIDERS
+              .filter(provider => !integrations.some(i => (i.provider_name || i.app_name) === provider.id))
+              .map((provider) => (
+                <HealthProviderCard
+                  key={provider.id}
+                  provider={provider}
+                  onConnect={() => setShowAddModal(true)}
+                />
+              ))}
+          </div>
         </div>
-      </div>
 
-      {/* Gemini Integration Dashboard */}
-      <div className="space-y-4">
-        <GeminiIntegrationDashboard />
-      </div>
-
-      {/* Health Data Dashboard */}
-      {integrations.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Health Data Overview</h2>
-          <HealthDataDashboard />
+        {/* Gemini интеграция */}
+        <div className="bloom-card bg-white/90 backdrop-blur-sm p-6">
+          <GeminiIntegrationDashboard />
         </div>
-      )}
 
-      {/* Modals */}
-      <AddIntegrationModal
-        open={showAddModal}
-        onOpenChange={setShowAddModal}
-        providers={SUPPORTED_PROVIDERS}
-        onSuccess={loadIntegrations}
-      />
+        {/* Обзор данных о здоровье */}
+        {integrations.length > 0 && (
+          <div className="bloom-card bg-white/90 backdrop-blur-sm p-6 space-y-4">
+            <h2 className="text-xl font-playfair font-semibold gentle-text">📊 Обзор данных о здоровье</h2>
+            <HealthDataDashboard />
+          </div>
+        )}
 
-      {showSettings && (
-        <IntegrationSettings
-          integrationId={showSettings}
-          onClose={() => setShowSettings(null)}
-          onUpdate={loadIntegrations}
+        {/* Модальные окна */}
+        <AddIntegrationModal
+          open={showAddModal}
+          onOpenChange={setShowAddModal}
+          providers={SUPPORTED_PROVIDERS}
+          onSuccess={loadIntegrations}
         />
-      )}
-    </div>
+
+        {showSettings && (
+          <IntegrationSettings
+            integrationId={showSettings}
+            onClose={() => setShowSettings(null)}
+            onUpdate={loadIntegrations}
+          />
+        )}
+      </div>
+    </PatientLayout>
   );
 }
