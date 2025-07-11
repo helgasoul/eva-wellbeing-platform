@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Heart, Cloud, User } from 'lucide-react';
+import { Menu, X, Heart, Cloud, User, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BackButton } from './BackButton';
 import { useAuth } from '@/context/AuthContext';
+import { useSubscription } from '@/context/SubscriptionContext';
 import bloomLogo from '@/assets/bloom-logo-white-bg.png';
 
 export const Header = () => {
@@ -12,6 +13,27 @@ export const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
+  const { currentPlan } = useSubscription();
+
+  // Helper function to get plan display info
+  const getPlanDisplayInfo = (plan: any) => {
+    if (!plan) return null;
+    
+    switch (plan.id) {
+      case 'essential':
+        return { icon: '🌿', name: 'Essential', color: 'from-green-500 to-emerald-500' };
+      case 'plus':
+        return { icon: '🌺', name: 'Plus', color: 'from-orange-500 to-red-500' };
+      case 'optimum':
+        return { icon: '⭐', name: 'Optimum', color: 'from-purple-500 to-indigo-500' };
+      case 'digital_twin':
+        return { icon: '🤖', name: 'Digital Twin', color: 'from-cyan-500 to-blue-600' };
+      default:
+        return { icon: '🌿', name: 'Essential', color: 'from-green-500 to-emerald-500' };
+    }
+  };
+
+  const planInfo = getPlanDisplayInfo(currentPlan);
 
   // Проверяем, нужно ли показывать кнопку "Назад" в хедере
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/login-safe', '/emergency-access'].includes(location.pathname);
@@ -119,6 +141,17 @@ export const Header = () => {
 
           {/* Кнопки действий */}
           <div className="hidden md:flex items-center space-x-3">
+            {/* Отображение текущего тарифа для авторизованных пользователей */}
+            {user && planInfo && (
+              <Link to="/how-we-help" className="group">
+                <div className={`bg-gradient-to-r ${planInfo.color} text-white px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer flex items-center gap-2`}>
+                  <span className="text-base">{planInfo.icon}</span>
+                  <span>{planInfo.name}</span>
+                  <Crown className="h-3 w-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </Link>
+            )}
+            
             <Button 
               variant="ghost"
               className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
@@ -183,6 +216,21 @@ export const Header = () => {
               ))}
               
               <div className="flex flex-col space-y-3 pt-4 border-t border-border/30">
+                {/* Отображение текущего тарифа в мобильной версии */}
+                {user && planInfo && (
+                  <Link 
+                    to="/how-we-help" 
+                    className="group"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <div className={`bg-gradient-to-r ${planInfo.color} text-white px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 w-full`}>
+                      <span className="text-base">{planInfo.icon}</span>
+                      <span>Мой тариф: {planInfo.name}</span>
+                      <Crown className="h-3 w-3 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </Link>
+                )}
+
                 <Button 
                   variant="ghost" 
                   className="w-full justify-center py-3 font-medium rounded-xl"
