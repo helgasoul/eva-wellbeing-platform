@@ -179,17 +179,18 @@ const PatientDashboard = () => {
       
     } catch (error) {
       console.error('Error loading health data:', error);
-      // Fallback к старому методу
-      const stats = healthDataAggregator.getDataStats();
-      const dataCompleteness = Math.min(100, (stats.totalEntries / 30) * 100);
       
+      // Устанавливаем пустые данные в случае ошибки
       setHealthStats({
-        ...stats,
-        dataCompleteness
+        totalEntries: 0,
+        symptomEntries: 0,
+        nutritionEntries: 0,
+        wearableEntries: 0,
+        daysWithData: 0,
+        dataCompleteness: 0
       });
       
-      const timeline = healthDataAggregator.getTimeline(7);
-      setRecentEvents(timeline.slice(0, 5));
+      setRecentEvents([]);
     } finally {
       setIsLoading(false);
     }
