@@ -37,18 +37,21 @@ import {
   Shield,
   Clipboard,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  // ✅ НОВЫЕ ИМПОРТЫ для тестирования функционала
+  Play,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { healthDataAggregator, HealthDataTimelineEntry } from '@/services/healthDataAggregator';
+import { toast } from 'sonner';
 
 // ✅ НОВЫЙ ИМПОРТ сервиса персонализации
 import { personalizationEngine, Recommendation, GoalProgress } from '@/services/personalizationService';
 // ✅ НОВЫЙ ИМПОРТ сервиса рекомендаций Eva
 import { evaRecommendationEngine, EvaRecommendation } from '@/services/evaRecommendationEngine';
-// ✅ ИМПОРТ ДЛЯ ТЕСТИРОВАНИЯ
-import { TestEvaRecommendations } from '@/components/testing/TestEvaRecommendations';
 
 interface HealthStats {
   totalEntries: number;
@@ -70,6 +73,10 @@ const PatientDashboard = () => {
   // ✅ НОВЫЕ СОСТОЯНИЯ для рекомендаций Eva
   const [evaRecommendations, setEvaRecommendations] = useState<EvaRecommendation[]>([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
+  
+  // ✅ НОВЫЕ СОСТОЯНИЯ для тестирования функционала
+  const [isTestingClaudeAnalysis, setIsTestingClaudeAnalysis] = useState(false);
+  const [isTestingRecommendations, setIsTestingRecommendations] = useState(false);
   
   // ✅ НОВОЕ: Получаем данные онбординга для персонализации
   const onboardingData = user?.onboardingData || 
@@ -212,6 +219,63 @@ const PatientDashboard = () => {
       setEvaRecommendations([]);
     } finally {
       setIsLoadingRecommendations(false);
+    }
+  };
+
+  // ✅ НОВЫЕ ФУНКЦИИ для тестирования функционала
+  const runClaudeAnalysis = async () => {
+    if (!user?.id) {
+      toast.error('Пользователь не авторизован');
+      return;
+    }
+
+    setIsTestingClaudeAnalysis(true);
+    try {
+      console.log('🧠 Запускаем ежедневный анализ Claude...');
+      
+      const { data, error } = await supabase.functions.invoke('daily-health-analysis', {
+        body: {
+          userId: user.id,
+          analysisDate: new Date().toISOString().split('T')[0]
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('✅ Анализ Claude выполнен успешно!');
+      console.log('Claude analysis result:', data);
+      
+    } catch (error) {
+      console.error('Error running Claude analysis:', error);
+      toast.error('Ошибка при выполнении анализа: ' + (error as Error).message);
+    } finally {
+      setIsTestingClaudeAnalysis(false);
+    }
+  };
+
+  const updateRecommendations = async () => {
+    if (!user?.id) {
+      toast.error('Пользователь не авторизован');
+      return;
+    }
+
+    setIsTestingRecommendations(true);
+    try {
+      console.log('🔄 Обновляем рекомендации Eva...');
+      
+      const updatedRecommendations = await evaRecommendationEngine.analyzePatientData(user.id);
+      setEvaRecommendations(updatedRecommendations.slice(0, 6));
+      
+      toast.success('✅ Рекомендации Eva обновлены!');
+      console.log('Updated recommendations:', updatedRecommendations);
+      
+    } catch (error) {
+      console.error('Error updating recommendations:', error);
+      toast.error('Ошибка при обновлении рекомендаций: ' + (error as Error).message);
+    } finally {
+      setIsTestingRecommendations(false);
     }
   };
 
@@ -540,7 +604,7 @@ const PatientDashboard = () => {
       <Card className="bg-card/90 backdrop-blur-sm border-primary/20 shadow-elegant">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <CardTitle className="text-xl font-semibold text-foreground flex items-center gap-2">
                 <Brain className="h-5 w-5 text-primary" />
                 Рекомендации Eva
@@ -549,9 +613,46 @@ const PatientDashboard = () => {
                 Персональные советы на основе анализа ваших данных
               </CardDescription>
             </div>
-            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-              На основе ИИ-анализа
-            </Badge>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                На основе ИИ-анализа
+              </Badge>
+            </div>
+          </div>
+          
+          {/* ✅ НОВЫЕ КНОПКИ УПРАВЛЕНИЯ */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            <Button 
+              onClick={runClaudeAnalysis}
+              disabled={isTestingClaudeAnalysis}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 text-xs h-8 px-3"
+            >
+              {isTestingClaudeAnalysis ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Play className="h-3 w-3" />
+              )}
+              <span className="hidden sm:inline">Запустить анализ</span>
+              <span className="sm:hidden">Анализ</span>
+            </Button>
+            
+            <Button 
+              onClick={updateRecommendations}
+              disabled={isTestingRecommendations}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 text-xs h-8 px-3"
+            >
+              {isTestingRecommendations ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3 w-3" />
+              )}
+              <span className="hidden sm:inline">Обновить рекомендации</span>
+              <span className="sm:hidden">Обновить</span>
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -614,23 +715,27 @@ const PatientDashboard = () => {
     
     return (
       <div className={`border-2 rounded-xl p-4 transition-all duration-300 hover:shadow-md ${colors.bg} ${recommendation.priority === 'critical' ? 'animate-pulse' : ''}`}>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-3">
-              <div className={`p-2 rounded-lg ${colors.badge}`}>
+              <div className={`p-2 rounded-lg ${colors.badge} flex-shrink-0`}>
                 {getTypeIcon(recommendation.type)}
               </div>
-              <div className="flex-1">
-                <h3 className={`font-semibold ${colors.text} mb-1`}>{recommendation.title}</h3>
+              <div className="flex-1 min-w-0">
+                <h3 className={`font-semibold ${colors.text} mb-1 break-words leading-tight`}>
+                  {recommendation.title}
+                </h3>
                 <Badge variant="secondary" className={`text-xs ${colors.badge} border-0`}>
                   {getPriorityText(recommendation.priority)}
                 </Badge>
               </div>
             </div>
             
-            <p className={`text-sm mb-3 ${colors.text}`}>{recommendation.description}</p>
+            <p className={`text-sm mb-3 ${colors.text} break-words leading-relaxed`}>
+              {recommendation.description}
+            </p>
             
-            <div className={`text-xs mb-3 p-2 bg-white/50 rounded-lg`}>
+            <div className={`text-xs mb-3 p-2 bg-white/50 rounded-lg break-words`}>
               <strong>Почему Eva рекомендует:</strong>{' '}
               <span className={colors.text}>{recommendation.reason}</span>
             </div>
@@ -643,26 +748,26 @@ const PatientDashboard = () => {
                     {recommendation.actionSteps.map((step, idx) => (
                       <li key={idx} className="flex items-start gap-2">
                         <CheckCircle className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className={colors.text}>{step}</span>
+                        <span className={`${colors.text} break-words leading-relaxed`}>{step}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div className="p-2 bg-white/50 rounded">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div className="p-2 bg-white/50 rounded break-words">
                     <strong>На основе данных:</strong><br/>
                     <span className={colors.text}>{recommendation.basedOnData.join(', ')}</span>
                   </div>
-                  <div className="p-2 bg-white/50 rounded">
+                  <div className="p-2 bg-white/50 rounded break-words">
                     <strong>Ожидаемый эффект:</strong><br/>
                     <span className={colors.text}>{recommendation.estimatedImpact === 'high' ? 'Высокий' : recommendation.estimatedImpact === 'medium' ? 'Средний' : 'Низкий'}</span>
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between text-xs p-2 bg-white/50 rounded">
-                  <span><strong>Уверенность ИИ:</strong> {recommendation.confidence}%</span>
-                  <span><strong>Временные рамки:</strong> {recommendation.timeframe}</span>
+                <div className="flex items-center justify-between text-xs p-2 bg-white/50 rounded flex-wrap gap-2">
+                  <span className="break-words"><strong>Уверенность ИИ:</strong> {recommendation.confidence}%</span>
+                  <span className="break-words"><strong>Временные рамки:</strong> {recommendation.timeframe}</span>
                 </div>
               </div>
             )}
@@ -672,7 +777,7 @@ const PatientDashboard = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="ml-2 p-1 h-auto"
+            className="ml-2 p-1 h-auto self-start flex-shrink-0"
           >
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </Button>
@@ -950,9 +1055,6 @@ const PatientDashboard = () => {
         {/* ✅ НОВЫЕ ПЕРСОНАЛИЗИРОВАННЫЕ СЕКЦИИ */}
         <PhaseRecommendations />
         <GoalTracking />
-        
-        {/* ✅ КОМПОНЕНТ ТЕСТИРОВАНИЯ интеграции Claude -> Eva */}
-        <TestEvaRecommendations />
         
         {/* ✅ НОВЫЙ РАЗДЕЛ "Рекомендации Eva" */}
         <EvaRecommendationsSection />
