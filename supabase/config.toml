@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.monthly-health-analysis]
 verify_jwt = false
+
+[functions.claude-cycle-analysis]
+verify_jwt = false

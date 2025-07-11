@@ -67,6 +67,7 @@ interface NutritionCorrelation {
   recommendations: string[];
   optimal_range: string;
   current_intake?: number;
+  claude_insight?: string; // Дополнительный инсайт от Claude
 }
 
 interface ActivityCorrelation {
@@ -79,7 +80,28 @@ interface ActivityCorrelation {
   };
   optimal_timing: string[];
   recommendations: string[];
+  claude_insight?: string; // Дополнительный инсайт от Claude
 }
+
+// Вспомогательная функция для получения профиля пользователя
+const getUserProfile = () => {
+  try {
+    const onboardingData = localStorage.getItem('bloom-onboarding-data');
+    if (onboardingData) {
+      const data = JSON.parse(onboardingData);
+      return {
+        age: data.age,
+        menopausePhase: data.menopausePhase,
+        symptoms: data.symptoms,
+        goals: data.goals,
+        medicalHistory: data.medicalHistory
+      };
+    }
+  } catch (error) {
+    console.warn('Ошибка получения профиля пользователя:', error);
+  }
+  return null;
+};
 
 export const analyzeIntegratedHealth = async (
   cycleEntries: MenstrualEntry[],
@@ -91,21 +113,71 @@ export const analyzeIntegratedHealth = async (
   nutrition: NutritionCorrelation[];
   activity: ActivityCorrelation[];
 }> => {
+  console.log('🧠 Начинаем анализ корреляций с Claude AI...');
   
-  // Анализ менструального цикла
-  const cycleAnalysis = analyzeCycles(cycleEntries);
-  
-  // Анализ корреляций с питанием
-  const nutritionCorrelations = analyzeNutritionCorrelations(cycleEntries, nutritionEntries, symptomEntries);
-  
-  // Анализ корреляций с активностью
-  const activityCorrelations = analyzeActivityCorrelations(cycleEntries, activityEntries, symptomEntries);
+  try {
+    // Получаем профиль пользователя из localStorage
+    const userProfile = getUserProfile();
+    
+    // Импортируем Supabase client для вызова edge функции
+    const { supabase } = await import('@/integrations/supabase/client');
+    
+    // Вызываем Claude для анализа корреляций
+    const { data, error } = await supabase.functions.invoke('claude-cycle-analysis', {
+      body: {
+        cycleEntries,
+        symptomEntries,
+        nutritionEntries,
+        activityEntries,
+        userProfile
+      }
+    });
 
-  return {
-    cycle: cycleAnalysis,
-    nutrition: nutritionCorrelations,
-    activity: activityCorrelations
-  };
+    if (error) {
+      console.error('Ошибка вызова Claude анализа:', error);
+      throw new Error(error.message);
+    }
+
+    if (!data || !data.success) {
+      console.error('Некорректный ответ от Claude:', data);
+      throw new Error(data?.error || 'Ошибка анализа данных');
+    }
+
+    const claudeAnalysis = data.analysis;
+    console.log('✅ Получили анализ от Claude:', claudeAnalysis);
+
+    // Обрабатываем результаты Claude
+    const cycleAnalysis: CycleAnalysis = claudeAnalysis.cycle_analysis || getDefaultCycleAnalysis();
+    
+    const nutritionCorrelations: NutritionCorrelation[] = claudeAnalysis.nutrition_correlations || [];
+    
+    const activityCorrelations: ActivityCorrelation[] = claudeAnalysis.activity_correlations || [];
+
+    // Добавляем дополнительные инсайты от Claude
+    if (claudeAnalysis.integrated_insights) {
+      console.log('🔍 Интегрированные инсайты от Claude:', claudeAnalysis.integrated_insights);
+    }
+
+    return {
+      cycle: cycleAnalysis,
+      nutrition: nutritionCorrelations,
+      activity: activityCorrelations
+    };
+
+  } catch (error) {
+    console.error('❌ Ошибка анализа с Claude, используем fallback логику:', error);
+    
+    // Fallback к локальному анализу если Claude недоступен
+    const cycleAnalysis = analyzeCycles(cycleEntries);
+    const nutritionCorrelations = analyzeNutritionCorrelations(cycleEntries, nutritionEntries, symptomEntries);
+    const activityCorrelations = analyzeActivityCorrelations(cycleEntries, activityEntries, symptomEntries);
+
+    return {
+      cycle: cycleAnalysis,
+      nutrition: nutritionCorrelations,
+      activity: activityCorrelations
+    };
+  }
 };
 
 const analyzeCycles = (entries: MenstrualEntry[]): CycleAnalysis => {

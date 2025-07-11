@@ -13,6 +13,7 @@ interface NutritionCorrelation {
   recommendations: string[];
   optimal_range: string;
   current_intake?: number;
+  claude_insight?: string; // Дополнительный инсайт от Claude
 }
 
 interface ActivityCorrelation {
@@ -25,6 +26,7 @@ interface ActivityCorrelation {
   };
   optimal_timing: string[];
   recommendations: string[];
+  claude_insight?: string; // Дополнительный инсайт от Claude
 }
 
 interface CorrelationAnalysisViewProps {
@@ -228,6 +230,19 @@ const NutritionCorrelationCard: React.FC<{ correlation: NutritionCorrelation }> 
           </div>
         )}
 
+        {/* Claude инсайт */}
+        {correlation.claude_insight && (
+          <div className="mb-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+            <div className="flex items-start gap-2">
+              <Brain className="h-4 w-4 text-indigo-600 mt-0.5" />
+              <div>
+                <div className="text-sm font-medium text-indigo-800">Claude AI:</div>
+                <div className="text-sm text-indigo-700">{correlation.claude_insight}</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Рекомендации */}
         <div className="space-y-1">
           <div className="text-sm font-medium text-gray-700">Рекомендации:</div>
@@ -304,6 +319,19 @@ const ActivityCorrelationCard: React.FC<{ correlation: ActivityCorrelation }> = 
             );
           })}
         </div>
+
+        {/* Claude инсайт */}
+        {correlation.claude_insight && (
+          <div className="mb-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+            <div className="flex items-start gap-2">
+              <Brain className="h-4 w-4 text-indigo-600 mt-0.5" />
+              <div>
+                <div className="text-sm font-medium text-indigo-800">Claude AI:</div>
+                <div className="text-sm text-indigo-700">{correlation.claude_insight}</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Оптимальное время */}
         <div className="mb-4">

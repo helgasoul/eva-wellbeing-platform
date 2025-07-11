@@ -324,11 +324,30 @@ export default function CycleTracker() {
               )}
               
               {activeTab === 'correlations' && (
-                <CorrelationAnalysisView
-                  nutritionCorrelations={nutritionCorrelations}
-                  activityCorrelations={activityCorrelations}
-                  onUpdateLifestyle={generateCorrelationAnalysis}
-                />
+                <div className="space-y-4">
+                  {/* Индикатор Claude AI */}
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                          🤖
+                        </div>
+                        <div>
+                          <div className="font-semibold text-indigo-900">Анализ с Claude AI</div>
+                          <div className="text-sm text-indigo-700">
+                            Корреляции анализируются с помощью искусственного интеллекта Claude на основе ваших данных в Supabase
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <CorrelationAnalysisView
+                    nutritionCorrelations={nutritionCorrelations}
+                    activityCorrelations={activityCorrelations}
+                    onUpdateLifestyle={generateCorrelationAnalysis}
+                  />
+                </div>
               )}
               
               {activeTab === 'insights' && (
