@@ -513,6 +513,63 @@ export type Database = {
           },
         ]
       }
+      body_composition_metrics: {
+        Row: {
+          bmi: number | null
+          body_fat_percentage: number | null
+          bone_density: number | null
+          created_at: string
+          device_source: string | null
+          id: string
+          measurement_date: string
+          measurement_method: string | null
+          metabolic_age: number | null
+          muscle_mass_kg: number | null
+          recorded_at: string
+          updated_at: string
+          user_id: string
+          visceral_fat_level: number | null
+          water_percentage: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          bmi?: number | null
+          body_fat_percentage?: number | null
+          bone_density?: number | null
+          created_at?: string
+          device_source?: string | null
+          id?: string
+          measurement_date: string
+          measurement_method?: string | null
+          metabolic_age?: number | null
+          muscle_mass_kg?: number | null
+          recorded_at?: string
+          updated_at?: string
+          user_id: string
+          visceral_fat_level?: number | null
+          water_percentage?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          bmi?: number | null
+          body_fat_percentage?: number | null
+          bone_density?: number | null
+          created_at?: string
+          device_source?: string | null
+          id?: string
+          measurement_date?: string
+          measurement_method?: string | null
+          metabolic_age?: number | null
+          muscle_mass_kg?: number | null
+          recorded_at?: string
+          updated_at?: string
+          user_id?: string
+          visceral_fat_level?: number | null
+          water_percentage?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       calculator_results: {
         Row: {
           calculated_at: string
@@ -3036,6 +3093,54 @@ export type Database = {
         }
         Relationships: []
       }
+      glucose_metrics: {
+        Row: {
+          created_at: string
+          device_source: string | null
+          id: string
+          meal_context: string | null
+          measurement_time: string | null
+          measurement_type: string
+          measurement_unit: string
+          measurement_value: number
+          medication_taken: boolean | null
+          recorded_at: string
+          symptoms_noted: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_source?: string | null
+          id?: string
+          meal_context?: string | null
+          measurement_time?: string | null
+          measurement_type: string
+          measurement_unit?: string
+          measurement_value: number
+          medication_taken?: boolean | null
+          recorded_at?: string
+          symptoms_noted?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_source?: string | null
+          id?: string
+          meal_context?: string | null
+          measurement_time?: string | null
+          measurement_type?: string
+          measurement_unit?: string
+          measurement_value?: number
+          medication_taken?: boolean | null
+          recorded_at?: string
+          symptoms_noted?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       group_members: {
         Row: {
           anonymous_name: string
@@ -4567,6 +4672,66 @@ export type Database = {
           },
         ]
       }
+      medical_devices: {
+        Row: {
+          connection_status: string | null
+          created_at: string
+          data_types: string[] | null
+          device_identifier: string | null
+          device_name: string
+          device_settings: Json | null
+          device_type: string
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          manufacturer: string | null
+          model_number: string | null
+          registered_at: string
+          serial_number: string | null
+          sync_frequency: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connection_status?: string | null
+          created_at?: string
+          data_types?: string[] | null
+          device_identifier?: string | null
+          device_name: string
+          device_settings?: Json | null
+          device_type: string
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          manufacturer?: string | null
+          model_number?: string | null
+          registered_at?: string
+          serial_number?: string | null
+          sync_frequency?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connection_status?: string | null
+          created_at?: string
+          data_types?: string[] | null
+          device_identifier?: string | null
+          device_name?: string
+          device_settings?: Json | null
+          device_type?: string
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          manufacturer?: string | null
+          model_number?: string | null
+          registered_at?: string
+          serial_number?: string | null
+          sync_frequency?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       medical_events: {
         Row: {
           attached_files: Json | null
@@ -5907,6 +6072,72 @@ export type Database = {
           updated_at?: string
           website?: string | null
           working_hours?: Json | null
+        }
+        Relationships: []
+      }
+      physical_activity_detailed: {
+        Row: {
+          activity_date: string
+          activity_subtype: string | null
+          activity_type: string
+          calories_burned: number | null
+          created_at: string
+          device_source: string | null
+          distance_km: number | null
+          duration_minutes: number
+          elevation_gain: number | null
+          end_time: string | null
+          heart_rate_avg: number | null
+          heart_rate_max: number | null
+          id: string
+          intensity_level: string | null
+          start_time: string | null
+          steps_count: number | null
+          updated_at: string
+          user_id: string
+          workout_notes: string | null
+        }
+        Insert: {
+          activity_date: string
+          activity_subtype?: string | null
+          activity_type: string
+          calories_burned?: number | null
+          created_at?: string
+          device_source?: string | null
+          distance_km?: number | null
+          duration_minutes: number
+          elevation_gain?: number | null
+          end_time?: string | null
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
+          id?: string
+          intensity_level?: string | null
+          start_time?: string | null
+          steps_count?: number | null
+          updated_at?: string
+          user_id: string
+          workout_notes?: string | null
+        }
+        Update: {
+          activity_date?: string
+          activity_subtype?: string | null
+          activity_type?: string
+          calories_burned?: number | null
+          created_at?: string
+          device_source?: string | null
+          distance_km?: number | null
+          duration_minutes?: number
+          elevation_gain?: number | null
+          end_time?: string | null
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
+          id?: string
+          intensity_level?: string | null
+          start_time?: string | null
+          steps_count?: number | null
+          updated_at?: string
+          user_id?: string
+          workout_notes?: string | null
         }
         Relationships: []
       }
