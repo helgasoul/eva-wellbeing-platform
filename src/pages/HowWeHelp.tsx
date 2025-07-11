@@ -604,9 +604,9 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Comparison Table */}
-        <section className="py-20 bg-gradient-to-br from-pink-50/50 via-purple-50/30 to-background relative overflow-hidden">
+        <section className="py-20 bg-gradient-to-br from-soft-pink/15 via-soft-purple/10 to-background relative overflow-hidden">
           {/* Decorative background elements */}
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-100/10 via-transparent to-purple-100/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-soft-pink/5 via-transparent to-soft-purple/5"></div>
           
           <div className="max-w-7xl mx-auto px-4 relative z-10">
             <div className="text-center mb-12">
@@ -624,10 +624,10 @@ const HowWeHelp: React.FC = () => {
             
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
-              <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-elegant border border-pink-100/50 p-8">
+              <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-elegant border border-soft-pink/30 p-8">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b-2 border-pink-200/50">
+                    <tr className="border-b-2 border-soft-pink/50">
                       <th className="text-left p-6 font-semibold text-foreground text-lg"></th>
                       <th className="text-center p-6">
                         <div className="text-center">
@@ -656,7 +656,7 @@ const HowWeHelp: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="border-b border-pink-100/50">
+                     <tr className="border-b border-soft-pink/30">
                       <td className="p-6 font-medium text-foreground text-lg">Стоимость за год</td>
                       <td className="text-center p-6">
                         <div className="text-2xl font-bold text-primary">₽2,990</div>
@@ -724,7 +724,7 @@ const HowWeHelp: React.FC = () => {
             {/* Mobile Cards */}
             <div className="md:hidden space-y-6">
               {SUBSCRIPTION_PLANS.map((plan, index) => (
-                <div key={plan.id} className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-elegant border border-pink-100/50 p-6 relative">
+                <div key={plan.id} className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-elegant border border-soft-pink/30 p-6 relative">
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground px-4 py-1 rounded-full text-sm font-bold">
                       Популярный
@@ -798,7 +798,7 @@ const HowWeHelp: React.FC = () => {
 
             {/* Microcopy */}
             <div className="mt-12 text-center">
-              <div className="bg-gradient-to-r from-pink-50/50 to-purple-50/50 rounded-2xl p-6 border border-pink-100/50">
+              <div className="bg-gradient-to-r from-soft-pink/20 to-soft-purple/20 rounded-2xl p-6 border border-soft-pink/30">
                 <p className="text-muted-foreground leading-relaxed">
                   <span className="text-xl mr-2">✨</span>
                   Каждый тариф включает бесплатную onboarding-консультацию и доступ к женскому сообществу поддержки.
@@ -809,9 +809,9 @@ const HowWeHelp: React.FC = () => {
         </section>
 
         {/* Additional Services */}
-        <section className="py-20 bg-gradient-to-br from-pink-50/30 via-purple-50/20 to-background relative overflow-hidden">
+        <section className="py-20 bg-gradient-to-br from-soft-pink/10 via-soft-purple/8 to-background relative overflow-hidden">
           {/* Decorative background elements */}
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-100/5 via-transparent to-purple-100/5"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-soft-pink/3 via-transparent to-soft-purple/3"></div>
           
           <div className="max-w-7xl mx-auto px-4 relative z-10">
             <div className="text-center mb-16">
@@ -825,7 +825,7 @@ const HowWeHelp: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Онлайн-консилиум врачей */}
-              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
                 <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">👩‍⚕️</div>
                 <h3 className="font-semibold text-xl mb-3 text-foreground">Онлайн-консилиум врачей</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -836,7 +836,7 @@ const HowWeHelp: React.FC = () => {
                   <span className="text-lg">💰</span>
                   ₽15,000
                 </div>
-                <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                <button className="w-full bg-gradient-to-r from-purple to-soft-pink hover:from-purple/90 hover:to-soft-pink/90 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
                   Записаться
                 </button>
                 <div className="mt-4 text-center">
@@ -848,7 +848,7 @@ const HowWeHelp: React.FC = () => {
               </div>
 
               {/* МРТ молочной железы */}
-              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
                 <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🩺</div>
                 <h3 className="font-semibold text-xl mb-3 text-foreground">МРТ молочной железы с контрастным усилением</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -859,7 +859,7 @@ const HowWeHelp: React.FC = () => {
                   <span className="text-lg">💰</span>
                   ₽8,500
                 </div>
-                <button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                <button className="w-full bg-gradient-to-r from-soft-blue to-purple hover:from-soft-blue/90 hover:to-purple/90 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
                   Записаться
                 </button>
                 <div className="mt-4 text-center">
@@ -871,7 +871,7 @@ const HowWeHelp: React.FC = () => {
               </div>
 
               {/* DEXA-сканирование */}
-              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
                 <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🦴</div>
                 <h3 className="font-semibold text-xl mb-3 text-foreground">DEXA-сканирование</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -882,7 +882,7 @@ const HowWeHelp: React.FC = () => {
                   <span className="text-lg">💰</span>
                   ₽4,000
                 </div>
-                <button className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                <button className="w-full bg-gradient-to-r from-mint to-soft-blue hover:from-mint/90 hover:to-soft-blue/90 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
                   Записаться
                 </button>
                 <div className="mt-4 text-center">
@@ -894,7 +894,7 @@ const HowWeHelp: React.FC = () => {
               </div>
 
               {/* Персональный план питания */}
-              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
                 <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🍏</div>
                 <h3 className="font-semibold text-xl mb-3 text-foreground">Персональный план питания</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -917,7 +917,7 @@ const HowWeHelp: React.FC = () => {
               </div>
 
               {/* Генетическое тестирование */}
-              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2 relative">
+              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2 relative">
                 <div className="absolute -top-3 -right-3 bg-gradient-to-r from-orange-400 to-red-400 text-white px-3 py-1 rounded-full text-sm font-bold">
                   Популярное
                 </div>
@@ -943,7 +943,7 @@ const HowWeHelp: React.FC = () => {
               </div>
 
               {/* Маммография */}
-              <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-pink-100/50 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
                 <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🔬</div>
                 <h3 className="font-semibold text-xl mb-3 text-foreground">Маммография</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">

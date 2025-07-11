@@ -37,16 +37,16 @@
 
 @layer base {
   :root {
-    /* Профессиональная палитра */
+    /* Unified Professional Palette */
     --background: 0 0% 100%;
     --foreground: 222 15% 25%;
     
-    /* Primary - элегантный глубокий индиго */
-    --primary: 244 54% 45%;
+    /* Primary - сдержанный индиго */
+    --primary: 244 46% 52%;
     --primary-foreground: 0 0% 100%;
     
-    /* Сдержанные вторичные цвета */
-    --secondary: 220 16% 95%;
+    /* Secondary - нейтральный серый */
+    --secondary: 220 14% 96%;
     --secondary-foreground: 222 15% 25%;
     
     /* Safe area for mobile devices */
@@ -78,39 +78,41 @@
     --accent: 254 43% 95%;
     --accent-foreground: 222 15% 25%;
     
-    /* Профессиональные цвета для интерфейса */
-    --professional-slate: 220 16% 92%;
-    --professional-blue: 217 73% 57%;
-    --professional-indigo: 244 54% 65%;
-    --professional-purple: 266 69% 75%;
-    --professional-gray: 222 13% 65%;
-    --professional-neutral: 220 16% 98%;
+    /* Unified color system - сдержанная профессиональная палитра */
+    --soft-purple: 254 28% 88%;
+    --soft-purple-foreground: 254 28% 35%;
+    --soft-pink: 330 25% 90%;
+    --soft-pink-foreground: 330 25% 35%;
+    --soft-blue: 217 30% 85%;
+    --soft-blue-foreground: 217 30% 35%;
     
-    /* Доверительный бадж */
-    --trust: 217 73% 92%;
-    --trust-foreground: 217 73% 35%;
+    /* Trust and confidence */
+    --trust: 217 30% 90%;
+    --trust-foreground: 217 30% 35%;
     
-    /* Успех - сдержанный мятный */
-    --success: 163 58% 55%;
-    --success-foreground: 0 0% 100%;
+    /* Success - сдержанный мятный */
+    --success: 163 35% 65%;
+    --success-foreground: 163 35% 25%;
     
-    /* Мятные цвета для планов */
-    --mint: 164 41% 58%;
-    --mint-light: 163 31% 73%;
-    --mint-foreground: 0 0% 100%;
+    /* Plan colors - приглушенные */
+    --mint: 164 30% 70%;
+    --mint-light: 163 25% 78%;
+    --mint-foreground: 163 30% 25%;
     
-    /* Сдержанные оранжевые цвета для планов */
-    --orange: 25 65% 60%;
-    --orange-light: 28 58% 68%;
-    --orange-foreground: 0 0% 100%;
+    --orange: 25 40% 72%;
+    --orange-light: 28 35% 78%;
+    --orange-foreground: 25 40% 25%;
     
-    /* Предупреждение */
-    --warning: 45 93% 58%;
-    --warning-foreground: 0 0% 100%;
+    --purple: 254 28% 75%;
+    --purple-light: 254 25% 82%;
+    --purple-foreground: 254 28% 25%;
     
-    /* Деструктивный */
-    --destructive: 0 75% 60%;
-    --destructive-foreground: 0 0% 100%;
+    /* System colors */
+    --warning: 45 60% 68%;
+    --warning-foreground: 45 60% 25%;
+    
+    --destructive: 0 50% 70%;
+    --destructive-foreground: 0 50% 25%;
 
     --radius: 0.75rem;
     

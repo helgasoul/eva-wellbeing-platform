@@ -6,7 +6,7 @@ export const SUBSCRIPTION_PLANS = [
     monthlyPrice: 249,
     currency: 'RUB' as const,
     icon: '🌿',
-    color: 'from-green-500 to-emerald-500',
+    color: 'from-mint to-mint-light',
     description: 'Старт в заботе о себе',
     features: [
       'Трекер симптомов менопаузы',
@@ -84,7 +84,7 @@ export const SUBSCRIPTION_PLANS = [
     monthlyPrice: 1332,
     currency: 'RUB' as const,
     icon: '🌟',
-    color: 'from-purple-500 to-indigo-500',
+    color: 'from-purple to-purple-light',
     description: 'Максимальная экспертиза',
     features: [
       'Всё из Plus',
@@ -130,7 +130,7 @@ export const SUBSCRIPTION_PLANS = [
     monthlyPrice: 4165,
     currency: 'RUB' as const,
     icon: '🤖',
-    color: 'from-cyan-500 to-blue-600',
+    color: 'from-soft-blue to-primary',
     isComingSoon: true,
     description: 'Революционная платформа персонализированного долголетия',
     shortDescription: 'Персональный 3D-двойник с ИИ-прогнозированием старения, биобанк образцов, квантовое шифрование данных и система превентивного долголетия',

@@ -24,8 +24,8 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
     <section className="py-20 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-rose-50/20 rounded-3xl mb-8 relative overflow-hidden">
       {/* Мягкие декоративные элементы */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-16 left-16 w-28 h-28 bg-purple-200/40 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-16 right-16 w-36 h-36 bg-pink-200/40 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-16 left-16 w-28 h-28 bg-soft-purple/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-16 right-16 w-36 h-36 bg-soft-pink/20 rounded-full blur-3xl animate-pulse"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -91,7 +91,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
               </div>
 
               {/* Цитата */}
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-purple-200/30 shadow-lg animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <div className="bg-card/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-soft-purple/30 shadow-lg animate-fade-in" style={{ animationDelay: '0.6s' }}>
                 <div className="text-4xl text-[#A97FB2] mb-4 text-center">"</div>
                 <p className="text-lg text-[#53415B] italic text-center leading-relaxed">
                   Для меня Bloom — это не просто проект, а способ быть рядом с каждой женщиной в момент перемен.
@@ -110,7 +110,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
             {/* Правая часть - Детальная информация */}
             <div className="space-y-6">
               {/* История */}
-              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-pink-200/30 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 border border-soft-pink/30 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-pink-400/80 to-rose-500/80 rounded-xl flex items-center justify-center mr-4">
                     <Heart className="w-6 h-6 text-white" />
@@ -129,7 +129,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
               </div>
 
               {/* Видение */}
-              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-purple-200/30 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+              <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 border border-soft-purple/30 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-400/80 to-indigo-500/80 rounded-xl flex items-center justify-center mr-4">
                     <Globe className="w-6 h-6 text-white" />
@@ -148,7 +148,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
               </div>
 
               {/* Контакт */}
-              <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-blue-200/30 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+              <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 border border-soft-blue/30 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-400/80 to-cyan-500/80 rounded-xl flex items-center justify-center mr-4">
                     <Mail className="w-6 h-6 text-white" />

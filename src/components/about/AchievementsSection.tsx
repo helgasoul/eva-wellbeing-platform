@@ -50,16 +50,16 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
 
   const statIcons = [Heart, Users, MessageCircle, Award];
   const statGradients = [
-    'from-pink-500 to-rose-500',
-    'from-purple-500 to-pink-500',
-    'from-blue-500 to-purple-500',
-    'from-orange-500 to-pink-500'
+    'from-soft-pink to-soft-pink/80',
+    'from-soft-purple to-soft-purple/80',
+    'from-soft-blue to-soft-blue/80',
+    'from-orange to-orange/80'
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-purple-50/50 via-pink-50/30 to-background relative overflow-hidden mb-8">
+    <section className="py-20 bg-gradient-to-br from-soft-purple/20 via-soft-pink/15 to-background relative overflow-hidden mb-8">
       {/* Decorative background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-100/10 via-transparent to-pink-100/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-soft-purple/5 via-transparent to-soft-pink/5"></div>
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
@@ -78,7 +78,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
             const Icon = statIcons[index % statIcons.length];
             const gradient = statGradients[index % statGradients.length];
             return (
-              <div key={index} className="group text-center bg-white/80 backdrop-blur-sm rounded-3xl p-8 hover:bg-white/90 hover:shadow-elegant hover:scale-105 hover:-translate-y-2 transition-all duration-300">
+              <div key={index} className="group text-center bg-card/80 backdrop-blur-sm rounded-3xl p-8 hover:bg-card/90 hover:shadow-elegant hover:scale-105 hover:-translate-y-2 transition-all duration-300">
                 <div className={`w-20 h-20 bg-gradient-to-br ${gradient} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="w-10 h-10 text-white" />
                 </div>
@@ -104,7 +104,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                 {isEditing && (
                   <button
                     onClick={() => removeStat(index)}
-                    className="text-red-400 hover:text-red-300 text-sm mt-4 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-full transition-colors"
+                    className="text-destructive hover:text-destructive/80 text-sm mt-4 bg-destructive/10 hover:bg-destructive/20 px-3 py-1 rounded-full transition-colors"
                   >
                     Удалить
                   </button>
@@ -116,7 +116,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
           {isEditing && (
             <div 
               onClick={addStat}
-              className="bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-dashed border-pink-300/50 hover:border-pink-400/70 hover:bg-white/80 transition-all cursor-pointer flex items-center justify-center min-h-[200px] group"
+              className="bg-card/60 backdrop-blur-sm rounded-3xl border-2 border-dashed border-soft-pink/50 hover:border-soft-pink hover:bg-card/80 transition-all cursor-pointer flex items-center justify-center min-h-[200px] group"
             >
               <div className="text-center text-muted-foreground group-hover:text-foreground transition-colors">
                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">+</div>
@@ -128,7 +128,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
 
         {/* Партнерства и награды */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 hover:bg-white/90 transition-colors">
+           <div className="bg-card/80 backdrop-blur-sm rounded-3xl p-8 hover:bg-card/90 transition-colors">
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">🤝</div>
               <h3 className="text-2xl font-bold text-foreground">Наши партнёры</h3>
@@ -136,7 +136,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
             </div>
             <div className="space-y-4">
               {data.partnerships.map((partnership, index) => (
-                <div key={index} className="flex items-center justify-between bg-pink-50/50 rounded-2xl p-4">
+                <div key={index} className="flex items-center justify-between bg-soft-pink/50 rounded-2xl p-4">
                   <AdminEditableSection
                     title={`Партнерство ${index + 1}`}
                     content={partnership}
@@ -155,7 +155,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                         const newPartnerships = data.partnerships.filter((_, i) => i !== index);
                         updatePartnerships(newPartnerships);
                       }}
-                      className="text-red-400 hover:text-red-300 ml-4 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors"
+                       className="text-destructive hover:text-destructive/80 ml-4 bg-destructive/10 hover:bg-destructive/20 p-2 rounded-full transition-colors"
                     >
                       ✕
                     </button>
@@ -165,7 +165,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {isEditing && (
                 <button
                   onClick={() => updatePartnerships([...data.partnerships, ''])}
-                  className="w-full text-muted-foreground hover:text-foreground text-lg mt-4 bg-pink-50/50 hover:bg-pink-100/50 py-3 rounded-2xl transition-colors"
+                  className="w-full text-muted-foreground hover:text-foreground text-lg mt-4 bg-soft-pink/30 hover:bg-soft-pink/50 py-3 rounded-2xl transition-colors"
                 >
                   + Добавить партнера
                 </button>
@@ -173,7 +173,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 hover:bg-white/90 transition-colors">
+          <div className="bg-card/80 backdrop-blur-sm rounded-3xl p-8 hover:bg-card/90 transition-colors">
             <div className="text-center mb-6">
               <div className="text-4xl mb-3">🏆</div>
               <h3 className="text-2xl font-bold text-foreground">Награды и признания</h3>
@@ -181,7 +181,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
             </div>
             <div className="space-y-4">
               {data.awards.map((award, index) => (
-                <div key={index} className="flex items-center justify-between bg-purple-50/50 rounded-2xl p-4">
+                <div key={index} className="flex items-center justify-between bg-soft-purple/50 rounded-2xl p-4">
                   <AdminEditableSection
                     title={`Награда ${index + 1}`}
                     content={award}
@@ -200,7 +200,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
                         const newAwards = data.awards.filter((_, i) => i !== index);
                         updateAwards(newAwards);
                       }}
-                      className="text-red-400 hover:text-red-300 ml-4 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors"
+                      className="text-destructive hover:text-destructive/80 ml-4 bg-destructive/10 hover:bg-destructive/20 p-2 rounded-full transition-colors"
                     >
                       ✕
                     </button>
@@ -210,7 +210,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {isEditing && (
                 <button
                   onClick={() => updateAwards([...data.awards, ''])}
-                  className="w-full text-muted-foreground hover:text-foreground text-lg mt-4 bg-purple-50/50 hover:bg-purple-100/50 py-3 rounded-2xl transition-colors"
+                  className="w-full text-muted-foreground hover:text-foreground text-lg mt-4 bg-soft-purple/30 hover:bg-soft-purple/50 py-3 rounded-2xl transition-colors"
                 >
                   + Добавить награду
                 </button>
@@ -221,7 +221,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({
 
         {/* Final message */}
         <div className="text-center">
-          <div className="bg-gradient-to-r from-purple-50/80 to-pink-50/80 rounded-3xl p-8 border border-purple-100/50 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-soft-purple/30 to-soft-pink/30 rounded-3xl p-8 border border-soft-purple/30 max-w-4xl mx-auto">
             <div className="text-4xl mb-4">🌸</div>
             <p className="text-xl text-muted-foreground leading-relaxed">
               Ваше здоровье и благополучие — наш главный приоритет.

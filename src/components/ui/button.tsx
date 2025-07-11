@@ -19,6 +19,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground hover:scale-[1.01] active:scale-[0.99] rounded-lg",
         link: "text-primary underline-offset-4 hover:underline hover:scale-[1.01] active:scale-[0.99]",
         premium: "bg-gradient-to-r from-primary via-secondary to-primary/90 text-primary-foreground shadow-elevated hover:shadow-floating hover:scale-[1.02] active:scale-[0.98] rounded-xl border border-primary/20",
+        soft: "bg-soft-purple/20 text-soft-purple-foreground hover:bg-soft-purple/30 hover:scale-[1.01] active:scale-[0.99] rounded-lg border border-soft-purple/30",
+        plan: "bg-gradient-to-r text-foreground shadow-soft hover:shadow-elevated hover:scale-[1.02] active:scale-[0.98] rounded-xl border",
       },
       size: {
         default: "h-11 px-6 py-3",

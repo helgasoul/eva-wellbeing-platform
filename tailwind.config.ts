@@ -71,6 +71,23 @@ export default {
 					light: 'hsl(var(--orange-light))',
 					foreground: 'hsl(var(--orange-foreground))'
 				},
+				purple: {
+					DEFAULT: 'hsl(var(--purple))',
+					light: 'hsl(var(--purple-light))',
+					foreground: 'hsl(var(--purple-foreground))'
+				},
+				'soft-purple': {
+					DEFAULT: 'hsl(var(--soft-purple))',
+					foreground: 'hsl(var(--soft-purple-foreground))'
+				},
+				'soft-pink': {
+					DEFAULT: 'hsl(var(--soft-pink))',
+					foreground: 'hsl(var(--soft-pink-foreground))'
+				},
+				'soft-blue': {
+					DEFAULT: 'hsl(var(--soft-blue))',
+					foreground: 'hsl(var(--soft-blue-foreground))'
+				},
 				warning: {
 					DEFAULT: 'hsl(var(--warning))',
 					foreground: 'hsl(var(--warning-foreground))'

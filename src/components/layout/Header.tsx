@@ -25,11 +25,11 @@ export const Header = () => {
       case 'plus':
         return { icon: '🌺', name: 'Plus', color: 'from-orange to-orange-light' };
       case 'optimum':
-        return { icon: '⭐', name: 'Optimum', color: 'from-purple-500 to-indigo-500' };
+        return { icon: '⭐', name: 'Optimum', color: 'from-purple to-purple-light' };
       case 'digital_twin':
-        return { icon: '🤖', name: 'Digital Twin', color: 'from-cyan-500 to-blue-600' };
+        return { icon: '🤖', name: 'Digital Twin', color: 'from-soft-blue to-primary' };
       default:
-        return { icon: '🌿', name: 'Essential', color: 'from-green-500 to-emerald-500' };
+        return { icon: '🌿', name: 'Essential', color: 'from-mint to-mint-light' };
     }
   };
 

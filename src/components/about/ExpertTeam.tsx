@@ -58,9 +58,9 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
     <section className="py-20 bg-gradient-to-br from-purple-50/40 via-pink-50/30 to-rose-50/20 rounded-3xl mb-8 relative overflow-hidden">
       {/* Мягкие декоративные элементы */}
       <div className="absolute inset-0 opacity-15">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-purple-200/40 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-40 h-40 bg-pink-200/40 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-rose-200/30 rounded-full blur-2xl"></div>
+         <div className="absolute top-20 left-20 w-32 h-32 bg-soft-purple/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-soft-pink/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-soft-pink/15 rounded-full blur-2xl"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -78,7 +78,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
           {data.map((expert, index) => (
             <div 
               key={expert.id} 
-              className="group bg-white/60 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-white/50 animate-fade-in"
+              className="group bg-card/60 backdrop-blur-sm rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-border/30 animate-fade-in"
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               <div className="p-8">
@@ -154,7 +154,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
                 {/* Детальная информация в карточках */}
                 <div className="space-y-4">
                   {/* Достижения */}
-                  <div className="bg-white/50 rounded-xl p-4 border border-rose-200/30">
+                  <div className="bg-card/50 rounded-xl p-4 border border-soft-pink/30">
                     <div className="flex items-center mb-2">
                       <Award className="w-5 h-5 text-primary mr-2" />
                       <h4 className="text-base font-semibold text-[#53415B]">Чем горжусь</h4>
@@ -171,7 +171,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
                   </div>
 
                   {/* Интересы/подход */}
-                  <div className="bg-white/50 rounded-xl p-4 border border-purple-200/30">
+                  <div className="bg-card/50 rounded-xl p-4 border border-soft-purple/30">
                     <div className="flex items-center mb-2">
                       <Stethoscope className="w-5 h-5 text-primary mr-2" />
                       <h4 className="text-base font-semibold text-[#53415B]">Особое внимание уделяю</h4>
@@ -189,7 +189,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
 
                   {/* Подход к работе */}
                   {isEditing && (
-                    <div className="bg-white/50 rounded-xl p-4 border border-blue-200/30">
+                    <div className="bg-card/50 rounded-xl p-4 border border-soft-blue/30">
                       <div className="flex items-center mb-2">
                         <Heart className="w-5 h-5 text-primary mr-2" />
                         <h4 className="text-base font-semibold text-[#53415B]">Мой подход</h4>
@@ -225,7 +225,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
           {isEditing && (
             <div 
               onClick={addNewExpert}
-              className="bg-white/30 backdrop-blur-sm rounded-3xl border-2 border-dashed border-purple-300/40 hover:border-purple-400/60 transition-colors cursor-pointer flex items-center justify-center min-h-[500px] group"
+              className="bg-card/30 backdrop-blur-sm rounded-3xl border-2 border-dashed border-soft-purple/40 hover:border-soft-purple/60 transition-colors cursor-pointer flex items-center justify-center min-h-[500px] group"
             >
               <div className="text-center text-[#A97FB2] group-hover:text-[#53415B] transition-colors">
                 <Plus className="w-12 h-12 mx-auto mb-4 group-hover:scale-110 transition-transform" />
@@ -237,7 +237,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
 
         {/* Microcopy внизу */}
         <div className="text-center mt-16 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-          <div className="inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm rounded-full px-8 py-4 border border-primary/20 shadow-lg">
+          <div className="inline-flex items-center space-x-2 bg-card/70 backdrop-blur-sm rounded-full px-8 py-4 border border-primary/20 shadow-lg">
             <Heart className="h-5 w-5 text-primary animate-pulse" />
             <p className="text-lg font-medium text-[#53415B] italic">
               Врачи Bloom — всегда на связи и готовы поддержать вас на любом этапе пути
