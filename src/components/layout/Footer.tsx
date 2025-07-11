@@ -2,7 +2,7 @@
 import React from 'react';
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import bloomLogo from '@/assets/bloom-logo-white-bg.png';
+import bloomLogo from '@/assets/bloom-logo-transparent.png';
 
 export const Footer = () => {
   return (
@@ -11,11 +11,11 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-3 mb-4 group">
+            <div className="flex items-center space-x-3 mb-4 group relative">
               <img 
                 src={bloomLogo} 
                 alt="Bloom"
-                className="h-40 w-auto object-contain animate-petal-dance group-hover:animate-bloom-glow transition-all duration-300"
+                className="h-12 w-auto object-contain animate-petal-dance group-hover:animate-bloom-glow transition-all duration-300"
               />
               {/* Декоративная аура при hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-lg scale-150"></div>

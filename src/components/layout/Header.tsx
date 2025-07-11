@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { BackButton } from './BackButton';
 import { useAuth } from '@/context/AuthContext';
 import { useSubscription } from '@/context/SubscriptionContext';
-import bloomLogo from '@/assets/bloom-logo-white-bg.png';
+import bloomLogo from '@/assets/bloom-logo-transparent.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -113,7 +113,7 @@ export const Header = () => {
                 <img 
                   src={bloomLogo} 
                   alt="Bloom - Ваш заботливый помощник в мире женского здоровья"
-                  className="h-48 w-auto object-contain group-hover:animate-bloom-glow transition-all duration-300"
+                  className="h-8 w-auto object-contain group-hover:animate-bloom-glow transition-all duration-300"
                 />
                 {/* Декоративная аура при hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-md scale-110"></div>
