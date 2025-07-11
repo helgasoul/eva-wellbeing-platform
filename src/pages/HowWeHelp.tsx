@@ -5,6 +5,7 @@ import { useSubscription } from '@/context/SubscriptionContext';
 import { useSubscriptionInterest } from '@/hooks/useSubscriptionInterest';
 import { SUBSCRIPTION_PLANS, ADDITIONAL_SERVICES } from '@/data/subscriptionPlans';
 import { Layout } from '@/components/layout/Layout';
+import { Heart } from 'lucide-react';
 import caringSupport from '@/assets/caring-support-hero.jpg';
 
 const HowWeHelp: React.FC = () => {
@@ -75,13 +76,13 @@ const HowWeHelp: React.FC = () => {
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-muted/20">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-primary/5 via-purple-50 to-accent/10 py-24 relative overflow-hidden">
+        <section className="bg-gradient-to-br from-primary/5 via-accent/10 to-muted/20 py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10"></div>
           <div className="max-w-7xl mx-auto px-4 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1">
                 <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground leading-tight">
-                  Мы рядом на каждом этапе вашего пути
+                  Мы рядом на каждом этапе вашего <span className="text-primary bg-gradient-to-r from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent">пути</span>
                 </h1>
                 <p className="text-xl md:text-2xl mb-8 text-muted-foreground leading-relaxed">
                   Забота, поддержка и знания — для вашего спокойствия и уверенности в любой момент менопаузы.
@@ -94,7 +95,8 @@ const HowWeHelp: React.FC = () => {
                     Всё, что обычно стоит десятки тысяч в частных клиниках, теперь становится ближе — от 2 990 ₽ в год
                   </p>
                 </div>
-                <button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-elegant hover:shadow-soft transform hover:-translate-y-1">
+                <button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-elegant hover:shadow-soft transform hover:-translate-y-1 group">
+                  <Heart className="mr-3 h-5 w-5 group-hover:animate-pulse transition-all duration-300" />
                   Начать путь с Bloom
                 </button>
               </div>
@@ -116,8 +118,13 @@ const HowWeHelp: React.FC = () => {
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-16">
+              <div className="flex justify-center mb-8 animate-fade-in">
+                <div className="inline-flex p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full shadow-elegant animate-gentle-float">
+                  <Heart className="h-8 w-8 text-primary" />
+                </div>
+              </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Начните заботу о себе с Bloom
+                Начните заботу о себе с <span className="text-primary bg-gradient-to-r from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent">Bloom</span>
               </h2>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                 Маленькие шаги сегодня — уверенность и спокойствие завтра.<br />

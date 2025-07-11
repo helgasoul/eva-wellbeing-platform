@@ -44,14 +44,19 @@ const Contact = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-muted/20">
         <div className="container mx-auto px-6 py-12">
           {/* Hero Section */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold mb-6 text-foreground">
-              Свяжитесь с <span className="text-primary">командой</span>
+            <div className="flex justify-center mb-8 animate-fade-in">
+              <div className="inline-flex p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full shadow-elegant animate-gentle-float">
+                <MessageCircle className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground leading-tight">
+              Свяжитесь с <span className="text-primary bg-gradient-to-r from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent">командой</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               У вас есть вопросы, предложения или нужна помощь? Мы всегда готовы выслушать и помочь.
             </p>
           </div>
@@ -173,13 +178,13 @@ const Contact = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-primary/5">
+              <Card className="bg-gradient-to-br from-primary/5 via-accent/5 to-muted/10 border-primary/20">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold text-lg mb-2">Часто задаваемые вопросы</h3>
                   <p className="text-muted-foreground mb-4">
                     Возможно, ответ на ваш вопрос уже есть в нашей базе знаний.
                   </p>
-                  <Button variant="outline">
+                  <Button variant="outline" className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/30 hover:from-primary/20 hover:to-accent/20">
                     Перейти к FAQ
                   </Button>
                 </CardContent>
