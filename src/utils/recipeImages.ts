@@ -13,7 +13,7 @@ export const recipeImages = {
   'peri_dinner_1': '/recipe-stewed-vegetables-tofu.jpg',
   
   // Menopause recipes
-  'meno_breakfast_1': '/recipe-chia-pudding.jpg',
+  'meno_breakfast_1': '/recipe-chia-pudding-berries.jpg',
   'meno_lunch_1': '/recipe-chicken-avocado-salad.jpg',
   'meno_lunch_2': '/recipe-lentil-soup.jpg',
   'meno_dinner_1': '/recipe-baked-fish-vegetables.jpg',
