@@ -253,11 +253,13 @@ const Documents = () => {
   };
 
   const handlePreview = (doc) => {
+    console.log('Opening preview for:', doc.name, { isMobile, previewOpen: true });
     setSelectedDocument(doc);
     setPreviewOpen(true);
   };
 
   const handleClosePreview = () => {
+    console.log('Closing preview');
     setSelectedDocument(null);
     setPreviewOpen(false);
   };
@@ -386,7 +388,7 @@ const Documents = () => {
         {/* Two-panel layout */}
         <div className="flex gap-6 min-h-96">
           {/* Documents List Panel */}
-          <div className={`${previewOpen && !isMobile ? 'w-3/5' : 'w-full'} transition-all duration-300`}>
+          <div className={`${previewOpen && selectedDocument && !isMobile ? 'w-3/5' : 'w-full'} transition-all duration-300`}>
             <DocumentList
               documents={documents}
               onPreview={handlePreview}
@@ -398,23 +400,29 @@ const Documents = () => {
 
           {/* Preview Panel - Desktop */}
           {previewOpen && selectedDocument && !isMobile && (
-            <DocumentPreviewPanel
-              document={selectedDocument}
-              onClose={handleClosePreview}
-              onDownload={handleDownload}
-              onOpenFull={handleView}
-            />
+            <div className="w-2/5 bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <DocumentPreviewPanel
+                document={selectedDocument}
+                onClose={handleClosePreview}
+                onDownload={handleDownload}
+                onOpenFull={handleView}
+              />
+            </div>
           )}
         </div>
 
         {/* Preview Panel - Mobile Modal */}
         {previewOpen && selectedDocument && isMobile && (
-          <DocumentPreviewPanel
-            document={selectedDocument}
-            onClose={handleClosePreview}
-            onDownload={handleDownload}
-            onOpenFull={handleView}
-          />
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-hidden">
+              <DocumentPreviewPanel
+                document={selectedDocument}
+                onClose={handleClosePreview}
+                onDownload={handleDownload}
+                onOpenFull={handleView}
+              />
+            </div>
+          </div>
         )}
       </div>
     </PatientLayout>
