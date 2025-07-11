@@ -1,46 +1,28 @@
-// Import all recipe images
-import oatmealBerries from "@/assets/recipe-oatmeal-berries.jpg";
-import greenSmoothie from "@/assets/recipe-green-smoothie.jpg";
-import chickenSalad from "@/assets/recipe-chicken-salad.jpg";
-import omeletAvocadoSpinach from "@/assets/recipe-omelet-avocado-spinach.jpg";
-import quinoaNuts from "@/assets/recipe-quinoa-nuts.jpg";
-import warmChickpeaSalad from "@/assets/recipe-warm-chickpea-salad.jpg";
-import tofuVegetables from "@/assets/recipe-tofu-vegetables.jpg";
-import chiaPuddingBerries from "@/assets/recipe-chia-pudding-berries.jpg";
-import salmonQuinoaSalad from "@/assets/recipe-salmon-quinoa-salad.jpg";
-import lentilTurmericSoup from "@/assets/recipe-lentil-turmeric-soup.jpg";
-import bakedMackerelVegetables from "@/assets/recipe-baked-mackerel-vegetables.jpg";
-import cottageCheesNuts from "@/assets/recipe-cottage-cheese-nuts.jpg";
-import sardinesGreensSalad from "@/assets/recipe-sardines-greens-salad.jpg";
-import cottageCheeseCasserole from "@/assets/recipe-cottage-cheese-casserole.jpg";
-import calciumMagnesiumSmoothie from "@/assets/recipe-calcium-magnesium-smoothie.jpg";
-import bakedCodVegetables from "@/assets/recipe-baked-cod-vegetables.jpg";
-
-// Recipe image mappings
+// Recipe image mappings using public folder paths
 export const recipeImages = {
   // Premenopause recipes
-  'pre_breakfast_1': oatmealBerries,
-  'pre_breakfast_2': greenSmoothie,
-  'pre_lunch_1': chickenSalad,
-  'pre_dinner_1': bakedCodVegetables,
+  'pre_breakfast_1': '/recipe-oatmeal.jpg',
+  'pre_breakfast_2': '/recipe-green-smoothie.jpg',
+  'pre_lunch_1': '/recipe-chicken-salad.jpg',
+  'pre_dinner_1': '/recipe-baked-fish-vegetables.jpg',
   
   // Perimenopause recipes
-  'peri_breakfast_1': omeletAvocadoSpinach,
-  'peri_breakfast_2': quinoaNuts,
-  'peri_lunch_1': warmChickpeaSalad,
-  'peri_dinner_1': tofuVegetables,
+  'peri_breakfast_1': '/recipe-omelet.jpg',
+  'peri_breakfast_2': '/recipe-quinoa.jpg',
+  'peri_lunch_1': '/recipe-tofu-vegetables.jpg',
+  'peri_dinner_1': '/recipe-tofu-vegetables.jpg',
   
   // Menopause recipes
-  'meno_breakfast_1': chiaPuddingBerries,
-  'meno_lunch_1': salmonQuinoaSalad,
-  'meno_lunch_2': lentilTurmericSoup,
-  'meno_dinner_1': bakedMackerelVegetables,
+  'meno_breakfast_1': '/recipe-chia-pudding.jpg',
+  'meno_lunch_1': '/recipe-chicken-salad.jpg',
+  'meno_lunch_2': '/recipe-lentil-soup.jpg',
+  'meno_dinner_1': '/recipe-baked-fish-vegetables.jpg',
   
   // Postmenopause recipes
-  'post_breakfast_1': cottageCheesNuts,
-  'post_lunch_1': sardinesGreensSalad,
-  'post_dinner_1': cottageCheeseCasserole,
-  'post_snack_1': calciumMagnesiumSmoothie,
+  'post_breakfast_1': '/recipe-oatmeal.jpg',
+  'post_lunch_1': '/recipe-chicken-salad.jpg',
+  'post_dinner_1': '/recipe-omelet.jpg',
+  'post_snack_1': '/recipe-green-smoothie.jpg',
 };
 
 export const getRecipeImage = (recipeId: string): string | undefined => {
