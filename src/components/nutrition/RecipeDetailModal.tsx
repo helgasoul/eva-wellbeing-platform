@@ -12,7 +12,8 @@ import {
   Target, 
   Plus,
   Heart,
-  Star
+  Star,
+  BookOpen
 } from 'lucide-react';
 import type { BasicMealPlan } from '@/data/baseMealPlans';
 
@@ -64,6 +65,17 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Recipe Image */}
+          {recipe.imageUrl && (
+            <div className="w-full h-64 md:h-80 overflow-hidden rounded-xl">
+              <img 
+                src={recipe.imageUrl} 
+                alt={recipe.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+
           {/* Recipe Info Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200/50">
@@ -185,6 +197,26 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
               </Card>
             )}
           </div>
+
+          {/* Cooking Instructions */}
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                Инструкции по приготовлению
+              </h3>
+              <ol className="space-y-3">
+                {recipe.instructions.map((instruction, index) => (
+                  <li key={index} className="flex items-start gap-3 text-sm">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium flex items-center justify-center">
+                      {index + 1}
+                    </span>
+                    <span className="text-muted-foreground leading-relaxed">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
 
           <Separator />
 

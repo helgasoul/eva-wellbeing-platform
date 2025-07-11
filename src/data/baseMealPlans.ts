@@ -15,6 +15,8 @@ interface BasicMealPlan {
   prepTime: number;
   cookTime: number;
   minAccessLevel: 'essential' | 'plus' | 'optimum';
+  imageUrl?: string;
+  instructions: string[];
 }
 
 export const baseMealPlans = {
@@ -35,7 +37,14 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 10,
       cookTime: 5,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      imageUrl: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=400&h=300',
+      instructions: [
+        'Залейте овсяные хлопья кипятком и дайте настояться 5 минут',
+        'Добавьте чернику и тщательно перемешайте',
+        'Посыпьте грецкими орехами и семенами льна',
+        'Подавайте теплым'
+      ]
     },
     {
       id: 'pre_breakfast_2',
@@ -53,7 +62,15 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 5,
       cookTime: 0,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      imageUrl: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=400&h=300',
+      instructions: [
+        'Очистите банан и киви, нарежьте крупными кусками',
+        'Промойте шпинат',
+        'Добавьте все ингредиенты в блендер',
+        'Взбивайте 1-2 минуты до однородности',
+        'Подавайте охлажденным'
+      ]
     },
     {
       id: 'pre_lunch_1',
@@ -71,7 +88,16 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 15,
       cookTime: 10,
-      minAccessLevel: 'plus' as const
+      minAccessLevel: 'plus' as const,
+      imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&h=300',
+      instructions: [
+        'Отварите куриную грудку в подсоленной воде 10 минут',
+        'Нарежьте курицу кубиками',
+        'Нарежьте авокадо дольками',
+        'Разрежьте помидоры черри пополам',
+        'Смешайте все ингредиенты с зеленью',
+        'Заправьте оливковым маслом'
+      ]
     },
     {
       id: 'pre_dinner_1',
@@ -89,7 +115,15 @@ export const baseMealPlans = {
       difficulty: 'medium' as const,
       prepTime: 10,
       cookTime: 25,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      imageUrl: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&w=400&h=300',
+      instructions: [
+        'Разогрейте духовку до 180°C',
+        'Нарежьте овощи крупными кусками',
+        'Положите рыбу и овощи на противень',
+        'Сбрызните оливковым маслом, посолите',
+        'Запекайте 25 минут до готовности'
+      ]
     }
   ],
   perimenopause: [
@@ -109,7 +143,15 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 5,
       cookTime: 10,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      instructions: [
+        'Взбейте яйца в миске',
+        'Нарежьте авокадо дольками',
+        'Разогрейте сковороду с маслом',
+        'Вылейте яйца, добавьте шпинат',
+        'Готовьте 3-4 минуты, добавьте авокадо',
+        'Посыпьте семенами льна'
+      ]
     },
     {
       id: 'peri_breakfast_2',
@@ -127,7 +169,15 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 5,
       cookTime: 15,
-      minAccessLevel: 'plus' as const
+      minAccessLevel: 'plus' as const,
+      instructions: [
+        'Промойте киноа в холодной воде',
+        'Отварите киноа в подсоленной воде 15 минут',
+        'Нарежьте курагу мелкими кусочками',
+        'Измельчите миндаль',
+        'Смешайте готовую киноа с орехами и курагой',
+        'Добавьте корицу и перемешайте'
+      ]
     },
     {
       id: 'peri_lunch_1',
@@ -145,7 +195,15 @@ export const baseMealPlans = {
       difficulty: 'medium' as const,
       prepTime: 15,
       cookTime: 20,
-      minAccessLevel: 'plus' as const
+      minAccessLevel: 'plus' as const,
+      instructions: [
+        'Нарежьте тыкву кубиками',
+        'Запеките тыкву в духовке 180°C 20 минут',
+        'Отварите нут до мягкости',
+        'Промойте руколу',
+        'Смешайте теплую тыкву с нутом',
+        'Добавьте руколу и семена подсолнечника'
+      ]
     },
     {
       id: 'peri_dinner_1',
@@ -163,7 +221,15 @@ export const baseMealPlans = {
       difficulty: 'medium' as const,
       prepTime: 10,
       cookTime: 15,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      instructions: [
+        'Нарежьте тофу кубиками',
+        'Нарежьте овощи соломкой',
+        'Разогрейте сковороду с маслом',
+        'Обжарьте тофу до золотистого цвета',
+        'Добавьте овощи и тушите 10 минут',
+        'Посыпьте кунжутом перед подачей'
+      ]
     }
   ],
   menopause: [
@@ -183,7 +249,14 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 10,
       cookTime: 0,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      instructions: [
+        'Смешайте семена чиа с кокосовым молоком',
+        'Добавьте мед и тщательно перемешайте',
+        'Оставьте в холодильнике на ночь',
+        'Перед подачей добавьте малину',
+        'Перемешайте и подавайте охлажденным'
+      ]
     },
     {
       id: 'meno_lunch_1',
@@ -201,7 +274,15 @@ export const baseMealPlans = {
       difficulty: 'medium' as const,
       prepTime: 15,
       cookTime: 20,
-      minAccessLevel: 'plus' as const
+      minAccessLevel: 'plus' as const,
+      instructions: [
+        'Отварите киноа в подсоленной воде 15 минут',
+        'Приготовьте лосось на гриле 6-8 минут',
+        'Промойте и нарежьте зелень',
+        'Смешайте киноа с зеленью',
+        'Добавьте лосось кусочками',
+        'Посыпьте кунжутом и заправьте маслом'
+      ]
     },
     {
       id: 'meno_lunch_2',
@@ -219,7 +300,15 @@ export const baseMealPlans = {
       difficulty: 'medium' as const,
       prepTime: 10,
       cookTime: 25,
-      minAccessLevel: 'optimum' as const
+      minAccessLevel: 'optimum' as const,
+      instructions: [
+        'Нарежьте морковь кубиками',
+        'Натрите имбирь на терке',
+        'Обжарьте морковь с имбирем 5 минут',
+        'Добавьте чечевицу и куркуму',
+        'Залейте водой и варите 20 минут',
+        'Взбейте блендером до однородности'
+      ]
     },
     {
       id: 'meno_dinner_1',
@@ -237,7 +326,15 @@ export const baseMealPlans = {
       difficulty: 'medium' as const,
       prepTime: 10,
       cookTime: 30,
-      minAccessLevel: 'plus' as const
+      minAccessLevel: 'plus' as const,
+      instructions: [
+        'Разогрейте духовку до 200°C',
+        'Нарежьте картофель дольками',
+        'Подготовьте спаржу, удалив жесткие концы',
+        'Выложите рыбу и овощи на противень',
+        'Полейте лимонным соком',
+        'Запекайте 25-30 минут'
+      ]
     }
   ],
   postmenopause: [
@@ -257,7 +354,14 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 5,
       cookTime: 0,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      instructions: [
+        'Выложите творог в тарелку',
+        'Измельчите грецкие орехи',
+        'Посыпьте творог орехами и семенами кунжута',
+        'Добавьте изюм',
+        'Аккуратно перемешайте'
+      ]
     },
     {
       id: 'post_lunch_1',
@@ -275,7 +379,15 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 10,
       cookTime: 0,
-      minAccessLevel: 'plus' as const
+      minAccessLevel: 'plus' as const,
+      instructions: [
+        'Отварите брокколи на пару 5 минут',
+        'Промойте и нарежьте зелень',
+        'Разберите сардины на кусочки',
+        'Смешайте все ингредиенты в салатнице',
+        'Посыпьте кунжутом',
+        'Заправьте лимонным соком'
+      ]
     },
     {
       id: 'post_dinner_1',
@@ -293,7 +405,15 @@ export const baseMealPlans = {
       difficulty: 'medium' as const,
       prepTime: 10,
       cookTime: 30,
-      minAccessLevel: 'optimum' as const
+      minAccessLevel: 'optimum' as const,
+      instructions: [
+        'Разогрейте духовку до 180°C',
+        'Отварите брокколи и измельчите',
+        'Смешайте творог с брокколи',
+        'Измельчите миндаль',
+        'Добавьте орехи и кунжут в смесь',
+        'Выложите в форму и запекайте 30 минут'
+      ]
     },
     {
       id: 'post_snack_1',
@@ -311,7 +431,14 @@ export const baseMealPlans = {
       difficulty: 'easy' as const,
       prepTime: 5,
       cookTime: 0,
-      minAccessLevel: 'essential' as const
+      minAccessLevel: 'essential' as const,
+      instructions: [
+        'Очистите банан и нарежьте кусочками',
+        'Добавьте все ингредиенты в блендер',
+        'Взбивайте 1-2 минуты до однородности',
+        'Процедите через сито при желании',
+        'Подавайте охлажденным'
+      ]
     }
   ]
 };
