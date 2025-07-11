@@ -1,6 +1,8 @@
-// ✅ ЭТАП 4: Сервис онбординга с Supabase
+// ✅ ЭТАП 4: Сервис онбординга с Supabase (Enhanced)
 import { supabase } from '@/integrations/supabase/client';
 import { OnboardingData } from '@/types/onboarding';
+import { validateOnboardingCompleteness, getOnboardingProgress } from '@/utils/onboardingValidation';
+import { runOnboardingDiagnostics, autoRepairOnboarding } from '@/utils/onboardingDiagnostics';
 
 export interface OnboardingStep {
   step_number: number;
@@ -74,22 +76,84 @@ class OnboardingService {
     }
   }
 
-  // Проверка завершения онбординга
-  async isOnboardingComplete(userId: string): Promise<{ completed: boolean, error: string | null }> {
+  // Enhanced onboarding completion check with comprehensive validation
+  async isOnboardingComplete(userId: string): Promise<{ 
+    completed: boolean; 
+    error: string | null; 
+    progress?: any;
+    diagnostics?: any;
+  }> {
     try {
-      // Проверяем профиль пользователя
+      // 1. Check profile flag
       const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
-        .select('onboarding_completed')
+        .select('onboarding_completed, registration_completed')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error('Check onboarding complete error:', profileError);
         return { completed: false, error: profileError.message };
       }
 
-      return { completed: profile?.onboarding_completed || false, error: null };
+      if (!profile) {
+        return { completed: false, error: 'User profile not found' };
+      }
+
+      // 2. If flag says complete, validate data integrity
+      if (profile.onboarding_completed) {
+        const validation = await validateOnboardingCompleteness(userId);
+        
+        // If validation fails but flag is true, this indicates data corruption
+        if (!validation.isValid && validation.errors.some(e => e.includes('Missing'))) {
+          console.warn('⚠️ Onboarding marked complete but validation failed:', validation.errors);
+          
+          // Auto-repair if possible
+          const repair = await autoRepairOnboarding(userId);
+          if (repair.repaired) {
+            console.log('✅ Auto-repaired onboarding issues:', repair.actions);
+          }
+          
+          return { 
+            completed: validation.progress.hasEssentialData, // Use validation result
+            error: null,
+            progress: validation.progress,
+            diagnostics: { autoRepaired: repair.repaired, actions: repair.actions }
+          };
+        }
+
+        return { 
+          completed: true, 
+          error: null,
+          progress: validation.progress 
+        };
+      }
+
+      // 3. If flag says incomplete, check if we have sufficient data anyway
+      const validation = await validateOnboardingCompleteness(userId);
+      
+      if (validation.progress.hasEssentialData) {
+        console.log('🔧 User has sufficient data but flag is false - fixing...');
+        
+        // Update the flag
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ 
+            onboarding_completed: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+
+        if (!updateError) {
+          return { completed: true, error: null, progress: validation.progress };
+        }
+      }
+
+      return { 
+        completed: false, 
+        error: null,
+        progress: validation.progress
+      };
 
     } catch (error: any) {
       console.error('Check onboarding complete error:', error);
@@ -129,10 +193,26 @@ class OnboardingService {
     }
   }
 
-  // Завершение онбординга
+  // Enhanced onboarding completion with validation
   async completeOnboarding(userId: string, onboardingData: OnboardingData, analysis?: MenopauseAnalysisResult): Promise<{ error: string | null }> {
     try {
-      // 1. Сохраняем анализ, если предоставлен
+      console.log('🚀 Starting enhanced onboarding completion process...');
+      
+      // 1. Pre-completion validation
+      const validation = await validateOnboardingCompleteness(userId, onboardingData);
+      
+      if (!validation.isValid) {
+        console.warn('⚠️ Onboarding validation failed:', validation.errors);
+        
+        // Allow completion if we have essential data (70%+)
+        if (!validation.progress.hasEssentialData) {
+          return { error: `Insufficient onboarding data. Missing: ${validation.progress.missingSteps.join(', ')}` };
+        }
+        
+        console.log('✅ Proceeding with essential data despite minor validation issues');
+      }
+
+      // 2. Save analysis if provided
       if (analysis) {
         console.log('🔄 Saving menopause analysis...', { 
           phase: analysis.menopause_phase, 
@@ -148,17 +228,20 @@ class OnboardingService {
         console.log('✅ Analysis saved successfully');
       }
 
-      // 2. Обновляем статус онбординга в профиле
+      // 3. Update profile with comprehensive data
       console.log('🔄 Updating user profile completion status...');
       
+      const profileUpdate = {
+        onboarding_completed: true,
+        registration_completed: true,
+        menopause_phase: analysis?.menopause_phase,
+        onboarding_completion_percentage: validation.progress.completionPercentage,
+        updated_at: new Date().toISOString()
+      };
+
       const { error: profileError } = await supabase
         .from('user_profiles')
-        .update({
-          onboarding_completed: true,
-          registration_completed: true, // Also ensure registration is marked complete
-          menopause_phase: analysis?.menopause_phase,
-          updated_at: new Date().toISOString()
-        })
+        .update(profileUpdate)
         .eq('id', userId);
 
       if (profileError) {
@@ -166,32 +249,33 @@ class OnboardingService {
         return { error: `Ошибка обновления профиля: ${profileError.message}` };
       }
 
-      // 3. Verify the update was successful
-      const { data: updatedProfile, error: verifyError } = await supabase
-        .from('user_profiles')
-        .select('onboarding_completed, registration_completed')
-        .eq('id', userId)
-        .single();
-
-      if (verifyError) {
-        console.error('❌ Profile verification failed:', verifyError);
-        return { error: 'Не удалось подтвердить завершение онбординга' };
+      // 4. Verify completion with enhanced diagnostics  
+      const diagnostics = await runOnboardingDiagnostics(userId);
+      
+      if (diagnostics.systemStatus === 'error') {
+        console.error('❌ Post-completion diagnostics failed:', diagnostics.recommendations);
+        return { error: 'Onboarding completion verification failed' };
       }
 
-      if (!updatedProfile?.onboarding_completed) {
-        console.error('❌ Onboarding completion flag not set');
-        return { error: 'Статус онбординга не был обновлен' };
+      // 5. Auto-repair any issues found
+      if (diagnostics.systemStatus === 'warning') {
+        console.log('🔧 Running auto-repair for minor issues...');
+        const repair = await autoRepairOnboarding(userId);
+        if (repair.repaired) {
+          console.log('✅ Auto-repaired issues:', repair.actions);
+        }
       }
 
-      console.log(`✅ Onboarding completed successfully for user ${userId}`, {
-        onboarding_completed: updatedProfile.onboarding_completed,
-        registration_completed: updatedProfile.registration_completed
+      console.log(`✅ Enhanced onboarding completed successfully for user ${userId}`, {
+        completionPercentage: validation.progress.completionPercentage,
+        systemStatus: diagnostics.systemStatus,
+        hasEssentialData: validation.progress.hasEssentialData
       });
       
       return { error: null };
 
     } catch (error: any) {
-      console.error('❌ Complete onboarding error:', error);
+      console.error('❌ Enhanced onboarding completion error:', error);
       return { error: error.message || 'Ошибка завершения онбординга' };
     }
   }
@@ -303,6 +387,21 @@ class OnboardingService {
       console.error('Clear onboarding data error:', error);
       return { error: error.message || 'Ошибка очистки данных онбординга' };
     }
+  }
+
+  // Get comprehensive onboarding progress
+  async getProgress(userId: string) {
+    return await getOnboardingProgress(userId);
+  }
+
+  // Run diagnostics
+  async runDiagnostics(userId: string) {
+    return await runOnboardingDiagnostics(userId);
+  }
+
+  // Validate data completeness
+  async validateCompleteness(userId: string, onboardingData?: OnboardingData) {
+    return await validateOnboardingCompleteness(userId, onboardingData);
   }
 }
 

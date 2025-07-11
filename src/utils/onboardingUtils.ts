@@ -61,13 +61,12 @@ export const getGeolocationData = () => {
 };
 
 /**
- * Проверить, нужно ли перенаправить пользователя на онбординг
+ * Enhanced check for onboarding redirect with data validation
  */
 export const shouldRedirectToOnboarding = (user: any): boolean => {
   if (!user || user.role !== 'patient') return false;
   
-  // Если это восстановление пароля и у пользователя есть базовые данные,
-  // не требуем онбординг
+  // If password recovery and user has essential data, skip onboarding
   const urlParams = new URLSearchParams(window.location.search);
   const isPasswordRecovery = urlParams.get('type') === 'recovery';
   
@@ -75,15 +74,34 @@ export const shouldRedirectToOnboarding = (user: any): boolean => {
     return false;
   }
   
-  return !Boolean(user.onboardingCompleted);
+  // Primary check: onboarding completion flag
+  if (user.onboardingCompleted) {
+    return false;
+  }
+  
+  // Secondary check: does user have essential data anyway?
+  const status = getOnboardingStatus(user);
+  if (status.isCompleted && status.hasGeolocation) {
+    // User has data but flag might be wrong - let them proceed
+    console.log('🔧 User has essential data but flag shows incomplete');
+    return false;
+  }
+  
+  return true;
 };
 
 /**
- * Проверить, нужно ли перенаправить пользователя на дашборд
+ * Enhanced check for dashboard redirect with progress validation
  */
 export const shouldRedirectToDashboard = (user: any): boolean => {
   if (!user || user.role !== 'patient') return false;
-  return Boolean(user.onboardingCompleted);
+  
+  // Primary check: completion flag
+  if (user.onboardingCompleted) return true;
+  
+  // Secondary check: essential data present
+  const status = getOnboardingStatus(user);
+  return status.isCompleted && status.hasGeolocation;
 };
 
 /**

@@ -1,46 +1,107 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/roles';
+import { onboardingService } from '@/services/onboardingService';
+import { shouldRedirectToOnboarding, shouldRedirectToDashboard } from '@/utils/onboardingUtils';
 
 /**
- * Хук для проверки статуса онбординга и автоматического редиректа
+ * Enhanced hook for onboarding status checking with comprehensive validation
  * 
- * Логика:
- * - Если пользователь авторизован И завершил онбординг → редирект на дашборд
- * - Если пользователь авторизован НО не завершил онбординг → редирект на онбординг
- * - Для других ролей (doctor, admin) → проверка не нужна
- * - Исключение: не редиректим если пользователь на странице сброса пароля или уже на онбординге
+ * Features:
+ * - Validates actual data completeness, not just flags
+ * - Provides detailed progress information
+ * - Auto-repairs common issues
+ * - Handles edge cases and data corruption
  */
 export const useOnboardingCheck = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [onboardingState, setOnboardingState] = useState<{
+    needsOnboarding: boolean;
+    hasCompletedOnboarding: boolean;
+    progress?: any;
+    isValidating: boolean;
+  }>({
+    needsOnboarding: false,
+    hasCompletedOnboarding: false,
+    isValidating: false
+  });
 
   useEffect(() => {
-    // Ждем загрузки пользователя
     if (isLoading || !user) return;
 
-    // Не редиректим если пользователь на странице сброса пароля или уже на онбординге
-    if (location.pathname === '/reset-password' || location.pathname === '/patient/onboarding') return;
+    // Skip checks for non-patients
+    if (user.role !== UserRole.PATIENT) return;
 
-    // Проверяем только пациенток
-    if (user.role === UserRole.PATIENT) {
-      if (user.onboardingCompleted) {
-        console.log('✅ User has completed onboarding - redirecting to dashboard');
-        navigate('/patient/dashboard', { replace: true });
-      } else {
-        console.log('🔄 User needs to complete onboarding - redirecting to onboarding');
-        navigate('/patient/onboarding', { replace: true });
+    // Skip redirects for certain pages
+    const skipRedirectPaths = ['/reset-password', '/patient/onboarding'];
+    if (skipRedirectPaths.includes(location.pathname)) return;
+
+    // Enhanced onboarding check with validation
+    const validateAndRedirect = async () => {
+      setOnboardingState(prev => ({ ...prev, isValidating: true }));
+
+      try {
+        // Get comprehensive onboarding status
+        const completionCheck = await onboardingService.isOnboardingComplete(user.id);
+        
+        console.log('🔍 Enhanced onboarding check:', {
+          userId: user.id,
+          flagStatus: user.onboardingCompleted,
+          validationResult: completionCheck.completed,
+          progress: completionCheck.progress
+        });
+
+        const shouldGoToDashboard = shouldRedirectToDashboard({
+          ...user,
+          onboardingCompleted: completionCheck.completed
+        });
+
+        const shouldGoToOnboarding = shouldRedirectToOnboarding({
+          ...user,
+          onboardingCompleted: completionCheck.completed
+        });
+
+        setOnboardingState({
+          needsOnboarding: shouldGoToOnboarding,
+          hasCompletedOnboarding: shouldGoToDashboard,
+          progress: completionCheck.progress,
+          isValidating: false
+        });
+
+        // Perform redirects
+        if (shouldGoToDashboard) {
+          console.log('✅ User has sufficient onboarding data - redirecting to dashboard');
+          navigate('/patient/dashboard', { replace: true });
+        } else if (shouldGoToOnboarding) {
+          console.log('🔄 User needs to complete onboarding - redirecting to onboarding');
+          navigate('/patient/onboarding', { replace: true });
+        }
+
+      } catch (error) {
+        console.error('❌ Enhanced onboarding check failed:', error);
+        setOnboardingState(prev => ({ ...prev, isValidating: false }));
+        
+        // Fallback to simple flag-based check
+        if (user.onboardingCompleted) {
+          navigate('/patient/dashboard', { replace: true });
+        } else {
+          navigate('/patient/onboarding', { replace: true });
+        }
       }
-    }
+    };
+
+    validateAndRedirect();
   }, [user, isLoading, navigate, location.pathname]);
 
   return {
     user,
-    isLoading,
-    needsOnboarding: user?.role === UserRole.PATIENT && !user?.onboardingCompleted,
-    hasCompletedOnboarding: user?.role === UserRole.PATIENT && user?.onboardingCompleted
+    isLoading: isLoading || onboardingState.isValidating,
+    needsOnboarding: onboardingState.needsOnboarding,
+    hasCompletedOnboarding: onboardingState.hasCompletedOnboarding,
+    progress: onboardingState.progress
   };
 };
 
