@@ -65,20 +65,18 @@ serve(async (req) => {
       throw new Error(`Integration not found: ${integrationError?.message}`);
     }
 
-    // Create sync log entry
-    const { data: syncLog, error: syncLogError } = await supabase
-      .from('health_data_sync_logs')
-      .insert({
-        integration_id,
-        sync_status: 'running',
-        data_types_synced: data_types || []
-      })
-      .select()
-      .single();
+    // Create sync log entry using secure function
+    const { data: syncLogResult, error: syncLogError } = await supabase
+      .rpc('create_health_sync_log_secure', {
+        p_integration_id: integration_id,
+        p_data_types_synced: data_types || []
+      });
 
     if (syncLogError) {
       throw new Error(`Failed to create sync log: ${syncLogError.message}`);
     }
+
+    const syncLogId = syncLogResult;
 
     const startTime = Date.now();
     let syncedRecords = 0;
@@ -143,21 +141,19 @@ serve(async (req) => {
         .eq('id', integration_id);
     }
 
-    // Update sync log
+    // Calculate sync results
     const syncDuration = Date.now() - startTime;
     const syncStatus = errors.length === 0 ? 'completed' : (syncedRecords > 0 ? 'partial' : 'failed');
 
-    await supabase
-      .from('health_data_sync_logs')
-      .update({
-        sync_completed_at: new Date().toISOString(),
-        sync_status: syncStatus,
-        records_synced: syncedRecords,
-        records_failed: failedRecords,
-        sync_duration_ms: syncDuration,
-        error_details: errors.length > 0 ? errors : null
-      })
-      .eq('id', syncLog.id);
+    // Update sync log using secure function
+    await supabase.rpc('update_health_sync_log_secure', {
+      p_log_id: syncLogId,
+      p_sync_status: syncStatus,
+      p_records_synced: syncedRecords,
+      p_records_failed: failedRecords,
+      p_sync_duration_ms: syncDuration,
+      p_error_details: errors.length > 0 ? errors : null
+    });
 
     console.log('✅ Sync completed', { 
       syncedRecords, 
@@ -169,7 +165,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        sync_id: syncLog.id,
+        sync_id: syncLogId,
         synced_records: syncedRecords,
         failed_records: failedRecords,
         sync_status: syncStatus,
@@ -514,29 +510,26 @@ async function storeHealthData(
 ) {
   const recordedDate = new Date(dataPoint.timestamp).toISOString().split('T')[0];
   
-  const { error } = await supabase
-    .from('external_health_data')
-    .upsert({
-      user_id: userId,
-      integration_id: integrationId,
-      data_type: dataPoint.type,
-      data_payload: {
-        value: dataPoint.value,
-        unit: dataPoint.unit,
-        source: dataPoint.source,
-        metadata: dataPoint.metadata
-      },
-      external_id: `${dataPoint.type}_${dataPoint.timestamp}`,
-      recorded_date: recordedDate,
-      recorded_timestamp: dataPoint.timestamp,
-      data_source: dataPoint.source,
-      data_quality_score: 1.0,
-      is_processed: false
-    }, {
-      onConflict: 'integration_id,external_id,data_type'
-    });
+  const { data, error } = await supabase.rpc('insert_external_health_data_secure', {
+    p_user_id: userId,
+    p_integration_id: integrationId,
+    p_data_type: dataPoint.type,
+    p_data_payload: {
+      value: dataPoint.value,
+      unit: dataPoint.unit,
+      source: dataPoint.source,
+      metadata: dataPoint.metadata
+    },
+    p_external_id: `${dataPoint.type}_${dataPoint.timestamp}`,
+    p_recorded_date: recordedDate,
+    p_recorded_timestamp: dataPoint.timestamp,
+    p_data_source: dataPoint.source,
+    p_data_quality_score: 1.0
+  });
 
   if (error) {
     throw new Error(`Failed to store health data: ${error.message}`);
   }
+
+  return data;
 }

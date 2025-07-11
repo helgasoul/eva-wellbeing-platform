@@ -3436,6 +3436,42 @@ export type Database = {
           },
         ]
       }
+      health_data_access_log: {
+        Row: {
+          access_type: string
+          accessed_at: string
+          accessed_user_data: string
+          id: string
+          ip_address: unknown | null
+          record_count: number | null
+          table_accessed: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          access_type: string
+          accessed_at?: string
+          accessed_user_data: string
+          id?: string
+          ip_address?: unknown | null
+          record_count?: number | null
+          table_accessed: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          access_type?: string
+          accessed_at?: string
+          accessed_user_data?: string
+          id?: string
+          ip_address?: unknown | null
+          record_count?: number | null
+          table_accessed?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       health_data_sync_logs: {
         Row: {
           created_at: string | null
@@ -7221,6 +7257,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      create_health_sync_log_secure: {
+        Args: { p_integration_id: string; p_data_types_synced?: string[] }
+        Returns: string
+      }
       generate_ticket_number: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -7255,9 +7295,43 @@ export type Database = {
         Args: { post_id: string }
         Returns: undefined
       }
+      insert_external_health_data_secure: {
+        Args: {
+          p_user_id: string
+          p_integration_id: string
+          p_data_type: string
+          p_data_payload: Json
+          p_external_id?: string
+          p_recorded_date?: string
+          p_recorded_timestamp?: string
+          p_data_source?: string
+          p_data_quality_score?: number
+        }
+        Returns: string
+      }
+      log_health_data_access: {
+        Args: {
+          p_accessed_user_data: string
+          p_access_type: string
+          p_table_accessed: string
+          p_record_count?: number
+        }
+        Returns: undefined
+      }
       perform_health_check: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      update_health_sync_log_secure: {
+        Args: {
+          p_log_id: string
+          p_sync_status: string
+          p_records_synced?: number
+          p_records_failed?: number
+          p_sync_duration_ms?: number
+          p_error_details?: Json
+        }
+        Returns: boolean
       }
     }
     Enums: {
