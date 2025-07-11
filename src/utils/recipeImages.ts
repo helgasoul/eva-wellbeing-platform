@@ -1,8 +1,8 @@
 // Recipe image mappings using public folder paths
 export const recipeImages = {
   // Premenopause recipes
-  'pre_breakfast_1': '/recipe-oatmeal.jpg',
-  'pre_breakfast_2': '/recipe-green-smoothie.jpg',
+  'pre_breakfast_1': '/recipe-oatmeal-berries-nuts.jpg',
+  'pre_breakfast_2': '/recipe-green-smoothie-fruits.jpg',
   'pre_lunch_1': '/recipe-chicken-salad.jpg',
   'pre_dinner_1': '/recipe-baked-fish-vegetables.jpg',
   
