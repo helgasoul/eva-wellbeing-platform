@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -87,13 +88,99 @@ const PatientDashboard = () => {
   }, [user?.id]);
 
   const loadHealthData = async () => {
+    if (!user?.id) return;
+    
     try {
       setIsLoading(true);
       
-      // Получаем статистику данных
-      const stats = healthDataAggregator.getDataStats();
+      // Получаем реальные данные из Supabase
+      const [nutritionResponse, symptomResponse] = await Promise.all([
+        supabase
+          .from('nutrition_entries')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50),
+        supabase
+          .from('symptom_entries')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50)
+      ]);
+
+      console.log('Nutrition data:', nutritionResponse.data);
+      console.log('Symptom data:', symptomResponse.data);
+
+      const nutritionData = nutritionResponse.data || [];
+      const symptomData = symptomResponse.data || [];
+
+      // Создаем события для timeline
+      const events: HealthDataTimelineEntry[] = [];
+
+      // Добавляем события питания
+      nutritionData.forEach((entry: any) => {
+        events.push({
+          id: entry.id,
+          date: entry.entry_date,
+          type: 'nutrition',
+          data: {
+            id: entry.id,
+            date: entry.entry_date,
+            mealType: entry.meal_type || 'meal',
+            foods: entry.food_items || [],
+            calories: entry.calories || 0,
+            timestamp: entry.created_at
+          } as any,
+          timestamp: entry.created_at
+        });
+      });
+
+      // Добавляем события симптомов
+      symptomData.forEach((entry: any) => {
+        events.push({
+          id: entry.id,
+          date: entry.entry_date,
+          type: 'symptom',
+          data: {
+            id: entry.id,
+            date: entry.entry_date,
+            symptoms: entry.physical_symptoms || [],
+            severity: entry.energy_level || 1,
+            notes: entry.notes,
+            timestamp: entry.created_at
+          } as any,
+          timestamp: entry.created_at
+        });
+      });
+
+      // Сортируем события по времени (самые новые первыми)
+      events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       
-      // Рассчитываем полноту данных (оптимально 30 записей за месяц)
+      setRecentEvents(events.slice(0, 5)); // Показываем последние 5 событий
+      console.log('Recent events loaded:', events.slice(0, 5));
+
+      // Рассчитываем статистику
+      const totalEntries = nutritionData.length + symptomData.length;
+      const dataCompleteness = Math.min(100, (totalEntries / 30) * 100);
+      
+      setHealthStats({
+        totalEntries,
+        symptomEntries: symptomData.length,
+        nutritionEntries: nutritionData.length,
+        wearableEntries: 0, // Пока нет данных с носимых устройств
+        daysWithData: new Set([
+          ...nutritionData.map((e: any) => e.entry_date),
+          ...symptomData.map((e: any) => e.entry_date)
+        ]).size,
+        dataCompleteness,
+        lastEntry: events[0]?.timestamp
+      });
+      
+    } catch (error) {
+      console.error('Error loading health data:', error);
+      // Fallback к старому методу
+      const stats = healthDataAggregator.getDataStats();
       const dataCompleteness = Math.min(100, (stats.totalEntries / 30) * 100);
       
       setHealthStats({
@@ -101,12 +188,8 @@ const PatientDashboard = () => {
         dataCompleteness
       });
       
-      // Получаем последние события
       const timeline = healthDataAggregator.getTimeline(7);
-      setRecentEvents(timeline.slice(0, 5)); // Показываем последние 5 событий
-      
-    } catch (error) {
-      console.error('Error loading health data:', error);
+      setRecentEvents(timeline.slice(0, 5));
     } finally {
       setIsLoading(false);
     }
@@ -150,6 +233,33 @@ const PatientDashboard = () => {
         const symptomData = event.data as any;
         return `Записаны симптомы: ${symptomData.symptoms?.slice(0, 2).join(', ') || 'данные о самочувствии'}`;
       case 'nutrition':
+        const nutritionData = event.data as any;
+        const foods = nutritionData.foods || [];
+        if (foods.length > 0) {
+          const firstFood = foods[0];
+          const foodName = firstFood.name || 'блюдо';
+          const mealType = nutritionData.mealType;
+          let mealTypeText = '';
+          
+          switch (mealType) {
+            case 'breakfast':
+              mealTypeText = 'завтрак';
+              break;
+            case 'lunch':
+              mealTypeText = 'обед';
+              break;
+            case 'dinner':
+              mealTypeText = 'ужин';
+              break;
+            case 'snack':
+              mealTypeText = 'перекус';
+              break;
+            default:
+              mealTypeText = 'прием пищи';
+          }
+          
+          return `${mealTypeText}: ${foodName}${foods.length > 1 ? ` и еще ${foods.length - 1} блюд` : ''}`;
+        }
         return 'Добавлена запись о питании';
       case 'wearable':
         const wearableData = event.data as any;
