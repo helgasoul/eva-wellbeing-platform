@@ -3,7 +3,7 @@ export const recipeImages = {
   // Premenopause recipes
   'pre_breakfast_1': '/recipe-oatmeal-berries-nuts.jpg',
   'pre_breakfast_2': '/recipe-green-smoothie-fruits.jpg',
-  'pre_lunch_1': '/recipe-chicken-salad.jpg',
+  'pre_lunch_1': '/recipe-chicken-avocado-salad.jpg',
   'pre_dinner_1': '/recipe-baked-fish-vegetables.jpg',
   
   // Perimenopause recipes
@@ -14,13 +14,13 @@ export const recipeImages = {
   
   // Menopause recipes
   'meno_breakfast_1': '/recipe-chia-pudding.jpg',
-  'meno_lunch_1': '/recipe-chicken-salad.jpg',
+  'meno_lunch_1': '/recipe-chicken-avocado-salad.jpg',
   'meno_lunch_2': '/recipe-lentil-soup.jpg',
   'meno_dinner_1': '/recipe-baked-fish-vegetables.jpg',
   
   // Postmenopause recipes
   'post_breakfast_1': '/recipe-oatmeal.jpg',
-  'post_lunch_1': '/recipe-chicken-salad.jpg',
+  'post_lunch_1': '/recipe-chicken-avocado-salad.jpg',
   'post_dinner_1': '/recipe-omelet.jpg',
   'post_snack_1': '/recipe-green-smoothie.jpg',
 };
