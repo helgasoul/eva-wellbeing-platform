@@ -31,7 +31,7 @@ const HeroSection: React.FC = () => {
           </h1>
           
           <p className="text-lg md:text-xl lg:text-2xl mb-8 text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Поддержка, знания и забота для женщин в период менопаузы — всё для вашего комфорта, уверенности и новых открытий
+            Поддержка, знания и забота для женщин в период перименопаузы, менопаузы  и постменопаузы — всё для вашего комфорта, уверенности и новых открытий
           </p>
 
           {/* Изображение женщин с мягкой аурой */}
