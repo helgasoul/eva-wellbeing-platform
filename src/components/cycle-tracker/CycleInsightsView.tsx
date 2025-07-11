@@ -501,11 +501,11 @@ const PersonalPatterns: React.FC<{
             {patterns.map(pattern => (
               <div key={pattern.id} className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
                 <div className="flex items-center mb-2">
-                  <span className="text-lg mr-2">{pattern.icon}</span>
-                  <h4 className="font-medium text-gray-800">{pattern.name}</h4>
+                  <span className="text-lg mr-2 flex-shrink-0">{pattern.icon}</span>
+                  <h4 className="font-medium text-gray-800 break-words leading-tight">{pattern.name}</h4>
                 </div>
-                <p className="text-sm text-gray-700 mb-2">{pattern.description}</p>
-                <div className="text-xs text-purple-700">
+                <p className="text-sm text-gray-700 mb-2 break-words leading-relaxed">{pattern.description}</p>
+                <div className="text-xs text-purple-700 break-words">
                   <strong>Частота:</strong> {pattern.frequency}
                 </div>
               </div>
@@ -543,8 +543,8 @@ const OptimizationRecommendations: React.FC<{
               <div className="space-y-2">
                 {optimization.suggestions.map((suggestion, index) => (
                   <div key={index} className="flex items-start text-sm text-gray-700">
-                    <span className="text-blue-500 mr-2">•</span>
-                    {suggestion}
+                    <span className="text-blue-500 mr-2 flex-shrink-0">•</span>
+                    <span className="break-words leading-relaxed">{suggestion}</span>
                   </div>
                 ))}
               </div>

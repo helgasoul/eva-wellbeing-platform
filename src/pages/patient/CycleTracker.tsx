@@ -10,6 +10,7 @@ import { AddCycleEntryModal } from '@/components/cycle-tracker/AddCycleEntryModa
 import { QuickStats } from '@/components/cycle-tracker/QuickStats';
 import { analyzeIntegratedHealth } from '@/utils/cycleAnalyzer';
 import { healthDataService } from '@/services/healthDataService';
+import { dailyAnalysisScheduler } from '@/services/dailyAnalysisScheduler';
 import { cn } from '@/lib/utils';
 
 interface MenstrualEntry {
@@ -94,6 +95,11 @@ export default function CycleTracker() {
   useEffect(() => {
     loadCycleData();
     generateCorrelationAnalysis();
+    
+    // Инициализируем ежедневное обновление анализа
+    if (user?.id) {
+      dailyAnalysisScheduler.initializeDailySchedule();
+    }
   }, [user?.id]);
 
   const loadCycleData = async () => {
@@ -154,6 +160,24 @@ export default function CycleTracker() {
     if (!user?.id) return;
     
     try {
+      // Проверяем, есть ли свежие данные от ежедневного анализа
+      const cachedAnalysis = await dailyAnalysisScheduler.getLatestAnalysisResults(user.id);
+      
+      if (cachedAnalysis) {
+        // Используем кэшированные результаты анализа Claude
+        console.log('📊 Используем кэшированные результаты анализа Claude');
+        setNutritionCorrelations(cachedAnalysis.nutrition || []);
+        setActivityCorrelations(cachedAnalysis.activity || []);
+        
+        if (cachedAnalysis.cycle) {
+          setCycleAnalysis(cachedAnalysis.cycle);
+        }
+        return;
+      }
+      
+      // Если нет кэшированных данных, используем интегрированный анализ
+      console.log('🔬 Запускаем интегрированный анализ здоровья...');
+      
       // Интеграция всех данных платформы
       const symptomEntries = JSON.parse(localStorage.getItem(`symptom_entries_${user.id}`) || '[]');
       const nutritionEntries = JSON.parse(localStorage.getItem(`nutrition_entries_${user.id}`) || '[]');
@@ -170,8 +194,11 @@ export default function CycleTracker() {
       setNutritionCorrelations(correlationResults.nutrition);
       setActivityCorrelations(correlationResults.activity);
       setCycleAnalysis(correlationResults.cycle);
+      
+      console.log('✅ Анализ корреляций завершен');
+      
     } catch (error) {
-      console.error('Error generating correlation analysis:', error);
+      console.error('❌ Ошибка анализа корреляций:', error);
     }
   };
 
@@ -325,19 +352,29 @@ export default function CycleTracker() {
               
               {activeTab === 'correlations' && (
                 <div className="space-y-4">
-                  {/* Индикатор Claude AI */}
+                  {/* Индикатор Claude AI и автоматического обновления */}
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-4">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
                           🤖
                         </div>
-                        <div>
+                        <div className="min-w-0 flex-1">
                           <div className="font-semibold text-indigo-900">Анализ с Claude AI</div>
-                          <div className="text-sm text-indigo-700">
-                            Корреляции анализируются с помощью искусственного интеллекта Claude на основе ваших данных в Supabase
+                          <div className="text-sm text-indigo-700 break-words leading-relaxed">
+                            Корреляции анализируются с помощью ИИ Claude на основе ваших данных в Supabase
                           </div>
                         </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 p-3 bg-white/70 rounded-lg border border-indigo-100">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-green-600">🕐</span>
+                        <span className="text-indigo-800 font-medium">Автоматическое обновление:</span>
+                        <span className="text-indigo-700">каждое утро в 6:00</span>
+                      </div>
+                      <div className="text-xs text-indigo-600 mt-1">
+                        Виджеты "Влияние питания", "Физическая активность" и "Персональные рекомендации" обновляются автоматически
                       </div>
                     </div>
                   </div>

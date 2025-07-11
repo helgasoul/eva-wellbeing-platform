@@ -234,10 +234,10 @@ const NutritionCorrelationCard: React.FC<{ correlation: NutritionCorrelation }> 
         {correlation.claude_insight && (
           <div className="mb-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
             <div className="flex items-start gap-2">
-              <Brain className="h-4 w-4 text-indigo-600 mt-0.5" />
-              <div>
+              <Brain className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
                 <div className="text-sm font-medium text-indigo-800">Claude AI:</div>
-                <div className="text-sm text-indigo-700">{correlation.claude_insight}</div>
+                <div className="text-sm text-indigo-700 break-words leading-relaxed">{correlation.claude_insight}</div>
               </div>
             </div>
           </div>
@@ -246,12 +246,12 @@ const NutritionCorrelationCard: React.FC<{ correlation: NutritionCorrelation }> 
         {/* Рекомендации */}
         <div className="space-y-1">
           <div className="text-sm font-medium text-gray-700">Рекомендации:</div>
-          {correlation.recommendations.slice(0, 2).map((rec, index) => (
-            <div key={index} className="flex items-start text-sm text-gray-600">
-              <span className="text-purple-500 mr-2">•</span>
-              <span>{rec}</span>
-            </div>
-          ))}
+           {correlation.recommendations.slice(0, 2).map((rec, index) => (
+             <div key={index} className="flex items-start text-sm text-gray-600">
+               <span className="text-purple-500 mr-2 flex-shrink-0">•</span>
+               <span className="break-words leading-relaxed">{rec}</span>
+             </div>
+           ))}
         </div>
       </CardContent>
     </Card>
@@ -324,10 +324,10 @@ const ActivityCorrelationCard: React.FC<{ correlation: ActivityCorrelation }> = 
         {correlation.claude_insight && (
           <div className="mb-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
             <div className="flex items-start gap-2">
-              <Brain className="h-4 w-4 text-indigo-600 mt-0.5" />
-              <div>
+              <Brain className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
                 <div className="text-sm font-medium text-indigo-800">Claude AI:</div>
-                <div className="text-sm text-indigo-700">{correlation.claude_insight}</div>
+                <div className="text-sm text-indigo-700 break-words leading-relaxed">{correlation.claude_insight}</div>
               </div>
             </div>
           </div>
@@ -429,12 +429,12 @@ const ComplexRecommendations: React.FC<{
                 {rec.items.map((item, itemIndex) => (
                   <li key={itemIndex} className="text-sm text-gray-600 flex items-start">
                     <span className={cn(
-                      "mr-2",
+                      "mr-2 flex-shrink-0",
                       rec.type === 'warning' && "text-red-500",
                       rec.type === 'success' && "text-green-500",
                       rec.type === 'info' && "text-blue-500"
                     )}>•</span>
-                    <span>{item}</span>
+                    <span className="break-words leading-relaxed">{item}</span>
                   </li>
                 ))}
               </ul>
