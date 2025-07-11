@@ -6,6 +6,7 @@ import { UserRole } from '@/types/roles';
 import { authAuditService } from './authAuditService';
 import { rateLimitService } from './rateLimitService';
 import { passwordPolicyService } from './passwordPolicyService';
+import { legacyAuthService } from './legacyAuthService';
 
 export interface AuthResponse {
   user: User | null;
@@ -153,7 +154,7 @@ class AuthService {
     }
   }
 
-  // Вход в систему
+  // Вход в систему с поддержкой JIT миграции
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       console.log('🔐 Начинаем процесс входа для:', credentials.email);
@@ -170,7 +171,7 @@ class AuthService {
         };
       }
       
-      // 1. Аутентификация в Supabase
+      // 1. Пытаемся войти через Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
@@ -179,10 +180,24 @@ class AuthService {
       if (error) {
         console.error('❌ Ошибка аутентификации Supabase:', error);
         
+        // 2. Если аутентификация в Supabase неуспешна, пытаемся JIT миграцию
+        if (error.message === 'Invalid login credentials') {
+          console.log('🔄 Пытаемся JIT миграцию для:', credentials.email);
+          
+          const migrationResult = await this.attemptJITMigration(credentials);
+          if (migrationResult.success) {
+            // Если миграция успешна, пытаемся войти снова
+            console.log('✅ JIT миграция успешна, повторная аутентификация');
+            return await this.login(credentials);
+          } else {
+            console.log('❌ JIT миграция неуспешна');
+          }
+        }
+        
         // Логируем неудачную попытку входа
         await authAuditService.logLoginAttempt(credentials.email, false, error.message);
         
-        // Если это ошибка невалидных учетных данных, показываем более понятное сообщение
+        // Показываем более понятное сообщение
         if (error.message === 'Invalid login credentials') {
           return { 
             user: null, 
@@ -454,6 +469,74 @@ class AuthService {
       }
       
       return { error: error.message || 'Ошибка обновления пароля' };
+    }
+  }
+
+  // JIT миграция пользователя
+  private async attemptJITMigration(credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Начинаем JIT миграцию для:', credentials.email);
+
+      // 1. Проверяем в legacy системе
+      const legacyAuthResult = await legacyAuthService.authenticateUser(
+        credentials.email, 
+        credentials.password
+      );
+
+      if (!legacyAuthResult.success || !legacyAuthResult.user) {
+        return { 
+          success: false, 
+          error: legacyAuthResult.error || 'Пользователь не найден в legacy системе' 
+        };
+      }
+
+      console.log('✅ Legacy аутентификация успешна, вызываем Edge Function');
+
+      // 2. Вызываем Edge Function для миграции
+      const { data: migrationResult, error: migrationError } = await supabase.functions.invoke(
+        'jit-password-migration',
+        {
+          body: {
+            email: credentials.email,
+            password: credentials.password,
+            legacyUserData: legacyAuthService.prepareMigrationData(legacyAuthResult.user)
+          }
+        }
+      );
+
+      if (migrationError) {
+        console.error('❌ Ошибка Edge Function миграции:', migrationError);
+        return { 
+          success: false, 
+          error: `Ошибка миграции: ${migrationError.message}` 
+        };
+      }
+
+      if (!migrationResult?.success) {
+        console.error('❌ Edge Function вернула ошибку:', migrationResult?.error);
+        return { 
+          success: false, 
+          error: migrationResult?.error || 'Неизвестная ошибка миграции' 
+        };
+      }
+
+      console.log('🎉 JIT миграция завершена успешно');
+
+      // 3. Очищаем legacy данные после успешной миграции
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('eva_user_data');
+        localStorage.removeItem('eva_onboarding_data');
+        console.log('🧹 Legacy данные очищены из localStorage');
+      }
+
+      return { success: true };
+
+    } catch (error: any) {
+      console.error('💥 Критическая ошибка JIT миграции:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Неизвестная ошибка миграции' 
+      };
     }
   }
 

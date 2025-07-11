@@ -20,6 +20,7 @@ export const LoginForm = () => {
   const [showMigrationForm, setShowMigrationForm] = useState(false);
   const [migrationPassword, setMigrationPassword] = useState('');
   const [isMigrating, setIsMigrating] = useState(false);
+  const [isJITMigrating, setIsJITMigrating] = useState(false);
   const { login, isLoading, error } = useAuth();
   const { toast } = useToast();
 
@@ -42,19 +43,29 @@ export const LoginForm = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
+      setIsJITMigrating(true);
+      
       await login({
         email: data.email,
         password: data.password,
         rememberMe: data.rememberMe,
       });
+      
+      setIsJITMigrating(false);
     } catch (error: any) {
-      // Check for localStorage data that needs migration
+      setIsJITMigrating(false);
+      
+      // Проверяем legacy данные для fallback миграции через UI
       const localUser = localStorage.getItem('eva_user_data');
-      if (localUser && error.message === 'Invalid login credentials') {
-        const userData = JSON.parse(localUser);
-        if (userData.email === data.email) {
-          setShowMigrationForm(true);
-          return;
+      if (localUser && error.message?.includes('Неверный email или пароль')) {
+        try {
+          const userData = JSON.parse(localUser);
+          if (userData.email === data.email) {
+            setShowMigrationForm(true);
+            return;
+          }
+        } catch (parseError) {
+          console.warn('Не удалось парсить legacy данные:', parseError);
         }
       }
       console.error('Login error:', error);
@@ -119,6 +130,14 @@ export const LoginForm = () => {
       {error && (
         <div className="mb-6">
           <ErrorMessage message={error} />
+        </div>
+      )}
+
+      {isJITMigrating && (
+        <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+          <p className="text-sm text-primary text-center">
+            🔄 Мигрируем ваш аккаунт в новую систему...
+          </p>
         </div>
       )}
 
@@ -187,11 +206,18 @@ export const LoginForm = () => {
 
         <Button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || isJITMigrating}
           className="bloom-button w-full flex items-center justify-center space-x-2"
         >
-          {isLoading && <LoadingSpinner size="sm" />}
-          <span>{isLoading ? 'Входим...' : 'Войти'}</span>
+          {(isLoading || isJITMigrating) && <LoadingSpinner size="sm" />}
+          <span>
+            {isJITMigrating 
+              ? 'Миграция аккаунта...' 
+              : isLoading 
+                ? 'Входим...' 
+                : 'Войти'
+            }
+          </span>
         </Button>
       </form>
 
