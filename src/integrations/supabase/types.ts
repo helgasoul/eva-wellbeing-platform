@@ -1054,6 +1054,60 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_nutrition_plans: {
+        Row: {
+          analysis_session_id: string | null
+          calorie_target: number | null
+          created_at: string
+          dietary_restrictions: Json | null
+          generated_at: string | null
+          id: string
+          is_generated: boolean | null
+          macro_targets: Json | null
+          meal_plan: Json
+          nutritional_goals: Json | null
+          personalization_factors: Json | null
+          plan_date: string
+          subscription_tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_session_id?: string | null
+          calorie_target?: number | null
+          created_at?: string
+          dietary_restrictions?: Json | null
+          generated_at?: string | null
+          id?: string
+          is_generated?: boolean | null
+          macro_targets?: Json | null
+          meal_plan?: Json
+          nutritional_goals?: Json | null
+          personalization_factors?: Json | null
+          plan_date: string
+          subscription_tier: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_session_id?: string | null
+          calorie_target?: number | null
+          created_at?: string
+          dietary_restrictions?: Json | null
+          generated_at?: string | null
+          id?: string
+          is_generated?: boolean | null
+          macro_targets?: Json | null
+          meal_plan?: Json
+          nutritional_goals?: Json | null
+          personalization_factors?: Json | null
+          plan_date?: string
+          subscription_tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_weather_records: {
         Row: {
           created_at: string

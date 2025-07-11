@@ -33,6 +33,10 @@ serve(async (req) => {
     
     console.log(`Starting daily analysis for user ${userId} on ${targetDate}`);
 
+    // Проверяем подписку пользователя
+    const userSubscription = await getUserSubscription(userId);
+    const hasNutritionPlanAccess = userSubscription && ['plus', 'optimum'].includes(userSubscription.plan_id);
+
     // Создаем сессию анализа
     const { data: session, error: sessionError } = await supabase
       .from('ai_analysis_sessions')
@@ -56,11 +60,20 @@ serve(async (req) => {
     // Собираем данные за день
     const healthData = await collectDailyHealthData(userId, targetDate);
     
+    // Получаем профиль пользователя для персонализации
+    const userProfile = await getUserProfile(userId);
+    
     // Выполняем анализ с Claude
-    const analysisResult = await performClaudeAnalysis(healthData);
+    const analysisResult = await performClaudeAnalysis(healthData, userProfile, userSubscription);
     
     // Сохраняем результаты
     await saveAnalysisResults(session.id, userId, analysisResult, healthData);
+    
+    // Генерируем и сохраняем план питания для Plus/Optimum подписчиков
+    let nutritionPlanId = null;
+    if (hasNutritionPlanAccess && analysisResult.nutritionPlan) {
+      nutritionPlanId = await saveNutritionPlan(userId, session.id, targetDate, analysisResult.nutritionPlan, userSubscription.plan_id);
+    }
     
     // Обновляем статус сессии
     await supabase
@@ -76,12 +89,14 @@ serve(async (req) => {
       .eq('id', session.id);
 
     // Send push notification about new insights
-    await sendDailyInsightNotification(userId, analysisResult);
+    await sendDailyInsightNotification(userId, analysisResult, hasNutritionPlanAccess);
 
     return new Response(JSON.stringify({
       success: true,
       sessionId: session.id,
-      summary: analysisResult.summary
+      summary: analysisResult.summary,
+      hasNutritionPlan: !!nutritionPlanId,
+      nutritionPlanId: nutritionPlanId
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -162,15 +177,22 @@ async function collectDailyHealthData(userId: string, date: string): Promise<Dai
   };
 }
 
-async function performClaudeAnalysis(healthData: DailyHealthData): Promise<any> {
+async function performClaudeAnalysis(healthData: DailyHealthData, userProfile: any, userSubscription: any): Promise<any> {
   const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
   
   if (!anthropicApiKey) {
     throw new Error('ANTHROPIC_API_KEY не настроен');
   }
 
+  const hasNutritionPlanAccess = userSubscription && ['plus', 'optimum'].includes(userSubscription.plan_id);
+  
   const analysisPrompt = `
 Проанализируй данные о здоровье пользователя за ${healthData.date}:
+
+ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ:
+${JSON.stringify(userProfile, null, 2)}
+
+ПОДПИСКА: ${userSubscription?.plan_id || 'essential'}
 
 СИМПТОМЫ:
 ${JSON.stringify(healthData.symptoms, null, 2)}
@@ -197,6 +219,15 @@ ${JSON.stringify(healthData.weather, null, 2)}
 4. Области, требующие внимания
 5. Оценку качества данных (0-1)
 6. Краткое резюме дня
+${hasNutritionPlanAccess ? `
+7. ПЕРСОНАЛИЗИРОВАННЫЙ ПЛАН ПИТАНИЯ на завтра (только для подписок Plus/Optimum):
+   - Завтрак, обед, ужин и 2 перекуса
+   - Учти симптомы, циклические изменения, погоду
+   - Включи калории, макронутриенты для каждого приема пищи
+   - Добавь советы по приготовлению и заменам
+   - Учти диетические ограничения из профиля
+   - Сфокусируйся на улучшении выявленных симптомов
+` : ''}
 
 Ответ представь в JSON формате с полями:
 - keyFindings (массив ключевых находок)
@@ -207,6 +238,17 @@ ${JSON.stringify(healthData.weather, null, 2)}
 - confidence (уверенность в анализе 0-1)
 - dataQuality (качество данных 0-1)
 - summary (краткое резюме)
+${hasNutritionPlanAccess ? `
+- nutritionPlan (объект с полями):
+  - dailyCalories (общая калорийность)
+  - macroTargets (белки, жиры, углеводы в граммах)
+  - meals (массив с завтраком, обедом, ужином)
+  - snacks (массив из 2 перекусов)
+  - hydrationGoal (цель по воде в мл)
+  - specialConsiderations (особые рекомендации)
+  - shoppingList (список покупок)
+  - preparationTips (советы по приготовлению)
+` : ''}
 `;
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -219,7 +261,7 @@ ${JSON.stringify(healthData.weather, null, 2)}
     },
     body: JSON.stringify({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4000,
+      max_tokens: hasNutritionPlanAccess ? 6000 : 4000,
       temperature: 0.3,
       messages: [
         {
@@ -241,6 +283,7 @@ ${JSON.stringify(healthData.weather, null, 2)}
   try {
     return JSON.parse(responseText);
   } catch (parseError) {
+    console.error('Failed to parse Claude response:', parseError);
     // Если не удалось парсить JSON, возвращаем структурированный ответ
     return {
       keyFindings: [responseText.substring(0, 500)],
@@ -308,7 +351,7 @@ async function saveAnalysisResults(sessionId: string, userId: string, analysis: 
   }
 }
 
-async function sendDailyInsightNotification(userId: string, analysisResult: any) {
+async function sendDailyInsightNotification(userId: string, analysisResult: any, hasNutritionPlan: boolean = false) {
   try {
     // Check if user has notification preferences
     const { data: preferences } = await supabase
@@ -324,21 +367,24 @@ async function sendDailyInsightNotification(userId: string, analysisResult: any)
 
     // Create notification payload
     const notification = {
-      title: '🌟 Новые инсайты о вашем здоровье',
-      body: analysisResult.summary?.substring(0, 100) + '...' || 'Проанализированы ваши данные за сегодня',
-      icon: '/icons/insight-icon.png',
+      title: hasNutritionPlan ? '🍽️ Ваш персональный план питания готов!' : '🌟 Новые инсайты о вашем здоровье',
+      body: hasNutritionPlan 
+        ? 'Новый план питания составлен с учетом ваших данных за сегодня' 
+        : analysisResult.summary?.substring(0, 100) + '...' || 'Проанализированы ваши данные за сегодня',
+      icon: hasNutritionPlan ? '/icons/nutrition-icon.png' : '/icons/insight-icon.png',
       badge: '/icons/badge-72x72.png',
-      url: '/patient/ai-chat',
+      url: hasNutritionPlan ? '/patient/nutrition' : '/patient/ai-chat',
       data: {
-        type: 'daily_insight',
+        type: hasNutritionPlan ? 'nutrition_plan' : 'daily_insight',
         analysisDate: new Date().toISOString().split('T')[0],
         hasRecommendations: analysisResult.recommendations?.length > 0 || false,
-        keyFindingsCount: analysisResult.keyFindings?.length || 0
+        keyFindingsCount: analysisResult.keyFindings?.length || 0,
+        hasNutritionPlan: hasNutritionPlan
       },
       actions: [
         {
           action: 'view',
-          title: 'Посмотреть анализ'
+          title: hasNutritionPlan ? 'Посмотреть план' : 'Посмотреть анализ'
         },
         {
           action: 'dismiss',
@@ -363,5 +409,88 @@ async function sendDailyInsightNotification(userId: string, analysisResult: any)
 
   } catch (error) {
     console.error('Error in sendDailyInsightNotification:', error);
+  }
+}
+
+async function getUserSubscription(userId: string) {
+  try {
+    const { data: subscription } = await supabase
+      .from('user_subscriptions')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .single();
+    
+    return subscription;
+  } catch (error) {
+    console.error('Error getting user subscription:', error);
+    return null;
+  }
+}
+
+async function getUserProfile(userId: string) {
+  try {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select(`
+        *,
+        onboarding_data,
+        dietary_restrictions,
+        health_goals,
+        lifestyle_data
+      `)
+      .eq('id', userId)
+      .single();
+    
+    return profile;
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    return null;
+  }
+}
+
+async function saveNutritionPlan(userId: string, sessionId: string, planDate: string, nutritionPlan: any, subscriptionTier: string): Promise<string | null> {
+  try {
+    // Рассчитываем дату на завтра для плана
+    const tomorrow = new Date(planDate);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('daily_nutrition_plans')
+      .insert({
+        user_id: userId,
+        analysis_session_id: sessionId,
+        plan_date: tomorrowStr,
+        subscription_tier: subscriptionTier,
+        meal_plan: nutritionPlan.meals || [],
+        nutritional_goals: {
+          dailyCalories: nutritionPlan.dailyCalories,
+          macroTargets: nutritionPlan.macroTargets,
+          hydrationGoal: nutritionPlan.hydrationGoal
+        },
+        dietary_restrictions: [],
+        calorie_target: nutritionPlan.dailyCalories,
+        macro_targets: nutritionPlan.macroTargets,
+        personalization_factors: {
+          specialConsiderations: nutritionPlan.specialConsiderations,
+          shoppingList: nutritionPlan.shoppingList,
+          preparationTips: nutritionPlan.preparationTips,
+          snacks: nutritionPlan.snacks
+        }
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Error saving nutrition plan:', error);
+      return null;
+    }
+
+    console.log(`Nutrition plan saved for user ${userId} with ID: ${data.id}`);
+    return data.id;
+  } catch (error) {
+    console.error('Error in saveNutritionPlan:', error);
+    return null;
   }
 }
