@@ -56,7 +56,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
                 {role.icon === 'bloom' ? (
                   <img src={bloomIcon} alt="Bloom" className="h-6 w-6" />
                 ) : (
-                  <role.icon className="h-6 w-6 text-white" />
+                  <role.icon className="h-6 w-6 text-eva-dusty-rose" />
                 )}
               </div>
                <div className="flex-1">
