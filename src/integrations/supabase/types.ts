@@ -3879,6 +3879,139 @@ export type Database = {
         }
         Relationships: []
       }
+      integration_audit_logs: {
+        Row: {
+          compliance_check_passed: boolean | null
+          created_at: string | null
+          data_quality_score: number | null
+          endpoint_called: string | null
+          error_message: string | null
+          id: string
+          operation_type: string
+          partner_id: string
+          processing_time_ms: number | null
+          records_processed: number | null
+          request_payload: Json | null
+          response_payload: Json | null
+          status_code: number | null
+          user_id: string | null
+        }
+        Insert: {
+          compliance_check_passed?: boolean | null
+          created_at?: string | null
+          data_quality_score?: number | null
+          endpoint_called?: string | null
+          error_message?: string | null
+          id?: string
+          operation_type: string
+          partner_id: string
+          processing_time_ms?: number | null
+          records_processed?: number | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          status_code?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          compliance_check_passed?: boolean | null
+          created_at?: string | null
+          data_quality_score?: number | null
+          endpoint_called?: string | null
+          error_message?: string | null
+          id?: string
+          operation_type?: string
+          partner_id?: string
+          processing_time_ms?: number | null
+          records_processed?: number | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          status_code?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_audit_logs_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "medical_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_orders: {
+        Row: {
+          clinical_notes: string | null
+          created_at: string | null
+          diagnosis_codes: string[] | null
+          external_order_id: string | null
+          hl7_message: string | null
+          id: string
+          integration_metadata: Json | null
+          order_number: string
+          order_status: string | null
+          ordered_tests: Json
+          ordering_provider_name: string | null
+          ordering_provider_npi: string | null
+          partner_id: string
+          patient_demographics: Json
+          priority_level: string | null
+          specimen_collection_date: string | null
+          specimen_collection_site: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          clinical_notes?: string | null
+          created_at?: string | null
+          diagnosis_codes?: string[] | null
+          external_order_id?: string | null
+          hl7_message?: string | null
+          id?: string
+          integration_metadata?: Json | null
+          order_number: string
+          order_status?: string | null
+          ordered_tests?: Json
+          ordering_provider_name?: string | null
+          ordering_provider_npi?: string | null
+          partner_id: string
+          patient_demographics: Json
+          priority_level?: string | null
+          specimen_collection_date?: string | null
+          specimen_collection_site?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          clinical_notes?: string | null
+          created_at?: string | null
+          diagnosis_codes?: string[] | null
+          external_order_id?: string | null
+          hl7_message?: string | null
+          id?: string
+          integration_metadata?: Json | null
+          order_number?: string
+          order_status?: string | null
+          ordered_tests?: Json
+          ordering_provider_name?: string | null
+          ordering_provider_npi?: string | null
+          partner_id?: string
+          patient_demographics?: Json
+          priority_level?: string | null
+          specimen_collection_date?: string | null
+          specimen_collection_site?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_orders_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "medical_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_results: {
         Row: {
           created_at: string | null
@@ -4033,6 +4166,71 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "lab_tests_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "medical_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_tests_catalog: {
+        Row: {
+          cost: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          loinc_code: string | null
+          methodology: string | null
+          normal_ranges: Json | null
+          partner_id: string | null
+          snomed_code: string | null
+          specimen_type: string
+          test_category: string
+          test_code: string
+          test_name: string
+          turnaround_time_hours: number | null
+          units: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          loinc_code?: string | null
+          methodology?: string | null
+          normal_ranges?: Json | null
+          partner_id?: string | null
+          snomed_code?: string | null
+          specimen_type: string
+          test_category: string
+          test_code: string
+          test_name: string
+          turnaround_time_hours?: number | null
+          units?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          loinc_code?: string | null
+          methodology?: string | null
+          normal_ranges?: Json | null
+          partner_id?: string | null
+          snomed_code?: string | null
+          specimen_type?: string
+          test_category?: string
+          test_code?: string
+          test_name?: string
+          turnaround_time_hours?: number | null
+          units?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_tests_catalog_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "medical_partners"
@@ -4259,6 +4457,62 @@ export type Database = {
         }
         Relationships: []
       }
+      medical_data_mappings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          data_type: string
+          id: string
+          is_active: boolean | null
+          mapping_rules: Json | null
+          partner_id: string
+          source_field: string
+          source_system: string
+          target_field: string
+          transformation_logic: string | null
+          updated_at: string | null
+          validation_rules: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          data_type: string
+          id?: string
+          is_active?: boolean | null
+          mapping_rules?: Json | null
+          partner_id: string
+          source_field: string
+          source_system: string
+          target_field: string
+          transformation_logic?: string | null
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          data_type?: string
+          id?: string
+          is_active?: boolean | null
+          mapping_rules?: Json | null
+          partner_id?: string
+          source_field?: string
+          source_system?: string
+          target_field?: string
+          transformation_logic?: string | null
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_data_mappings_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "medical_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_events: {
         Row: {
           attached_files: Json | null
@@ -4461,12 +4715,20 @@ export type Database = {
           api_version: string | null
           appointment_booking_available: boolean | null
           available_services: Json
+          certification_details: Json | null
+          compliance_standards: string[] | null
           coordinates: unknown | null
           created_at: string
+          data_retention_days: number | null
+          data_standards_supported: string[] | null
           email: string | null
+          fhir_endpoint: string | null
+          hl7_endpoint: string | null
           id: string
+          integration_capabilities: Json | null
           integration_status: string | null
           last_sync: string | null
+          last_sync_at: string | null
           legal_entity: string | null
           license_number: string | null
           online_results_available: boolean | null
@@ -4477,6 +4739,7 @@ export type Database = {
           quality_rating: number | null
           service_areas: Json | null
           specializations: Json
+          sync_frequency: string | null
           telemedicine_available: boolean | null
           updated_at: string
           website: string | null
@@ -4490,12 +4753,20 @@ export type Database = {
           api_version?: string | null
           appointment_booking_available?: boolean | null
           available_services?: Json
+          certification_details?: Json | null
+          compliance_standards?: string[] | null
           coordinates?: unknown | null
           created_at?: string
+          data_retention_days?: number | null
+          data_standards_supported?: string[] | null
           email?: string | null
+          fhir_endpoint?: string | null
+          hl7_endpoint?: string | null
           id?: string
+          integration_capabilities?: Json | null
           integration_status?: string | null
           last_sync?: string | null
+          last_sync_at?: string | null
           legal_entity?: string | null
           license_number?: string | null
           online_results_available?: boolean | null
@@ -4506,6 +4777,7 @@ export type Database = {
           quality_rating?: number | null
           service_areas?: Json | null
           specializations?: Json
+          sync_frequency?: string | null
           telemedicine_available?: boolean | null
           updated_at?: string
           website?: string | null
@@ -4519,12 +4791,20 @@ export type Database = {
           api_version?: string | null
           appointment_booking_available?: boolean | null
           available_services?: Json
+          certification_details?: Json | null
+          compliance_standards?: string[] | null
           coordinates?: unknown | null
           created_at?: string
+          data_retention_days?: number | null
+          data_standards_supported?: string[] | null
           email?: string | null
+          fhir_endpoint?: string | null
+          hl7_endpoint?: string | null
           id?: string
+          integration_capabilities?: Json | null
           integration_status?: string | null
           last_sync?: string | null
+          last_sync_at?: string | null
           legal_entity?: string | null
           license_number?: string | null
           online_results_available?: boolean | null
@@ -4535,6 +4815,7 @@ export type Database = {
           quality_rating?: number | null
           service_areas?: Json | null
           specializations?: Json
+          sync_frequency?: string | null
           telemedicine_available?: boolean | null
           updated_at?: string
           website?: string | null
@@ -5306,6 +5587,74 @@ export type Database = {
           verified_by?: string | null
         }
         Relationships: []
+      }
+      partner_api_configurations: {
+        Row: {
+          api_key_encrypted: string | null
+          api_type: string
+          authentication_method: string
+          base_url: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_tested_at: string | null
+          oauth_config: Json | null
+          partner_id: string
+          rate_limits: Json | null
+          retry_config: Json | null
+          supported_formats: string[] | null
+          test_results: Json | null
+          timeout_seconds: number | null
+          updated_at: string | null
+          webhook_endpoints: Json | null
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          api_type: string
+          authentication_method: string
+          base_url: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_tested_at?: string | null
+          oauth_config?: Json | null
+          partner_id: string
+          rate_limits?: Json | null
+          retry_config?: Json | null
+          supported_formats?: string[] | null
+          test_results?: Json | null
+          timeout_seconds?: number | null
+          updated_at?: string | null
+          webhook_endpoints?: Json | null
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          api_type?: string
+          authentication_method?: string
+          base_url?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_tested_at?: string | null
+          oauth_config?: Json | null
+          partner_id?: string
+          rate_limits?: Json | null
+          retry_config?: Json | null
+          supported_formats?: string[] | null
+          test_results?: Json | null
+          timeout_seconds?: number | null
+          updated_at?: string | null
+          webhook_endpoints?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_api_configurations_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "medical_partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       partner_doctors: {
         Row: {
