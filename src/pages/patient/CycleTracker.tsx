@@ -362,7 +362,7 @@ export default function CycleTracker() {
                         <div className="min-w-0 flex-1">
                           <div className="font-semibold text-indigo-900">Анализ с Claude AI</div>
                           <div className="text-sm text-indigo-700 break-words leading-relaxed">
-                            Корреляции анализируются с помощью ИИ Claude на основе ваших данных в Supabase
+                            Корреляции анализируются с помощью искусственного интеллекта на основе ваших данных
                           </div>
                         </div>
                       </div>
