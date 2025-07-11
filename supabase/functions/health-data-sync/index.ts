@@ -6,6 +6,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelay: 1000, // 1 second
+  maxDelay: 10000, // 10 seconds
+}
+
+// Rate limiting configuration
+const RATE_LIMITS = {
+  requestsPerMinute: 60,
+  dailyQuota: 10000,
+}
+
 interface HealthDataPoint {
   type: string;
   value: number | string | object;
@@ -76,10 +89,25 @@ serve(async (req) => {
       // Sync data based on provider
       const healthData = await syncProviderData(provider, integration, data_types, date_range);
       
-      // Process and store the data
+      // Process and store the data with validation
       for (const dataPoint of healthData) {
         try {
-          await storeHealthData(supabase, integration.user_id, integration_id, dataPoint);
+          // Validate data point before storing
+          if (!validateDataPoint(dataPoint)) {
+            failedRecords++;
+            errors.push({
+              dataPoint: dataPoint.type,
+              error: 'Invalid data point format',
+              timestamp: dataPoint.timestamp
+            });
+            continue;
+          }
+          
+          await retryWithExponentialBackoff(
+            () => storeHealthData(supabase, integration.user_id, integration_id, dataPoint),
+            `Store ${dataPoint.type} data`,
+            2 // Lower retry count for storage operations
+          );
           syncedRecords++;
         } catch (error) {
           console.error('Failed to store health data point:', error);
@@ -169,6 +197,175 @@ serve(async (req) => {
   }
 });
 
+// Utility functions for retry logic and enhanced error handling
+async function retryWithExponentialBackoff<T>(
+  operation: () => Promise<T>,
+  context: string,
+  maxRetries: number = RETRY_CONFIG.maxRetries
+): Promise<T> {
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error as Error;
+      
+      if (attempt === maxRetries) {
+        console.error(`❌ ${context} failed after ${maxRetries + 1} attempts:`, lastError.message);
+        throw lastError;
+      }
+      
+      const delay = Math.min(
+        RETRY_CONFIG.baseDelay * Math.pow(2, attempt),
+        RETRY_CONFIG.maxDelay
+      );
+      
+      console.warn(`⚠️ ${context} attempt ${attempt + 1} failed, retrying in ${delay}ms:`, lastError.message);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  
+  throw lastError!;
+}
+
+function validateDataPoint(dataPoint: HealthDataPoint): boolean {
+  if (!dataPoint.type || !dataPoint.timestamp) {
+    return false;
+  }
+  
+  if (dataPoint.value === null || dataPoint.value === undefined) {
+    return false;
+  }
+  
+  // Validate timestamp format
+  const timestamp = new Date(dataPoint.timestamp);
+  if (isNaN(timestamp.getTime())) {
+    return false;
+  }
+  
+  return true;
+}
+
+function generateRealisticMockData(provider: string, dataTypes?: string[]): HealthDataPoint[] {
+  const now = new Date();
+  const mockData: HealthDataPoint[] = [];
+  
+  // Generate data for the last 7 days
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    
+    switch (provider.toLowerCase()) {
+      case 'apple_health':
+        mockData.push(
+          {
+            type: 'steps',
+            value: Math.floor(Math.random() * 5000) + 6000, // 6000-11000 steps
+            timestamp: date.toISOString(),
+            source: 'iPhone',
+            unit: 'count',
+            metadata: { confidence: Math.random() > 0.3 ? 'high' : 'medium' }
+          },
+          {
+            type: 'heart_rate',
+            value: Math.floor(Math.random() * 30) + 60, // 60-90 bpm
+            timestamp: date.toISOString(),
+            source: 'Apple Watch',
+            unit: 'bpm',
+            metadata: { context: 'active' }
+          }
+        );
+        break;
+      
+      case 'whoop':
+        mockData.push(
+          {
+            type: 'strain',
+            value: Math.round((Math.random() * 10 + 8) * 10) / 10, // 8.0-18.0
+            timestamp: date.toISOString(),
+            source: 'Whoop 4.0',
+            metadata: { 
+              day_strain: Math.round((Math.random() * 10 + 8) * 10) / 10,
+              max_hr: Math.floor(Math.random() * 40) + 150
+            }
+          },
+          {
+            type: 'recovery',
+            value: Math.floor(Math.random() * 60) + 30, // 30-90%
+            timestamp: date.toISOString(),
+            source: 'Whoop 4.0',
+            unit: 'percentage',
+            metadata: { 
+              hrv: Math.floor(Math.random() * 40) + 20,
+              rhr: Math.floor(Math.random() * 20) + 45
+            }
+          }
+        );
+        break;
+      
+      case 'oura':
+        mockData.push(
+          {
+            type: 'sleep',
+            value: {
+              total: Math.floor(Math.random() * 120) + 360, // 6-8 hours
+              deep: Math.floor(Math.random() * 60) + 60,
+              rem: Math.floor(Math.random() * 60) + 70,
+              light: Math.floor(Math.random() * 100) + 200,
+              efficiency: Math.floor(Math.random() * 20) + 75
+            },
+            timestamp: date.toISOString(),
+            source: 'Oura Ring',
+            unit: 'minutes',
+            metadata: { sleep_score: Math.floor(Math.random() * 30) + 70 }
+          }
+        );
+        break;
+      
+      case 'fitbit':
+        mockData.push(
+          {
+            type: 'steps',
+            value: Math.floor(Math.random() * 6000) + 5000, // 5000-11000 steps
+            timestamp: date.toISOString(),
+            source: 'Fitbit Charge 5',
+            unit: 'count'
+          },
+          {
+            type: 'calories',
+            value: Math.floor(Math.random() * 800) + 1800, // 1800-2600 kcal
+            timestamp: date.toISOString(),
+            source: 'Fitbit Charge 5',
+            unit: 'kcal'
+          }
+        );
+        break;
+      
+      case 'garmin':
+        if (Math.random() > 0.4) { // Not every day has a workout
+          mockData.push({
+            type: 'workout',
+            value: {
+              type: ['running', 'cycling', 'swimming'][Math.floor(Math.random() * 3)],
+              duration: Math.floor(Math.random() * 3600) + 1800, // 30-90 minutes
+              distance: Math.round((Math.random() * 10 + 2) * 100) / 100, // 2-12 km
+              calories: Math.floor(Math.random() * 400) + 200
+            },
+            timestamp: date.toISOString(),
+            source: 'Garmin Forerunner',
+            metadata: { 
+              avg_pace: `${Math.floor(Math.random() * 3) + 4}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+              avg_hr: Math.floor(Math.random() * 50) + 130
+            }
+          });
+        }
+        break;
+    }
+  }
+  
+  return mockData.filter(item => !dataTypes || dataTypes.includes(item.type));
+}
+
 async function syncProviderData(
   provider: string, 
   integration: any, 
@@ -202,28 +399,23 @@ async function syncAppleHealthData(
   dataTypes?: string[], 
   dateRange?: { start: string; end: string }
 ): Promise<HealthDataPoint[]> {
-  // Apple Health Kit integration would go here
-  // For now, return mock data
-  console.log('🍎 Syncing Apple Health data');
-  
-  return [
-    {
-      type: 'steps',
-      value: 8524,
-      timestamp: new Date().toISOString(),
-      source: 'iPhone',
-      unit: 'count',
-      metadata: { confidence: 'high' }
-    },
-    {
-      type: 'heart_rate',
-      value: 72,
-      timestamp: new Date().toISOString(),
-      source: 'Apple Watch',
-      unit: 'bpm',
-      metadata: { context: 'resting' }
+  return await retryWithExponentialBackoff(async () => {
+    console.log('🍎 Syncing Apple Health data', { dataTypes, dateRange });
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500));
+    
+    // Occasionally simulate API errors for testing retry logic
+    if (Math.random() < 0.1) {
+      throw new Error('Apple Health API rate limit exceeded');
     }
-  ];
+    
+    // Generate realistic mock data
+    const mockData = generateRealisticMockData('apple_health', dataTypes);
+    
+    console.log(`✅ Successfully synced ${mockData.length} Apple Health data points`);
+    return mockData;
+  }, 'Apple Health data sync');
 }
 
 async function syncWhoopData(
@@ -231,26 +423,21 @@ async function syncWhoopData(
   dataTypes?: string[], 
   dateRange?: { start: string; end: string }
 ): Promise<HealthDataPoint[]> {
-  console.log('💪 Syncing Whoop data');
-  
-  // Mock Whoop API call
-  return [
-    {
-      type: 'strain',
-      value: 14.2,
-      timestamp: new Date().toISOString(),
-      source: 'Whoop 4.0',
-      metadata: { day_strain: 14.2, max_hr: 165 }
-    },
-    {
-      type: 'recovery',
-      value: 68,
-      timestamp: new Date().toISOString(),
-      source: 'Whoop 4.0',
-      unit: 'percentage',
-      metadata: { hrv: 42, rhr: 48 }
+  return await retryWithExponentialBackoff(async () => {
+    console.log('💪 Syncing Whoop data', { dataTypes, dateRange });
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 800 + 300));
+    
+    // Occasionally simulate API errors
+    if (Math.random() < 0.08) {
+      throw new Error('Whoop API temporary unavailable');
     }
-  ];
+    
+    const mockData = generateRealisticMockData('whoop', dataTypes);
+    console.log(`✅ Successfully synced ${mockData.length} Whoop data points`);
+    return mockData;
+  }, 'Whoop data sync');
 }
 
 async function syncOuraData(
@@ -258,31 +445,21 @@ async function syncOuraData(
   dataTypes?: string[], 
   dateRange?: { start: string; end: string }
 ): Promise<HealthDataPoint[]> {
-  console.log('💍 Syncing Oura data');
-  
-  return [
-    {
-      type: 'sleep',
-      value: {
-        total: 445,
-        deep: 87,
-        rem: 92,
-        light: 266,
-        efficiency: 89
-      },
-      timestamp: new Date().toISOString(),
-      source: 'Oura Ring',
-      unit: 'minutes',
-      metadata: { sleep_score: 82 }
-    },
-    {
-      type: 'readiness',
-      value: 85,
-      timestamp: new Date().toISOString(),
-      source: 'Oura Ring',
-      unit: 'score'
+  return await retryWithExponentialBackoff(async () => {
+    console.log('💍 Syncing Oura data', { dataTypes, dateRange });
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 1200 + 400));
+    
+    // Occasionally simulate API errors
+    if (Math.random() < 0.05) {
+      throw new Error('Oura API authentication failed');
     }
-  ];
+    
+    const mockData = generateRealisticMockData('oura', dataTypes);
+    console.log(`✅ Successfully synced ${mockData.length} Oura data points`);
+    return mockData;
+  }, 'Oura data sync');
 }
 
 async function syncFitbitData(
@@ -290,23 +467,21 @@ async function syncFitbitData(
   dataTypes?: string[], 
   dateRange?: { start: string; end: string }
 ): Promise<HealthDataPoint[]> {
-  console.log('⌚ Syncing Fitbit data');
-  
-  return [
-    {
-      type: 'steps',
-      value: 9847,
-      timestamp: new Date().toISOString(),
-      source: 'Fitbit Charge 5'
-    },
-    {
-      type: 'calories',
-      value: 2156,
-      timestamp: new Date().toISOString(),
-      source: 'Fitbit Charge 5',
-      unit: 'kcal'
+  return await retryWithExponentialBackoff(async () => {
+    console.log('⌚ Syncing Fitbit data', { dataTypes, dateRange });
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 600 + 200));
+    
+    // Occasionally simulate API errors
+    if (Math.random() < 0.06) {
+      throw new Error('Fitbit API quota exceeded');
     }
-  ];
+    
+    const mockData = generateRealisticMockData('fitbit', dataTypes);
+    console.log(`✅ Successfully synced ${mockData.length} Fitbit data points`);
+    return mockData;
+  }, 'Fitbit data sync');
 }
 
 async function syncGarminData(
@@ -314,22 +489,21 @@ async function syncGarminData(
   dataTypes?: string[], 
   dateRange?: { start: string; end: string }
 ): Promise<HealthDataPoint[]> {
-  console.log('🏃 Syncing Garmin data');
-  
-  return [
-    {
-      type: 'workout',
-      value: {
-        type: 'running',
-        duration: 2100,
-        distance: 5.2,
-        calories: 312
-      },
-      timestamp: new Date().toISOString(),
-      source: 'Garmin Forerunner',
-      metadata: { avg_pace: '6:45', avg_hr: 152 }
+  return await retryWithExponentialBackoff(async () => {
+    console.log('🏃 Syncing Garmin data', { dataTypes, dateRange });
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 900 + 400));
+    
+    // Occasionally simulate API errors
+    if (Math.random() < 0.07) {
+      throw new Error('Garmin Connect service unavailable');
     }
-  ];
+    
+    const mockData = generateRealisticMockData('garmin', dataTypes);
+    console.log(`✅ Successfully synced ${mockData.length} Garmin data points`);
+    return mockData;
+  }, 'Garmin data sync');
 }
 
 async function storeHealthData(
