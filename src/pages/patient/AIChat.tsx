@@ -9,6 +9,7 @@ import { ClaudeChatService, UserLimitStatus } from '@/services/claudeChatService
 import { LimitStatusBar } from '@/components/ai-chat/LimitStatusBar';
 import { ChatInterface } from '@/components/ai-chat/ChatInterface';
 import { DailyAnalysisPanel } from '@/components/ai-chat/DailyAnalysisPanel';
+import { MonthlyAnalysisPanel } from '@/components/ai-chat/MonthlyAnalysisPanel';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -299,6 +300,9 @@ const AIChat: React.FC = () => {
 
         {/* Панель ежедневного анализа */}
         <DailyAnalysisPanel />
+
+        {/* Панель ежемесячного анализа */}
+        <MonthlyAnalysisPanel />
 
         {/* Чат интерфейс */}
         <ChatInterface

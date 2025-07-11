@@ -9,3 +9,6 @@ enable_signup = true
 
 [functions.daily-health-analysis]
 verify_jwt = false
+
+[functions.monthly-health-analysis]
+verify_jwt = false
