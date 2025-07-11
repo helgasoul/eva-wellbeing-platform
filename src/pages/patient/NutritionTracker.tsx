@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 export default function NutritionTracker() {
-  const { user } = useAuth();
+  const { user, saveUserData } = useAuth();
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [entries, setEntries] = useState<FoodEntry[]>([]);
@@ -113,6 +113,11 @@ export default function NutritionTracker() {
       setEntries(updatedEntries);
       setCurrentEntry(entry);
       setIsEditing(false);
+
+      // Синхронизируем с DataBridge
+      if (saveUserData) {
+        await saveUserData('nutrition_entries', updatedEntries);
+      }
 
       // Сохраняем в localStorage как резервную копию
       localStorage.setItem(`nutrition_entries_${user.id}`, JSON.stringify(updatedEntries));

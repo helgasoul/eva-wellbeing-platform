@@ -122,39 +122,36 @@ const SymptomTracker: React.FC = () => {
     
     setIsLoading(true);
     try {
-      console.log('🔄 SymptomTracker: Сохранение новой записи...');
+      console.log('🔄 SymptomTracker: Сохранение записи в Supabase...');
 
-      // Создать новую запись с уникальным ID
-      const newEntry: SymptomEntry = {
-        id: generateId(),
-        user_id: user.id,
-        ...entryData,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+      // Сначала сохраняем в Supabase
+      const savedEntry = await healthDataService.saveSymptomEntry(user.id, entryData);
+      
+      if (!savedEntry) {
+        throw new Error('Не удалось сохранить в Supabase');
+      }
 
-      // Обновить локальные данные
-      const updatedEntries = entries.filter(e => e.entry_date !== newEntry.entry_date);
-      updatedEntries.push(newEntry);
+      // Обновляем локальное состояние с данными из Supabase
+      const updatedEntries = entries.filter(e => e.entry_date !== savedEntry.entry_date);
+      updatedEntries.push(savedEntry);
       updatedEntries.sort((a, b) => b.entry_date.localeCompare(a.entry_date));
       
       setEntries(updatedEntries);
-      setCurrentEntry(newEntry);
+      setCurrentEntry(savedEntry);
       setIsEditing(false);
 
-      // Сохранить через DataBridge
+      // Сохраняем в DataBridge для синхронизации
       await saveUserData('symptom_entries', updatedEntries);
+      
+      // Сохраняем локально как резервную копию
+      localStorage.setItem(`symptom_entries_${user.id}`, JSON.stringify(updatedEntries));
 
-      console.log('✅ SymptomTracker: Запись сохранена успешно');
+      console.log('✅ SymptomTracker: Запись успешно сохранена в Supabase и синхронизирована');
       showNotification('Запись симптомов сохранена', 'success');
-
-      // Асинхронно пытаемся сохранить в Supabase
-      healthDataService.saveSymptomEntry(user.id, entryData).then(savedEntry => {
-        if (savedEntry) {
-          console.log('✅ SymptomTracker: Запись синхронизирована с облаком');
-        }
-      }).catch(error => {
-        console.warn('⚠️ SymptomTracker: Не удалось синхронизировать с облаком:', error);
+      
+      toast({
+        title: "Запись сохранена",
+        description: "Данные успешно сохранены в облаке"
       });
       
     } catch (error) {
