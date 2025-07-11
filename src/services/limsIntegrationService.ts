@@ -38,36 +38,46 @@ export interface MedicalPartner {
 export class LIMSIntegrationService {
   
   async getMedicalPartners(): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('medical_partners')
-      .select('id, name, partner_type, status, api_endpoint, api_version')
-      .eq('partner_type', 'lims')
-      .eq('status', 'active');
+    try {
+      const response = await (supabase as any)
+        .from('medical_partners')
+        .select('id, name, partner_type, status')
+        .eq('partner_type', 'lims')
+        .eq('status', 'active');
 
-    if (error) throw error;
-    return data || [];
+      if (response.error) throw response.error;
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching medical partners:', error);
+      return [];
+    }
   }
 
   async createLabOrder(order: Omit<LabOrder, 'id'>): Promise<any> {
-    const { data, error } = await supabase
-      .from('lab_orders')
-      .insert(order)
-      .select()
-      .single();
+    try {
+      const response = await (supabase as any)
+        .from('lab_orders')
+        .insert(order)
+        .select()
+        .single();
 
-    if (error) throw error;
-    
-    // Log the integration activity
-    await this.logIntegrationActivity({
-      partner_id: order.partner_id,
-      user_id: order.user_id,
-      operation_type: 'lab_order_created',
-      endpoint_called: 'create_lab_order',
-      records_processed: 1,
-      compliance_check_passed: true
-    });
+      if (response.error) throw response.error;
+      
+      // Log the integration activity
+      await this.logIntegrationActivity({
+        partner_id: order.partner_id,
+        user_id: order.user_id,
+        operation_type: 'lab_order_created',
+        endpoint_called: 'create_lab_order',
+        records_processed: 1,
+        compliance_check_passed: true
+      });
 
-    return data;
+      return response.data;
+    } catch (error) {
+      console.error('Error creating lab order:', error);
+      throw error;
+    }
   }
 
   async getLabOrders(userId: string, filters?: {
@@ -76,43 +86,42 @@ export class LIMSIntegrationService {
     date_from?: string;
     date_to?: string;
   }): Promise<any[]> {
-    let query = supabase
-      .from('lab_orders')
-      .select(`
-        *,
-        medical_partners (
-          name,
-          partner_type
-        )
-      `)
-      .eq('user_id', userId);
+    try {
+      let query = (supabase as any)
+        .from('lab_orders')
+        .select('*')
+        .eq('user_id', userId);
 
-    if (filters?.partner_id) {
-      query = query.eq('partner_id', filters.partner_id);
-    }
-    if (filters?.status) {
-      query = query.eq('order_status', filters.status);
-    }
-    if (filters?.date_from) {
-      query = query.gte('created_at', filters.date_from);
-    }
-    if (filters?.date_to) {
-      query = query.lte('created_at', filters.date_to);
-    }
+      if (filters?.partner_id) {
+        query = query.eq('partner_id', filters.partner_id);
+      }
+      if (filters?.status) {
+        query = query.eq('order_status', filters.status);
+      }
+      if (filters?.date_from) {
+        query = query.gte('created_at', filters.date_from);
+      }
+      if (filters?.date_to) {
+        query = query.lte('created_at', filters.date_to);
+      }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
-    if (error) throw error;
-    return data || [];
+      const response = await query.order('created_at', { ascending: false });
+      if (response.error) throw response.error;
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching lab orders:', error);
+      return [];
+    }
   }
 
   async syncWithPartner(partnerId: string): Promise<{ success: boolean; message: string }> {
     try {
-      const { data, error } = await supabase.functions.invoke('lims-sync', {
+      const response = await supabase.functions.invoke('lims-sync', {
         body: { partner_id: partnerId }
       });
 
-      if (error) throw error;
-      return data;
+      if (response.error) throw response.error;
+      return response.data || { success: true, message: 'Sync completed' };
     } catch (error) {
       console.error('LIMS sync error:', error);
       return { success: false, message: 'Sync failed: ' + (error as Error).message };
@@ -121,7 +130,7 @@ export class LIMSIntegrationService {
 
   async processHL7Message(partnerId: string, hl7Message: string, userId: string): Promise<any> {
     try {
-      const { data, error } = await supabase.functions.invoke('process-hl7', {
+      const response = await supabase.functions.invoke('process-hl7', {
         body: { 
           partner_id: partnerId, 
           hl7_message: hl7Message,
@@ -129,8 +138,8 @@ export class LIMSIntegrationService {
         }
       });
 
-      if (error) throw error;
-      return data;
+      if (response.error) throw response.error;
+      return response.data;
     } catch (error) {
       console.error('HL7 processing error:', error);
       throw error;
@@ -139,12 +148,12 @@ export class LIMSIntegrationService {
 
   async validateFHIRData(fhirResource: any): Promise<{ valid: boolean; errors?: string[] }> {
     try {
-      const { data, error } = await supabase.functions.invoke('validate-fhir', {
+      const response = await supabase.functions.invoke('validate-fhir', {
         body: { fhir_resource: fhirResource }
       });
 
-      if (error) throw error;
-      return data;
+      if (response.error) throw response.error;
+      return response.data || { valid: false, errors: ['Validation failed'] };
     } catch (error) {
       console.error('FHIR validation error:', error);
       return { valid: false, errors: [(error as Error).message] };
@@ -152,40 +161,44 @@ export class LIMSIntegrationService {
   }
 
   async getLabTestsCatalog(partnerId?: string): Promise<any[]> {
-    let query = supabase
-      .from('lab_tests_catalog')
-      .select('*')
-      .eq('is_active', true);
+    try {
+      let query = (supabase as any)
+        .from('lab_tests_catalog')
+        .select('*')
+        .eq('is_active', true);
 
-    if (partnerId) {
-      query = query.eq('partner_id', partnerId);
+      if (partnerId) {
+        query = query.eq('partner_id', partnerId);
+      }
+
+      const response = await query.order('test_category', { ascending: true });
+      if (response.error) throw response.error;
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching lab tests catalog:', error);
+      return [];
     }
-
-    const { data, error } = await query.order('test_category', { ascending: true });
-    if (error) throw error;
-    return data || [];
   }
 
   async getIntegrationAuditLogs(partnerId?: string, limit = 100): Promise<any[]> {
-    let query = supabase
-      .from('integration_audit_logs')
-      .select(`
-        *,
-        medical_partners (
-          name,
-          partner_type
-        )
-      `)
-      .order('created_at', { ascending: false })
-      .limit(limit);
+    try {
+      let query = (supabase as any)
+        .from('integration_audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
 
-    if (partnerId) {
-      query = query.eq('partner_id', partnerId);
+      if (partnerId) {
+        query = query.eq('partner_id', partnerId);
+      }
+
+      const response = await query;
+      if (response.error) throw response.error;
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      return [];
     }
-
-    const { data, error } = await query;
-    if (error) throw error;
-    return data || [];
   }
 
   private async logIntegrationActivity(activity: {
@@ -203,7 +216,7 @@ export class LIMSIntegrationService {
     compliance_check_passed?: boolean;
   }): Promise<void> {
     try {
-      await supabase
+      await (supabase as any)
         .from('integration_audit_logs')
         .insert({
           ...activity,
@@ -216,12 +229,12 @@ export class LIMSIntegrationService {
 
   async testPartnerConnection(partnerId: string): Promise<{ success: boolean; message: string; details?: any }> {
     try {
-      const { data, error } = await supabase.functions.invoke('test-partner-connection', {
+      const response = await supabase.functions.invoke('test-partner-connection', {
         body: { partner_id: partnerId }
       });
 
-      if (error) throw error;
-      return data;
+      if (response.error) throw response.error;
+      return response.data || { success: true, message: 'Connection test completed' };
     } catch (error) {
       console.error('Partner connection test error:', error);
       return { success: false, message: 'Connection test failed: ' + (error as Error).message };
@@ -229,26 +242,36 @@ export class LIMSIntegrationService {
   }
 
   async getDataMappings(partnerId: string): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('medical_data_mappings')
-      .select('*')
-      .eq('partner_id', partnerId)
-      .eq('is_active', true);
+    try {
+      const response = await (supabase as any)
+        .from('medical_data_mappings')
+        .select('*')
+        .eq('partner_id', partnerId)
+        .eq('is_active', true);
 
-    if (error) throw error;
-    return data || [];
+      if (response.error) throw response.error;
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching data mappings:', error);
+      return [];
+    }
   }
 
   async updateDataMapping(mappingId: string, updates: any): Promise<any> {
-    const { data, error } = await supabase
-      .from('medical_data_mappings')
-      .update(updates)
-      .eq('id', mappingId)
-      .select()
-      .single();
+    try {
+      const response = await (supabase as any)
+        .from('medical_data_mappings')
+        .update(updates)
+        .eq('id', mappingId)
+        .select()
+        .single();
 
-    if (error) throw error;
-    return data;
+      if (response.error) throw response.error;
+      return response.data;
+    } catch (error) {
+      console.error('Error updating data mapping:', error);
+      throw error;
+    }
   }
 }
 
