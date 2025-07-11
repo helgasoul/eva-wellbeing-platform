@@ -3,16 +3,24 @@ import { Upload, FileText, AlertTriangle, Bot, CheckCircle, Clock, Calendar, Eye
 import { useToast } from '@/hooks/use-toast';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { useEvaAI, DocumentUtils } from '@/services/evaAIService';
+import { DocumentList } from '@/components/documents/DocumentList';
+import { DocumentPreviewPanel } from '@/components/documents/DocumentPreviewPanel';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Documents = () => {
   const { toast } = useToast();
   const { analyzeDocument, analyzeCSV, isAnalyzing: aiAnalyzing, error: aiError } = useEvaAI();
+  const isMobile = useIsMobile();
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [userTier, setUserTier] = useState('plus'); // 'basic' или 'plus'
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [analyzingDoc, setAnalyzingDoc] = useState(null);
+  
+  // Состояние для preview панели
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // Симуляция загруженных документов
   useEffect(() => {
@@ -244,6 +252,16 @@ const Documents = () => {
     }
   };
 
+  const handlePreview = (doc) => {
+    setSelectedDocument(doc);
+    setPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setSelectedDocument(null);
+    setPreviewOpen(false);
+  };
+
   const handleView = (doc) => {
     toast({
       title: "Просмотр документа",
@@ -365,153 +383,38 @@ const Documents = () => {
           </label>
         </div>
 
-        {/* Documents List */}
-        <div className="space-y-4">
-          {documents.map((doc) => (
-            <div key={doc.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    {getStatusIcon(doc.status)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-3">
-                      <h3 className="text-lg font-medium text-gray-900 truncate">
-                        {doc.name}
-                      </h3>
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                        {doc.category}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                      <span>{doc.size}</span>
-                      <span className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {formatDate(doc.uploadedAt)}
-                      </span>
-                    </div>
-                    
-                    {/* AI Analysis Results */}
-                    {doc.aiAnalysis && (
-                      <div className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-                        <div className="flex items-center space-x-2 mb-3">
-                          <Bot className="w-5 h-5 text-purple-600" />
-                          <h4 className="font-medium text-purple-900">Анализ ИИ помощника Eva</h4>
-                          <span className={`px-2 py-1 text-xs rounded-full ${getRiskLevelColor(doc.aiAnalysis.riskLevel)}`}>
-                            {doc.aiAnalysis.riskLevel === 'high' ? 'Высокий приоритет' : 
-                             doc.aiAnalysis.riskLevel === 'medium' ? 'Средний приоритет' : 'Низкий приоритет'}
-                          </span>
-                        </div>
-                        
-                        <p className="text-sm text-gray-700 mb-3">
-                          {doc.aiAnalysis.summary}
-                        </p>
-                        
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <h5 className="font-medium text-gray-900 mb-2">Ключевые моменты:</h5>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                              {doc.aiAnalysis.insights.map((insight, idx) => (
-                                <li key={idx} className="flex items-start">
-                                  <span className="text-purple-500 mr-2">•</span>
-                                  {insight}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          
-                          <div>
-                            <h5 className="font-medium text-gray-900 mb-2">Рекомендации:</h5>
-                            <ul className="text-sm text-gray-600 space-y-1">
-                              {doc.aiAnalysis.recommendations.map((rec, idx) => (
-                                <li key={idx} className="flex items-start">
-                                  <span className="text-blue-500 mr-2">•</span>
-                                  {rec}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                          <div className="flex items-start space-x-2">
-                            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                            <div>
-                              <p className="text-sm font-medium text-amber-800">
-                                Важное предупреждение
-                              </p>
-                              <p className="text-xs text-amber-700 mt-1">
-                                {doc.aiAnalysis.disclaimer}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-4 flex justify-center">
-                          <button 
-                            onClick={handleBookAppointment}
-                            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center space-x-2"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            <span>Записаться к врачу</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Loading State for Analysis */}
-                    {analyzingDoc === doc.id && (
-                      <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="flex items-center space-x-2">
-                          <Bot className="w-5 h-5 text-blue-600 animate-pulse" />
-                          <span className="text-sm text-blue-700">
-                            ИИ помощник Eva анализирует документ...
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <button 
-                    onClick={() => handleView(doc)}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <Eye className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => handleDownload(doc)}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <Download className="w-5 h-5" />
-                  </button>
-                  {userTier === 'plus' && doc.status === 'uploaded' && (
-                    <button 
-                      onClick={() => analyzeDocumentById(doc.id)}
-                      className="p-2 text-purple-600 hover:text-purple-700 transition-colors"
-                      disabled={analyzingDoc === doc.id}
-                    >
-                      <Bot className="w-5 h-5" />
-                    </button>
-                  )}
-                  <button 
-                    onClick={() => handleDelete(doc.id)}
-                    className="p-2 text-red-400 hover:text-red-600 transition-colors"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {documents.length === 0 && !uploading && (
-          <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">У вас пока нет загруженных документов</p>
+        {/* Two-panel layout */}
+        <div className="flex gap-6 min-h-96">
+          {/* Documents List Panel */}
+          <div className={`${previewOpen && !isMobile ? 'w-3/5' : 'w-full'} transition-all duration-300`}>
+            <DocumentList
+              documents={documents}
+              onPreview={handlePreview}
+              onDownload={handleDownload}
+              onDelete={handleDelete}
+              selectedDocId={selectedDocument?.id}
+            />
           </div>
+
+          {/* Preview Panel - Desktop */}
+          {previewOpen && selectedDocument && !isMobile && (
+            <DocumentPreviewPanel
+              document={selectedDocument}
+              onClose={handleClosePreview}
+              onDownload={handleDownload}
+              onOpenFull={handleView}
+            />
+          )}
+        </div>
+
+        {/* Preview Panel - Mobile Modal */}
+        {previewOpen && selectedDocument && isMobile && (
+          <DocumentPreviewPanel
+            document={selectedDocument}
+            onClose={handleClosePreview}
+            onDownload={handleDownload}
+            onOpenFull={handleView}
+          />
         )}
       </div>
     </PatientLayout>
