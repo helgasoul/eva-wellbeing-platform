@@ -20,7 +20,8 @@ import {
   AlertTriangle,
   Database,
   FileX,
-  Brain
+  Brain,
+  Link as LinkIcon
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -53,6 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           { name: 'Анализ сна', href: '/patient/sleep-dashboard', icon: Brain },
           { name: 'Источники данных', href: '/patient/data-sources', icon: Database },
           { name: 'Устройства', href: '/patient/wearables', icon: Brain },
+          { name: 'Интеграции данных', href: '/patient/health-data-integrations', icon: LinkIcon },
           { name: 'Запись к врачу', href: '/patient/doctor-booking', icon: Stethoscope },
           { name: 'Анализы', href: '/patient/lab-tests', icon: FileText },
           { name: 'Мои инсайты', href: '/patient/insights', icon: BarChart3 },

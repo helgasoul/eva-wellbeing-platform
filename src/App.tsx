@@ -381,6 +381,14 @@ function App() {
         </OnboardingGuard>
       </ProtectedRoute>
     } />
+    
+    <Route path="/patient/health-data-integrations" element={
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
+        <OnboardingGuard>
+          <HealthDataIntegrations />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
 
                     {/* DOCTOR ROUTES */}
                     <Route path="/doctor/dashboard" element={
