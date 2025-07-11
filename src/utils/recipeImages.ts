@@ -10,7 +10,7 @@ export const recipeImages = {
   'peri_breakfast_1': '/recipe-omelet-avocado-spinach.jpg',
   'peri_breakfast_2': '/recipe-quinoa-nuts-porridge.jpg',
   'peri_lunch_1': '/recipe-warm-tuna-salad.jpg',
-  'peri_dinner_1': '/recipe-tofu-vegetables.jpg',
+  'peri_dinner_1': '/recipe-stewed-vegetables-tofu.jpg',
   
   // Menopause recipes
   'meno_breakfast_1': '/recipe-chia-pudding.jpg',
