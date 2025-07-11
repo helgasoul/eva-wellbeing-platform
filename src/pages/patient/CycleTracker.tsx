@@ -9,6 +9,7 @@ import { CycleSidebar } from '@/components/cycle-tracker/CycleSidebar';
 import { AddCycleEntryModal } from '@/components/cycle-tracker/AddCycleEntryModal';
 import { QuickStats } from '@/components/cycle-tracker/QuickStats';
 import { analyzeIntegratedHealth } from '@/utils/cycleAnalyzer';
+import { healthDataService } from '@/services/healthDataService';
 import { cn } from '@/lib/utils';
 
 interface MenstrualEntry {
@@ -98,14 +99,52 @@ export default function CycleTracker() {
   const loadCycleData = async () => {
     if (!user?.id) return;
     
+    setLoading(true);
     try {
-      // Загружаем данные из localStorage (в будущем можно заменить на API)
+      console.log('🔄 CycleTracker: Загрузка данных из Supabase...');
+      
+      // Загружаем последние 90 дней
+      const endDate = new Date().toISOString().split('T')[0];
+      const startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      const menstrualData = await healthDataService.getMenstrualEntries(user.id, {
+        start: startDate,
+        end: endDate
+      });
+      
+      // Конвертируем данные из Supabase в формат компонента
+      const convertedEntries: MenstrualEntry[] = menstrualData.map(entry => ({
+        id: entry.id,
+        date: entry.entry_date,
+        type: entry.is_period_start ? 'menstruation' : 'spotting',
+        flow: ['', 'light', 'normal', 'heavy', 'very_heavy'][entry.flow_level] as any,
+        symptoms: {
+          cramping: (entry.symptoms as any)?.cramps || 1,
+          breast_tenderness: (entry.symptoms as any)?.other_symptoms?.includes('breast_tenderness') ? 3 : 1,
+          bloating: (entry.symptoms as any)?.bloating || 1,
+          mood_changes: parseInt((entry.symptoms as any)?.mood_changes?.[0] || '1'),
+          headache: (entry.symptoms as any)?.other_symptoms?.includes('headache') || false,
+          back_pain: (entry.symptoms as any)?.other_symptoms?.includes('back_pain') || false
+        },
+        notes: entry.notes || '',
+        created_at: entry.created_at
+      }));
+      
+      setCycleEntries(convertedEntries);
+      console.log('✅ CycleTracker: Загружено записей из Supabase:', convertedEntries.length);
+      
+    } catch (error) {
+      console.error('❌ CycleTracker: Ошибка загрузки данных:', error);
+      
+      // Fallback к localStorage
       const stored = localStorage.getItem(`cycle_entries_${user.id}`);
       if (stored) {
-        setCycleEntries(JSON.parse(stored));
+        try {
+          setCycleEntries(JSON.parse(stored));
+        } catch (parseError) {
+          console.error('Error parsing stored cycle data:', parseError);
+        }
       }
-    } catch (error) {
-      console.error('Error loading cycle data:', error);
     } finally {
       setLoading(false);
     }
@@ -136,12 +175,75 @@ export default function CycleTracker() {
     }
   };
 
-  const handleSaveEntry = (entry: MenstrualEntry) => {
-    const updatedEntries = [...cycleEntries, entry];
-    setCycleEntries(updatedEntries);
-    
-    // Сохраняем в localStorage
-    if (user?.id) {
+  const handleSaveEntry = async (formEntry: MenstrualEntry) => {
+    if (!user?.id) return;
+
+    try {
+      console.log('🔄 CycleTracker: Сохранение записи в Supabase...', formEntry);
+
+      // Маппинг строк в числа для flow_level
+      const flowMapping = {
+        'light': 1,
+        'normal': 2,
+        'heavy': 3,
+        'very_heavy': 4
+      };
+
+      // Преобразуем данные формы в формат базы данных
+      const entryData = {
+        entry_date: formEntry.date,
+        flow_level: formEntry.flow ? flowMapping[formEntry.flow] : 0,
+        symptoms: {
+          cramps: formEntry.symptoms.cramping,
+          bloating: formEntry.symptoms.bloating,
+          mood_changes: [formEntry.symptoms.mood_changes.toString()],
+          other_symptoms: [
+            ...(formEntry.symptoms.headache ? ['headache'] : []),
+            ...(formEntry.symptoms.back_pain ? ['back_pain'] : []),
+            ...(formEntry.symptoms.breast_tenderness > 1 ? ['breast_tenderness'] : [])
+          ]
+        },
+        cycle_day: null, // Будет вычислено автоматически
+        is_period_start: formEntry.type === 'menstruation',
+        notes: formEntry.notes || ''
+      };
+
+      // Сохраняем в Supabase
+      const savedEntry = await healthDataService.saveMenstrualEntry(user.id, entryData);
+      
+      if (savedEntry) {
+        // Конвертируем данные из Supabase обратно в формат компонента для локального состояния
+        const convertedEntry: MenstrualEntry = {
+          id: savedEntry.id,
+          date: savedEntry.entry_date,
+          type: savedEntry.is_period_start ? 'menstruation' : 'spotting',
+          flow: ['', 'light', 'normal', 'heavy', 'very_heavy'][savedEntry.flow_level] as any,
+          symptoms: {
+            cramping: (savedEntry.symptoms as any)?.cramps || 1,
+            breast_tenderness: (savedEntry.symptoms as any)?.other_symptoms?.includes('breast_tenderness') ? 3 : 1,
+            bloating: (savedEntry.symptoms as any)?.bloating || 1,
+            mood_changes: parseInt((savedEntry.symptoms as any)?.mood_changes?.[0] || '1'),
+            headache: (savedEntry.symptoms as any)?.other_symptoms?.includes('headache') || false,
+            back_pain: (savedEntry.symptoms as any)?.other_symptoms?.includes('back_pain') || false
+          },
+          notes: savedEntry.notes || '',
+          created_at: savedEntry.created_at
+        };
+        
+        // Обновляем локальное состояние конвертированными данными
+        const updatedEntries = [...cycleEntries, convertedEntry];
+        setCycleEntries(updatedEntries);
+        
+        console.log('✅ CycleTracker: Запись успешно сохранена в Supabase');
+      } else {
+        throw new Error('Не удалось сохранить в Supabase');
+      }
+    } catch (error) {
+      console.error('❌ CycleTracker: Ошибка сохранения записи:', error);
+      
+      // Fallback к localStorage
+      const updatedEntries = [...cycleEntries, formEntry];
+      setCycleEntries(updatedEntries);
       localStorage.setItem(`cycle_entries_${user.id}`, JSON.stringify(updatedEntries));
     }
     
