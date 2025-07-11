@@ -21,7 +21,7 @@ export const Header = () => {
     
     switch (plan.id) {
       case 'essential':
-        return { icon: '🌿', name: 'Essential', color: 'from-green-500 to-emerald-500' };
+        return { icon: '🌿', name: 'Essential', color: 'from-mint to-mint-light' };
       case 'plus':
         return { icon: '🌺', name: 'Plus', color: 'from-orange-500 to-red-500' };
       case 'optimum':
