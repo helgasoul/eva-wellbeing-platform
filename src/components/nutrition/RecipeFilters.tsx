@@ -45,104 +45,106 @@ export const RecipeFilters: React.FC<RecipeFiltersProps> = ({
   ];
 
   return (
-    <Card className="bg-gradient-to-br from-card/90 to-accent/5 backdrop-blur-sm border-primary/10 shadow-elegant rounded-2xl">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-foreground">
-          <Filter className="h-5 w-5 text-primary" />
+    <Card className="bg-gradient-to-br from-card/90 to-accent/5 backdrop-blur-sm border-primary/10 shadow-elegant rounded-2xl sticky top-4 z-10">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-foreground text-base">
+          <Filter className="h-4 w-4 text-primary" />
           Фильтры рецептов
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Фазы менопаузы */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <span className="text-primary">🌸</span>
-            Фаза менопаузы
+            <span>Фаза менопаузы</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {phases.map((phase) => (
               <Button
                 key={phase.id}
                 variant={selectedPhase === phase.id ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onPhaseChange(phase.id)}
-                className="h-auto py-2 px-3 text-xs"
+                className="h-7 py-1 px-2 text-xs min-w-0 flex-shrink-0"
               >
                 <span className="mr-1">{phase.icon}</span>
-                {phase.label}
+                <span className="truncate">{phase.label}</span>
               </Button>
             ))}
           </div>
         </div>
 
         {/* Типы приемов пищи */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Clock className="h-4 w-4" />
-            Прием пищи
+            <span>Прием пищи</span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-1.5">
             {mealTypes.map((type) => (
               <Button
                 key={type.id}
                 variant={selectedMealType === type.id ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onMealTypeChange(type.id)}
-                className="h-auto py-2 px-3 text-xs justify-start"
+                className="h-7 py-1 px-2 text-xs justify-start min-w-0"
               >
-                <span className="mr-2">
+                <span className="mr-1.5 flex-shrink-0">
                   {typeof type.icon === 'string' ? type.icon : type.icon}
                 </span>
-                {type.label}
+                <span className="truncate">{type.label}</span>
               </Button>
             ))}
           </div>
         </div>
 
         {/* Сложность приготовления */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <ChefHat className="h-4 w-4" />
-            Сложность
+            <span>Сложность</span>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             {difficulties.map((difficulty) => (
               <Button
                 key={difficulty.id}
                 variant={selectedDifficulty === difficulty.id ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onDifficultyChange(difficulty.id)}
-                className="flex-1 h-auto py-2 px-3 text-xs"
+                className="flex-1 h-7 py-1 px-2 text-xs min-w-0"
               >
-                <span className="mr-1">
+                <span className="mr-1 flex-shrink-0">
                   {typeof difficulty.icon === 'string' ? difficulty.icon : difficulty.icon}
                 </span>
-                {difficulty.label}
+                <span className="truncate">{difficulty.label}</span>
               </Button>
             ))}
           </div>
         </div>
 
         {/* Активные фильтры */}
-        <div className="pt-4 border-t border-border/50">
-          <div className="flex flex-wrap gap-2">
-            {selectedPhase !== 'all' && (
-              <Badge variant="secondary" className="text-xs">
-                {phases.find(p => p.id === selectedPhase)?.label}
-              </Badge>
-            )}
-            {selectedMealType !== 'all' && (
-              <Badge variant="secondary" className="text-xs">
-                {mealTypes.find(m => m.id === selectedMealType)?.label}
-              </Badge>
-            )}
-            {selectedDifficulty !== 'all' && (
-              <Badge variant="secondary" className="text-xs">
-                {difficulties.find(d => d.id === selectedDifficulty)?.label}
-              </Badge>
-            )}
+        {(selectedPhase !== 'all' || selectedMealType !== 'all' || selectedDifficulty !== 'all') && (
+          <div className="pt-3 border-t border-border/50">
+            <div className="flex flex-wrap gap-1">
+              {selectedPhase !== 'all' && (
+                <Badge variant="secondary" className="text-xs truncate max-w-24">
+                  {phases.find(p => p.id === selectedPhase)?.label}
+                </Badge>
+              )}
+              {selectedMealType !== 'all' && (
+                <Badge variant="secondary" className="text-xs truncate max-w-24">
+                  {mealTypes.find(m => m.id === selectedMealType)?.label}
+                </Badge>
+              )}
+              {selectedDifficulty !== 'all' && (
+                <Badge variant="secondary" className="text-xs truncate max-w-24">
+                  {difficulties.find(d => d.id === selectedDifficulty)?.label}
+                </Badge>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
