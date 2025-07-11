@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, FileText, AlertTriangle, Bot, CheckCircle, Clock, Calendar, Eye, Download, Trash2, MessageCircle, Settings, User, Bell, Search, Filter, BookOpen, Heart, Shield, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useEvaAI, DocumentUtils } from '@/services/evaAIService';
+import { DocumentUtils } from '@/services/evaAIService';
+import { GeminiService } from '@/services/geminiService';
 
 const DocumentPlatform = () => {
   const { toast } = useToast();
-  const { analyzeDocument, analyzeCSV, isAnalyzing: aiAnalyzing, error: aiError } = useEvaAI();
   const [documents, setDocuments] = useState([]);
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [userTier, setUserTier] = useState('plus');
   const [selectedDoc, setSelectedDoc] = useState(null);
@@ -101,10 +102,11 @@ const DocumentPlatform = () => {
   // Анализ документа с помощью ИИ
   const analyzeDocumentById = async (docId, fileContent = null, file = null) => {
     setAnalyzingDoc(docId);
+    setAiAnalyzing(true);
     
     toast({
       title: "Анализ начат",
-      description: "ИИ помощник Eva начал анализ вашего документа",
+      description: "ИИ помощник Gemini начал анализ вашего документа",
     });
 
     try {
@@ -140,12 +142,22 @@ const DocumentPlatform = () => {
         documentType = doc.type;
       }
 
-      let analysis;
-      if (documentType === 'csv') {
-        analysis = await analyzeCSV(content);
-      } else {
-        analysis = await analyzeDocument(content, documentType);
+      const result = await GeminiService.analyzeDocument(content, documentType);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Ошибка анализа документа');
       }
+      
+      // Convert Gemini response format to expected format
+      const analysis = {
+        summary: result.analysis?.patientSummary || 'Анализ завершен',
+        insights: result.analysis?.keyFindings || [],
+        recommendations: result.analysis?.recommendedActions || [],
+        riskLevel: result.analysis?.riskAssessment?.level || 'medium',
+        abnormalValues: result.analysis?.abnormalValues || [],
+        menopauseRelevance: result.analysis?.menopauseRelevance || [],
+        disclaimer: 'Данный анализ предоставлен ИИ помощником Gemini и не заменяет профессиональную медицинскую консультацию. Обязательно обратитесь к врачу для получения персонализированных рекомендаций.'
+      };
 
       setDocuments(prev => prev.map(document => 
         document.id === docId 
@@ -155,7 +167,7 @@ const DocumentPlatform = () => {
 
       toast({
         title: "Анализ завершен",
-        description: "ИИ помощник Eva успешно проанализировал ваш документ",
+        description: "ИИ помощник Gemini успешно проанализировал ваш документ",
       });
     } catch (error) {
       console.error('Ошибка анализа:', error);
@@ -166,11 +178,12 @@ const DocumentPlatform = () => {
       ));
       toast({
         title: "Ошибка анализа",
-        description: "Произошла ошибка при анализе документа. Попробуйте еще раз.",
+        description: error.message || "Произошла ошибка при анализе документа. Попробуйте еще раз.",
         variant: "destructive",
       });
     } finally {
       setAnalyzingDoc(null);
+      setAiAnalyzing(false);
     }
   };
 
@@ -418,10 +431,10 @@ const DocumentPlatform = () => {
                 </p>
                 {userTier === 'plus' ? (
                   <div className="mt-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
-                    <p className="text-sm text-purple-700 flex items-center justify-center">
-                      <Bot className="w-4 h-4 mr-2" />
-                      Автоматический анализ с ИИ помощником Eva включен
-                    </p>
+                     <p className="text-sm text-purple-700 flex items-center justify-center">
+                       <Bot className="w-4 h-4 mr-2" />
+                       Автоматический анализ с ИИ помощником Gemini включен
+                     </p>
                   </div>
                 ) : (
                   <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -500,7 +513,7 @@ const DocumentPlatform = () => {
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-2">
                               <Bot className="w-6 h-6 text-purple-600" />
-                              <h4 className="text-lg font-semibold text-purple-900">Анализ ИИ помощника Eva</h4>
+                              <h4 className="text-lg font-semibold text-purple-900">Анализ ИИ помощника Gemini</h4>
                             </div>
                             <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getRiskLevelColor(doc.aiAnalysis.riskLevel)}`}>
                               {doc.aiAnalysis.riskLevel === 'high' ? 'Высокий приоритет' : 
@@ -595,9 +608,9 @@ const DocumentPlatform = () => {
                           <div className="flex items-center justify-center space-x-3">
                             <Bot className="w-6 h-6 text-blue-600 animate-pulse" />
                             <div className="text-center">
-                              <p className="text-sm font-medium text-blue-700">
-                                ИИ помощник Eva анализирует документ...
-                              </p>
+                               <p className="text-sm font-medium text-blue-700">
+                                 ИИ помощник Gemini анализирует документ...
+                               </p>
                               <p className="text-xs text-blue-600 mt-1">
                                 Это может занять несколько минут
                               </p>
@@ -675,9 +688,9 @@ const DocumentPlatform = () => {
             </div>
             <div className="text-center mb-6">
               <Bot className="w-16 h-16 text-purple-600 mx-auto mb-4" />
-              <p className="text-gray-600">
-                Для автоматического анализа документов с ИИ помощником Eva необходим тариф Plus
-              </p>
+               <p className="text-gray-600">
+                 Для автоматического анализа документов с ИИ помощником Gemini необходим тариф Plus
+               </p>
             </div>
             <div className="space-y-4">
               <button 

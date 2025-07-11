@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Upload, FileText, AlertTriangle, Bot, CheckCircle, Clock, Calendar, Eye, Download, Trash2, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PatientLayout } from '@/components/layout/PatientLayout';
-import { useEvaAI, DocumentUtils } from '@/services/evaAIService';
+import { DocumentUtils } from '@/services/evaAIService';
+import { GeminiService } from '@/services/geminiService';
 import { DocumentList } from '@/components/documents/DocumentList';
 import { DocumentPreviewPanel } from '@/components/documents/DocumentPreviewPanel';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Documents = () => {
   const { toast } = useToast();
-  const { analyzeDocument, analyzeCSV, isAnalyzing: aiAnalyzing, error: aiError } = useEvaAI();
   const isMobile = useIsMobile();
   const [documents, setDocuments] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [userTier, setUserTier] = useState('plus'); // 'basic' или 'plus'
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState(null);
@@ -73,10 +74,11 @@ const Documents = () => {
   // Анализ документа с помощью ИИ
   const analyzeDocumentById = async (docId: number | string) => {
     setAnalyzingDoc(docId);
+    setAiAnalyzing(true);
     
     toast({
       title: "Анализ начат",
-      description: "ИИ помощник Eva начал анализ вашего документа",
+      description: "ИИ помощник Gemini начал анализ вашего документа",
     });
 
     try {
@@ -95,7 +97,21 @@ const Documents = () => {
         Дата: ${doc.uploadedAt}`;
 
       const documentType = DocumentUtils.getDocumentType({ name: doc.name } as File);
-      const analysis = await analyzeDocument(mockContent, documentType);
+      const result = await GeminiService.analyzeDocument(mockContent, documentType);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Ошибка анализа документа');
+      }
+      
+      // Convert Gemini response format to expected format
+      const analysis = {
+        summary: result.analysis?.patientSummary || 'Анализ завершен',
+        insights: result.analysis?.keyFindings || [],
+        recommendations: result.analysis?.recommendedActions || [],
+        riskLevel: result.analysis?.riskAssessment?.level || 'medium',
+        abnormalValues: result.analysis?.abnormalValues || [],
+        menopauseRelevance: result.analysis?.menopauseRelevance || []
+      };
 
       setDocuments(prev => prev.map(document => 
         document.id === docId 
@@ -105,7 +121,7 @@ const Documents = () => {
 
       toast({
         title: "Анализ завершен",
-        description: "ИИ помощник Eva успешно проанализировал ваш документ",
+        description: "ИИ помощник Gemini успешно проанализировал ваш документ",
       });
     } catch (error) {
       console.error('Ошибка анализа:', error);
@@ -116,28 +132,37 @@ const Documents = () => {
       ));
       toast({
         title: "Ошибка анализа",
-        description: "Произошла ошибка при анализе документа. Попробуйте еще раз.",
+        description: error.message || "Произошла ошибка при анализе документа. Попробуйте еще раз.",
         variant: "destructive",
       });
     } finally {
       setAnalyzingDoc(null);
+      setAiAnalyzing(false);
     }
   };
 
   // Анализ документа с реальным содержимым файла
   const analyzeDocumentWithContent = async (docId: number | string, content: string, file: File) => {
     setAnalyzingDoc(docId);
+    setAiAnalyzing(true);
     
     try {
       const documentType = DocumentUtils.getDocumentType(file);
-      let analysis;
-
-      // Проверяем, является ли файл CSV
-      if (documentType === 'csv') {
-        analysis = await analyzeCSV(content);
-      } else {
-        analysis = await analyzeDocument(content, documentType);
+      const result = await GeminiService.analyzeDocument(content, documentType);
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Ошибка анализа документа');
       }
+      
+      // Convert Gemini response format to expected format
+      const analysis = {
+        summary: result.analysis?.patientSummary || 'Анализ завершен',
+        insights: result.analysis?.keyFindings || [],
+        recommendations: result.analysis?.recommendedActions || [],
+        riskLevel: result.analysis?.riskAssessment?.level || 'medium',
+        abnormalValues: result.analysis?.abnormalValues || [],
+        menopauseRelevance: result.analysis?.menopauseRelevance || []
+      };
 
       setDocuments(prev => prev.map(document => 
         document.id === docId 
@@ -147,7 +172,7 @@ const Documents = () => {
 
       toast({
         title: "Анализ завершен",
-        description: "ИИ помощник Eva успешно проанализировал содержимое вашего документа",
+        description: "ИИ помощник Gemini успешно проанализировал содержимое вашего документа",
       });
     } catch (error) {
       console.error('Ошибка анализа содержимого:', error);
@@ -158,11 +183,12 @@ const Documents = () => {
       ));
       toast({
         title: "Ошибка анализа",
-        description: "Произошла ошибка при анализе содержимого документа. Попробуйте еще раз.",
+        description: error.message || "Произошла ошибка при анализе содержимого документа. Попробуйте еще раз.",
         variant: "destructive",
       });
     } finally {
       setAnalyzingDoc(null);
+      setAiAnalyzing(false);
     }
   };
 
@@ -378,7 +404,7 @@ const Documents = () => {
               {userTier === 'plus' && (
                 <p className="text-sm text-purple-600 mt-2 flex items-center justify-center">
                   <Bot className="w-4 h-4 mr-1" />
-                  Автоматический анализ с ИИ помощником Eva
+                  Автоматический анализ с ИИ помощником Gemini
                 </p>
               )}
             </div>
