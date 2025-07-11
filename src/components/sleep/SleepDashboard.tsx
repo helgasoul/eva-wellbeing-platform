@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { PageHeader } from '@/components/layout/PageHeader';
+
 import { 
   Moon, 
   Sun, 
@@ -17,7 +18,8 @@ import {
   Zap,
   AlertTriangle,
   CheckCircle,
-  Info
+  Info,
+  ChevronLeft
 } from 'lucide-react';
 import { format, parseISO, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -61,6 +63,7 @@ interface SleepData {
 }
 
 export const SleepDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [sleepData, setSleepData] = useState<SleepData[]>([]);
   const [insights, setInsights] = useState<SleepInsights | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month'>('week');
@@ -223,28 +226,55 @@ export const SleepDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Анализ сна"
-        description="Детальная аналитика качества сна и влияния на симптомы менопаузы"
-        actions={
-          <div className="flex gap-2">
+      {/* Header with Back Button */}
+      <div className="border-b border-border bg-background/95 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-4">
+          {/* Back Button */}
+          <div className="flex items-center gap-4 mb-4">
             <Button
-              variant={selectedPeriod === 'week' ? 'default' : 'outline'}
+              variant="ghost"
               size="sm"
-              onClick={() => setSelectedPeriod('week')}
+              onClick={() => navigate('/patient/dashboard')}
+              className="flex items-center gap-2"
+              aria-label="Вернуться в дашборд"
             >
-              Неделя
-            </Button>
-            <Button
-              variant={selectedPeriod === 'month' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedPeriod('month')}
-            >
-              Месяц
+              <ChevronLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Назад</span>
             </Button>
           </div>
-        }
-      />
+          
+          {/* Title and Actions */}
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h1 className="text-2xl font-semibold text-foreground mb-2">
+                Анализ сна
+              </h1>
+              <p className="text-muted-foreground max-w-2xl">
+                Детальная аналитика качества сна и влияния на симптомы менопаузы
+              </p>
+            </div>
+            
+            <div className="ml-4 flex-shrink-0">
+              <div className="flex gap-2">
+                <Button
+                  variant={selectedPeriod === 'week' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedPeriod('week')}
+                >
+                  Неделя
+                </Button>
+                <Button
+                  variant={selectedPeriod === 'month' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedPeriod('month')}
+                >
+                  Месяц
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
