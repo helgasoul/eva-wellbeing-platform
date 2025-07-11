@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Activity, Heart, Moon, Footprints } from "lucide-react";
+import { Loader2, Activity, Heart, Moon, Footprints, Thermometer, Target, Dumbbell, Utensils, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,14 +13,47 @@ interface HealthDataSummary {
   count: number;
 }
 
+// Supported health data types configuration
 const DATA_TYPE_CONFIG = {
+  // Activity & Movement
   steps: { icon: Footprints, label: 'Steps', unit: 'steps', color: 'bg-blue-500' },
+  workouts: { icon: Dumbbell, label: 'Workouts', unit: 'sessions', color: 'bg-indigo-500' },
+  calories: { icon: Zap, label: 'Calories', unit: 'kcal', color: 'bg-yellow-500' },
+  
+  // Cardiovascular
   heart_rate: { icon: Heart, label: 'Heart Rate', unit: 'bpm', color: 'bg-red-500' },
+  
+  // Sleep & Recovery
   sleep: { icon: Moon, label: 'Sleep', unit: 'hours', color: 'bg-purple-500' },
-  strain: { icon: Activity, label: 'Strain', unit: 'score', color: 'bg-orange-500' },
   recovery: { icon: Activity, label: 'Recovery', unit: '%', color: 'bg-green-500' },
-  calories: { icon: Activity, label: 'Calories', unit: 'kcal', color: 'bg-yellow-500' },
+  readiness: { icon: Target, label: 'Readiness', unit: 'score', color: 'bg-emerald-500' },
+  
+  // Stress & Performance
+  strain: { icon: Activity, label: 'Strain', unit: 'score', color: 'bg-orange-500' },
+  
+  // Body Metrics
+  temperature: { icon: Thermometer, label: 'Temperature', unit: '°C', color: 'bg-cyan-500' },
+  
+  // Nutrition
+  nutrition: { icon: Utensils, label: 'Nutrition', unit: 'entries', color: 'bg-amber-500' },
 };
+
+// Validation for supported data types
+export const SUPPORTED_DATA_TYPES = Object.keys(DATA_TYPE_CONFIG);
+
+// Validation function for data types
+export const validateDataType = (dataType: string): boolean => {
+  return SUPPORTED_DATA_TYPES.includes(dataType);
+};
+
+// Provider-specific data type mappings
+export const PROVIDER_DATA_TYPES = {
+  apple_health: ['steps', 'heart_rate', 'workouts', 'sleep', 'nutrition'],
+  whoop: ['strain', 'recovery', 'sleep', 'heart_rate'],
+  oura: ['sleep', 'readiness', 'temperature', 'heart_rate'],
+  fitbit: ['steps', 'workouts', 'sleep', 'heart_rate', 'calories'],
+  garmin: ['workouts', 'heart_rate', 'calories', 'sleep'],
+} as const;
 
 export function HealthDataDashboard() {
   const [healthData, setHealthData] = useState<HealthDataSummary[]>([]);
@@ -46,22 +79,31 @@ export function HealthDataDashboard() {
 
       if (error) throw error;
 
-      // Group by data type and get latest value for each
-      const grouped = (data || []).reduce((acc: Record<string, any>, item) => {
-        const type = item.data_type;
-        if (!acc[type] || new Date(item.recorded_date) > new Date(acc[type].recorded_date)) {
-          acc[type] = {
-            data_type: type,
-            latest_value: typeof item.data_payload === 'object' && item.data_payload && 'value' in item.data_payload ? item.data_payload.value : item.data_payload,
-            recorded_date: item.recorded_date,
-            data_source: item.data_source || 'Unknown',
-            count: 1
-          };
-        } else {
-          acc[type].count++;
-        }
-        return acc;
-      }, {});
+      // Filter and validate data types, then group by data type and get latest value for each
+      const grouped = (data || [])
+        .filter(item => {
+          // Validate data type is supported
+          if (!validateDataType(item.data_type)) {
+            console.warn(`Unsupported data type: ${item.data_type}`);
+            return false;
+          }
+          return true;
+        })
+        .reduce((acc: Record<string, any>, item) => {
+          const type = item.data_type;
+          if (!acc[type] || new Date(item.recorded_date) > new Date(acc[type].recorded_date)) {
+            acc[type] = {
+              data_type: type,
+              latest_value: typeof item.data_payload === 'object' && item.data_payload && 'value' in item.data_payload ? item.data_payload.value : item.data_payload,
+              recorded_date: item.recorded_date,
+              data_source: item.data_source || 'Unknown',
+              count: 1
+            };
+          } else {
+            acc[type].count++;
+          }
+          return acc;
+        }, {});
 
       setHealthData(Object.values(grouped));
     } catch (error) {
@@ -78,9 +120,34 @@ export function HealthDataDashboard() {
 
   const formatValue = (dataType: string, value: any) => {
     if (typeof value === 'object') {
-      // Handle complex objects like sleep data
-      if (dataType === 'sleep' && value.total) {
-        return `${Math.round(value.total / 60)}h ${value.total % 60}m`;
+      // Handle complex objects
+      switch (dataType) {
+        case 'sleep':
+          if (value.total) {
+            return `${Math.round(value.total / 60)}h ${value.total % 60}m`;
+          }
+          if (value.duration) {
+            return `${Math.round(value.duration / 3600)}h ${Math.round((value.duration % 3600) / 60)}m`;
+          }
+          break;
+        case 'workouts':
+          if (value.duration) {
+            return `${Math.round(value.duration / 60)}min`;
+          }
+          if (value.count) {
+            return `${value.count} sessions`;
+          }
+          break;
+        case 'nutrition':
+          if (value.entries) {
+            return `${value.entries} logged`;
+          }
+          break;
+        case 'temperature':
+          if (value.body_temperature) {
+            return `${value.body_temperature.toFixed(1)}°C`;
+          }
+          break;
       }
       return JSON.stringify(value);
     }
@@ -88,11 +155,23 @@ export function HealthDataDashboard() {
     const config = DATA_TYPE_CONFIG[dataType as keyof typeof DATA_TYPE_CONFIG];
     if (!config) return value;
     
-    if (dataType === 'steps') {
-      return value.toLocaleString();
+    // Format specific data types
+    switch (dataType) {
+      case 'steps':
+        return value.toLocaleString();
+      case 'calories':
+        return Math.round(value).toLocaleString();
+      case 'temperature':
+        return `${typeof value === 'number' ? value.toFixed(1) : value}°C`;
+      case 'readiness':
+      case 'recovery':
+      case 'strain':
+        return `${Math.round(value)}`;
+      case 'heart_rate':
+        return Math.round(value);
+      default:
+        return `${value} ${config.unit}`;
     }
-    
-    return `${value} ${config.unit}`;
   };
 
   if (loading) {
