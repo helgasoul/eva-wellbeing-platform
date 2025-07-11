@@ -1,3 +1,4 @@
+
 /**
  * Comprehensive onboarding system diagnostics
  */
@@ -195,10 +196,10 @@ export const autoRepairOnboarding = async (userId: string): Promise<{ repaired: 
       for (const stepName of diagnostics.dataIntegrity.duplicateSteps) {
         const { data: steps } = await supabase
           .from('onboarding_data')
-          .select('id, created_at')
+          .select('id, completed_at')
           .eq('user_id', userId)
           .eq('step_name', stepName)
-          .order('created_at', { ascending: false });
+          .order('completed_at', { ascending: false });
 
         if (steps && steps.length > 1) {
           const duplicateIds = steps.slice(1).map(step => step.id);
