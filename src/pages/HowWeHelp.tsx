@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useSubscription } from '@/context/SubscriptionContext';
+import { useSubscriptionInterest } from '@/hooks/useSubscriptionInterest';
 import { SUBSCRIPTION_PLANS, ADDITIONAL_SERVICES } from '@/data/subscriptionPlans';
 import { Layout } from '@/components/layout/Layout';
 import caringSupport from '@/assets/caring-support-hero.jpg';
@@ -9,6 +10,8 @@ import caringSupport from '@/assets/caring-support-hero.jpg';
 const HowWeHelp: React.FC = () => {
   const { user } = useAuth();
   const { subscription, upgradeSubscription, isLoading } = useSubscription();
+  const { expressInterest, getInterestCount, isLoading: isInterestLoading } = useSubscriptionInterest();
+  const [interestCounts, setInterestCounts] = useState<Record<string, number>>({});
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,6 +25,21 @@ const HowWeHelp: React.FC = () => {
     }
   }, [location]);
 
+  // Загрузка количества заинтересованных пользователей
+  useEffect(() => {
+    const loadInterestCounts = async () => {
+      const counts: Record<string, number> = {};
+      for (const plan of SUBSCRIPTION_PLANS) {
+        if (plan.isComingSoon) {
+          counts[plan.id] = await getInterestCount(plan.id);
+        }
+      }
+      setInterestCounts(counts);
+    };
+    
+    loadInterestCounts();
+  }, [getInterestCount]);
+
   const handleSelectPlan = async (planId: string) => {
     if (!user) {
       navigate('/register');
@@ -33,6 +51,23 @@ const HowWeHelp: React.FC = () => {
       navigate('/patient/dashboard');
     } catch (error) {
       console.error('Ошибка при выборе плана:', error);
+    }
+  };
+
+  const handleExpressInterest = async (planId: string) => {
+    if (!user) {
+      navigate('/register');
+      return;
+    }
+
+    const success = await expressInterest(planId);
+    if (success) {
+      // Обновить счетчик интереса
+      const newCount = await getInterestCount(planId);
+      setInterestCounts(prev => ({
+        ...prev,
+        [planId]: newCount
+      }));
     }
   };
 
@@ -96,13 +131,32 @@ const HowWeHelp: React.FC = () => {
                   <div className="order-1">
                     <div className="text-center lg:text-left">
                       <div className="text-6xl mb-4">
-                        {plan.id === 'essential' ? '🌱' : plan.id === 'plus' ? '🌺' : '✨'}
+                        {plan.id === 'essential' ? '🌱' : 
+                         plan.id === 'plus' ? '🌺' : 
+                         plan.id === 'optimum' ? '✨' : 
+                         plan.id === 'digital_twin' ? '🤖' : '✨'}
                       </div>
                       <h2 className="text-3xl font-bold text-foreground mb-4">
                         {plan.id === 'essential' ? '🌱 Essential — первый шаг к гармонии' : 
                          plan.id === 'plus' ? '🌺 Plus — Персональный путь к вашему балансу' :
+                         plan.id === 'optimum' ? '✨ Optimum — Ваше долголетие и забота на высшем уровне' :
+                         plan.id === 'digital_twin' ? `🤖 ${plan.name} — ${plan.subtitle}` :
                          '✨ Optimum — Ваше долголетие и забота на высшем уровне'}
                       </h2>
+
+                      {plan.isComingSoon && (
+                        <div className="mb-6">
+                          <span className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                            В разработке
+                          </span>
+                        </div>
+                      )}
+
+                      {plan.shortDescription && (
+                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                          {plan.shortDescription}
+                        </p>
+                      )}
                       
                       {plan.id === 'plus' && (
                         <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
@@ -209,19 +263,29 @@ const HowWeHelp: React.FC = () => {
                       </div>
                       
                       <button
-                        onClick={() => handleSelectPlan(plan.id)}
-                        disabled={isLoading}
+                        onClick={() => plan.isComingSoon ? handleExpressInterest(plan.id) : handleSelectPlan(plan.id)}
+                        disabled={isLoading || (plan.isComingSoon && isInterestLoading)}
                         className={`bg-gradient-to-r ${plan.color} text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-elegant hover:shadow-soft hover:-translate-y-1 ${
                           plan.popular ? 'ring-2 ring-accent ring-offset-2' : ''
                         }`}
                       >
-                        {isLoading ? 'Загрузка...' : (
+                        {isLoading || (plan.isComingSoon && isInterestLoading) ? 'Загрузка...' : (
+                          plan.isComingSoon ? 'Жду!' :
                           plan.id === 'essential' ? 'Попробовать бесплатно' :
                           plan.id === 'plus' ? 'Выбрать Plus' :
-                           plan.id === 'optimum' ? 'Получить максимальную поддержку' :
-                           'Выбрать план'
+                          plan.id === 'optimum' ? 'Получить максимальную поддержку' :
+                          'Выбрать план'
                         )}
                       </button>
+
+                      {plan.isComingSoon && interestCounts[plan.id] !== undefined && (
+                        <div className="mt-4">
+                          <p className="text-sm text-muted-foreground text-center">
+                            {interestCounts[plan.id]} {interestCounts[plan.id] === 1 ? 'пользователь ждет' : 
+                             interestCounts[plan.id] < 5 ? 'пользователя ждут' : 'пользователей ждут'} этот тариф
+                          </p>
+                        </div>
+                      )}
                       
                       {plan.popular && (
                         <div className="mt-4">

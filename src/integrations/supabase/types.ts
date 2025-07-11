@@ -6713,6 +6713,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_interest: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          interested_at: string
+          ip_address: unknown | null
+          referrer: string | null
+          subscription_plan_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          interested_at?: string
+          ip_address?: unknown | null
+          referrer?: string | null
+          subscription_plan_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          interested_at?: string
+          ip_address?: unknown | null
+          referrer?: string | null
+          subscription_plan_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       support_groups: {
         Row: {
           category: string

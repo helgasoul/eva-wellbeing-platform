@@ -2,14 +2,18 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SUBSCRIPTION_PLANS } from '@/data/subscriptionPlans';
 
 export interface SubscriptionPlan {
-  id: 'essential' | 'plus' | 'optimum';
+  id: 'essential' | 'plus' | 'optimum' | 'digital_twin';
   name: string;
+  subtitle?: string;
   price: number;
   monthlyPrice: number;
   currency: 'RUB';
   icon: string;
   color: string;
   popular?: boolean;
+  isComingSoon?: boolean;
+  description: string;
+  shortDescription?: string;
   features: string[];
   limitations: {
     symptom_entries: number | 'unlimited';
@@ -19,9 +23,11 @@ export interface SubscriptionPlan {
     genetic_testing: boolean;
     priority_support: boolean;
     personal_coordinator: boolean;
+    digital_twin?: boolean;
+    biobank?: boolean;
+    quantum_encryption?: boolean;
   };
   target_audience: string[];
-  description: string;
 }
 
 export interface UserSubscription {
@@ -112,8 +118,14 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
         return plan.limitations.priority_support;
       case 'personal_coordinator':
         return plan.limitations.personal_coordinator;
+      case 'digital_twin':
+        return plan.limitations.digital_twin || false;
+      case 'biobank':
+        return plan.limitations.biobank || false;
+      case 'quantum_encryption':
+        return plan.limitations.quantum_encryption || false;
       case 'wearable_integration':
-        return ['plus', 'optimum'].includes(plan.id);
+        return ['plus', 'optimum', 'digital_twin'].includes(plan.id);
       default:
         return true;
     }
