@@ -9,6 +9,7 @@ import { HealthProviderCard } from "@/components/health/HealthProviderCard";
 import { HealthDataDashboard } from "@/components/health/HealthDataDashboard";
 import { AddIntegrationModal } from "@/components/health/AddIntegrationModal";
 import { IntegrationSettings } from "@/components/health/IntegrationSettings";
+import { GeminiIntegrationDashboard } from "@/components/health/GeminiIntegrationDashboard";
 
 interface HealthIntegration {
   id: string;
@@ -253,6 +254,11 @@ export default function HealthDataIntegrations() {
               />
             ))}
         </div>
+      </div>
+
+      {/* Gemini Integration Dashboard */}
+      <div className="space-y-4">
+        <GeminiIntegrationDashboard />
       </div>
 
       {/* Health Data Dashboard */}
