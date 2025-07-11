@@ -304,7 +304,6 @@ async function saveAnalysisResults(sessionId: string, userId: string, analysis: 
             expected_impact: correlation.impact || 'Moderate positive effect'
           }
         });
-      }
     }
   }
 }
