@@ -34,23 +34,62 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     },
     fetch: (url, options = {}) => {
       const startTime = Date.now();
-      return fetch(url, {
-        ...options,
-        signal: AbortSignal.timeout(15000) // 15 second timeout
-      }).then(response => {
-        const duration = Date.now() - startTime;
-        if (isDevelopment) {
-          console.log(`🌐 Supabase Request: ${url} (${duration}ms)`, {
-            status: response.status,
-            ok: response.ok
+      
+      // Увеличенный таймаут для критических авторизационных запросов
+      const isAuthRequest = url.includes('/auth/') || url.includes('/rest/v1/user_profiles');
+      const timeout = isAuthRequest ? 30000 : 15000; // 30s для auth, 15s для остальных
+      
+      const fetchWithRetry = async (retryCount = 0): Promise<Response> => {
+        try {
+          const response = await fetch(url, {
+            ...options,
+            signal: AbortSignal.timeout(timeout)
           });
+          
+          const duration = Date.now() - startTime;
+          
+          if (isDevelopment) {
+            console.log(`🌐 Supabase Request: ${url} (${duration}ms)`, {
+              status: response.status,
+              ok: response.ok,
+              retry: retryCount > 0 ? retryCount : undefined
+            });
+          }
+          
+          // Retry логика для 5xx ошибок и timeout
+          if (!response.ok && response.status >= 500 && retryCount < 2) {
+            console.warn(`⚠️ Server error ${response.status}, retrying... (attempt ${retryCount + 1})`);
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000)); // Exponential backoff
+            return fetchWithRetry(retryCount + 1);
+          }
+          
+          return response;
+        } catch (error) {
+          const duration = Date.now() - startTime;
+          
+          // Retry для network errors и timeouts
+          if (retryCount < 2 && (
+            error instanceof Error && (
+              error.name === 'AbortError' || 
+              error.message.includes('network') ||
+              error.message.includes('timeout')
+            )
+          )) {
+            console.warn(`⚠️ Network error, retrying... (attempt ${retryCount + 1})`, error.message);
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000)); // Exponential backoff
+            return fetchWithRetry(retryCount + 1);
+          }
+          
+          console.error(`❌ Supabase Request Failed: ${url} (${duration}ms)`, {
+            error: error.message,
+            name: error.name,
+            retries: retryCount
+          });
+          throw error;
         }
-        return response;
-      }).catch(error => {
-        const duration = Date.now() - startTime;
-        console.error(`❌ Supabase Request Failed: ${url} (${duration}ms)`, error);
-        throw error;
-      });
+      };
+      
+      return fetchWithRetry();
     }
   },
   db: {
