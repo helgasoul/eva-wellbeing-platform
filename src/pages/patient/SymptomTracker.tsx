@@ -117,12 +117,26 @@ const SymptomTracker: React.FC = () => {
     }
   };
 
-  const saveEntry = async (entryData: Omit<SymptomEntry, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
+  const saveEntry = async (formData: any) => {
     if (!user?.id) return;
     
     setIsLoading(true);
     try {
-      console.log('🔄 SymptomTracker: Сохранение записи в Supabase...');
+      console.log('🔄 SymptomTracker: Сохранение записи в Supabase...', formData);
+
+      // Преобразуем данные формы в формат базы данных
+      const entryData = {
+        entry_date: formData.date,
+        hot_flashes: formData.hotFlashes,
+        night_sweats: formData.nightSweats,
+        sleep_data: formData.sleep,
+        mood_data: formData.mood,
+        energy_level: formData.energy,
+        physical_symptoms: formData.physicalSymptoms,
+        notes: formData.notes
+      };
+
+      console.log('🔄 Преобразованные данные для базы:', entryData);
 
       // Сначала сохраняем в Supabase
       const savedEntry = await healthDataService.saveSymptomEntry(user.id, entryData);
@@ -161,7 +175,14 @@ const SymptomTracker: React.FC = () => {
       const localEntry: SymptomEntry = {
         id: generateId(),
         user_id: user.id,
-        ...entryData,
+        entry_date: formData.date,
+        hot_flashes: formData.hotFlashes,
+        night_sweats: formData.nightSweats,
+        sleep_data: formData.sleep,
+        mood_data: formData.mood,
+        energy_level: formData.energy,
+        physical_symptoms: formData.physicalSymptoms,
+        notes: formData.notes,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
