@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { UserRole, ROLE_LABELS, ROLE_DESCRIPTIONS } from '@/types/roles';
-import { Heart, Briefcase, Shield } from 'lucide-react';
+import { Heart, Stethoscope, Shield } from 'lucide-react';
+import bloomIcon from '@/assets/bloom-icon.png';
 
 interface RoleSelectorProps {
   selectedRole: UserRole;
@@ -17,14 +18,14 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
       value: UserRole.PATIENT,
       label: ROLE_LABELS[UserRole.PATIENT],
       description: ROLE_DESCRIPTIONS[UserRole.PATIENT],
-      icon: Heart,
+      icon: 'bloom',
       color: 'from-eva-dusty-rose to-primary'
     },
     {
       value: UserRole.DOCTOR,
-      label: ROLE_LABELS[UserRole.DOCTOR],
-      description: ROLE_DESCRIPTIONS[UserRole.DOCTOR],
-      icon: Briefcase,
+      label: 'Врач',
+      description: 'Врач',
+      icon: Stethoscope,
       color: 'from-eva-mauve to-eva-taupe'
     }
     // Роль администратора убрана из публичной регистрации
@@ -36,7 +37,6 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
         Выберите вашу роль
       </label>
       {roles.map((role) => {
-        const IconComponent = role.icon;
         const isSelected = selectedRole === role.value;
         
         return (
@@ -52,8 +52,12 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
             onClick={() => onRoleChange(role.value)}
           >
             <div className="flex items-start space-x-4">
-              <div className={`p-3 rounded-full bg-gradient-to-br ${role.color}`}>
-                <IconComponent className="h-6 w-6 text-white" />
+              <div className={`p-3 rounded-full bg-gradient-to-br ${role.color} flex items-center justify-center`}>
+                {role.icon === 'bloom' ? (
+                  <img src={bloomIcon} alt="Bloom" className="h-6 w-6" />
+                ) : (
+                  <role.icon className="h-6 w-6 text-white" />
+                )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
