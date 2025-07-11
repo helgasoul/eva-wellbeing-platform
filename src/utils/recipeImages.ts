@@ -19,10 +19,10 @@ export const recipeImages = {
   'meno_dinner_1': '/recipe-baked-mackerel-vegetables.jpg',
   
   // Postmenopause recipes
-  'post_breakfast_1': '/recipe-oatmeal-berries-nuts.jpg',
-  'post_lunch_1': '/recipe-chicken-avocado-salad.jpg',
-  'post_dinner_1': '/recipe-omelet-avocado-spinach.jpg',
-  'post_snack_1': '/recipe-green-smoothie-fruits.jpg',
+  'post_breakfast_1': '/recipe-cottage-cheese-seeds-nuts.jpg',
+  'post_lunch_1': '/recipe-sardines-greens-salad.jpg',
+  'post_dinner_1': '/recipe-cottage-cheese-casserole.jpg',
+  'post_snack_1': '/recipe-calcium-magnesium-smoothie.jpg',
 };
 
 export const getRecipeImage = (recipeId: string): string | undefined => {
