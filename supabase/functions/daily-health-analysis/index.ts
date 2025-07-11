@@ -75,6 +75,9 @@ serve(async (req) => {
       })
       .eq('id', session.id);
 
+    // Send push notification about new insights
+    await sendDailyInsightNotification(userId, analysisResult);
+
     return new Response(JSON.stringify({
       success: true,
       sessionId: session.id,
@@ -301,6 +304,65 @@ async function saveAnalysisResults(sessionId: string, userId: string, analysis: 
             expected_impact: correlation.impact || 'Moderate positive effect'
           }
         });
+      }
     }
+  }
+}
+
+async function sendDailyInsightNotification(userId: string, analysisResult: any) {
+  try {
+    // Check if user has notification preferences
+    const { data: preferences } = await supabase
+      .from('user_notification_preferences')
+      .select('daily_insights_enabled, push_notifications_enabled')
+      .eq('user_id', userId)
+      .single();
+
+    if (!preferences?.daily_insights_enabled || !preferences?.push_notifications_enabled) {
+      console.log(`Daily insight notifications disabled for user ${userId}`);
+      return;
+    }
+
+    // Create notification payload
+    const notification = {
+      title: '🌟 Новые инсайты о вашем здоровье',
+      body: analysisResult.summary?.substring(0, 100) + '...' || 'Проанализированы ваши данные за сегодня',
+      icon: '/icons/insight-icon.png',
+      badge: '/icons/badge-72x72.png',
+      url: '/patient/ai-chat',
+      data: {
+        type: 'daily_insight',
+        analysisDate: new Date().toISOString().split('T')[0],
+        hasRecommendations: analysisResult.recommendations?.length > 0 || false,
+        keyFindingsCount: analysisResult.keyFindings?.length || 0
+      },
+      actions: [
+        {
+          action: 'view',
+          title: 'Посмотреть анализ'
+        },
+        {
+          action: 'dismiss',
+          title: 'Позже'
+        }
+      ]
+    };
+
+    // Call send-push-notification function
+    const { error } = await supabase.functions.invoke('send-push-notification', {
+      body: {
+        userId: userId,
+        notification: notification
+      }
+    });
+
+    if (error) {
+      console.error('Failed to send push notification:', error);
+    } else {
+      console.log(`Push notification sent successfully to user ${userId}`);
+    }
+
+  } catch (error) {
+    console.error('Error in sendDailyInsightNotification:', error);
   }
 }
