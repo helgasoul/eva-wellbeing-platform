@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { 
   Plus, 
   MessageSquare, 
-  Phone, 
   Search, 
   AlertTriangle, 
   FileText,
@@ -41,12 +40,6 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ role, onAction }) =>
             label: 'Задать вопрос ИИ',
             icon: MessageSquare,
             action: () => onAction?.('ai-chat')
-          },
-          {
-            label: 'SOS',
-            icon: Phone,
-            action: () => onAction?.('emergency'),
-            variant: 'destructive'
           }
         ];
       
