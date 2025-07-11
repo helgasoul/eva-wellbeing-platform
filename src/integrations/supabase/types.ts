@@ -1823,33 +1823,48 @@ export type Database = {
         Row: {
           created_at: string
           data_payload: Json
+          data_quality_score: number | null
+          data_source: string | null
           data_type: string
           external_id: string | null
           id: string
           integration_id: string
+          is_processed: boolean | null
+          processing_errors: Json | null
           recorded_date: string
+          recorded_timestamp: string | null
           synced_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           data_payload: Json
+          data_quality_score?: number | null
+          data_source?: string | null
           data_type: string
           external_id?: string | null
           id?: string
           integration_id: string
+          is_processed?: boolean | null
+          processing_errors?: Json | null
           recorded_date: string
+          recorded_timestamp?: string | null
           synced_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           data_payload?: Json
+          data_quality_score?: number | null
+          data_source?: string | null
           data_type?: string
           external_id?: string | null
           id?: string
           integration_id?: string
+          is_processed?: boolean | null
+          processing_errors?: Json | null
           recorded_date?: string
+          recorded_timestamp?: string | null
           synced_at?: string
           user_id?: string
         }
@@ -3266,42 +3281,66 @@ export type Database = {
           app_name: string
           app_user_id: string | null
           created_at: string
+          error_details: Json | null
           id: string
           integration_status: string
+          integration_type: string | null
           last_sync_at: string | null
+          provider_name: string | null
+          provider_user_id: string | null
           refresh_token: string | null
+          scopes_granted: string[] | null
+          sync_frequency: string | null
           sync_settings: Json | null
           token_expires_at: string | null
           updated_at: string
           user_id: string
+          webhook_secret: string | null
+          webhook_url: string | null
         }
         Insert: {
           access_token?: string | null
           app_name: string
           app_user_id?: string | null
           created_at?: string
+          error_details?: Json | null
           id?: string
           integration_status?: string
+          integration_type?: string | null
           last_sync_at?: string | null
+          provider_name?: string | null
+          provider_user_id?: string | null
           refresh_token?: string | null
+          scopes_granted?: string[] | null
+          sync_frequency?: string | null
           sync_settings?: Json | null
           token_expires_at?: string | null
           updated_at?: string
           user_id: string
+          webhook_secret?: string | null
+          webhook_url?: string | null
         }
         Update: {
           access_token?: string | null
           app_name?: string
           app_user_id?: string | null
           created_at?: string
+          error_details?: Json | null
           id?: string
           integration_status?: string
+          integration_type?: string | null
           last_sync_at?: string | null
+          provider_name?: string | null
+          provider_user_id?: string | null
           refresh_token?: string | null
+          scopes_granted?: string[] | null
+          sync_frequency?: string | null
           sync_settings?: Json | null
           token_expires_at?: string | null
           updated_at?: string
           user_id?: string
+          webhook_secret?: string | null
+          webhook_url?: string | null
         }
         Relationships: []
       }

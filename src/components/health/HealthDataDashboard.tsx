@@ -9,6 +9,7 @@ interface HealthDataSummary {
   data_type: string;
   latest_value: any;
   recorded_date: string;
+  data_source: string;
   count: number;
 }
 
@@ -38,6 +39,7 @@ export function HealthDataDashboard() {
           data_type,
           data_payload,
           recorded_date,
+          data_source,
           created_at
         `)
         .order('recorded_date', { ascending: false });
@@ -50,10 +52,9 @@ export function HealthDataDashboard() {
         if (!acc[type] || new Date(item.recorded_date) > new Date(acc[type].recorded_date)) {
           acc[type] = {
             data_type: type,
-            latest_value: typeof item.data_payload === 'object' && item.data_payload && 'value' in item.data_payload 
-              ? (item.data_payload as any).value 
-              : item.data_payload,
+            latest_value: typeof item.data_payload === 'object' && item.data_payload && 'value' in item.data_payload ? item.data_payload.value : item.data_payload,
             recorded_date: item.recorded_date,
+            data_source: item.data_source || 'Unknown',
             count: 1
           };
         } else {
@@ -139,6 +140,11 @@ export function HealthDataDashboard() {
               <div className="text-xs text-muted-foreground">
                 {new Date(item.recorded_date).toLocaleDateString()}
               </div>
+              {item.data_source && (
+                <div className="text-xs text-muted-foreground">
+                  from {item.data_source}
+                </div>
+              )}
             </div>
           </Card>
         );

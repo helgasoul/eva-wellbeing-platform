@@ -48,6 +48,7 @@ import DataDiagnostics from "./pages/patient/DataDiagnostics";
 import PatientRecommendations from "./pages/patient/PatientRecommendations";
 import Calendar from "./pages/patient/Calendar";
 import AdvancedRecommendations from "./pages/patient/AdvancedRecommendations";
+import HealthDataIntegrations from "./pages/patient/HealthDataIntegrations";
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -369,6 +370,14 @@ function App() {
       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <AdvancedRecommendations />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/health-data" element={
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
+        <OnboardingGuard>
+          <HealthDataIntegrations />
         </OnboardingGuard>
       </ProtectedRoute>
     } />

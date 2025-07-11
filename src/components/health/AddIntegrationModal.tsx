@@ -41,12 +41,22 @@ export function AddIntegrationModal({ open, onOpenChange, providers, onSuccess }
 
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { error } = await supabase
         .from('health_app_integrations')
         .insert({
-          user_id: (await supabase.auth.getUser()).data.user?.id,
+          user_id: user.id,
           app_name: selectedProvider,
-          integration_status: 'pending'
+          provider_name: selectedProvider,
+          integration_status: 'pending',
+          sync_frequency: syncFrequency,
+          scopes_granted: selectedDataTypes,
+          sync_settings: {
+            auto_sync: true,
+            data_types: selectedDataTypes
+          }
         });
 
       if (error) throw error;
