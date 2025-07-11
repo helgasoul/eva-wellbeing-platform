@@ -8,6 +8,7 @@ import { MessageSquare, Heart, Zap, Moon, Activity } from 'lucide-react';
 import { ClaudeChatService, UserLimitStatus } from '@/services/claudeChatService';
 import { LimitStatusBar } from '@/components/ai-chat/LimitStatusBar';
 import { ChatInterface } from '@/components/ai-chat/ChatInterface';
+import { DailyAnalysisPanel } from '@/components/ai-chat/DailyAnalysisPanel';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -295,6 +296,9 @@ const AIChat: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Панель ежедневного анализа */}
+        <DailyAnalysisPanel />
 
         {/* Чат интерфейс */}
         <ChatInterface
