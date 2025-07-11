@@ -23,7 +23,7 @@ export const Header = () => {
       case 'essential':
         return { icon: '🌿', name: 'Essential', color: 'from-mint to-mint-light' };
       case 'plus':
-        return { icon: '🌺', name: 'Plus', color: 'from-orange-500 to-red-500' };
+        return { icon: '🌺', name: 'Plus', color: 'from-orange to-orange-light' };
       case 'optimum':
         return { icon: '⭐', name: 'Optimum', color: 'from-purple-500 to-indigo-500' };
       case 'digital_twin':

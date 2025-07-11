@@ -41,7 +41,7 @@ export const SUBSCRIPTION_PLANS = [
     monthlyPrice: 832,
     currency: 'RUB' as const,
     icon: '🌺',
-    color: 'from-orange-500 to-red-500',
+    color: 'from-orange to-orange-light',
     popular: true,
     description: 'Персональный подход',
     features: [

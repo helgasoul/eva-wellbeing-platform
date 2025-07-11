@@ -99,6 +99,11 @@
     --mint-light: 163 31% 73%;
     --mint-foreground: 0 0% 100%;
     
+    /* Сдержанные оранжевые цвета для планов */
+    --orange: 25 65% 60%;
+    --orange-light: 28 58% 68%;
+    --orange-foreground: 0 0% 100%;
+    
     /* Предупреждение */
     --warning: 45 93% 58%;
     --warning-foreground: 0 0% 100%;

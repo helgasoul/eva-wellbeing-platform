@@ -66,6 +66,11 @@ export default {
 					light: 'hsl(var(--mint-light))',
 					foreground: 'hsl(var(--mint-foreground))'
 				},
+				orange: {
+					DEFAULT: 'hsl(var(--orange))',
+					light: 'hsl(var(--orange-light))',
+					foreground: 'hsl(var(--orange-foreground))'
+				},
 				warning: {
 					DEFAULT: 'hsl(var(--warning))',
 					foreground: 'hsl(var(--warning-foreground))'
