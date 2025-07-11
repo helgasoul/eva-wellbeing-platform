@@ -29,17 +29,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Initialize auth state with enhanced monitoring
+  // Initialize auth state with enhanced monitoring and retry logic
   useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = async (retryCount = 0) => {
       try {
         setIsLoading(true);
-        console.log('🔐 Initializing authentication...');
+        console.log('🔐 Initializing authentication...', { retryCount });
         
-        // Get current user from Supabase with timeout
+        // Get current user from Supabase with extended timeout
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session timeout')), 10000)
+          setTimeout(() => reject(new Error('Session timeout')), 30000) // Increased to 30 seconds
         );
         
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
@@ -68,14 +68,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
         
       } catch (error) {
-        console.error('❌ Auth initialization error:', error);
-        setError('Ошибка инициализации авторизации');
+        console.error('❌ Auth initialization error:', error, { retryCount });
         
-        // Try to clear potentially corrupted session data
-        try {
-          await supabase.auth.signOut();
-        } catch (signOutError) {
-          console.error('Failed to clear session:', signOutError);
+        // Implement retry logic with exponential backoff for network-related errors
+        const maxRetries = 3;
+        const isNetworkError = error instanceof Error && (
+          error.message.includes('timeout') || 
+          error.message.includes('network') ||
+          error.message.includes('fetch')
+        );
+        
+        if (isNetworkError && retryCount < maxRetries) {
+          const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Exponential backoff, max 10s
+          console.warn(`🔄 Retrying auth initialization in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries + 1})`);
+          
+          setTimeout(() => {
+            initializeAuth(retryCount + 1);
+          }, retryDelay);
+          return; // Don't set loading to false yet
+        }
+        
+        // Set appropriate error message based on error type
+        if (error instanceof Error && error.message.includes('timeout')) {
+          setError('Медленное соединение. Попробуйте обновить страницу.');
+        } else if (isNetworkError) {
+          setError('Проблемы с сетью. Проверьте подключение к интернету.');
+        } else {
+          setError('Ошибка инициализации авторизации');
+        }
+        
+        // Try to clear potentially corrupted session data only on non-network errors
+        if (!isNetworkError) {
+          try {
+            await supabase.auth.signOut();
+          } catch (signOutError) {
+            console.error('Failed to clear session:', signOutError);
+          }
         }
       } finally {
         setIsLoading(false);
@@ -85,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initializeAuth();
 
-    // Subscribe to auth state changes with enhanced logging
+    // Subscribe to auth state changes with enhanced logging and retry logic
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state change:', { 
         event, 
@@ -95,27 +123,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          console.log('👤 Processing sign in...');
-          const { user: authenticatedUser } = await authService.getCurrentUser();
-          if (authenticatedUser) {
-            setUser(authenticatedUser);
-            setError(null); // Clear any previous errors
-            console.log('✅ User logged in successfully', { 
-              email: authenticatedUser.email,
-              role: authenticatedUser.role
-            });
+        // Use setTimeout to avoid blocking the auth state change handler
+        setTimeout(async () => {
+          try {
+            console.log('👤 Processing sign in...');
+            const { user: authenticatedUser } = await authService.getCurrentUser();
+            if (authenticatedUser) {
+              setUser(authenticatedUser);
+              setError(null); // Clear any previous errors
+              console.log('✅ User logged in successfully', { 
+                email: authenticatedUser.email,
+                role: authenticatedUser.role
+              });
+            }
+          } catch (error) {
+            console.error('❌ Error getting user profile after sign in:', error);
+            // Don't immediately set error - user might still be authenticated
+            // The error boundary will handle this if it persists
+            
+            // Try to recover by checking session again after a short delay
+            setTimeout(async () => {
+              try {
+                const { data: { session: currentSession } } = await supabase.auth.getSession();
+                if (currentSession?.user) {
+                  console.log('🔄 Attempting to recover user profile...');
+                  const { user: recoveredUser } = await authService.getCurrentUser();
+                  if (recoveredUser) {
+                    setUser(recoveredUser);
+                    setError(null);
+                    console.log('✅ Successfully recovered user profile');
+                  }
+                }
+              } catch (recoveryError) {
+                console.error('❌ Failed to recover user profile:', recoveryError);
+                setError('Ошибка получения профиля пользователя. Попробуйте обновить страницу.');
+              }
+            }, 2000);
           }
-        } catch (error) {
-          console.error('❌ Error getting user profile after sign in:', error);
-          setError('Ошибка получения профиля пользователя');
-        }
+        }, 0);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setError(null);
         console.log('👋 User logged out');
       } else if (event === 'TOKEN_REFRESHED') {
         console.log('🔄 Token refreshed successfully');
+        // Clear any previous errors when token is successfully refreshed
+        if (error) {
+          setError(null);
+        }
       }
     });
 
