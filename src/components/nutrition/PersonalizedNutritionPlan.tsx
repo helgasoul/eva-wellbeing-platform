@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, ChefHat, Users, Calendar, ShoppingCart } from 'lucide-react';
 import { NutritionPlanService, type NutritionPlan, type Meal } from '@/services/nutritionPlanService';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 interface PersonalizedNutritionPlanProps {
