@@ -3,9 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, ChefHat, Users, Calendar, ShoppingCart } from 'lucide-react';
+import { Clock, ChefHat, Users, Calendar, ShoppingCart, Apple, Loader2 } from 'lucide-react';
 import { NutritionPlanService, type NutritionPlan, type Meal } from '@/services/nutritionPlanService';
 import { useAuth } from '@/context/AuthContext';
+import { useSubscription } from '@/context/SubscriptionContext';
+import { NutritionDeficiencyAnalysisService, type NutritionAnalysisResult } from '@/services/nutritionDeficiencyAnalysisService';
+import { MonthlyAnalysisService } from '@/services/monthlyAnalysisService';
 import { toast } from '@/hooks/use-toast';
 
 interface PersonalizedNutritionPlanProps {

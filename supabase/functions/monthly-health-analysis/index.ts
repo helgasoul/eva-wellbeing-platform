@@ -69,6 +69,9 @@ serve(async (req) => {
     // Сохраняем результаты
     await saveMonthlyAnalysisResults(session.id, userId, analysisResult, healthData);
     
+    // Генерируем персонализированный план питания для Plus/Optimum пользователей
+    await generateNutritionPlanIfEligible(userId, session.id, analysisResult, healthData);
+    
     // Обновляем статус сессии
     await supabase
       .from('ai_analysis_sessions')
@@ -245,6 +248,8 @@ ${JSON.stringify(healthData.weather.slice(0, 5), null, 2)}
 7. Прогресс и рекомендации на следующий месяц
 8. Области, требующие особого внимания
 9. Оценку качества и полноты данных
+10. Детальный анализ питания с выявлением дефицитов нутриентов
+11. Персонализированные рекомендации по питанию
 
 Ответ представь в JSON формате с полями:
 - summary (краткое резюме месяца)
@@ -258,6 +263,8 @@ ${JSON.stringify(healthData.weather.slice(0, 5), null, 2)}
 - concerns (области внимания)
 - progress (оценка прогресса)
 - nextMonthGoals (цели на следующий месяц)
+- nutritionAnalysis (детальный анализ питания с дефицитами)
+- personalizedNutritionPlan (персонализированный план питания)
 - confidence (уверенность в анализе 0-1)
 - dataQuality (качество данных 0-1)
 `;
@@ -307,6 +314,8 @@ ${JSON.stringify(healthData.weather.slice(0, 5), null, 2)}
       concerns: [],
       progress: 'Недостаточно данных для оценки',
       nextMonthGoals: [],
+      nutritionAnalysis: { deficiencies: [], recommendations: [] },
+      personalizedNutritionPlan: null,
       confidence: 0.5,
       dataQuality: 0.7
     };
@@ -390,4 +399,257 @@ async function saveMonthlyAnalysisResults(sessionId: string, userId: string, ana
         }
       });
   }
+}
+
+async function generateNutritionPlanIfEligible(
+  userId: string, 
+  sessionId: string, 
+  analysisResult: any, 
+  healthData: MonthlyHealthData
+) {
+  try {
+    // Проверяем подписку пользователя
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('subscription_tier')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profile) {
+      console.log('Could not fetch user profile for nutrition plan generation');
+      return;
+    }
+
+    const subscriptionTier = profile.subscription_tier || 'essential';
+    
+    // Генерируем план только для Plus и Optimum пользователей
+    if (!['plus', 'optimum'].includes(subscriptionTier)) {
+      console.log(`User ${userId} has ${subscriptionTier} subscription - skipping nutrition plan generation`);
+      return;
+    }
+
+    console.log(`Generating nutrition plan for ${subscriptionTier} user ${userId}`);
+
+    // Анализируем дефициты питания
+    const nutritionAnalysis = await analyzeNutritionDeficiencies(
+      healthData,
+      analysisResult,
+      subscriptionTier as 'plus' | 'optimum'
+    );
+
+    // Генерируем персонализированный план питания
+    const nutritionPlan = await generatePersonalizedNutritionPlan(
+      userId,
+      sessionId,
+      nutritionAnalysis,
+      subscriptionTier as 'plus' | 'optimum',
+      healthData
+    );
+
+    // Сохраняем план в базе данных
+    if (nutritionPlan) {
+      const { error: insertError } = await supabase
+        .from('daily_nutrition_plans')
+        .insert({
+          user_id: userId,
+          analysis_session_id: sessionId,
+          plan_date: new Date().toISOString().split('T')[0],
+          subscription_tier: subscriptionTier,
+          meal_plan: nutritionPlan.meals,
+          nutritional_goals: nutritionPlan.goals,
+          dietary_restrictions: nutritionPlan.restrictions,
+          calorie_target: nutritionPlan.calorieTarget,
+          macro_targets: nutritionPlan.macroTargets,
+          personalization_factors: nutritionPlan.personalizationFactors,
+          is_generated: true,
+          generated_at: new Date().toISOString()
+        });
+
+      if (insertError) {
+        console.error('Error saving nutrition plan:', insertError);
+      } else {
+        console.log(`Successfully generated and saved nutrition plan for user ${userId}`);
+      }
+    }
+
+  } catch (error) {
+    console.error('Error in generateNutritionPlanIfEligible:', error);
+  }
+}
+
+async function analyzeNutritionDeficiencies(
+  healthData: MonthlyHealthData,
+  analysisResult: any,
+  subscriptionTier: 'plus' | 'optimum'
+) {
+  // Анализируем данные питания за месяц
+  const nutritionEntries = healthData.nutrition || [];
+  const symptoms = healthData.symptoms || [];
+  
+  // Подсчитываем потребление основных нутриентов
+  const nutrientIntake = {
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    fiber: 0,
+    iron: 0,
+    calcium: 0,
+    vitaminD: 0,
+    vitaminB12: 0,
+    folate: 0,
+    magnesium: 0,
+    omega3: 0,
+    vitaminC: 0
+  };
+
+  // Простая эвристическая оценка дефицитов на основе симптомов и питания
+  const deficiencies = [];
+  
+  // Проверяем на дефицит железа
+  const fatigueSymptoms = symptoms.filter(s => 
+    s.physical_symptoms?.includes('усталость') || 
+    s.energy_level < 3
+  );
+  
+  if (fatigueSymptoms.length > healthData.symptoms.length * 0.3) {
+    deficiencies.push({
+      nutrient: 'Железо',
+      severity: 'moderate',
+      confidence: 0.6,
+      recommendations: ['Включить красное мясо, печень, шпинат в рацион'],
+      foodSources: ['Говядина', 'Печень', 'Шпинат', 'Чечевица']
+    });
+  }
+
+  // Проверяем на дефицит витамина D (особенно зимой)
+  const currentMonth = new Date().getMonth();
+  if (currentMonth >= 10 || currentMonth <= 2) { // Зимние месяцы
+    deficiencies.push({
+      nutrient: 'Витамин D',
+      severity: 'mild',
+      confidence: 0.7,
+      recommendations: ['Увеличить потребление жирной рыбы', 'Рассмотреть прием добавок'],
+      foodSources: ['Лосось', 'Тунец', 'Яичные желтки', 'Обогащенное молоко']
+    });
+  }
+
+  return {
+    deficiencies,
+    overallNutritionScore: Math.max(60, 100 - deficiencies.length * 10),
+    recommendations: {
+      immediate: deficiencies.map(d => d.recommendations[0]),
+      longTerm: ['Регулярный контроль уровня витаминов', 'Сбалансированное питание'],
+      supplements: subscriptionTier === 'optimum' ? 
+        deficiencies.map(d => `${d.nutrient} добавки`) : []
+    }
+  };
+}
+
+async function generatePersonalizedNutritionPlan(
+  userId: string,
+  sessionId: string,
+  nutritionAnalysis: any,
+  subscriptionTier: 'plus' | 'optimum',
+  healthData: MonthlyHealthData
+) {
+  // Базовые параметры плана
+  const baseCalories = 1800; // Можно сделать более точный расчет
+  const macroTargets = {
+    protein: Math.round(baseCalories * 0.25 / 4), // 25% от калорий
+    carbs: Math.round(baseCalories * 0.45 / 4),   // 45% от калорий
+    fat: Math.round(baseCalories * 0.30 / 9)      // 30% от калорий
+  };
+
+  // Генерируем примерные блюда с учетом дефицитов
+  const meals = [
+    {
+      type: 'breakfast',
+      name: 'Омлет со шпинатом и авокадо',
+      description: 'Богат железом, фолатом и полезными жирами',
+      calories: 350,
+      macros: { protein: 20, carbs: 10, fat: 25 },
+      ingredients: [
+        { name: 'Яйца', amount: '2', unit: 'шт', calories_per_serving: 140 },
+        { name: 'Шпинат', amount: '50', unit: 'г', calories_per_serving: 12 },
+        { name: 'Авокадо', amount: '0.5', unit: 'шт', calories_per_serving: 120 }
+      ],
+      preparation_time: 15,
+      difficulty: 'easy',
+      cooking_tips: ['Готовить на медленном огне', 'Добавлять шпинат в конце']
+    },
+    {
+      type: 'lunch',
+      name: 'Лосось с киноа и брокколи',
+      description: 'Источник омега-3, белка и витаминов',
+      calories: 500,
+      macros: { protein: 35, carbs: 45, fat: 18 },
+      ingredients: [
+        { name: 'Лосось', amount: '120', unit: 'г', calories_per_serving: 250 },
+        { name: 'Киноа', amount: '80', unit: 'г', calories_per_serving: 150 },
+        { name: 'Брокколи', amount: '150', unit: 'г', calories_per_serving: 50 }
+      ],
+      preparation_time: 25,
+      difficulty: 'medium',
+      cooking_tips: ['Запекать лосось при 180°C', 'Варить киноа 15 минут']
+    },
+    {
+      type: 'dinner',
+      name: 'Куриная грудка с овощами',
+      description: 'Легкий ужин с высоким содержанием белка',
+      calories: 400,
+      macros: { protein: 40, carbs: 20, fat: 12 },
+      ingredients: [
+        { name: 'Куриная грудка', amount: '150', unit: 'г', calories_per_serving: 250 },
+        { name: 'Цуккини', amount: '100', unit: 'г', calories_per_serving: 20 },
+        { name: 'Болгарский перец', amount: '100', unit: 'г', calories_per_serving: 30 }
+      ],
+      preparation_time: 20,
+      difficulty: 'easy',
+      cooking_tips: ['Мариновать курицу заранее', 'Готовить на гриле или в духовке']
+    }
+  ];
+
+  // Перекусы
+  const snacks = [
+    {
+      name: 'Горсть миндаля',
+      description: 'Источник магния и полезных жиров',
+      calories: 160,
+      preparation_time: 0,
+      ingredients: ['Миндаль сырой 30г']
+    },
+    {
+      name: 'Греческий йогурт с ягодами',
+      description: 'Пробиотики и антиоксиданты',
+      calories: 120,
+      preparation_time: 2,
+      ingredients: ['Греческий йогурт 150г', 'Ягоды замороженные 50г']
+    }
+  ];
+
+  return {
+    meals,
+    goals: {
+      dailyCalories: baseCalories,
+      macroTargets,
+      hydrationGoal: 2000 // мл воды
+    },
+    restrictions: [], // Можно добавить анализ ограничений из данных пользователя
+    calorieTarget: baseCalories,
+    macroTargets,
+    personalizationFactors: {
+      specialConsiderations: nutritionAnalysis.deficiencies.map((d: any) => 
+        `Дефицит ${d.nutrient}: ${d.recommendations[0]}`
+      ),
+      shoppingList: meals.flatMap(meal => 
+        meal.ingredients.map(ing => `${ing.name} - ${ing.amount} ${ing.unit}`)
+      ),
+      preparationTips: [
+        'Готовьте порции заранее для экономии времени',
+        'Используйте свежие сезонные продукты',
+        'Пейте воду за 30 минут до еды'
+      ],
+      snacks
+    }
+  };
 }
