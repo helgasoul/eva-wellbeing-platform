@@ -16,6 +16,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import type { BasicMealPlan } from '@/data/baseMealPlans';
+import { getRecipeImage } from '@/utils/recipeImages';
 
 interface RecipeDetailModalProps {
   recipe: BasicMealPlan | null;
@@ -66,10 +67,10 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
 
         <div className="space-y-6">
           {/* Recipe Image */}
-          {recipe.imageUrl && (
+          {(recipe.imageUrl || getRecipeImage(recipe.id)) && (
             <div className="w-full h-64 md:h-80 overflow-hidden rounded-xl">
               <img 
-                src={recipe.imageUrl} 
+                src={getRecipeImage(recipe.id) || recipe.imageUrl} 
                 alt={recipe.name}
                 className="w-full h-full object-cover"
               />

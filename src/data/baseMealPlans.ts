@@ -116,7 +116,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 25,
       minAccessLevel: 'essential' as const,
-      imageUrl: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&w=400&h=300',
+      imageUrl: '/src/assets/recipe-baked-cod-vegetables.jpg',
       instructions: [
         'Разогрейте духовку до 180°C',
         'Нарежьте овощи крупными кусками',
@@ -144,6 +144,7 @@ export const baseMealPlans = {
       prepTime: 5,
       cookTime: 10,
       minAccessLevel: 'essential' as const,
+      imageUrl: '/src/assets/recipe-omelet-avocado-spinach.jpg',
       instructions: [
         'Взбейте яйца в миске',
         'Нарежьте авокадо дольками',
@@ -170,6 +171,7 @@ export const baseMealPlans = {
       prepTime: 5,
       cookTime: 15,
       minAccessLevel: 'plus' as const,
+      imageUrl: '/src/assets/recipe-quinoa-nuts.jpg',
       instructions: [
         'Промойте киноа в холодной воде',
         'Отварите киноа в подсоленной воде 15 минут',
@@ -196,6 +198,7 @@ export const baseMealPlans = {
       prepTime: 15,
       cookTime: 20,
       minAccessLevel: 'plus' as const,
+      imageUrl: '/src/assets/recipe-warm-chickpea-salad.jpg',
       instructions: [
         'Нарежьте тыкву кубиками',
         'Запеките тыкву в духовке 180°C 20 минут',
@@ -222,6 +225,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 15,
       minAccessLevel: 'essential' as const,
+      imageUrl: '/src/assets/recipe-tofu-vegetables.jpg',
       instructions: [
         'Нарежьте тофу кубиками',
         'Нарежьте овощи соломкой',
@@ -250,6 +254,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 0,
       minAccessLevel: 'essential' as const,
+      imageUrl: '/src/assets/recipe-chia-pudding-berries.jpg',
       instructions: [
         'Смешайте семена чиа с кокосовым молоком',
         'Добавьте мед и тщательно перемешайте',
@@ -275,6 +280,7 @@ export const baseMealPlans = {
       prepTime: 15,
       cookTime: 20,
       minAccessLevel: 'plus' as const,
+      imageUrl: '/src/assets/recipe-salmon-quinoa-salad.jpg',
       instructions: [
         'Отварите киноа в подсоленной воде 15 минут',
         'Приготовьте лосось на гриле 6-8 минут',
@@ -301,6 +307,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 25,
       minAccessLevel: 'optimum' as const,
+      imageUrl: '/src/assets/recipe-lentil-turmeric-soup.jpg',
       instructions: [
         'Нарежьте морковь кубиками',
         'Натрите имбирь на терке',
@@ -327,6 +334,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 30,
       minAccessLevel: 'plus' as const,
+      imageUrl: '/src/assets/recipe-baked-mackerel-vegetables.jpg',
       instructions: [
         'Разогрейте духовку до 200°C',
         'Нарежьте картофель дольками',
@@ -355,6 +363,7 @@ export const baseMealPlans = {
       prepTime: 5,
       cookTime: 0,
       minAccessLevel: 'essential' as const,
+      imageUrl: '/src/assets/recipe-cottage-cheese-nuts.jpg',
       instructions: [
         'Выложите творог в тарелку',
         'Измельчите грецкие орехи',
@@ -380,6 +389,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 0,
       minAccessLevel: 'plus' as const,
+      imageUrl: '/src/assets/recipe-sardines-greens-salad.jpg',
       instructions: [
         'Отварите брокколи на пару 5 минут',
         'Промойте и нарежьте зелень',
@@ -406,6 +416,7 @@ export const baseMealPlans = {
       prepTime: 10,
       cookTime: 30,
       minAccessLevel: 'optimum' as const,
+      imageUrl: '/src/assets/recipe-cottage-cheese-casserole.jpg',
       instructions: [
         'Разогрейте духовку до 180°C',
         'Отварите брокколи и измельчите',
@@ -432,6 +443,7 @@ export const baseMealPlans = {
       prepTime: 5,
       cookTime: 0,
       minAccessLevel: 'essential' as const,
+      imageUrl: '/src/assets/recipe-calcium-magnesium-smoothie.jpg',
       instructions: [
         'Очистите банан и нарежьте кусочками',
         'Добавьте все ингредиенты в блендер',
