@@ -37,17 +37,17 @@
 
 @layer base {
   :root {
-    /* Улучшенная палитра для лучшей видимости текста */
+    /* Профессиональная палитра */
     --background: 0 0% 100%;
-    --foreground: 240 10% 15%;
+    --foreground: 222 15% 25%;
     
-    /* Primary - мягкий сливовый цвет */
-    --primary: 310 45% 45%;
+    /* Primary - элегантный глубокий индиго */
+    --primary: 244 54% 45%;
     --primary-foreground: 0 0% 100%;
     
-    /* Теплые вторичные цвета */
-    --secondary: 210 20% 92%;
-    --secondary-foreground: 240 10% 20%;
+    /* Сдержанные вторичные цвета */
+    --secondary: 220 16% 95%;
+    --secondary-foreground: 222 15% 25%;
     
     /* Safe area for mobile devices */
     --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
@@ -57,71 +57,71 @@
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
     
-    /* Мягкие приглушенные тона */
-    --muted: 210 15% 95%;
-    --muted-foreground: 240 10% 50%;
+    /* Нейтральные приглушенные тона */
+    --muted: 220 16% 96%;
+    --muted-foreground: 222 13% 50%;
     
     /* UI элементы */
-    --border: 210 15% 87%;
-    --input: 210 15% 87%;
-    --ring: 310 45% 45%;
+    --border: 220 16% 88%;
+    --input: 220 16% 88%;
+    --ring: 244 54% 45%;
     
     /* Карточки и поверхности */
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 15%;
+    --card-foreground: 222 15% 25%;
     
     /* Поповеры */
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 15%;
+    --popover-foreground: 222 15% 25%;
     
-    /* Акцентные цвета - персиковый */
-    --accent: 24 85% 90%;
-    --accent-foreground: 240 10% 20%;
+    /* Акцентные цвета - профессиональный лиловый */
+    --accent: 254 43% 95%;
+    --accent-foreground: 222 15% 25%;
     
-    /* Заботливые цвета для дневника питания */
-    --caring-peach: 24 95% 83%;
-    --caring-mint: 166 50% 70%;
-    --caring-lavender: 280 60% 85%;
-    --caring-cream: 351 100% 96%;
-    --caring-warm: 345 57% 97%;
-    --caring-rose: 333 68% 88%;
+    /* Профессиональные цвета для интерфейса */
+    --professional-slate: 220 16% 92%;
+    --professional-blue: 217 73% 57%;
+    --professional-indigo: 244 54% 65%;
+    --professional-purple: 266 69% 75%;
+    --professional-gray: 222 13% 65%;
+    --professional-neutral: 220 16% 98%;
     
     /* Доверительный бадж */
-    --trust: 140 40% 90%;
-    --trust-foreground: 140 60% 30%;
+    --trust: 217 73% 92%;
+    --trust-foreground: 217 73% 35%;
     
     /* Успех */
-    --success: 142 71% 45%;
+    --success: 159 68% 45%;
     --success-foreground: 0 0% 100%;
     
     /* Предупреждение */
-    --warning: 38 92% 50%;
+    --warning: 45 93% 58%;
     --warning-foreground: 0 0% 100%;
     
     /* Деструктивный */
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --radius: 1.25rem;
+    --radius: 0.75rem;
     
-    /* Заботливые градиенты */
-    --gradient-warm-bg: linear-gradient(135deg, hsl(351 100% 99%), hsl(345 57% 97%));
-    --gradient-caring: linear-gradient(135deg, hsl(333 68% 88% / 0.3), hsl(24 95% 83% / 0.2));
-    --gradient-gentle: linear-gradient(135deg, hsl(166 50% 70% / 0.2), hsl(280 60% 85% / 0.15));
-    --gradient-peach: linear-gradient(135deg, hsl(24 95% 83% / 0.4), hsl(333 68% 88% / 0.3));
-    --gradient-mint: linear-gradient(135deg, hsl(166 50% 70% / 0.3), hsl(345 57% 97%));
+    /* Профессиональные градиенты */
+    --gradient-professional-bg: linear-gradient(135deg, hsl(220 16% 99%), hsl(254 43% 98%));
+    --gradient-elegant: linear-gradient(135deg, hsl(254 43% 95% / 0.4), hsl(244 54% 90% / 0.2));
+    --gradient-subtle: linear-gradient(135deg, hsl(217 73% 95% / 0.3), hsl(266 69% 92% / 0.2));
+    --gradient-corporate: linear-gradient(135deg, hsl(244 54% 96% / 0.5), hsl(254 43% 95% / 0.3));
+    --gradient-refined: linear-gradient(135deg, hsl(220 16% 96% / 0.4), hsl(222 13% 98%));
     
-    /* Мягкие тени */
-    --shadow-elegant: 0 10px 30px -10px hsl(333 68% 65% / 0.15);
-    --shadow-soft: 0 4px 24px hsl(333 68% 65% / 0.08);
-    --shadow-caring: 0 8px 32px hsl(24 95% 83% / 0.2);
-    --shadow-gentle: 0 2px 16px hsl(166 50% 70% / 0.15);
-    --shadow-warm: 0 6px 20px hsl(345 57% 85% / 0.25);
+    /* Элегантные тени */
+    --shadow-elegant: 0 4px 16px -4px hsl(244 54% 45% / 0.12);
+    --shadow-soft: 0 2px 8px hsl(244 54% 45% / 0.08);
+    --shadow-professional: 0 8px 24px -8px hsl(244 54% 45% / 0.15);
+    --shadow-subtle: 0 1px 4px hsl(244 54% 45% / 0.1);
+    --shadow-refined: 0 6px 20px -6px hsl(244 54% 45% / 0.18);
     
-    /* Анимации и переходы */
-    --transition-gentle: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    --transition-caring: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+    /* Плавные профессиональные переходы */
+    --transition-professional: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-elegant: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
   }
 
 /* Base styles */
@@ -215,11 +215,11 @@ p {
 
 @keyframes bloomGlow {
   0%, 100% { 
-    filter: drop-shadow(0 0 0px rgba(169, 127, 178, 0.4));
+    filter: drop-shadow(0 0 0px hsl(var(--primary) / 0.4));
     transform: scale(1);
   }
   50% { 
-    filter: drop-shadow(0 0 8px rgba(169, 127, 178, 0.6));
+    filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.6));
     transform: scale(1.02);
   }
 }
@@ -268,199 +268,196 @@ p {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
 }
 
-/* Заботливые стили для дневника питания */
-.caring-bg {
-  background: var(--gradient-warm-bg);
+/* Профессиональные стили для интерфейса */
+.professional-bg {
+  background: var(--gradient-professional-bg);
   background-attachment: fixed;
 }
 
-.caring-card {
-  background: var(--gradient-caring);
-  border: 1px solid hsl(var(--caring-peach) / 0.3);
-  box-shadow: var(--shadow-caring);
-  transition: var(--transition-caring);
+.elegant-card {
+  background: var(--gradient-elegant);
+  border: 1px solid hsl(var(--accent) / 0.4);
+  box-shadow: var(--shadow-elegant);
+  transition: var(--transition-elegant);
   border-radius: var(--radius);
 }
 
-.caring-card:hover {
+.elegant-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-warm);
+  box-shadow: var(--shadow-professional);
 }
 
-.gentle-card {
-  background: var(--gradient-gentle);
-  border: 1px solid hsl(var(--caring-mint) / 0.4);
-  box-shadow: var(--shadow-gentle);
-  transition: var(--transition-gentle);
+.subtle-card {
+  background: var(--gradient-subtle);
+  border: 1px solid hsl(var(--trust) / 0.4);
+  box-shadow: var(--shadow-subtle);
+  transition: var(--transition-professional);
   border-radius: var(--radius);
 }
 
-.peach-card {
-  background: var(--gradient-peach);
-  border: 1px solid hsl(var(--caring-peach) / 0.5);
-  box-shadow: var(--shadow-caring);
-  transition: var(--transition-bounce);
+.corporate-card {
+  background: var(--gradient-corporate);
+  border: 1px solid hsl(var(--accent) / 0.5);
+  box-shadow: var(--shadow-elegant);
+  transition: var(--transition-smooth);
   border-radius: var(--radius);
 }
 
-.mint-card {
-  background: var(--gradient-mint);
-  border: 1px solid hsl(var(--caring-mint) / 0.5);
-  box-shadow: var(--shadow-gentle);
-  transition: var(--transition-gentle);
+.refined-card {
+  background: var(--gradient-refined);
+  border: 1px solid hsl(var(--border) / 0.6);
+  box-shadow: var(--shadow-refined);
+  transition: var(--transition-professional);
   border-radius: var(--radius);
 }
 
-/* Заботливые кнопки */
-.btn-caring {
-  background: linear-gradient(135deg, hsl(var(--caring-peach)) 0%, hsl(var(--caring-rose)) 100%);
-  color: hsl(var(--foreground));
+/* Профессиональные кнопки */
+.btn-professional {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.9) 100%);
+  color: hsl(var(--primary-foreground));
   border: none;
-  box-shadow: var(--shadow-caring);
-  transition: var(--transition-bounce);
+  box-shadow: var(--shadow-elegant);
+  transition: var(--transition-smooth);
   border-radius: calc(var(--radius) * 0.8);
   font-weight: 600;
   padding: 0.75rem 1.5rem;
 }
 
-.btn-caring:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: var(--shadow-warm);
-  background: linear-gradient(135deg, hsl(var(--caring-peach) / 0.9) 0%, hsl(var(--caring-rose) / 0.9) 100%);
+.btn-professional:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: var(--shadow-professional);
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.95) 0%, hsl(var(--primary) / 0.85) 100%);
 }
 
-.btn-gentle {
-  background: linear-gradient(135deg, hsl(var(--caring-mint) / 0.8) 0%, hsl(var(--caring-lavender) / 0.6) 100%);
+.btn-elegant {
+  background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--secondary)) 100%);
   color: hsl(var(--foreground));
-  border: 1px solid hsl(var(--caring-mint) / 0.4);
-  box-shadow: var(--shadow-gentle);
-  transition: var(--transition-gentle);
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-subtle);
+  transition: var(--transition-elegant);
   border-radius: calc(var(--radius) * 0.8);
   font-weight: 500;
   padding: 0.75rem 1.5rem;
 }
 
-.btn-gentle:hover {
+.btn-elegant:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-soft);
-  background: linear-gradient(135deg, hsl(var(--caring-mint) / 0.9) 0%, hsl(var(--caring-lavender) / 0.7) 100%);
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.9) 0%, hsl(var(--secondary) / 0.9) 100%);
 }
 
-/* Эмпатичные текстовые стили */
-.caring-text {
-  color: hsl(var(--caring-peach) / 0.8);
+/* Профессиональные текстовые стили */
+.professional-text {
+  color: hsl(var(--primary));
   font-weight: 600;
   line-height: 1.6;
 }
 
-.gentle-text {
-  color: hsl(var(--caring-mint) / 0.9);
+.elegant-text {
+  color: hsl(var(--foreground));
   font-weight: 500;
   line-height: 1.7;
 }
 
-.soft-text {
+.refined-text {
   color: hsl(var(--muted-foreground));
   font-weight: 400;
   line-height: 1.8;
 }
 
-.warm-text {
-  color: hsl(var(--caring-rose) / 0.8);
+.corporate-text {
+  color: hsl(var(--primary) / 0.9);
   font-weight: 600;
   line-height: 1.6;
 }
 
-/* Анимации для заботливых элементов */
-@keyframes caringPulse {
+/* Анимации для профессиональных элементов */
+@keyframes professionalPulse {
   0%, 100% {
     transform: scale(1);
     opacity: 1;
   }
   50% {
-    transform: scale(1.05);
-    opacity: 0.8;
+    transform: scale(1.02);
+    opacity: 0.9;
   }
 }
 
-@keyframes gentleWave {
+@keyframes elegantFloat {
   0%, 100% {
-    transform: translateX(0) rotate(0deg);
-  }
-  25% {
-    transform: translateX(2px) rotate(1deg);
-  }
-  75% {
-    transform: translateX(-2px) rotate(-1deg);
-  }
-}
-
-@keyframes warmGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 8px hsl(var(--caring-peach) / 0.3));
+    transform: translateY(0);
   }
   50% {
-    filter: drop-shadow(0 0 16px hsl(var(--caring-peach) / 0.5));
+    transform: translateY(-3px);
   }
 }
 
-.animate-caring-pulse {
-  animation: caringPulse 3s ease-in-out infinite;
+@keyframes refinedGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px hsl(var(--primary) / 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.3));
+  }
 }
 
-.animate-gentle-wave {
-  animation: gentleWave 4s ease-in-out infinite;
+.animate-professional-pulse {
+  animation: professionalPulse 3s ease-in-out infinite;
 }
 
-.animate-warm-glow {
-  animation: warmGlow 2s ease-in-out infinite;
+.animate-elegant-float {
+  animation: elegantFloat 4s ease-in-out infinite;
 }
 
-/* Мягкие тени для элементов */
-.shadow-caring {
-  box-shadow: var(--shadow-caring);
+.animate-refined-glow {
+  animation: refinedGlow 2s ease-in-out infinite;
 }
 
-.shadow-gentle {
-  box-shadow: var(--shadow-gentle);
+/* Профессиональные тени для элементов */
+.shadow-professional {
+  box-shadow: var(--shadow-professional);
 }
 
-.shadow-warm {
-  box-shadow: var(--shadow-warm);
+.shadow-refined {
+  box-shadow: var(--shadow-refined);
 }
 
-/* Пустые состояния с эмпатией */
+.shadow-subtle {
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Элегантные состояния */
 .empty-state {
-  background: var(--gradient-gentle);
-  border: 2px dashed hsl(var(--caring-mint) / 0.4);
+  background: var(--gradient-elegant);
+  border: 2px dashed hsl(var(--border));
   border-radius: calc(var(--radius) * 1.2);
   padding: 2rem;
   text-align: center;
-  transition: var(--transition-gentle);
+  transition: var(--transition-professional);
 }
 
 .empty-state:hover {
-  border-color: hsl(var(--caring-mint) / 0.6);
-  background: var(--gradient-peach);
+  border-color: hsl(var(--primary) / 0.4);
+  background: var(--gradient-corporate);
 }
 
 .motivational-banner {
-  background: var(--gradient-peach);
-  border: 1px solid hsl(var(--caring-peach) / 0.4);
+  background: var(--gradient-elegant);
+  border: 1px solid hsl(var(--accent) / 0.4);
   border-radius: calc(var(--radius) * 1.5);
   padding: 1.5rem;
   margin: 1rem 0;
-  box-shadow: var(--shadow-caring);
-  animation: warmGlow 3s ease-in-out infinite;
+  box-shadow: var(--shadow-elegant);
+  animation: refinedGlow 3s ease-in-out infinite;
 }
 
 /* Персонализированные элементы */
 .personal-touch {
-  background: linear-gradient(135deg, hsl(var(--caring-cream)), hsl(var(--caring-warm)));
-  border: 1px solid hsl(var(--caring-peach) / 0.3);
+  background: var(--gradient-refined);
+  border: 1px solid hsl(var(--border));
   border-radius: calc(var(--radius) * 1.2);
   padding: 1.25rem;
-  box-shadow: var(--shadow-gentle);
+  box-shadow: var(--shadow-subtle);
   position: relative;
   overflow: hidden;
 }
@@ -472,8 +469,8 @@ p {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, hsl(var(--caring-peach) / 0.1) 0%, transparent 70%);
-  animation: gentleWave 6s ease-in-out infinite;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.05) 0%, transparent 70%);
+  animation: elegantFloat 6s ease-in-out infinite;
 }
 
 /* Увеличенные отступы для "воздуха" */
