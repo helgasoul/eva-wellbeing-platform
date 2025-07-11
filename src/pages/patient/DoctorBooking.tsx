@@ -143,7 +143,7 @@ export default function DoctorBooking() {
 
   const breadcrumbs = [
     { label: 'Главная', href: '/patient/dashboard' },
-    { label: 'Запись к врачу', href: '/patient/doctors' }
+    { label: 'Запись к врачу', href: '/patient/doctor-booking' }
   ];
 
   return (

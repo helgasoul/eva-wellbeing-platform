@@ -192,7 +192,7 @@ const PatientDashboard = () => {
         navigate('/patient/ai-chat');
         break;
       case 'doctors':
-        navigate('/patient/doctors');
+        navigate('/patient/doctor-booking');
         break;
       case 'community':
         navigate('/patient/community');

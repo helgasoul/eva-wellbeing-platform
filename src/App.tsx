@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./components/u
 import PasswordResetDebug from "./components/debug/PasswordResetDebug";
 
 import { OnboardingGuard } from "./components/auth/OnboardingGuard";
+import { DashboardRedirect } from "./components/DashboardRedirect";
 
 // Auth pages
 import Login from "./pages/Login";
@@ -146,11 +147,6 @@ function App() {
                       element={<LoginSafe />}
                     />
                     
-                    {/* LOGIN DEBUG ROUTE */}
-                    <Route
-                      path="/login-debug"
-                      element={<Login />}
-                    />
                     
                     <Route
                       path="/register"
@@ -192,7 +188,7 @@ function App() {
                     {/* Legacy dashboard route - redirect to role-specific dashboard */}
                     <Route path="/dashboard" element={
                       <ProtectedRoute>
-                        <Navigate to="/patient/dashboard" replace />
+                        <DashboardRedirect />
                       </ProtectedRoute>
                     } />
 
@@ -254,13 +250,6 @@ function App() {
       </ProtectedRoute>
     } />
     
-    <Route path="/patient/doctors" element={
-      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
-        <OnboardingGuard>
-          <DoctorBooking />
-        </OnboardingGuard>
-      </ProtectedRoute>
-    } />
     
     <Route path="/patient/community" element={
       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
