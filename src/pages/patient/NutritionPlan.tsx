@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { baseMealPlans, BasicMealPlan } from '@/data/baseMealPlans';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { useFoodDiary } from '@/contexts/FoodDiaryContext';
 import { useToast } from '@/hooks/use-toast';
-import { Utensils, ChefHat, Calendar, TrendingUp, Crown } from 'lucide-react';
+import { Utensils, ChefHat, Calendar, TrendingUp, Crown, BookOpen, Star } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -143,6 +144,9 @@ const NutritionPlan: React.FC = () => {
                 </h1>
                 <p className="text-muted-foreground text-lg">
                   {getPhaseRecommendation(userProfile.menopausePhase)}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  💡 Для просмотра всех рецептов перейдите в раздел <Link to="/patient/recipes" className="text-primary hover:underline">Рецепты</Link>
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   <Badge variant="secondary" className="text-xs">

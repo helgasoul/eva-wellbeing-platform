@@ -36,6 +36,7 @@ import FoodDiary from "./pages/patient/FoodDiary";
 import NutritionAnalysis from "./pages/patient/NutritionAnalysis";
 import NutritionPlan from "./pages/patient/NutritionPlan";
 import NutritionTracker from "./pages/patient/NutritionTracker";
+import Recipes from "./pages/patient/Recipes";
 import CycleTracker from "./pages/patient/CycleTracker";
 import WearableDevices from "./pages/patient/WearableDevices";
 import LabTests from "./pages/patient/LabTests";
@@ -258,6 +259,14 @@ function App() {
       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <NutritionAnalysis />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/recipes" element={
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
+        <OnboardingGuard>
+          <Recipes />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
