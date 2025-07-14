@@ -50,7 +50,8 @@ import PatientRecommendations from "./pages/patient/PatientRecommendations";
 import Calendar from "./pages/patient/Calendar";
 import AdvancedRecommendations from "./pages/patient/AdvancedRecommendations";
 import HealthDataIntegrations from "./pages/patient/HealthDataIntegrations";
-import MedicalDigitalTwin from "./pages/patient/MedicalDigitalTwin";
+import { MedicalDigitalTwin } from './pages/patient/MedicalDigitalTwin';
+import { BloomAcademy } from './pages/patient/BloomAcademy';
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -403,6 +404,14 @@ function App() {
       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
           <MedicalDigitalTwin />
+        </OnboardingGuard>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/patient/academy" element={
+      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
+        <OnboardingGuard>
+          <BloomAcademy />
         </OnboardingGuard>
       </ProtectedRoute>
     } />
