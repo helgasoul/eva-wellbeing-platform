@@ -4679,6 +4679,45 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_stats: {
+        Row: {
+          certificates_earned: number | null
+          created_at: string
+          current_streak_days: number | null
+          favorite_topics: string[] | null
+          id: string
+          total_courses_completed: number | null
+          total_courses_enrolled: number | null
+          total_hours_watched: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          certificates_earned?: number | null
+          created_at?: string
+          current_streak_days?: number | null
+          favorite_topics?: string[] | null
+          id?: string
+          total_courses_completed?: number | null
+          total_courses_enrolled?: number | null
+          total_hours_watched?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          certificates_earned?: number | null
+          created_at?: string
+          current_streak_days?: number | null
+          favorite_topics?: string[] | null
+          id?: string
+          total_courses_completed?: number | null
+          total_courses_enrolled?: number | null
+          total_hours_watched?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lesson_resources: {
         Row: {
           created_at: string | null
@@ -6939,6 +6978,85 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string
+          explanation: string | null
+          id: string
+          options: string[] | null
+          question: string
+          quiz_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: string[] | null
+          question: string
+          quiz_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: string[] | null
+          question?: string
+          quiz_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_id: string
+          max_attempts: number | null
+          passing_score: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_id: string
+          max_attempts?: number | null
+          passing_score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          max_attempts?: number | null
+          passing_score?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       research_files: {
         Row: {
           created_at: string
@@ -8267,6 +8385,59 @@ export type Database = {
           user_role?: string | null
         }
         Relationships: []
+      }
+      user_progress: {
+        Row: {
+          certificates_earned: string[] | null
+          completed_at: string | null
+          completion_percentage: number | null
+          course_id: string
+          created_at: string
+          current_lesson: number | null
+          id: string
+          last_accessed: string | null
+          quiz_scores: Json | null
+          started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          certificates_earned?: string[] | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          course_id: string
+          created_at?: string
+          current_lesson?: number | null
+          id?: string
+          last_accessed?: string | null
+          quiz_scores?: Json | null
+          started_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          certificates_earned?: string[] | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          course_id?: string
+          created_at?: string
+          current_lesson?: number | null
+          id?: string
+          last_accessed?: string | null
+          quiz_scores?: Json | null
+          started_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_progress_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_reminders: {
         Row: {
