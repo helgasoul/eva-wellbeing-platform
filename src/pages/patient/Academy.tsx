@@ -175,7 +175,7 @@ export const Academy: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold">Академия</h1>
+            <h1 className="text-3xl font-bold">Академия без|паузы</h1>
           </div>
           <p className="text-muted-foreground text-lg">
             Образовательная платформа для женского здоровья и благополучия
