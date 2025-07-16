@@ -2,11 +2,14 @@
 import React from 'react';
 import { User } from '@/types/auth';
 import { UserRole } from '@/types/roles';
-import { Bell, Search, User as UserIcon, LogOut, Settings } from 'lucide-react';
+import { Bell, Search, User as UserIcon, LogOut, Settings, MessageCircle, Crown, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { RoleSwitcher } from './RoleSwitcher';
 import { BackButton } from './BackButton';
+import { useSubscription } from '@/context/SubscriptionContext';
+import { Logo } from '@/components/ui/logo';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +32,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   onLogout, 
   title = 'Eva' 
 }) => {
+  const { currentPlan } = useSubscription();
+  
   const getRoleColor = (userRole: UserRole) => {
     switch (userRole) {
       case UserRole.PATIENT:
@@ -55,6 +60,30 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
     }
   };
 
+  // Helper function to get plan display info
+  const getPlanDisplayInfo = (plan: any) => {
+    if (!plan) return { icon: '🌿', name: 'Essential', color: 'bg-mint text-mint-foreground' };
+    
+    switch (plan.id) {
+      case 'essential':
+        return { icon: '🌿', name: 'Essential', color: 'bg-mint text-mint-foreground' };
+      case 'plus':
+        return { icon: '🌺', name: 'Plus', color: 'bg-orange text-orange-foreground' };
+      case 'optimum':
+        return { icon: '⭐', name: 'Optimum', color: 'bg-purple text-purple-foreground' };
+      case 'digital_twin':
+        return { icon: '🤖', name: 'Digital Twin', color: 'bg-soft-blue text-soft-blue-foreground' };
+      default:
+        return { icon: '🌿', name: 'Essential', color: 'bg-mint text-mint-foreground' };
+    }
+  };
+
+  const planInfo = getPlanDisplayInfo(currentPlan);
+
+  const handleContactTeam = () => {
+    window.open('mailto:support@bezpauzy.com', '_blank');
+  };
+
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -62,9 +91,11 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
           {/* Logo and Title with Back Button */}
           <div className="flex items-center space-x-4">
             <BackButton />
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-eva-dusty-rose to-primary rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">E</span>
+            <div className="flex items-center space-x-3">
+              {/* Логотип с иконкой */}
+              <div className="flex items-center space-x-2">
+                <Logo size="sm" showText={false} />
+                <Heart className="h-5 w-5 text-primary animate-pulse" />
               </div>
               <div>
                 <h1 className="text-xl font-playfair font-semibold text-foreground">
@@ -75,6 +106,31 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Center actions for patients */}
+          <div className="flex items-center space-x-3">
+            {/* Тариф пользователя */}
+            {role === UserRole.PATIENT && (
+              <Badge variant="secondary" className={`${planInfo.color} px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1`}>
+                <span>{planInfo.icon}</span>
+                <span>{planInfo.name}</span>
+                <Crown className="h-3 w-3" />
+              </Badge>
+            )}
+
+            {/* Кнопка "Написать команде" */}
+            {role === UserRole.PATIENT && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleContactTeam}
+                className="flex items-center gap-2 text-xs hover:bg-primary/5 hover:text-primary transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Написать команде</span>
+              </Button>
+            )}
           </div>
 
           {/* Search and Actions */}
