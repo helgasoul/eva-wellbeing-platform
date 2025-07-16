@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#F8F4FF"/>
+  
+  <!-- Two vertical bars (pause symbol) -->
+  <rect x="10" y="8" width="4" height="16" rx="2" fill="#8B7DD8"/>
+  <rect x="18" y="8" width="4" height="16" rx="2" fill="#8B7DD8"/>
+  
+  <!-- Flowing wave crossing through -->
+  <path d="M6 12 Q12 10 16 14 Q20 18 26 12" stroke="#7DD3FC" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+</svg>

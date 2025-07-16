@@ -1,17 +1,15 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
+import { Logo } from '@/components/ui/logo';
 
 export const RegisterFormHeader = () => {
   return (
     <div className="text-center mb-8">
       <div className="flex justify-center mb-4">
-        <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center">
-          <Sparkles className="w-8 h-8 text-white" />
-        </div>
+        <Logo size="lg" showText={true} showSlogan={true} />
       </div>
       
       <h2 className="text-2xl font-playfair font-semibold text-foreground mb-2">
-        Создать аккаунт в Bloom
+        Создать аккаунт
       </h2>
       
       <p className="text-muted-foreground">

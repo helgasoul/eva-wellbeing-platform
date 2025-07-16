@@ -2,7 +2,7 @@
 import React from 'react';
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import bloomLogo from '@/assets/bloom-logo-white-bg.png';
+import { Logo } from '@/components/ui/logo';
 
 export const Footer = () => {
   return (
@@ -12,16 +12,12 @@ export const Footer = () => {
           {/* Logo and Description */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4 group relative">
-              <img 
-                src={bloomLogo} 
-                alt="Bloom"
-                className="h-32 w-auto object-contain animate-petal-dance group-hover:animate-bloom-glow transition-all duration-300"
-              />
+              <Logo size="lg" showText={true} showSlogan={true} className="animate-petal-dance group-hover:animate-bloom-glow transition-all duration-300" />
               {/* Декоративная аура при hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-lg scale-150"></div>
             </div>
             <p className="text-muted-foreground mb-6 max-w-md leading-relaxed text-lg">
-              bloom — пространство поддержки и заботы для женщин в период менопаузы.
+              без | паузы — пространство поддержки и заботы для женщин в период менопаузы.
               Мы рядом, чтобы помочь принять и понять все изменения, делиться знаниями 
               и теплом, и быть вместе в сообществе, где важна каждая история.
             </p>
@@ -75,7 +71,7 @@ export const Footer = () => {
                 <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full group-hover:scale-110 transition-transform duration-300">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-muted-foreground">info@bloom-health.ru</span>
+                <span className="text-muted-foreground">info@bezpauzy.ru</span>
               </div>
               <div className="flex items-center space-x-3 group">
                 <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full group-hover:scale-110 transition-transform duration-300">
@@ -92,7 +88,7 @@ export const Footer = () => {
           <div className="flex items-center justify-center space-x-2">
             <Heart className="h-5 w-5 text-primary animate-pulse" />
             <p className="text-lg font-medium text-foreground italic">
-              С заботой о вас, команда bloom
+              С заботой о вас, команда без | паузы
             </p>
             <Heart className="h-5 w-5 text-primary animate-pulse" />
           </div>
@@ -101,7 +97,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-purple-200/20 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 bloom. Всё для вашего спокойствия и уверенности.
+            © 2024 без | паузы. Всё для вашего спокойствия и уверенности.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link 
