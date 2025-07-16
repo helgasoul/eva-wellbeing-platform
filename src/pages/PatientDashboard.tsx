@@ -52,6 +52,8 @@ import { toast } from 'sonner';
 import { personalizationEngine, Recommendation, GoalProgress } from '@/services/personalizationService';
 // ✅ НОВЫЙ ИМПОРТ сервиса рекомендаций Eva
 import { evaRecommendationEngine, EvaRecommendation } from '@/services/evaRecommendationEngine';
+// ✅ НОВЫЙ ИМПОРТ сервиса онбординга для валидации
+import { onboardingService } from '@/services/onboardingService';
 
 interface HealthStats {
   totalEntries: number;
@@ -78,6 +80,10 @@ const PatientDashboard = () => {
   const [isTestingClaudeAnalysis, setIsTestingClaudeAnalysis] = useState(false);
   const [isTestingRecommendations, setIsTestingRecommendations] = useState(false);
   
+  // ✅ НОВОЕ: Состояние для валидации онбординга
+  const [onboardingValidation, setOnboardingValidation] = useState<any>(null);
+  const [isLoadingValidation, setIsLoadingValidation] = useState(true);
+  
   // ✅ НОВОЕ: Получаем данные онбординга для персонализации
   const onboardingData = user?.onboardingData || 
                         JSON.parse(localStorage.getItem('onboardingData') || '{}');
@@ -93,6 +99,7 @@ const PatientDashboard = () => {
   useEffect(() => {
     loadHealthData();
     loadEvaRecommendations();
+    loadOnboardingValidation();
     // Инициализация завершена (автосинхронизация wearable удалена)
   }, [user?.id]);
 
@@ -219,6 +226,22 @@ const PatientDashboard = () => {
       setEvaRecommendations([]);
     } finally {
       setIsLoadingRecommendations(false);
+    }
+  };
+
+  // ✅ НОВАЯ ФУНКЦИЯ валидации онбординга
+  const loadOnboardingValidation = async () => {
+    if (!user?.id) return;
+    
+    setIsLoadingValidation(true);
+    try {
+      const validation = await onboardingService.validateCompleteness(user.id);
+      setOnboardingValidation(validation);
+    } catch (error) {
+      console.error('Ошибка валидации онбординга:', error);
+      setOnboardingValidation(null);
+    } finally {
+      setIsLoadingValidation(false);
     }
   };
 
@@ -382,26 +405,60 @@ const PatientDashboard = () => {
 
   // ✅ НОВЫЕ КОМПОНЕНТЫ ПЕРСОНАЛИЗАЦИИ
 
-  // Призыв к прохождению онбординга для пользователей без данных
+  // Призыв к завершению онбординга для пользователей с неполными данными
   const OnboardingPrompt = () => {
-    if (onboardingData && Object.keys(onboardingData).length > 0) return null;
+    // Показываем только если валидация загружена и данные неполные
+    if (isLoadingValidation || !onboardingValidation) return null;
+    
+    const { isValid, progress } = onboardingValidation;
+    const completionPercentage = progress?.completionPercentage || 0;
+    
+    // Показываем prompt только если данные неполные (менее 70%)
+    if (isValid && completionPercentage >= 70) return null;
+    
+    const getMissingDataText = () => {
+      if (!progress?.missingSteps || progress.missingSteps.length === 0) {
+        return 'Завершите заполнение профиля для получения персональных рекомендаций';
+      }
+      
+      const missingStepsText = progress.missingSteps.slice(0, 3).map((step: string) => {
+        switch (step) {
+          case 'basic-info': return 'базовая информация';
+          case 'health-status': return 'состояние здоровья';
+          case 'symptoms': return 'симптомы';
+          case 'lifestyle': return 'образ жизни';
+          case 'nutrition': return 'питание';
+          case 'goals': return 'цели';
+          default: return step;
+        }
+      }).join(', ');
+      
+      return `Не хватает данных: ${missingStepsText}${progress.missingSteps.length > 3 ? ' и др.' : ''}`;
+    };
     
     return (
-      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-elegant">
+      <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 shadow-elegant">
         <CardContent className="p-6">
-          <div className="flex items-center">
-            <AlertCircle className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" />
+          <div className="flex items-start">
+            <AlertCircle className="w-6 h-6 text-amber-600 mr-3 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="font-semibold text-blue-900 mb-1">Персонализируйте ваш опыт</h3>
-              <p className="text-blue-700 text-sm">
-                Пройдите онбординг, чтобы получить персональные рекомендации и адаптированную панель под вашу фазу менопаузы
+              <h3 className="font-semibold text-amber-900 mb-1">Улучшите персонализацию</h3>
+              <p className="text-amber-700 text-sm mb-3">
+                {getMissingDataText()}
               </p>
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-amber-600">Заполнено профиля</span>
+                  <span className="text-xs text-amber-600 font-medium">{completionPercentage}%</span>
+                </div>
+                <Progress value={completionPercentage} className="h-2" />
+              </div>
             </div>
             <Button 
               onClick={() => navigate('/patient/onboarding')}
-              className="ml-4 bg-blue-600 hover:bg-blue-700 text-white"
+              className="ml-4 bg-amber-600 hover:bg-amber-700 text-white"
             >
-              Начать
+              Завершить
             </Button>
           </div>
         </CardContent>
