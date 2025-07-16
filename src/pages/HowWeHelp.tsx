@@ -293,9 +293,15 @@ const HowWeHelp: React.FC = () => {
                       <button
                         onClick={() => plan.isComingSoon ? handleExpressInterest(plan.id) : handleSelectPlan(plan.id)}
                         disabled={isLoading || (plan.isComingSoon && isInterestLoading)}
-                        className={`bg-gradient-to-r ${plan.color} text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-elegant hover:shadow-soft hover:-translate-y-1 ${
+                        className={`bg-gradient-to-r ${plan.color} px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-all duration-300 shadow-elegant hover:shadow-soft hover:-translate-y-1 ${
                           plan.popular ? 'ring-2 ring-accent ring-offset-2' : ''
                         }`}
+                        style={{
+                          color: plan.id === 'essential' ? 'hsl(var(--mint-foreground))' :
+                                 plan.id === 'plus' ? 'hsl(var(--orange-foreground))' :
+                                 plan.id === 'optimum' ? 'hsl(var(--purple-foreground))' :
+                                 'hsl(var(--mint-foreground))'
+                        }}
                       >
                         {isLoading || (plan.isComingSoon && isInterestLoading) ? 'Загрузка...' : (
                           plan.isComingSoon ? 'Жду!' :

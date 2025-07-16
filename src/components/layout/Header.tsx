@@ -21,15 +21,15 @@ export const Header = () => {
     
     switch (plan.id) {
       case 'essential':
-        return { icon: '🌿', name: 'Essential', color: 'from-mint to-mint-light' };
+        return { icon: '🌿', name: 'Essential', color: 'from-mint to-mint-light', textColor: 'hsl(var(--mint-foreground))' };
       case 'plus':
-        return { icon: '🌺', name: 'Plus', color: 'from-orange to-orange-light' };
+        return { icon: '🌺', name: 'Plus', color: 'from-orange to-orange-light', textColor: 'hsl(var(--orange-foreground))' };
       case 'optimum':
-        return { icon: '⭐', name: 'Optimum', color: 'from-purple to-purple-light' };
+        return { icon: '⭐', name: 'Optimum', color: 'from-purple to-purple-light', textColor: 'hsl(var(--purple-foreground))' };
       case 'digital_twin':
-        return { icon: '🤖', name: 'Digital Twin', color: 'from-soft-blue to-primary' };
+        return { icon: '🤖', name: 'Digital Twin', color: 'from-soft-blue to-primary', textColor: 'hsl(var(--soft-blue-foreground))' };
       default:
-        return { icon: '🌿', name: 'Essential', color: 'from-mint to-mint-light' };
+        return { icon: '🌿', name: 'Essential', color: 'from-mint to-mint-light', textColor: 'hsl(var(--mint-foreground))' };
     }
   };
 
@@ -140,7 +140,7 @@ export const Header = () => {
             {/* Отображение текущего тарифа для авторизованных пользователей */}
             {user && planInfo && (
               <Link to="/how-we-help" className="group">
-                <div className={`bg-gradient-to-r ${planInfo.color} text-white px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer flex items-center gap-2`}>
+                <div className={`bg-gradient-to-r ${planInfo.color} px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer flex items-center gap-2`} style={{color: planInfo.textColor}}>
                   <span className="text-base">{planInfo.icon}</span>
                   <span>{planInfo.name}</span>
                   <Crown className="h-3 w-3 opacity-70 group-hover:opacity-100 transition-opacity" />
@@ -219,7 +219,7 @@ export const Header = () => {
                     className="group"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <div className={`bg-gradient-to-r ${planInfo.color} text-white px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 w-full`}>
+                    <div className={`bg-gradient-to-r ${planInfo.color} px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 w-full`} style={{color: planInfo.textColor}}>
                       <span className="text-base">{planInfo.icon}</span>
                       <span>Мой тариф: {planInfo.name}</span>
                       <Crown className="h-3 w-3 opacity-70 group-hover:opacity-100 transition-opacity" />
