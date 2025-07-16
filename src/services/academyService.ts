@@ -2,6 +2,45 @@ import { supabase } from '@/integrations/supabase/client';
 import { Course, CourseInstructor, Lesson, UserProgress, LearningStats, LearningGoal } from '@/types/academy';
 
 export class AcademyService {
+  private static logError(operation: string, error: any, context?: Record<string, any>) {
+    console.error(`[AcademyService] ${operation} error:`, error);
+    
+    // Log to system monitoring
+    try {
+      const errorDetails = {
+        operation,
+        error: error.message || 'Unknown error',
+        code: error.code || 'UNKNOWN',
+        context: context || {},
+        timestamp: new Date().toISOString(),
+        service: 'AcademyService'
+      };
+      
+      // Store in local storage for error reporting
+      const existingErrors = JSON.parse(localStorage.getItem('eva_service_errors') || '[]');
+      existingErrors.push(errorDetails);
+      localStorage.setItem('eva_service_errors', JSON.stringify(existingErrors.slice(-10))); // Keep last 10 errors
+    } catch (logError) {
+      console.error('Failed to log error:', logError);
+    }
+  }
+
+  private static async handleError(operation: string, error: any, context?: Record<string, any>): Promise<never> {
+    this.logError(operation, error, context);
+    
+    // Return user-friendly error messages
+    if (error.code === 'PGRST116') {
+      throw new Error('Данные не найдены');
+    } else if (error.code === 'PGRST301') {
+      throw new Error('Ошибка доступа к данным');
+    } else if (error.message?.includes('network')) {
+      throw new Error('Проблема с сетевым соединением');
+    } else if (error.message?.includes('timeout')) {
+      throw new Error('Время ожидания истекло');
+    } else {
+      throw new Error('Произошла ошибка при загрузке данных');
+    }
+  }
   // Получить все курсы с фильтрацией
   static async getCourses(filters?: {
     category?: string;
@@ -9,56 +48,64 @@ export class AcademyService {
     featured?: boolean;
     search?: string;
   }): Promise<Course[]> {
-    let query = supabase
-      .from('courses')
-      .select(`
-        *,
-        instructor:instructors(*)
-      `);
+    try {
+      let query = supabase
+        .from('courses')
+        .select(`
+          *,
+          instructor:instructors(*)
+        `);
 
-    if (filters?.category && filters.category !== 'all') {
-      query = query.eq('category', filters.category as any);
+      if (filters?.category && filters.category !== 'all') {
+        query = query.eq('category', filters.category as any);
+      }
+
+      if (filters?.difficulty && filters.difficulty !== 'all') {
+        query = query.eq('difficulty', filters.difficulty as any);
+      }
+
+      if (filters?.featured) {
+        query = query.eq('is_featured', true);
+      }
+
+      if (filters?.search) {
+        query = query.ilike('title', `%${filters.search}%`);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data?.map(course => ({
+        ...course,
+        instructor: course.instructor as CourseInstructor
+      })) || [];
+    } catch (error) {
+      return this.handleError('getCourses', error, { filters });
     }
-
-    if (filters?.difficulty && filters.difficulty !== 'all') {
-      query = query.eq('difficulty', filters.difficulty as any);
-    }
-
-    if (filters?.featured) {
-      query = query.eq('is_featured', true);
-    }
-
-    if (filters?.search) {
-      query = query.ilike('title', `%${filters.search}%`);
-    }
-
-    const { data, error } = await query.order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data?.map(course => ({
-      ...course,
-      instructor: course.instructor as CourseInstructor
-    })) || [];
   }
 
   // Получить курс по ID
   static async getCourse(courseId: string): Promise<Course | null> {
-    const { data, error } = await supabase
-      .from('courses')
-      .select(`
-        *,
-        instructor:instructors(*)
-      `)
-      .eq('id', courseId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .select(`
+          *,
+          instructor:instructors(*)
+        `)
+        .eq('id', courseId)
+        .single();
 
-    if (error) throw error;
+      if (error) throw error;
 
-    return data ? {
-      ...data,
-      instructor: data.instructor as CourseInstructor
-    } : null;
+      return data ? {
+        ...data,
+        instructor: data.instructor as CourseInstructor
+      } : null;
+    } catch (error) {
+      return this.handleError('getCourse', error, { courseId });
+    }
   }
 
   // Получить уроки курса
@@ -88,18 +135,25 @@ export class AcademyService {
 
   // Получить прогресс пользователя по курсу
   static async getUserProgress(courseId: string, userId: string): Promise<UserProgress | null> {
-    const { data, error } = await supabase
-      .from('user_course_progress')
-      .select('*')
-      .eq('course_id', courseId)
-      .eq('user_id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('user_course_progress')
+        .select('*')
+        .eq('course_id', courseId)
+        .eq('user_id', userId)
+        .single();
 
-    if (error && error.code !== 'PGRST116') throw error; 
-    return data ? {
-      ...data,
-      quiz_scores: Array.isArray(data.quiz_scores) ? data.quiz_scores as { lesson_id: string; score: number }[] : []
-    } : null;
+      if (error && error.code !== 'PGRST116') throw error; 
+      return data ? {
+        ...data,
+        quiz_scores: Array.isArray(data.quiz_scores) ? data.quiz_scores as { lesson_id: string; score: number }[] : []
+      } : null;
+    } catch (error) {
+      if (error.code === 'PGRST116') {
+        return null; // No progress found is normal
+      }
+      return this.handleError('getUserProgress', error, { courseId, userId });
+    }
   }
 
   // Создать или обновить прогресс пользователя

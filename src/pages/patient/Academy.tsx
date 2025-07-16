@@ -22,6 +22,7 @@ import { Course, UserProgress, LearningStats } from '@/types/academy';
 import { AcademyService } from '@/services/academyService';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { useSupabaseErrorHandler } from '@/hooks/useSupabaseErrorHandler';
 
 const categoryOptions = [
   { value: 'all', label: 'Все категории' },
@@ -42,6 +43,7 @@ const difficultyOptions = [
 
 export const Academy: React.FC = () => {
   const { user } = useAuth();
+  const { executeWithErrorHandling, isLoading: errorHandlerLoading } = useSupabaseErrorHandler();
   const [courses, setCourses] = useState<Course[]>([]);
   const [userProgress, setUserProgress] = useState<Record<string, UserProgress>>({});
   const [learningStats, setLearningStats] = useState<LearningStats | null>(null);
@@ -58,16 +60,25 @@ export const Academy: React.FC = () => {
   const loadAcademyData = async () => {
     if (!user) return;
 
-    try {
-      setLoading(true);
-      
-      // Загружаем курсы
-      const coursesData = await AcademyService.getCourses();
+    const coursesData = await executeWithErrorHandling(
+      () => AcademyService.getCourses(),
+      [],
+      {
+        successMessage: 'Данные Академии загружены',
+        skipErrorToast: false
+      }
+    );
+    
+    if (coursesData) {
       setCourses(coursesData);
 
       // Загружаем прогресс пользователя
       const progressPromises = coursesData.map(course => 
-        AcademyService.getUserProgress(course.id, user.id)
+        executeWithErrorHandling(
+          () => AcademyService.getUserProgress(course.id, user.id),
+          null,
+          { skipErrorToast: true }
+        )
       );
       const progressResults = await Promise.all(progressPromises);
       
@@ -80,27 +91,32 @@ export const Academy: React.FC = () => {
       setUserProgress(progressMap);
 
       // Загружаем статистику обучения
-      const stats = await AcademyService.getLearningStats(user.id);
-      setLearningStats(stats);
-
-    } catch (error) {
-      console.error('Error loading academy data:', error);
-      toast.error('Ошибка при загрузке данных Академии');
-    } finally {
-      setLoading(false);
+      const stats = await executeWithErrorHandling(
+        () => AcademyService.getLearningStats(user.id),
+        null,
+        { skipErrorToast: true }
+      );
+      
+      if (stats) {
+        setLearningStats(stats);
+      }
     }
   };
 
   const handleEnrollInCourse = async (courseId: string) => {
     if (!user) return;
 
-    try {
-      const progress = await AcademyService.enrollInCourse(courseId, user.id);
+    const progress = await executeWithErrorHandling(
+      () => AcademyService.enrollInCourse(courseId, user.id),
+      null,
+      {
+        successMessage: 'Вы записались на курс!',
+        skipErrorToast: false
+      }
+    );
+    
+    if (progress) {
       setUserProgress(prev => ({ ...prev, [courseId]: progress }));
-      toast.success('Вы записались на курс!');
-    } catch (error) {
-      console.error('Error enrolling in course:', error);
-      toast.error('Ошибка при записи на курс');
     }
   };
 
