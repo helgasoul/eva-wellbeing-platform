@@ -236,7 +236,7 @@ export const ADDITIONAL_SERVICES = [
   {
     id: 'mri_breast',
     name: 'МРТ молочной железы с контрастным усилением',
-    price: 8500,
+    price: 17500,
     description: 'Магнитно-резонансная томография с контрастом'
   },
   {

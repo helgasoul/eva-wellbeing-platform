@@ -830,169 +830,111 @@ const HowWeHelp: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Онлайн-консилиум врачей */}
-              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">👩‍⚕️</div>
-                <h3 className="font-semibold text-xl mb-3 text-foreground">Онлайн-консилиум врачей</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  <span className="font-medium text-primary">Ваша персональная команда заботы</span><br />
-                  Мультидисциплинарная консультация, чтобы принять верное решение вместе с ведущими специалистами.
-                </p>
-                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
-                  <span className="text-lg">💰</span>
-                  ₽15,000
-                </div>
-                <button className="w-full bg-gradient-to-r from-purple to-soft-pink hover:from-purple/90 hover:to-soft-pink/90 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
-                  Записаться
-                </button>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                    <span>🤝</span>
-                    Остались вопросы? Мы поможем
-                  </p>
-                </div>
-              </div>
+              {ADDITIONAL_SERVICES.map((service) => {
+                const getServiceIcon = (id: string) => {
+                  switch(id) {
+                    case 'consultation': return '👩‍⚕️';
+                    case 'biomarkers': return '🧪';
+                    case 'genetic_test': return '🧬';
+                    case 'dexa_scan': return '🦴';
+                    case 'nutrition_plan': return '🍏';
+                    case 'mammography': return '🔬';
+                    case 'endoscopy': return '🏥';
+                    case 'gynecologist_ultrasound': return '👩‍⚕️';
+                    case 'online_consilium': return '💬';
+                    case 'mri_breast': return '🩺';
+                    case 'mri_pelvis': return '🩺';
+                    case 'microbiome_atlas': return '🧬';
+                    default: return '🏥';
+                  }
+                };
 
-              {/* МРТ молочной железы */}
-              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🩺</div>
-                <h3 className="font-semibold text-xl mb-3 text-foreground">МРТ молочной железы с контрастным усилением</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  <span className="font-medium text-primary">Современная диагностика для вашего спокойствия</span><br />
-                  Магнитно-резонансная томография с бережным отношением к вашему здоровью.
-                </p>
-                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
-                  <span className="text-lg">💰</span>
-                  ₽8,500
-                </div>
-                <button className="w-full bg-gradient-to-r from-soft-blue to-purple hover:from-soft-blue/90 hover:to-purple/90 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
-                  Записаться
-                </button>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                    <span>🤝</span>
-                    Остались вопросы? Мы поможем
-                  </p>
-                </div>
-              </div>
+                const getServiceButtonText = (id: string) => {
+                  // Services that should have "Заказать" button
+                  const orderServices = ['genetic_test', 'biomarkers', 'microbiome_atlas'];
+                  return orderServices.includes(id) ? 'Заказать' : 'Записаться';
+                };
 
-              {/* DEXA-сканирование */}
-              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🦴</div>
-                <h3 className="font-semibold text-xl mb-3 text-foreground">DEXA-сканирование</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  <span className="font-medium text-primary">Контроль плотности костей для женского здоровья</span><br />
-                  Точная диагностика, заботливо и быстро.
-                </p>
-                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
-                  <span className="text-lg">💰</span>
-                  ₽4,000
-                </div>
-                <button className="w-full bg-gradient-to-r from-mint to-soft-blue hover:from-mint/90 hover:to-soft-blue/90 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
-                  Записаться
-                </button>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                    <span>🤝</span>
-                    Остались вопросы? Мы поможем
-                  </p>
-                </div>
-              </div>
+                const getServiceGradient = (id: string) => {
+                  switch(id) {
+                    case 'consultation': return 'from-purple to-soft-pink';
+                    case 'biomarkers': return 'from-soft-blue to-purple';
+                    case 'genetic_test': return 'from-purple-600 to-pink-600';
+                    case 'dexa_scan': return 'from-mint to-soft-blue';
+                    case 'nutrition_plan': return 'from-green-400 to-emerald-500';
+                    case 'mammography': return 'from-pink-500 to-rose-500';
+                    case 'endoscopy': return 'from-orange-400 to-red-400';
+                    case 'gynecologist_ultrasound': return 'from-purple-500 to-indigo-500';
+                    case 'online_consilium': return 'from-soft-blue to-purple';
+                    case 'mri_breast': return 'from-soft-blue to-purple';
+                    case 'mri_pelvis': return 'from-teal-500 to-cyan-500';
+                    case 'microbiome_atlas': return 'from-emerald-500 to-teal-500';
+                    default: return 'from-purple to-soft-pink';
+                  }
+                };
 
-              {/* Персональный план питания */}
-              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🍏</div>
-                <h3 className="font-semibold text-xl mb-3 text-foreground">Персональный план питания</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  <span className="font-medium text-primary">Индивидуально, с заботой о вас</span><br />
-                  Рекомендации от нутрициолога, учитывающие ваши особенности и потребности.
-                </p>
-                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
-                  <span className="text-lg">💰</span>
-                  ₽2,500
-                </div>
-                <button className="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
-                  Записаться
-                </button>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                    <span>🤝</span>
-                    Остались вопросы? Мы поможем
-                  </p>
-                </div>
-              </div>
+                const getServiceDescription = (id: string) => {
+                  switch(id) {
+                    case 'consultation': return 'Профессиональная консультация специалиста для решения ваших вопросов';
+                    case 'biomarkers': return 'Расширенная панель биомаркеров для комплексного анализа здоровья';
+                    case 'genetic_test': return 'Экзомное секвенирование для понимания генетических особенностей и рисков';
+                    case 'dexa_scan': return 'Точная диагностика плотности костной ткани для женского здоровья';
+                    case 'nutrition_plan': return 'Индивидуальный план питания от нутрициолога с учетом ваших потребностей';
+                    case 'mammography': return 'Рентгеновское исследование молочных желез с комфортом и заботой';
+                    case 'endoscopy': return 'Комплексное эндоскопическое обследование под наркозом для вашего комфорта';
+                    case 'gynecologist_ultrasound': return 'Комплексный осмотр с ультразвуковой диагностикой от специалиста';
+                    case 'online_consilium': return 'Мультидисциплинарная консультация ведущих специалистов онлайн';
+                    case 'mri_breast': return 'Магнитно-резонансная томография с контрастом для точной диагностики';
+                    case 'mri_pelvis': return 'Магнитно-резонансная томография органов малого таза';
+                    case 'microbiome_atlas': return 'Комплексное исследование микробиома кишечника от ведущей компании';
+                    default: return service.description;
+                  }
+                };
 
-              {/* Генетическое тестирование */}
-              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2 relative">
-                <div className="absolute -top-3 -right-3 bg-gradient-to-r from-orange-400 to-red-400 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  Популярное
-                </div>
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🧬</div>
-                <h3 className="font-semibold text-xl mb-3 text-foreground">Генетическое тестирование</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  <span className="font-medium text-primary">Ваша уникальная карта здоровья</span><br />
-                  Экзомное секвенирование для понимания генетических особенностей и рисков.
-                </p>
-                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
-                  <span className="text-lg">💰</span>
-                  ₽25,000
-                </div>
-                <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
-                  Записаться
-                </button>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                    <span>🤝</span>
-                    Остались вопросы? Мы поможем
-                  </p>
-                </div>
-              </div>
+                const isPopular = service.id === 'genetic_test';
 
-              {/* Маммография */}
-              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🔬</div>
-                <h3 className="font-semibold text-xl mb-3 text-foreground">Маммография</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  <span className="font-medium text-primary">Деликатная забота о женском здоровье</span><br />
-                  Рентгеновское исследование молочных желез с комфортом и заботой.
-                </p>
-                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
-                  <span className="text-lg">💰</span>
-                  ₽5,000
-                </div>
-                <button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
-                  Записаться
-                </button>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                    <span>🤝</span>
-                    Остались вопросы? Мы поможем
-                  </p>
-                </div>
-              </div>
-
-              {/* Анализ Микробиома компании Атлас */}
-              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
-                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🧬</div>
-                <h3 className="font-semibold text-xl mb-3 text-foreground">Анализ Микробиома компании Атлас</h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
-                  <span className="font-medium text-primary">Ваша микробиота под контролем</span><br />
-                  Комплексное исследование микробиома кишечника от ведущей компании для понимания вашего здоровья.
-                </p>
-                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
-                  <span className="text-lg">💰</span>
-                  ₽12,000
-                </div>
-                <button className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
-                  Заказать
-                </button>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-                    <span>🤝</span>
-                    Остались вопросы? Мы поможем
-                  </p>
-                </div>
-              </div>
+                return (
+                  <div key={service.id} className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2 relative">
+                    {isPopular && (
+                      <div className="absolute -top-3 -right-3 bg-gradient-to-r from-orange-400 to-red-400 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        Популярное
+                      </div>
+                    )}
+                    <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                      {getServiceIcon(service.id)}
+                    </div>
+                    <h3 className="font-semibold text-xl mb-3 text-foreground">
+                      {service.name}
+                    </h3>
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      <span className="font-medium text-primary">
+                        {service.id === 'genetic_test' ? 'Ваша уникальная карта здоровья' :
+                         service.id === 'mri_breast' ? 'Современная диагностика для вашего спокойствия' :
+                         service.id === 'online_consilium' ? 'Ваша персональная команда заботы' :
+                         service.id === 'dexa_scan' ? 'Контроль плотности костей для женского здоровья' :
+                         service.id === 'nutrition_plan' ? 'Индивидуально, с заботой о вас' :
+                         service.id === 'mammography' ? 'Деликатная забота о женском здоровье' :
+                         service.id === 'microbiome_atlas' ? 'Ваша микробиота под контролем' :
+                         'Профессиональная медицинская помощь'}
+                      </span><br />
+                      {getServiceDescription(service.id)}
+                    </p>
+                    <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                      <span className="text-lg">💰</span>
+                      ₽{service.price.toLocaleString()}
+                    </div>
+                    <button className={`w-full bg-gradient-to-r ${getServiceGradient(service.id)} hover:opacity-90 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105`}>
+                      {getServiceButtonText(service.id)}
+                    </button>
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                        <span>🤝</span>
+                        Остались вопросы? Мы поможем
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Support Message */}
