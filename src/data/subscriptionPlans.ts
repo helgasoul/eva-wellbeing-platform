@@ -124,7 +124,7 @@ export const SUBSCRIPTION_PLANS = [
   },
   {
     id: 'digital_twin' as const,
-    name: 'BLOOM Digital Twin',
+    name: 'без|паузы Digital Twin',
     subtitle: 'Тариф будущего',
     price: 49990,
     monthlyPrice: 4165,

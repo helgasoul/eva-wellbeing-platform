@@ -97,7 +97,7 @@ const HowWeHelp: React.FC = () => {
                 </div>
                 <button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-elegant hover:shadow-soft transform hover:-translate-y-1 group">
                   <Heart className="mr-3 h-5 w-5 group-hover:animate-pulse transition-all duration-300" />
-                  Начать путь с Bloom
+                  Начать путь с без|паузы
                 </button>
               </div>
               <div className="order-1 lg:order-2 flex justify-center">
@@ -324,7 +324,7 @@ const HowWeHelp: React.FC = () => {
                       {plan.popular && (
                         <div className="mt-4">
                           <span className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground px-4 py-2 rounded-full text-sm font-bold flex items-center justify-center gap-1">
-                            🌸 Самый популярный выбор среди женщин Bloom
+                            🌸 Самый популярный выбор среди женщин без|паузы
                           </span>
                         </div>
                       )}

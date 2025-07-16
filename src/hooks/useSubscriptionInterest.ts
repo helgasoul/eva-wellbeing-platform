@@ -28,7 +28,7 @@ export const useSubscriptionInterest = () => {
       }
 
       toast.success('Спасибо за ваш интерес! Мы сообщим, когда тариф будет доступен', {
-        description: 'Вы получите уведомление на email, когда BLOOM Digital Twin будет запущен'
+        description: 'Вы получите уведомление на email, когда без|паузы Digital Twin будет запущен'
       });
 
       return true;
