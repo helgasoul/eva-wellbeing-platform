@@ -423,12 +423,16 @@ const PatientDashboard = () => {
       
       const missingStepsText = progress.missingSteps.slice(0, 3).map((step: string) => {
         switch (step) {
-          case 'basic-info': return 'базовая информация';
-          case 'health-status': return 'состояние здоровья';
+          case 'basicInfo': return 'основная информация';
+          case 'menstrualHistory': return 'менструальная история';
           case 'symptoms': return 'симптомы';
+          case 'medicalHistory': return 'медицинская история';
           case 'lifestyle': return 'образ жизни';
-          case 'nutrition': return 'питание';
           case 'goals': return 'цели';
+          // Обратная совместимость со старыми значениями
+          case 'basic-info': return 'основная информация';
+          case 'health-status': return 'состояние здоровья';
+          case 'nutrition': return 'питание';
           default: return step;
         }
       }).join(', ');
