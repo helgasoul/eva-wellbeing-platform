@@ -2,7 +2,7 @@
 import React from 'react';
 import { User } from '@/types/auth';
 import { UserRole } from '@/types/roles';
-import { Bell, Search, User as UserIcon, LogOut, Settings, MessageCircle, Crown, Heart } from 'lucide-react';
+import { Bell, Search, User as UserIcon, LogOut, Settings, MessageCircle, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -95,7 +95,6 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
               {/* Логотип с иконкой */}
               <div className="flex items-center space-x-2">
                 <Logo size="sm" showText={false} />
-                <Heart className="h-5 w-5 text-primary animate-pulse" />
               </div>
               <div>
                 <h1 className="text-xl font-playfair font-semibold text-foreground">
