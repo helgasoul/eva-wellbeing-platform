@@ -38,7 +38,7 @@ const ValuePropositionSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl font-bold text-foreground mb-6 leading-tight">
-            Почему с Bloom забота о себе становится проще
+            Почему с без | паузы забота о себе становится проще
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-4">
             Здесь сочетаются забота, наука и технологии — ради вашего комфорта и уверенности
@@ -77,7 +77,7 @@ const ValuePropositionSection: React.FC = () => {
         <div className="bg-gradient-to-r from-accent/20 via-background to-muted/30 rounded-3xl p-8 border border-border/30 shadow-clean">
           <div className="text-center">
             <p className="text-lg font-medium text-foreground mb-2">
-              С заботой о вашем будущем, команда Bloom
+              С заботой о вашем будущем, команда без | паузы
             </p>
             <p className="text-muted-foreground text-sm">
               Если возникнут вопросы — мы всегда рядом, чтобы поддержать
