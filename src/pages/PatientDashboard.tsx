@@ -407,14 +407,62 @@ const PatientDashboard = () => {
 
   // Призыв к завершению онбординга для пользователей с неполными данными
   const OnboardingPrompt = () => {
-    // Показываем только если валидация загружена и данные неполные
-    if (isLoadingValidation || !onboardingValidation) return null;
+    // Показываем загрузку пока валидация не завершена
+    if (isLoadingValidation) {
+      return (
+        <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 shadow-elegant">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600"></div>
+              <span className="ml-2 text-amber-700">Проверка данных профиля...</span>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+    
+    // Fallback: если валидация не загрузилась, показываем базовый prompt
+    if (!onboardingValidation) {
+      console.log('OnboardingPrompt: Validation data missing, showing fallback');
+      return (
+        <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 shadow-elegant">
+          <CardContent className="p-6">
+            <div className="flex items-start">
+              <AlertCircle className="w-6 h-6 text-amber-600 mr-3 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-900 mb-1">Улучшите персонализацию</h3>
+                <p className="text-amber-700 text-sm mb-3">
+                  Завершите заполнение профиля для получения персональных рекомендаций
+                </p>
+              </div>
+              <Button 
+                onClick={() => navigate('/patient/onboarding')}
+                className="ml-4 bg-amber-600 hover:bg-amber-700 text-white"
+              >
+                Завершить
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
     
     const { isValid, progress } = onboardingValidation;
     const completionPercentage = progress?.completionPercentage || 0;
     
-    // Показываем prompt только если данные неполные (менее 70%)
-    if (isValid && completionPercentage >= 70) return null;
+    // Добавляем отладочную информацию
+    console.log('OnboardingPrompt debug:', {
+      isValid,
+      completionPercentage,
+      missingSteps: progress?.missingSteps,
+      shouldShow: completionPercentage < 70
+    });
+    
+    // Упрощенная логика: показываем prompt если завершенность меньше 70%
+    if (completionPercentage >= 70) {
+      console.log('OnboardingPrompt: Profile complete enough, hiding prompt');
+      return null;
+    }
     
     const getMissingDataText = () => {
       if (!progress?.missingSteps || progress.missingSteps.length === 0) {
