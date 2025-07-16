@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Layout } from '@/components/layout/Layout';
+import { PatientLayout } from '@/components/layout/PatientLayout';
 import { CourseCard } from '@/components/academy/CourseCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,48 +58,59 @@ export const Academy: React.FC = () => {
   }, [user]);
 
   const loadAcademyData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const coursesData = await executeWithErrorHandling(
-      () => AcademyService.getCourses(),
-      [],
-      {
-        successMessage: 'Данные Академии загружены',
-        skipErrorToast: false
-      }
-    );
-    
-    if (coursesData) {
-      setCourses(coursesData);
+    setLoading(true);
+    try {
+      const coursesData = await executeWithErrorHandling(
+        () => AcademyService.getCourses(),
+        [],
+        {
+          successMessage: 'Данные Академии загружены',
+          skipErrorToast: false
+        }
+      );
+      
+      if (coursesData) {
+        setCourses(coursesData);
 
-      // Загружаем прогресс пользователя
-      const progressPromises = coursesData.map(course => 
-        executeWithErrorHandling(
-          () => AcademyService.getUserProgress(course.id, user.id),
+        // Загружаем прогресс пользователя
+        const progressPromises = coursesData.map(course => 
+          executeWithErrorHandling(
+            () => AcademyService.getUserProgress(course.id, user.id),
+            null,
+            { skipErrorToast: true }
+          )
+        );
+        const progressResults = await Promise.all(progressPromises);
+        
+        const progressMap: Record<string, UserProgress> = {};
+        progressResults.forEach((progress, index) => {
+          if (progress) {
+            progressMap[coursesData[index].id] = progress;
+          }
+        });
+        setUserProgress(progressMap);
+
+        // Загружаем статистику обучения
+        const stats = await executeWithErrorHandling(
+          () => AcademyService.getLearningStats(user.id),
           null,
           { skipErrorToast: true }
-        )
-      );
-      const progressResults = await Promise.all(progressPromises);
-      
-      const progressMap: Record<string, UserProgress> = {};
-      progressResults.forEach((progress, index) => {
-        if (progress) {
-          progressMap[coursesData[index].id] = progress;
+        );
+        
+        if (stats) {
+          setLearningStats(stats);
         }
-      });
-      setUserProgress(progressMap);
-
-      // Загружаем статистику обучения
-      const stats = await executeWithErrorHandling(
-        () => AcademyService.getLearningStats(user.id),
-        null,
-        { skipErrorToast: true }
-      );
-      
-      if (stats) {
-        setLearningStats(stats);
       }
+    } catch (error) {
+      console.error('Error loading academy data:', error);
+      toast.error('Ошибка при загрузке данных Академии');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -153,24 +164,36 @@ export const Academy: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-muted rounded w-64 mb-4"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-80 bg-muted rounded-lg"></div>
-              ))}
-            </div>
+      <PatientLayout title="Академия без|паузы">
+        <div className="animate-pulse">
+          <div className="h-8 bg-muted rounded w-64 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-80 bg-muted rounded-lg"></div>
+            ))}
           </div>
         </div>
-      </Layout>
+      </PatientLayout>
+    );
+  }
+
+  if (!user) {
+    return (
+      <PatientLayout title="Академия без|паузы">
+        <div className="text-center py-12">
+          <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">Требуется авторизация</h3>
+          <p className="text-muted-foreground">
+            Войдите в систему, чтобы получить доступ к образовательным материалам
+          </p>
+        </div>
+      </PatientLayout>
     );
   }
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
+    <PatientLayout title="Академия без|паузы">
+      <div>
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
@@ -375,6 +398,6 @@ export const Academy: React.FC = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </PatientLayout>
   );
 };
