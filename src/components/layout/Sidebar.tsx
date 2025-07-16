@@ -114,11 +114,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
     switch (userRole) {
       case UserRole.PATIENT:
         return {
-          gradient: 'from-eva-dusty-rose to-eva-mauve',
-          bg: 'bg-white/80 backdrop-blur-sm border-eva-dusty-rose/20',
-          activeGradient: 'from-eva-dusty-rose to-eva-mauve',
-          hoverBg: 'hover:bg-eva-soft-pink hover:text-eva-dusty-rose',
-          iconColor: 'text-eva-dusty-rose'
+          gradient: 'from-soft-pink to-soft-purple',
+          bg: 'bg-white/80 backdrop-blur-sm border-soft-pink/20',
+          activeGradient: 'from-soft-pink to-soft-purple',
+          hoverBg: 'hover:bg-soft-pink/20 hover:text-soft-pink-foreground',
+          iconColor: 'text-soft-pink-foreground'
         };
       case UserRole.DOCTOR:
         return {
