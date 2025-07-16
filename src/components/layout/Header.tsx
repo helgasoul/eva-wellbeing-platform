@@ -43,13 +43,13 @@ export const Header = () => {
 
   const navItems = [
     { path: '/', label: 'Домой' },
-    { path: '/about', label: 'Почему Bloom' },
+    { path: '/about', label: 'Почему без | паузы' },
     { path: '/how-we-help', label: 'Как мы помогаем' },
     { path: '/contact', label: 'Написать команде' }
   ];
 
-  // Smart navigation for "Мой Bloom" button with enhanced error handling
-  const handleMyBloomClick = React.useCallback(async () => {
+  // Smart navigation for "Мой профиль" button with enhanced error handling
+  const handleMyProfileClick = React.useCallback(async () => {
     if (isNavigating || authLoading) {
       console.log('🔄 Navigation blocked: already navigating or loading auth');
       return;
@@ -151,13 +151,13 @@ export const Header = () => {
             <Button 
               variant="ghost"
               className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
-              onClick={handleMyBloomClick}
+              onClick={handleMyProfileClick}
               disabled={isNavigating}
             >
               {user ? (
                 <User className="mr-2 h-4 w-4" />
               ) : null}
-              {user ? 'Мой профиль' : 'Мой Bloom'}
+              {user ? 'Мой профиль' : 'Мой профиль'}
             </Button>
             
             {!user && (
@@ -232,14 +232,14 @@ export const Header = () => {
                   className="w-full justify-center py-3 font-medium rounded-xl"
                   onClick={() => {
                     setIsMenuOpen(false);
-                    handleMyBloomClick();
+                    handleMyProfileClick();
                   }}
                   disabled={isNavigating}
                 >
                   {user ? (
                     <User className="mr-2 h-4 w-4" />
                   ) : null}
-                  {user ? 'Мой профиль' : 'Мой Bloom'}
+                  {user ? 'Мой профиль' : 'Мой профиль'}
                 </Button>
                 
                 {!user && (

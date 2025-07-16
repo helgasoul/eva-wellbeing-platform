@@ -240,7 +240,7 @@ export const ExpertTeam: React.FC<ExpertTeamProps> = ({
           <div className="inline-flex items-center space-x-2 bg-card/70 backdrop-blur-sm rounded-full px-8 py-4 border border-primary/20 shadow-lg">
             <Heart className="h-5 w-5 text-primary animate-pulse" />
             <p className="text-lg font-medium text-[#53415B] italic">
-              Врачи Bloom — всегда на связи и готовы поддержать вас на любом этапе пути
+              Врачи без | паузы — всегда на связи и готовы поддержать вас на любом этапе пути
             </p>
             <Heart className="h-5 w-5 text-primary animate-pulse" />
           </div>

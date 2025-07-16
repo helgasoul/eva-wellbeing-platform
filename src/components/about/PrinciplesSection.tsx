@@ -133,7 +133,7 @@ export const PrinciplesSection: React.FC<PrinciplesSectionProps> = ({
           <div className="inline-flex items-center space-x-2 bg-white/50 backdrop-blur-sm rounded-full px-6 py-3 border border-primary/20">
             <Heart className="h-5 w-5 text-primary animate-pulse" />
             <p className="text-lg font-medium italic text-[#53415B]">
-              С заботой о вашем будущем, команда bloom
+              С заботой о вашем будущем, команда без | паузы
             </p>
             <Heart className="h-5 w-5 text-primary animate-pulse" />
           </div>

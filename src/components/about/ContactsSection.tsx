@@ -38,7 +38,7 @@ export const ContactsSection: React.FC<ContactsSectionProps> = ({
       key: 'press',
       title: 'Пресса',
       icon: MapPin,
-      description: 'Готовы рассказать и поделиться историей Bloom',
+      description: 'Готовы рассказать и поделиться историей без | паузы',
       microcopy: 'Готовы делиться историей и вдохновлять',
       gradient: 'from-blue-500 to-purple-500'
     }
@@ -107,7 +107,7 @@ export const ContactsSection: React.FC<ContactsSectionProps> = ({
         <div className="text-center mt-12 pt-8 border-t border-pink-200/50">
           <p className="text-lg text-muted-foreground leading-relaxed">
             <span className="text-2xl mr-2">✨</span>
-            Ваша история — важна для нас. Bloom — это не только сервис, это сообщество поддержки.
+            Ваша история — важна для нас. без | паузы — это не только сервис, это сообщество поддержки.
           </p>
         </div>
       </div>

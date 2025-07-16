@@ -51,7 +51,7 @@ import Calendar from "./pages/patient/Calendar";
 import AdvancedRecommendations from "./pages/patient/AdvancedRecommendations";
 import HealthDataIntegrations from "./pages/patient/HealthDataIntegrations";
 import MedicalDigitalTwin from './pages/patient/MedicalDigitalTwin';
-import { BloomAcademy } from './pages/patient/BloomAcademy';
+import { Academy } from './pages/patient/Academy';
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
@@ -411,7 +411,7 @@ function App() {
     <Route path="/patient/academy" element={
       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
         <OnboardingGuard>
-          <BloomAcademy />
+          <Academy />
         </OnboardingGuard>
       </ProtectedRoute>
     } />

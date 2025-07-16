@@ -120,7 +120,7 @@ export const LoginForm = () => {
       <div className="bloom-card p-8 w-full max-w-md mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-playfair font-semibold text-foreground mb-2">
-          Добро пожаловать в bloom
+          Добро пожаловать в без | паузы
         </h2>
         <p className="text-muted-foreground">
           Войдите в свой аккаунт

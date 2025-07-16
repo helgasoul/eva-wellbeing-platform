@@ -32,7 +32,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
         {/* Заголовок секции */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-[#53415B] mb-4 leading-tight animate-fade-in">
-            Знакомьтесь с человеком, который стоит за Bloom
+            Знакомьтесь с человеком, который стоит за без | паузы
           </h2>
           <p className="text-xl text-[#A97FB2] max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
             Человеческая история, которая изменила подход к женскому здоровью
@@ -94,7 +94,7 @@ export const FounderSection: React.FC<FounderSectionProps> = ({
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-soft-purple/30 shadow-lg animate-fade-in" style={{ animationDelay: '0.6s' }}>
                 <div className="text-4xl text-[#A97FB2] mb-4 text-center">"</div>
                 <p className="text-lg text-[#53415B] italic text-center leading-relaxed">
-                  Для меня Bloom — это не просто проект, а способ быть рядом с каждой женщиной в момент перемен.
+                  Для меня без | паузы — это не просто проект, а способ быть рядом с каждой женщиной в момент перемен.
                 </p>
                 <div className="text-4xl text-[#A97FB2] text-right">"</div>
               </div>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { UserRole, ROLE_LABELS, ROLE_DESCRIPTIONS } from '@/types/roles';
 import { Heart, Stethoscope, Shield } from 'lucide-react';
-import bloomIcon from '@/assets/bloom-icon.png';
+import { Logo } from '@/components/ui/logo';
 
 interface RoleSelectorProps {
   selectedRole: UserRole;
@@ -55,7 +55,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
               {role.icon && (
                 <div className={`p-3 rounded-full bg-gradient-to-br ${role.color} flex items-center justify-center`}>
                   {role.icon === 'bloom' ? (
-                    <img src={bloomIcon} alt="Bloom" className="h-6 w-6" />
+                    <Logo size="sm" showText={false} className="h-6 w-6" />
                   ) : (
                     <role.icon className="h-6 w-6 text-eva-dusty-rose" />
                   )}

@@ -19,7 +19,7 @@ interface AppLayoutProps {
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ 
   children, 
-  title = 'bloom',
+  title = 'без | паузы',
   role,
   showNavigation = true,
   breadcrumbs = [],
@@ -100,10 +100,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
               <div className="w-6 h-6 bg-gradient-to-br from-primary to-bloom-caramel rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xs">B</span>
+                <span className="text-white font-bold text-xs">б</span>
               </div>
               <span className="text-sm soft-text">
-                © 2024 bloom. Платформа поддержки женщин.
+                © 2024 без | паузы. Платформа поддержки женщин.
               </span>
             </div>
             <div className="flex space-x-4 text-sm soft-text">

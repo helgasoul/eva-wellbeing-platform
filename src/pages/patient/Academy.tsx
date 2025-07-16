@@ -40,7 +40,7 @@ const difficultyOptions = [
   { value: 'advanced', label: 'Продвинутый' }
 ];
 
-export const BloomAcademy: React.FC = () => {
+export const Academy: React.FC = () => {
   const { user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [userProgress, setUserProgress] = useState<Record<string, UserProgress>>({});
@@ -85,7 +85,7 @@ export const BloomAcademy: React.FC = () => {
 
     } catch (error) {
       console.error('Error loading academy data:', error);
-      toast.error('Ошибка при загрузке данных Academy');
+      toast.error('Ошибка при загрузке данных Академии');
     } finally {
       setLoading(false);
     }
@@ -159,7 +159,7 @@ export const BloomAcademy: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold">Bloom Academy</h1>
+            <h1 className="text-3xl font-bold">Академия</h1>
           </div>
           <p className="text-muted-foreground text-lg">
             Образовательная платформа для женского здоровья и благополучия
