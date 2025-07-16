@@ -43,6 +43,20 @@ export const useSupabaseErrorHandler = (): UseSupabaseErrorHandlerReturn => {
     );
   };
 
+  const isAuthError = (error: any): boolean => {
+    const errorMessage = error?.message || '';
+    return (
+      errorMessage.includes('requested path is invalid') ||
+      errorMessage.includes('Authentication failed') ||
+      errorMessage.includes('Invalid login credentials') ||
+      errorMessage.includes('Email not confirmed') ||
+      errorMessage.includes('User not found') ||
+      error?.code === 'SIGNUP_DISABLED' ||
+      error?.code === 'INVALID_CREDENTIALS' ||
+      error?.code === 'EMAIL_NOT_CONFIRMED'
+    );
+  };
+
   const isSupabaseError = (error: any): boolean => {
     return error?.code && error?.message && (error?.details || error?.hint);
   };
@@ -50,6 +64,13 @@ export const useSupabaseErrorHandler = (): UseSupabaseErrorHandlerReturn => {
   const getErrorMessage = (error: any): string => {
     if (isNetworkError(error)) {
       return 'Проблемы с подключением к серверу. Используются локальные данные.';
+    }
+    
+    if (isAuthError(error)) {
+      if (error?.message?.includes('requested path is invalid')) {
+        return 'Неверные настройки авторизации. Перейдите в настройки Supabase для исправления.';
+      }
+      return 'Ошибка авторизации. Попробуйте войти заново или обратитесь к администратору.';
     }
     
     if (isSupabaseError(error)) {

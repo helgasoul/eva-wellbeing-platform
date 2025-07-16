@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '@/types/roles';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -21,9 +21,36 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectTo
 }) => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
   // Улучшенная загрузка с таймаутом для предотвращения бесконечной загрузки
   const [loadingTimeout, setLoadingTimeout] = React.useState(false);
+  const [authError, setAuthError] = React.useState<string | null>(null);
+
+  // Проверяем параметры URL на наличие ошибок авторизации
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const error = urlParams.get('error');
+    const errorDescription = urlParams.get('error_description');
+    
+    if (error) {
+      console.error('Auth error detected:', error, errorDescription);
+      setAuthError(error);
+      
+      // Сохраняем детали ошибки в localStorage для диагностики
+      localStorage.setItem('eva_auth_error', JSON.stringify({
+        error,
+        errorDescription,
+        timestamp: new Date().toISOString(),
+        url: window.location.href
+      }));
+    }
+  }, [location.search]);
+
+  // Если обнаружена ошибка авторизации, перенаправляем на страницу ошибки
+  if (authError) {
+    return <Navigate to="/auth-error" replace />;
+  }
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
