@@ -25,7 +25,15 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
 
   useEffect(() => {
     // Проверяем только после загрузки пользователя
-    if (isLoading || !user) return;
+    if (isLoading) {
+      logger.debug('OnboardingGuard: Still loading user');
+      return;
+    }
+
+    if (!user) {
+      logger.debug('OnboardingGuard: No user found');
+      return;
+    }
 
     // Проверка только для пациенток
     if (user.role === 'patient') {
@@ -44,7 +52,22 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       // Проверяем, есть ли у пользователя критически важные данные
       const hasEssentialData = user.registrationCompleted || 
                               user.onboardingData || 
-                              Boolean(user.menopausePhase);
+                              Boolean(user.menopausePhase) ||
+                              (user.firstName && user.lastName);
+      
+      logger.debug('OnboardingGuard: Authentication check', {
+        userId: user.id,
+        email: user.email,
+        hasCompletedOnboarding,
+        hasEssentialData,
+        registrationCompleted: user.registrationCompleted,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        menopausePhase: user.menopausePhase,
+        onboardingData: !!user.onboardingData,
+        currentPath: location.pathname,
+        isPasswordRecovery
+      });
       
       // Если это восстановление пароля и у пользователя есть хотя бы базовые данные,
       // считаем онбординг завершенным и не редиректим
@@ -55,7 +78,6 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       
       // Улучшенная логика: проверяем наличие базовых данных онбординга
       if (!hasCompletedOnboarding && !hasEssentialData) {
-      
         logger.info('OnboardingGuard: Redirecting to onboarding', {
           userId: user.id,
           currentPath: location.pathname,
@@ -68,9 +90,11 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
         return;
       }
       
-      logger.debug('OnboardingGuard: Onboarding completed, allowing access', {
+      logger.debug('OnboardingGuard: Onboarding completed or has essential data, allowing access', {
         userId: user.id,
-        currentPath: location.pathname
+        currentPath: location.pathname,
+        hasCompletedOnboarding,
+        hasEssentialData
       });
     }
   }, [user, isLoading, navigate, location.pathname]);

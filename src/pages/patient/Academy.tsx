@@ -59,10 +59,12 @@ export const Academy: React.FC = () => {
 
   const loadAcademyData = async () => {
     if (!user) {
+      console.log('📚 Academy: No user found, skipping data load');
       setLoading(false);
       return;
     }
 
+    console.log('📚 Academy: Loading data for user:', user.email);
     setLoading(true);
     try {
       const coursesData = await executeWithErrorHandling(
@@ -75,6 +77,7 @@ export const Academy: React.FC = () => {
       );
       
       if (coursesData) {
+        console.log('📚 Academy: Loaded courses:', coursesData.length);
         setCourses(coursesData);
 
         // Загружаем прогресс пользователя
@@ -94,6 +97,7 @@ export const Academy: React.FC = () => {
           }
         });
         setUserProgress(progressMap);
+        console.log('📚 Academy: Loaded progress for courses:', Object.keys(progressMap).length);
 
         // Загружаем статистику обучения
         const stats = await executeWithErrorHandling(
@@ -104,10 +108,11 @@ export const Academy: React.FC = () => {
         
         if (stats) {
           setLearningStats(stats);
+          console.log('📚 Academy: Loaded learning stats:', stats);
         }
       }
     } catch (error) {
-      console.error('Error loading academy data:', error);
+      console.error('📚 Academy: Error loading data:', error);
       toast.error('Ошибка при загрузке данных Академии');
     } finally {
       setLoading(false);
@@ -178,14 +183,21 @@ export const Academy: React.FC = () => {
   }
 
   if (!user) {
+    console.log('📚 Academy: No user found, showing auth required message');
     return (
       <PatientLayout title="Академия без|паузы">
         <div className="text-center py-12">
           <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">Требуется авторизация</h3>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-4">
             Войдите в систему, чтобы получить доступ к образовательным материалам
           </p>
+          <Button 
+            onClick={() => window.location.href = '/auth'}
+            className="mt-4"
+          >
+            Войти в систему
+          </Button>
         </div>
       </PatientLayout>
     );
