@@ -14,7 +14,8 @@ import {
   BarChart3,
   BookOpen,
   Stethoscope,
-  Brain
+  Brain,
+  GraduationCap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -40,6 +41,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ role, classN
           { name: 'Главная', href: '/patient/dashboard', icon: Home },
           { name: 'Симптомы', href: '/patient/symptoms', icon: Activity },
           { name: 'Питание', href: '/patient/nutrition', icon: Calculator },
+          { name: 'Академия', href: '/patient/academy', icon: GraduationCap },
           { name: 'ИИ-помощник', href: '/patient/ai-chat', icon: MessageSquare, badge: 2 },
           { name: 'Настройки', href: '/patient/settings', icon: Settings },
         ];
