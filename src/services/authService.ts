@@ -156,8 +156,8 @@ class AuthService {
 
   // Вход в систему с поддержкой JIT миграции и улучшенной обработкой ошибок
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const MAX_RETRIES = 3;
-    const RETRY_DELAY = 1000; // 1 секунда
+    const MAX_RETRIES = 4;
+    const BASE_RETRY_DELAY = 2000; // 2 секунды
     
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -177,9 +177,9 @@ class AuthService {
           }
         }
         
-        // 1. Пытаемся войти через Supabase с таймаутом
+        // 1. Пытаемся войти через Supabase с увеличенным таймаутом
         const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('Network timeout')), 15000); // 15 секунд
+          setTimeout(() => reject(new Error('Network timeout')), 45000); // 45 секунд
         });
 
         const signInPromise = supabase.auth.signInWithPassword({
@@ -196,12 +196,14 @@ class AuthService {
           const isNetworkError = error.message.includes('Load failed') || 
                                 error.message.includes('Network timeout') ||
                                 error.message.includes('fetch') ||
+                                error.message.includes('AbortError') ||
                                 error.name === 'AuthRetryableFetchError' ||
                                 error.name === 'TypeError';
 
           if (isNetworkError && attempt < MAX_RETRIES) {
-            console.warn(`🔄 Сетевая ошибка на попытке ${attempt + 1}, повторяем через ${RETRY_DELAY * (attempt + 1)}мс...`);
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (attempt + 1)));
+            const retryDelay = Math.min(BASE_RETRY_DELAY * Math.pow(2, attempt) + Math.random() * 1000, 15000);
+            console.warn(`🔄 Сетевая ошибка на попытке ${attempt + 1}, повторяем через ${retryDelay}мс...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
             continue; // Пробуем снова
           }
           
@@ -330,12 +332,14 @@ class AuthService {
         const isNetworkError = error.message.includes('Load failed') || 
                               error.message.includes('Network timeout') ||
                               error.message.includes('fetch') ||
+                              error.message.includes('AbortError') ||
                               error.name === 'AuthRetryableFetchError' ||
                               error.name === 'TypeError';
 
         if (isNetworkError && attempt < MAX_RETRIES) {
-          console.warn(`🔄 Сетевая ошибка на попытке ${attempt + 1}, повторяем через ${RETRY_DELAY * (attempt + 1)}мс...`);
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (attempt + 1)));
+          const retryDelay = Math.min(BASE_RETRY_DELAY * Math.pow(2, attempt) + Math.random() * 1000, 15000);
+          console.warn(`🔄 Сетевая ошибка на попытке ${attempt + 1}, повторяем через ${retryDelay}мс...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
           continue; // Пробуем снова
         }
         

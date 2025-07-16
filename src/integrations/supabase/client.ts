@@ -32,20 +32,29 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
       'apikey': SUPABASE_PUBLISHABLE_KEY,
       'X-Client-Info': `bloom-app-${isProduction ? 'prod' : 'dev'}`
     },
-    fetch: (url, options = {}) => {
+    fetch: (url, options: any = {}) => {
       const startTime = Date.now();
       
       // Увеличенный таймаут для критических авторизационных запросов
       const isAuthRequest = url.includes('/auth/') || url.includes('/rest/v1/user_profiles');
-      const timeout = isAuthRequest ? 30000 : 15000; // 30s для auth, 15s для остальных
+      const timeout = isAuthRequest ? 60000 : 30000; // 60s для auth, 30s для остальных
       
       const fetchWithRetry = async (retryCount = 0): Promise<Response> => {
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
+          
           const response = await fetch(url, {
             ...options,
-            signal: AbortSignal.timeout(timeout)
+            signal: controller.signal,
+            headers: {
+              ...(options.headers || {}),
+              'Keep-Alive': 'timeout=60, max=100',
+              'Connection': 'keep-alive'
+            }
           });
           
+          clearTimeout(timeoutId);
           const duration = Date.now() - startTime;
           
           if (isDevelopment) {
@@ -56,11 +65,19 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
             });
           }
           
-          // Retry логика для 5xx ошибок и timeout
-          if (!response.ok && response.status >= 500 && retryCount < 2) {
-            console.warn(`⚠️ Server error ${response.status}, retrying... (attempt ${retryCount + 1})`);
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000)); // Exponential backoff
-            return fetchWithRetry(retryCount + 1);
+          // Retry логика для 5xx ошибок, 429, и некоторых 4xx
+          if (!response.ok && retryCount < 3) {
+            const shouldRetry = response.status >= 500 || 
+                               response.status === 429 || 
+                               response.status === 408 ||
+                               response.status === 0;
+            
+            if (shouldRetry) {
+              const retryDelay = Math.min(Math.pow(2, retryCount) * 1000 + Math.random() * 1000, 10000);
+              console.warn(`⚠️ Server error ${response.status}, retrying in ${retryDelay}ms... (attempt ${retryCount + 1})`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              return fetchWithRetry(retryCount + 1);
+            }
           }
           
           return response;
@@ -68,15 +85,19 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
           const duration = Date.now() - startTime;
           
           // Retry для network errors и timeouts
-          if (retryCount < 2 && (
+          if (retryCount < 3 && (
             error instanceof Error && (
               error.name === 'AbortError' || 
+              error.name === 'TypeError' ||
               error.message.includes('network') ||
-              error.message.includes('timeout')
+              error.message.includes('timeout') ||
+              error.message.includes('Load failed') ||
+              error.message.includes('fetch')
             )
           )) {
-            console.warn(`⚠️ Network error, retrying... (attempt ${retryCount + 1})`, error.message);
-            await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000)); // Exponential backoff
+            const retryDelay = Math.min(Math.pow(2, retryCount) * 1000 + Math.random() * 1000, 10000);
+            console.warn(`⚠️ Network error, retrying in ${retryDelay}ms... (attempt ${retryCount + 1})`, error.message);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
             return fetchWithRetry(retryCount + 1);
           }
           

@@ -149,14 +149,19 @@ class NetworkDiagnosticsService {
     const supabaseUrl = 'https://wbydubxjcdhoinhrozwx.supabase.co';
     
     try {
+      // Простой запрос к Supabase API с увеличенным таймаутом
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 секунд
+      
       const response = await fetch(`${supabaseUrl}/rest/v1/`, {
         method: 'GET',
         headers: {
           'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndieWR1YnhqY2Rob2luaHJvend4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNjI2MjgsImV4cCI6MjA2NTYzODYyOH0.A_n3yGRvALma5H9LTY6Cl1DLwgLg-xgwIP2slREkgy4'
         },
-        signal: AbortSignal.timeout(10000)
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
       const duration = Date.now() - startTime;
       
       if (response.ok) {
@@ -183,9 +188,9 @@ class NetworkDiagnosticsService {
       return {
         test: 'Supabase Availability',
         status: 'error',
-        message: `Supabase connection failed: ${error.message}`,
+        message: `Supabase connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         duration,
-        details: { error: error.name },
+        details: { error: error instanceof Error ? error.name : 'Unknown error' },
         timestamp: new Date().toISOString()
       };
     }

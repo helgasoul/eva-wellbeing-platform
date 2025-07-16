@@ -1,205 +1,157 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { authConfig, generateSecureId } from '@/config/auth';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle, Shield, Wifi, RefreshCw } from 'lucide-react';
+import { useNetworkDiagnostics } from '@/hooks/useNetworkDiagnostics';
 
 const LoginSafe = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { login } = useAuth();
   const navigate = useNavigate();
+  const { runDiagnostics, isRunning: isDiagnosticRunning } = useNetworkDiagnostics();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setIsLoading(true);
+    setError(null);
 
     try {
-      // БЕЗОПАСНАЯ ИМИТАЦИЯ ВХОДА
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // ✅ БЕЗОПАСНО: Создать тестового пользователя
-      const testUser = {
-        id: generateSecureId('safe'),
-        email: email,
-        firstName: 'Тест',
-        lastName: 'Пользователь',
-        role: 'patient' as const,
-        isVerified: true
-      };
-
-      // СОХРАНИТЬ В localStorage
-      localStorage.setItem('eva_user', JSON.stringify(testUser));
-      localStorage.setItem('eva_auth_token', 'safe_token_' + Date.now());
-
-      // Login successful
-      
-      // БЕЗОПАСНЫЙ РЕДИРЕКТ
-      navigate('/patient/dashboard');
-      
+      await login({ email, password });
+      navigate('/dashboard');
     } catch (err) {
-      console.error('❌ Login error:', err);
-      setError('Ошибка входа. Попробуйте еще раз.');
+      setError(err instanceof Error ? err.message : 'Ошибка входа');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleTestLogin = async (role: 'patient' | 'doctor' | 'admin') => {
-    setLoading(true);
-    setError('');
+  const handleDiagnostics = async () => {
+    await runDiagnostics();
+  };
 
-    try {
-        // ✅ БЕЗОПАСНО: Используем конфигурацию из authConfig
-        const testUsers = {
-        patient: {
-          id: generateSecureId('test_patient'),
-          email: authConfig.testUsers.patient.email,
-          firstName: authConfig.testUsers.patient.name.first,
-          lastName: authConfig.testUsers.patient.name.last,
-          role: 'patient' as const,
-          isVerified: true
-        },
-        doctor: {
-          id: generateSecureId('test_doctor'),
-          email: authConfig.testUsers.doctor.email,
-          firstName: authConfig.testUsers.doctor.name.first,
-          lastName: authConfig.testUsers.doctor.name.last,
-          role: 'doctor' as const,
-          isVerified: true
-        },
-        admin: {
-          id: generateSecureId('test_admin'),
-          email: authConfig.testUsers.admin.email,
-          firstName: authConfig.testUsers.admin.name.first,
-          lastName: authConfig.testUsers.admin.name.last,
-          role: 'admin' as const,
-          isVerified: true
-        }
-      };
-
-      const testUser = testUsers[role];
-      
-      // СОХРАНИТЬ В localStorage
-      localStorage.setItem('eva_user', JSON.stringify(testUser));
-      localStorage.setItem('eva_auth_token', 'safe_token_' + Date.now());
-
-      // Test login successful
-      
-      // РЕДИРЕКТ В ЗАВИСИМОСТИ ОТ РОЛИ
-      const redirectPaths = {
-        patient: '/patient/dashboard',
-        doctor: '/doctor/dashboard',
-        admin: '/admin/dashboard'
-      };
-      
-      navigate(redirectPaths[role]);
-      
-    } catch (err) {
-      console.error('❌ Test login error:', err);
-      setError('Ошибка тестового входа.');
-    } finally {
-      setLoading(false);
-    }
+  const handleOfflineMode = () => {
+    // Temporarily save credentials to localStorage for offline mode
+    localStorage.setItem('eva_offline_credentials', JSON.stringify({ email, password }));
+    navigate('/dashboard?offline=true');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Вход в bloom</h2>
-          <p className="text-gray-600">Безопасная версия входа</p>
-        </div>
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="your@email.com"
-              required
-            />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-md space-y-6 animate-fade-in">
+        {/* Safe Mode Header */}
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-4">
+            <Shield className="h-8 w-8 text-blue-600 mr-2" />
+            <h1 className="text-2xl font-bold text-blue-900">Безопасный вход</h1>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Пароль
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Ваш пароль"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? 'Вход...' : 'Войти'}
-          </button>
-        </form>
-
-        <div className="mt-6 space-y-3">
-          <div className="text-center text-sm text-gray-600 font-medium">
-            Быстрый тестовый вход:
-          </div>
-          
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => handleTestLogin('patient')}
-              disabled={loading}
-              className="bg-blue-100 text-blue-700 py-2 px-3 rounded text-xs hover:bg-blue-200 disabled:opacity-50 transition-colors"
-            >
-              Пациент
-            </button>
-            <button
-              onClick={() => handleTestLogin('doctor')}
-              disabled={loading}
-              className="bg-green-100 text-green-700 py-2 px-3 rounded text-xs hover:bg-green-200 disabled:opacity-50 transition-colors"
-            >
-              Врач
-            </button>
-            <button
-              onClick={() => handleTestLogin('admin')}
-              disabled={loading}
-              className="bg-red-100 text-red-700 py-2 px-3 rounded text-xs hover:bg-red-200 disabled:opacity-50 transition-colors"
-            >
-              Админ
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-6 text-center space-y-2">
-          <Link to="/register" className="text-purple-600 hover:text-purple-700 text-sm">
-            Нет аккаунта? Зарегистрироваться
-          </Link>
-          <br />
-          <Link to="/forgot-password" className="text-gray-500 hover:text-gray-700 text-sm">
-            Забыли пароль?
-          </Link>
-        </div>
-
-        <div className="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded">
-          <p className="text-xs text-yellow-800">
-            ⚠️ Временная безопасная версия входа. Для восстановления полной функциональности обратитесь к разработчику.
+          <p className="text-sm text-blue-700">
+            Альтернативный метод входа с улучшенной обработкой сетевых ошибок
           </p>
         </div>
+
+        {/* Emergency Options */}
+        <div className="grid grid-cols-1 gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDiagnostics}
+            disabled={isDiagnosticRunning}
+            className="flex items-center justify-center gap-2"
+          >
+            <Wifi className="h-4 w-4" />
+            {isDiagnosticRunning ? 'Проверка...' : 'Диагностика сети'}
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOfflineMode}
+            className="flex items-center justify-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Автономный режим
+          </Button>
+        </div>
+
+        {/* Login Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Вход в систему</CardTitle>
+            <CardDescription>
+              Введите ваши учетные данные для входа в Eva
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Введите ваш email"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Пароль</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Введите ваш пароль"
+                />
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-3">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Выполняется вход...' : 'Войти'}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate('/login')}
+                >
+                  Обычный вход
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Network Status */}
+        <Alert>
+          <Wifi className="h-4 w-4" />
+          <AlertDescription>
+            Статус: {navigator.onLine ? 'Онлайн' : 'Оффлайн'} | 
+            Режим: Безопасный вход с расширенными таймаутами
+          </AlertDescription>
+        </Alert>
       </div>
     </div>
   );
