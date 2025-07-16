@@ -10,6 +10,7 @@ import SymptomForecastSection from '../../components/insights/SymptomForecastSec
 import LocationSettings from '../../components/insights/LocationSettings';
 import { LabRecommendationWidget } from '../../components/lab/LabRecommendationWidget';
 import { useToast } from '../../hooks/use-toast';
+import { ArrowLeft } from 'lucide-react';
 
 interface HealthInsight {
   id: string;
@@ -216,6 +217,15 @@ export default function PatientInsights() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
+              <div className="flex items-center mb-2">
+                <button
+                  onClick={() => navigate('/patient/dashboard')}
+                  className="flex items-center text-gray-600 hover:text-gray-800 transition-colors mr-4"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  Назад в дашборд
+                </button>
+              </div>
               <h1 className="text-3xl font-bold text-gray-800 flex items-center">
                 🧠 Мои инсайты
               </h1>
