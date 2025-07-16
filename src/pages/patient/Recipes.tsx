@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecipeFilters } from '@/components/nutrition/RecipeFilters';
@@ -19,6 +20,7 @@ const Recipes: React.FC = () => {
 
   const { addDiaryEntry } = useFoodDiary();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Flatten all recipes from all phases
   const allRecipes = useMemo(() => {
@@ -83,6 +85,10 @@ const Recipes: React.FC = () => {
   const handleAddToDiaryFromDetail = (recipe: BasicMealPlan) => {
     setSelectedRecipeForDetail(null);
     setSelectedMealForDiary(recipe);
+  };
+
+  const handleUpgrade = () => {
+    navigate('/patient/subscription');
   };
 
   return (
@@ -175,6 +181,7 @@ const Recipes: React.FC = () => {
                     recipe={recipe}
                     onViewRecipe={() => handleViewRecipe(recipe)}
                     onAddToDiary={handleAddToDiary}
+                    onUpgrade={handleUpgrade}
                   />
                 ))}
               </div>

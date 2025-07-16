@@ -96,11 +96,11 @@ export const formatPrice = (price: number, currency: string = 'RUB'): string => 
 };
 
 export const canAccessRecipe = (
-  userSubscription: 'essential' | 'plus' | 'optimum',
+  userSubscription: 'essential' | 'plus' | 'optimum' | 'digital_twin',
   recipeMinLevel: 'essential' | 'plus' | 'optimum'
 ): boolean => {
-  const hierarchyMap = { essential: 1, plus: 2, optimum: 3 };
-  const userLevel = hierarchyMap[userSubscription];
-  const requiredLevel = hierarchyMap[recipeMinLevel];
+  const hierarchyMap = { essential: 1, plus: 2, optimum: 3, digital_twin: 3 };
+  const userLevel = hierarchyMap[userSubscription] || 1;
+  const requiredLevel = hierarchyMap[recipeMinLevel] || 1;
   return userLevel >= requiredLevel;
 };

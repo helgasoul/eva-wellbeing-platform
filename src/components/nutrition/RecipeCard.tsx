@@ -9,22 +9,34 @@ import {
   Zap, 
   Star,
   Eye,
-  Plus
+  Plus,
+  Lock,
+  Crown
 } from 'lucide-react';
 import { BasicMealPlan } from '@/data/baseMealPlans';
 import { getRecipeImage } from '@/utils/recipeImages';
+import { useSubscription } from '@/context/SubscriptionContext';
+import { canAccessRecipe } from '@/utils/subscriptionUtils';
 
 interface RecipeCardProps {
   recipe: BasicMealPlan;
   onViewRecipe?: () => void;
   onAddToDiary?: (recipe: BasicMealPlan) => void;
+  onUpgrade?: () => void;
 }
 
 export const RecipeCard: React.FC<RecipeCardProps> = ({
   recipe,
   onViewRecipe,
-  onAddToDiary
+  onAddToDiary,
+  onUpgrade
 }) => {
+  const subscription = useSubscription();
+  
+  const hasAccess = canAccessRecipe(
+    subscription.subscription?.plan?.id || 'essential',
+    recipe.minAccessLevel || 'essential'
+  );
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy': return 'bg-green-100 text-green-800 border-green-200';
@@ -63,16 +75,66 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
     }
   };
 
+  const getAccessLevelIcon = (level: string) => {
+    switch (level) {
+      case 'plus':
+        return <Star className="h-3 w-3" />;
+      case 'optimum':
+        return <Crown className="h-3 w-3" />;
+      default:
+        return null;
+    }
+  };
+
+  const getAccessLevelColor = (level: string) => {
+    switch (level) {
+      case 'plus':
+        return 'bg-amber-500/20 text-amber-700 border-amber-500/30';
+      case 'optimum':
+        return 'bg-purple-500/20 text-purple-700 border-purple-500/30';
+      default:
+        return 'bg-green-500/20 text-green-700 border-green-500/30';
+    }
+  };
+
+  const getAccessLevelText = (level: string) => {
+    switch (level) {
+      case 'plus':
+        return 'Plus';
+      case 'optimum':
+        return 'Optimum';
+      default:
+        return 'Essential';
+    }
+  };
+
   return (
-    <Card className="group h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-card to-accent/5 border-primary/10 max-w-sm">
+    <Card className={`group h-full flex flex-col transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-gradient-to-br from-card to-accent/5 border-primary/10 max-w-sm ${!hasAccess ? 'opacity-75' : ''}`}>
       {/* Recipe Image */}
       {(recipe.imageUrl || getRecipeImage(recipe.id)) && (
-        <div className="w-full h-48 overflow-hidden rounded-t-lg">
+        <div className="w-full h-48 overflow-hidden rounded-t-lg relative">
           <img 
             src={getRecipeImage(recipe.id) || recipe.imageUrl} 
             alt={recipe.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${!hasAccess ? 'grayscale' : ''}`}
           />
+          {!hasAccess && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <div className="bg-black/60 rounded-full p-3">
+                <Lock className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          )}
+          {recipe.minAccessLevel && recipe.minAccessLevel !== 'essential' && (
+            <div className="absolute top-2 right-2">
+              <Badge 
+                variant="outline" 
+                className={`${getAccessLevelColor(recipe.minAccessLevel)} backdrop-blur-sm text-xs`}
+              >
+                {getAccessLevelIcon(recipe.minAccessLevel)} {getAccessLevelText(recipe.minAccessLevel)}
+              </Badge>
+            </div>
+          )}
         </div>
       )}
       
@@ -150,24 +212,37 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 
         {/* Action Buttons */}
         <div className="flex gap-2 pt-2 mt-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onViewRecipe}
-            className="flex-1 h-8 text-xs px-2"
-          >
-            <Eye className="h-3 w-3 mr-1" />
-            <span className="truncate">Рецепт</span>
-          </Button>
-          
-          <Button
-            size="sm"
-            onClick={() => onAddToDiary?.(recipe)}
-            className="flex-1 h-8 text-xs px-2"
-          >
-            <Plus className="h-3 w-3 mr-1" />
-            <span className="truncate">В дневник</span>
-          </Button>
+          {hasAccess ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onViewRecipe}
+                className="flex-1 h-8 text-xs px-2"
+              >
+                <Eye className="h-3 w-3 mr-1" />
+                <span className="truncate">Рецепт</span>
+              </Button>
+              
+              <Button
+                size="sm"
+                onClick={() => onAddToDiary?.(recipe)}
+                className="flex-1 h-8 text-xs px-2"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                <span className="truncate">В дневник</span>
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="sm"
+              onClick={onUpgrade}
+              className="w-full h-8 text-xs px-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+            >
+              <Lock className="h-3 w-3 mr-1" />
+              <span className="truncate">Обновить до {getAccessLevelText(recipe.minAccessLevel || 'essential')}</span>
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
