@@ -234,7 +234,7 @@ const AIChat: React.FC = () => {
   };
 
   return (
-    <PatientLayout title="bloom - Eva, ваш цифровой помощник" breadcrumbs={breadcrumbs}>
+    <PatientLayout title="без | паузы - Eva, ваш цифровой помощник" breadcrumbs={breadcrumbs}>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Заголовок с информацией о лимитах */}
         <div className="bg-gradient-to-br from-background via-primary/5 to-accent/10 p-8 rounded-3xl shadow-elegant border border-primary/10">

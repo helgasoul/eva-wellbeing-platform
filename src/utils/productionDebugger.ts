@@ -1,5 +1,5 @@
 /**
- * Production Debugging Utility for Bloom App
+ * Production Debugging Utility for без | паузы App
  * Helps monitor and debug issues in production environment
  */
 
@@ -96,7 +96,7 @@ class ProductionDebugger {
   // Console commands for debugging
   setupConsoleCommands() {
     if (typeof window !== 'undefined') {
-      (window as any).bloomDebug = {
+      (window as any).appDebug = {
         getInfo: () => this.getDebugInfo(),
         getErrors: () => this.errors,
         clearErrors: () => { this.errors = []; },

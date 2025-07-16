@@ -124,7 +124,7 @@ const HowWeHelp: React.FC = () => {
                 </div>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Начните заботу о себе с <span className="text-primary bg-gradient-to-r from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent">Bloom</span>
+                Начните заботу о себе с <span className="text-primary bg-gradient-to-r from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent">без | паузы</span>
               </h2>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                 Маленькие шаги сегодня — уверенность и спокойствие завтра.<br />

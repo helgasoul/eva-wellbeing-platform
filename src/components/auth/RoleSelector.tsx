@@ -54,7 +54,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
             <div className="flex items-start space-x-4">
               {role.icon && (
                 <div className={`p-3 rounded-full bg-gradient-to-br ${role.color} flex items-center justify-center`}>
-                  {role.icon === 'bloom' ? (
+                  {role.icon === 'app' ? (
                     <Logo size="sm" showText={false} className="h-6 w-6" />
                   ) : (
                     <role.icon className="h-6 w-6 text-eva-dusty-rose" />

@@ -129,7 +129,7 @@ const NutritionPlan: React.FC = () => {
   };
 
   return (
-    <PatientLayout title="bloom - Планы питания" breadcrumbs={breadcrumbs}>
+    <PatientLayout title="без | паузы - Планы питания" breadcrumbs={breadcrumbs}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Заголовок и статистика */}
         <div className="bg-gradient-to-br from-background via-primary/5 to-accent/10 p-8 rounded-3xl shadow-elegant border border-primary/10">

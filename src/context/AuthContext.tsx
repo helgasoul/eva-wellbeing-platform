@@ -265,7 +265,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(newUser);
 
       toast({
-        title: 'Добро пожаловать в Bloom!',
+        title: 'Добро пожаловать в без | паузы!',
         description: 'Ваш аккаунт успешно создан',
       });
 
@@ -440,7 +440,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       toast({
         title: 'Онбординг завершен!',
-        description: 'Добро пожаловать в Bloom! Теперь у вас есть доступ ко всем функциям платформы.',
+        description: 'Добро пожаловать в без | паузы! Теперь у вас есть доступ ко всем функциям платформы.',
       });
       
       console.log('✅ Onboarding completed successfully', {

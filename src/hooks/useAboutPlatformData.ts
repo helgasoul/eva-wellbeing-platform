@@ -154,9 +154,9 @@ const defaultData: AboutPlatformData = {
     ]
   },
   contacts: {
-    general: "info@bloom-health.com",
-    partnerships: "partners@bloom-health.com",
-    press: "press@bloom-health.com"
+    general: "info@bez-pauzy.com",
+    partnerships: "partners@bez-pauzy.com",
+    press: "press@bez-pauzy.com"
   }
 };
 

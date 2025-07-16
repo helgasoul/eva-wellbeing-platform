@@ -298,7 +298,7 @@ const DataDiagnostics: React.FC = () => {
   };
 
   return (
-    <PatientLayout title="bloom - Диагностика данных" breadcrumbs={breadcrumbs}>
+    <PatientLayout title="без | паузы - Диагностика данных" breadcrumbs={breadcrumbs}>
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Заголовок */}
         <div className="bloom-card p-6">

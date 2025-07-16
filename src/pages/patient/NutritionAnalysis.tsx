@@ -101,7 +101,7 @@ const NutritionAnalysis: React.FC = () => {
   const canViewAdvancedFeatures = currentPlan?.id === 'optimum';
 
   return (
-    <PatientLayout title="bloom - Анализ питания" breadcrumbs={breadcrumbs}>
+    <PatientLayout title="без | паузы - Анализ питания" breadcrumbs={breadcrumbs}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Заголовок */}
         <div className="bg-gradient-to-br from-background via-primary/5 to-accent/10 p-8 rounded-3xl shadow-elegant border border-primary/10">

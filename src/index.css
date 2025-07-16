@@ -225,7 +225,7 @@ p {
   50% { transform: translateY(-5px); }
 }
 
-@keyframes bloomGlow {
+@keyframes appGlow {
   0%, 100% { 
     filter: drop-shadow(0 0 0px hsl(var(--primary) / 0.4));
     transform: scale(1);
@@ -250,8 +250,8 @@ p {
   animation: gentleFloat 3s ease-in-out infinite;
 }
 
-.animate-bloom-glow {
-  animation: bloomGlow 4s ease-in-out infinite;
+.animate-app-glow {
+  animation: appGlow 4s ease-in-out infinite;
 }
 
 .animate-petal-dance {
@@ -556,18 +556,94 @@ p {
   }
 }
 
-/* Bloom gradient background */
-.bloom-gradient {
+/* App gradient background */
+.app-gradient {
   background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
 }
 
-/* Bloom card styling */
-.bloom-card {
+/* App card styling */
+.app-card {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
   box-shadow: var(--shadow-elegant);
 }
+
+/* App-specific component styles */
+.app-button {
+  @apply btn-professional;
+}
+
+.app-input {
+  @apply border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors bg-background;
+}
+
+.app-card-secondary {
+  @apply bg-secondary/50 border border-border rounded-lg;
+}
+
+/* App color utilities */
+.bg-app-vanilla {
+  background-color: hsl(var(--accent));
+}
+
+.bg-app-cream {
+  background-color: hsl(var(--secondary));
+}
+
+.bg-app-warm-cream {
+  background-color: hsl(var(--muted));
+}
+
+.bg-app-dusty-rose {
+  background-color: hsl(var(--primary));
+}
+
+.bg-app-mauve {
+  background-color: hsl(var(--primary) / 0.9);
+}
+
+.bg-app-soft-pink {
+  background-color: hsl(var(--soft-pink));
+}
+
+.bg-app-sage {
+  background-color: hsl(var(--soft-blue));
+}
+
+.border-app-cream {
+  border-color: hsl(var(--border));
+}
+
+.border-app-sage {
+  border-color: hsl(var(--soft-blue));
+}
+
+.text-app-dusty-rose {
+  color: hsl(var(--primary));
+}
+
+.ring-app-soft-pink {
+  --tw-ring-color: hsl(var(--soft-pink));
+}
+
+/* Legacy compatibility - map old bloom classes to new app classes */
+.bloom-gradient { @apply app-gradient; }
+.bloom-card { @apply app-card; }
+.bloom-button { @apply app-button; }
+.bloom-input { @apply app-input; }
+.bloom-card-secondary { @apply app-card-secondary; }
+.bg-bloom-vanilla { @apply bg-app-vanilla; }
+.bg-bloom-cream { @apply bg-app-cream; }
+.bg-bloom-warm-cream { @apply bg-app-warm-cream; }
+.bg-bloom-dusty-rose { @apply bg-app-dusty-rose; }
+.bg-bloom-mauve { @apply bg-app-mauve; }
+.bg-bloom-soft-pink { @apply bg-app-soft-pink; }
+.bg-bloom-sage { @apply bg-app-sage; }
+.border-bloom-cream { @apply border-app-cream; }
+.border-bloom-sage { @apply border-app-sage; }
+.text-bloom-dusty-rose { @apply text-app-dusty-rose; }
+.ring-bloom-soft-pink { @apply ring-app-soft-pink; }
 
 @layer utilities {
   /* Text truncation utilities */

@@ -74,7 +74,7 @@ const FoodDiary: React.FC = () => {
   const canUseAdvanced = currentPlan?.id === 'plus' || currentPlan?.id === 'optimum';
 
   return (
-    <PatientLayout title="bloom - Дневник питания" breadcrumbs={breadcrumbs}>
+    <PatientLayout title="без | паузы - Дневник питания" breadcrumbs={breadcrumbs}>
       <div className="caring-bg min-h-screen">
         <div className="max-w-7xl mx-auto space-y-8 py-4">
           {/* Теплое приветствие */}

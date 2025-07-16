@@ -142,7 +142,7 @@ const Contact = () => {
                   <p className="text-muted-foreground">
                     Напишите нам на электронную почту, и мы ответим в течение 24 часов.
                   </p>
-                  <p className="font-semibold mt-2">support@bloom-health.com</p>
+                  <p className="font-semibold mt-2">support@bez-pauzy.com</p>
                 </CardContent>
               </Card>
 

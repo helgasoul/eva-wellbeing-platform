@@ -225,7 +225,7 @@ const SymptomTracker: React.FC = () => {
   };
 
   return (
-    <PatientLayout title="bloom - Дневник симптомов" breadcrumbs={breadcrumbs}>
+    <PatientLayout title="без | паузы - Дневник симптомов" breadcrumbs={breadcrumbs}>
       <div className="space-y-6">
         {/* Заголовок */}
         <div className="bloom-card p-6">

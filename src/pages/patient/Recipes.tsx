@@ -87,7 +87,7 @@ const Recipes: React.FC = () => {
 
   return (
     <PatientLayout 
-      title="Рецепты - bloom"
+      title="Рецепты - без | паузы"
       breadcrumbs={[
         { label: 'Главная', href: '/patient/dashboard' },
         { label: 'Рецепты', href: '/patient/recipes' }
