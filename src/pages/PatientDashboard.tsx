@@ -436,7 +436,11 @@ const PatientDashboard = () => {
                 </p>
               </div>
               <Button 
-                onClick={() => navigate('/patient/onboarding')}
+                onClick={() => {
+                  console.log('🚀 OnboardingPrompt: Forced navigation to onboarding');
+                  sessionStorage.setItem('forcedOnboarding', 'true');
+                  navigate('/patient/onboarding');
+                }}
                 className="ml-4 bg-amber-600 hover:bg-amber-700 text-white"
               >
                 Завершить
@@ -507,7 +511,11 @@ const PatientDashboard = () => {
               </div>
             </div>
             <Button 
-              onClick={() => navigate('/patient/onboarding')}
+              onClick={() => {
+                console.log('🚀 OnboardingPrompt: Forced navigation to onboarding (detailed)');
+                sessionStorage.setItem('forcedOnboarding', 'true');
+                navigate('/patient/onboarding');
+              }}
               className="ml-4 bg-amber-600 hover:bg-amber-700 text-white"
             >
               Завершить

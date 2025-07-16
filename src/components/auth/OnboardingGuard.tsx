@@ -39,7 +39,7 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
     if (user.role === 'patient') {
       // ✅ ИСПРАВЛЕНО: Проверяем текущий маршрут - не редиректим если уже на онбординге
       if (location.pathname === '/patient/onboarding') {
-        logger.debug('OnboardingGuard: Already on onboarding page');
+        logger.debug('OnboardingGuard: Already on onboarding page, allowing access');
         return;
       }
 
@@ -48,6 +48,9 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       // Проверяем, является ли это recovery-ссылкой (сброс пароля)
       const urlParams = new URLSearchParams(window.location.search);
       const isPasswordRecovery = urlParams.get('type') === 'recovery';
+      
+      // Check for forced onboarding state from session storage
+      const forcedOnboarding = sessionStorage.getItem('forcedOnboarding') === 'true';
       
       // Проверяем, есть ли у пользователя критически важные данные
       const hasEssentialData = user.registrationCompleted || 
@@ -66,13 +69,20 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
         menopausePhase: user.menopausePhase,
         onboardingData: !!user.onboardingData,
         currentPath: location.pathname,
-        isPasswordRecovery
+        isPasswordRecovery,
+        forcedOnboarding
       });
       
       // Если это восстановление пароля и у пользователя есть хотя бы базовые данные,
       // считаем онбординг завершенным и не редиректим
       if (isPasswordRecovery && hasEssentialData) {
         logger.debug('OnboardingGuard: Password recovery for registered user, allowing access');
+        return;
+      }
+      
+      // Если включен форсированный онбординг, разрешаем доступ к онбордингу
+      if (forcedOnboarding) {
+        logger.debug('OnboardingGuard: Forced onboarding mode active, allowing access');
         return;
       }
       

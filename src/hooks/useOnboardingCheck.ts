@@ -35,9 +35,12 @@ export const useOnboardingCheck = () => {
     // Skip checks for non-patients
     if (user.role !== UserRole.PATIENT) return;
 
-    // Skip redirects for certain pages
+    // Skip redirects for certain pages AND manual navigation to onboarding
     const skipRedirectPaths = ['/reset-password', '/patient/onboarding'];
-    if (skipRedirectPaths.includes(location.pathname)) return;
+    if (skipRedirectPaths.includes(location.pathname)) {
+      console.log('🚫 Skipping redirect for protected path:', location.pathname);
+      return;
+    }
 
     // Enhanced onboarding check with validation
     const validateAndRedirect = async () => {
@@ -49,6 +52,7 @@ export const useOnboardingCheck = () => {
         
         console.log('🔍 Enhanced onboarding check:', {
           userId: user.id,
+          currentPath: location.pathname,
           flagStatus: user.onboardingCompleted,
           validationResult: completionCheck.completed,
           progress: completionCheck.progress
@@ -71,24 +75,29 @@ export const useOnboardingCheck = () => {
           isValidating: false
         });
 
-        // Perform redirects
-        if (shouldGoToDashboard) {
+        // Only perform redirects if user is on a page that requires redirect
+        // This prevents conflicts with manual navigation
+        if (shouldGoToDashboard && location.pathname === '/') {
           console.log('✅ User has sufficient onboarding data - redirecting to dashboard');
           navigate('/patient/dashboard', { replace: true });
-        } else if (shouldGoToOnboarding) {
+        } else if (shouldGoToOnboarding && location.pathname === '/') {
           console.log('🔄 User needs to complete onboarding - redirecting to onboarding');
           navigate('/patient/onboarding', { replace: true });
+        } else {
+          console.log('🔄 Validation complete, staying on current page:', location.pathname);
         }
 
       } catch (error) {
         console.error('❌ Enhanced onboarding check failed:', error);
         setOnboardingState(prev => ({ ...prev, isValidating: false }));
         
-        // Fallback to simple flag-based check
-        if (user.onboardingCompleted) {
-          navigate('/patient/dashboard', { replace: true });
-        } else {
-          navigate('/patient/onboarding', { replace: true });
+        // Fallback to simple flag-based check only for root path
+        if (location.pathname === '/') {
+          if (user.onboardingCompleted) {
+            navigate('/patient/dashboard', { replace: true });
+          } else {
+            navigate('/patient/onboarding', { replace: true });
+          }
         }
       }
     };

@@ -424,6 +424,10 @@ const PatientOnboarding = () => {
         hasGeolocation: !!formData.geolocation
       });
 
+      // Clear forced onboarding flag
+      sessionStorage.removeItem('forcedOnboarding');
+      console.log('🧹 Cleared forced onboarding flag');
+
       // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Сначала обновляем статус в AuthContext
       const onboardingSummary = {
         phaseResult,
