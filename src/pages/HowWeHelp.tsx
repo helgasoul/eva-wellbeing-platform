@@ -964,6 +964,29 @@ const HowWeHelp: React.FC = () => {
                   </p>
                 </div>
               </div>
+
+              {/* Анализ Микробиома компании Атлас */}
+              <div className="group bg-card/80 backdrop-blur-sm rounded-3xl p-8 shadow-elegant border border-soft-pink/30 hover:shadow-soft hover:scale-105 transition-all duration-300 hover:-translate-y-2">
+                <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🧬</div>
+                <h3 className="font-semibold text-xl mb-3 text-foreground">Анализ Микробиома компании Атлас</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  <span className="font-medium text-primary">Ваша микробиота под контролем</span><br />
+                  Комплексное исследование микробиома кишечника от ведущей компании для понимания вашего здоровья.
+                </p>
+                <div className="text-3xl font-bold text-primary mb-6 flex items-center gap-2">
+                  <span className="text-lg">💰</span>
+                  ₽12,000
+                </div>
+                <button className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 px-6 rounded-2xl font-semibold transition-all duration-300 hover:shadow-elegant hover:scale-105">
+                  Заказать
+                </button>
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    <span>🤝</span>
+                    Остались вопросы? Мы поможем
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Support Message */}
