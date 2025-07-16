@@ -50,7 +50,7 @@ import PatientRecommendations from "./pages/patient/PatientRecommendations";
 import Calendar from "./pages/patient/Calendar";
 import AdvancedRecommendations from "./pages/patient/AdvancedRecommendations";
 import HealthDataIntegrations from "./pages/patient/HealthDataIntegrations";
-import { MedicalDigitalTwin } from './pages/patient/MedicalDigitalTwin';
+import MedicalDigitalTwin from './pages/patient/MedicalDigitalTwin';
 import { BloomAcademy } from './pages/patient/BloomAcademy';
 
 // Doctor pages
