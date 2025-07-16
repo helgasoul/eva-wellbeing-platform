@@ -22,6 +22,7 @@ import LoginSafe from "./pages/LoginSafe";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import { AuthError } from "./pages/AuthError";
 
 // NEW: Multi-step registration
 import MultiStepRegistration from "./pages/auth/MultiStepRegistration";
@@ -149,6 +150,12 @@ function App() {
                     <Route
                       path="/login-safe"
                       element={<LoginSafe />}
+                    />
+                    
+                    {/* AUTH ERROR ROUTE */}
+                    <Route
+                      path="/auth-error"
+                      element={<AuthError />}
                     />
                     
                     

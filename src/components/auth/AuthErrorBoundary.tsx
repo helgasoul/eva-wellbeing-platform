@@ -129,6 +129,11 @@ export class AuthErrorBoundary extends Component<Props, State> {
     window.location.href = `/login-safe?returnTo=${encodeURIComponent(currentPath)}`;
   };
 
+  handleAuthError = () => {
+    // Переход к специальной странице обработки ошибок авторизации
+    window.location.href = '/auth-error';
+  };
+
   render() {
     if (this.state.hasError) {
       if (this.props.fallbackComponent) {
@@ -226,6 +231,15 @@ export class AuthErrorBoundary extends Component<Props, State> {
                 </Button>
 
                 <Button
+                  onClick={this.handleAuthError}
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <Activity className="w-4 h-4" />
+                  Диагностика и решение
+                </Button>
+
+                <Button
                   onClick={this.handleEmergencyLogin}
                   variant="outline"
                   className="w-full flex items-center justify-center gap-2"
@@ -250,7 +264,7 @@ export class AuthErrorBoundary extends Component<Props, State> {
                 <p className="text-sm text-muted-foreground">
                   Если проблема повторяется, обратитесь в поддержку: 
                   <br />
-                  <span className="font-mono text-xs">support@eva-platform.com</span>
+                  <span className="font-mono text-xs">support@bez-pauzy.com</span>
                 </p>
               </div>
             </div>

@@ -52,29 +52,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Если загрузка зависла, показываем ошибку с возможностью перезагрузки
+  // Если загрузка зависла, перенаправляем на страницу ошибки авторизации
   if (loadingTimeout) {
-    return (
-      <div className="min-h-screen bloom-gradient flex items-center justify-center">
-        <div className="bloom-card p-8 text-center">
-          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">⚠️</span>
-          </div>
-          <h2 className="text-xl font-playfair font-semibold text-foreground mb-2">
-            Проблема с подключением
-          </h2>
-          <p className="text-muted-foreground mb-4">
-            Не удается загрузить данные авторизации
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Перезагрузить страницу
-          </button>
-        </div>
-      </div>
-    );
+    return <Navigate to="/auth-error" replace />;
   }
 
   // ЛОГИКА ДЛЯ requireGuest (регистрация/вход)
