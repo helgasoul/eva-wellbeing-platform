@@ -244,6 +244,48 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_error_logs: {
+        Row: {
+          created_at: string | null
+          error_details: Json | null
+          error_message: string
+          error_type: string
+          id: string
+          ip_address: string | null
+          recovery_attempted: boolean | null
+          recovery_successful: boolean | null
+          url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_details?: Json | null
+          error_message: string
+          error_type: string
+          id?: string
+          ip_address?: string | null
+          recovery_attempted?: boolean | null
+          recovery_successful?: boolean | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_details?: Json | null
+          error_message?: string
+          error_type?: string
+          id?: string
+          ip_address?: string | null
+          recovery_attempted?: boolean | null
+          recovery_successful?: boolean | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       automation_user_settings: {
         Row: {
           automation_enabled: boolean | null
@@ -8732,6 +8774,16 @@ export type Database = {
         Args: { p_integration_id: string; p_data_types_synced?: string[] }
         Returns: string
       }
+      create_system_alert: {
+        Args: {
+          p_alert_type: string
+          p_severity: string
+          p_title: string
+          p_description?: string
+          p_alert_data?: Json
+        }
+        Returns: string
+      }
       generate_ticket_number: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -8777,6 +8829,18 @@ export type Database = {
           p_recorded_timestamp?: string
           p_data_source?: string
           p_data_quality_score?: number
+        }
+        Returns: string
+      }
+      log_auth_error: {
+        Args: {
+          p_user_id: string
+          p_error_type: string
+          p_error_message: string
+          p_error_details?: Json
+          p_user_agent?: string
+          p_ip_address?: string
+          p_url?: string
         }
         Returns: string
       }
