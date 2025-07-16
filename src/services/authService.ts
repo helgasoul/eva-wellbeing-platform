@@ -154,151 +154,212 @@ class AuthService {
     }
   }
 
-  // Вход в систему с поддержкой JIT миграции
+  // Вход в систему с поддержкой JIT миграции и улучшенной обработкой ошибок
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    try {
-      console.log('🔐 Начинаем процесс входа для:', credentials.email);
-      
-      // Проверяем rate limiting
-      const rateLimitResult = await rateLimitService.checkRateLimit('login', credentials.email);
-      if (!rateLimitResult.allowed) {
-        await authAuditService.logLoginAttempt(credentials.email, false, 'Rate limit exceeded');
-        return {
-          user: null,
-          error: `Превышено количество попыток входа. Попробуйте через ${Math.ceil(rateLimitResult.retryAfter! / 60)} минут.`,
-          rateLimited: true,
-          retryAfter: rateLimitResult.retryAfter
-        };
-      }
-      
-      // 1. Пытаемся войти через Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
-      });
-
-      if (error) {
-        console.error('❌ Ошибка аутентификации Supabase:', error);
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 1000; // 1 секунда
+    
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        console.log(`🔐 Начинаем процесс входа для: ${credentials.email} (попытка ${attempt + 1}/${MAX_RETRIES + 1})`);
         
-        // 2. Если аутентификация в Supabase неуспешна, пытаемся JIT миграцию
-        if (error.message === 'Invalid login credentials') {
-          console.log('🔄 Пытаемся JIT миграцию для:', credentials.email);
-          
-          const migrationResult = await this.attemptJITMigration(credentials);
-          if (migrationResult.success) {
-            // Если миграция успешна, пытаемся войти снова
-            console.log('✅ JIT миграция успешна, повторная аутентификация');
-            return await this.login(credentials);
-          } else {
-            console.log('❌ JIT миграция неуспешна');
+        // Проверяем rate limiting только на первой попытке
+        if (attempt === 0) {
+          const rateLimitResult = await rateLimitService.checkRateLimit('login', credentials.email);
+          if (!rateLimitResult.allowed) {
+            await authAuditService.logLoginAttempt(credentials.email, false, 'Rate limit exceeded');
+            return {
+              user: null,
+              error: `Превышено количество попыток входа. Попробуйте через ${Math.ceil(rateLimitResult.retryAfter! / 60)} минут.`,
+              rateLimited: true,
+              retryAfter: rateLimitResult.retryAfter
+            };
           }
         }
         
-        // Логируем неудачную попытку входа
+        // 1. Пытаемся войти через Supabase с таймаутом
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Network timeout')), 15000); // 15 секунд
+        });
+
+        const signInPromise = supabase.auth.signInWithPassword({
+          email: credentials.email,
+          password: credentials.password,
+        });
+
+        const { data, error } = await Promise.race([signInPromise, timeoutPromise]);
+
+        if (error) {
+          console.error(`❌ Ошибка аутентификации Supabase (попытка ${attempt + 1}):`, error);
+          
+          // Проверяем, является ли ошибка сетевой
+          const isNetworkError = error.message.includes('Load failed') || 
+                                error.message.includes('Network timeout') ||
+                                error.message.includes('fetch') ||
+                                error.name === 'AuthRetryableFetchError' ||
+                                error.name === 'TypeError';
+
+          if (isNetworkError && attempt < MAX_RETRIES) {
+            console.warn(`🔄 Сетевая ошибка на попытке ${attempt + 1}, повторяем через ${RETRY_DELAY * (attempt + 1)}мс...`);
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (attempt + 1)));
+            continue; // Пробуем снова
+          }
+          
+          // 2. Если аутентификация в Supabase неуспешна, пытаемся JIT миграцию
+          if (error.message === 'Invalid login credentials') {
+            console.log('🔄 Пытаемся JIT миграцию для:', credentials.email);
+            
+            const migrationResult = await this.attemptJITMigration(credentials);
+            if (migrationResult.success) {
+              // Если миграция успешна, пытаемся войти снова
+              console.log('✅ JIT миграция успешна, повторная аутентификация');
+              return await this.login(credentials);
+            } else {
+              console.log('❌ JIT миграция неуспешна');
+            }
+          }
+          
+          // Логируем неудачную попытку входа
+          await authAuditService.logLoginAttempt(credentials.email, false, error.message);
+          
+          // Показываем более понятное сообщение
+          if (error.message === 'Invalid login credentials') {
+            return { 
+              user: null, 
+              error: 'Неверный email или пароль. Проверьте данные или восстановите пароль.' 
+            };
+          }
+          
+          if (isNetworkError) {
+            return { 
+              user: null, 
+              error: 'Проблема с подключением к серверу. Проверьте интернет-соединение и попробуйте еще раз.' 
+            };
+          }
+          
+          return { 
+            user: null, 
+            error: `Ошибка входа: ${error.message}` 
+          };
+        }
+
+        if (!data.user) {
+          console.error('❌ Пользователь не получен после аутентификации');
+          await authAuditService.logLoginAttempt(credentials.email, false, 'Пользователь не получен');
+          return { 
+            user: null, 
+            error: 'Не удалось получить данные пользователя' 
+          };
+        }
+
+        console.log('✅ Аутентификация успешна, ID пользователя:', data.user.id);
+
+        // 2. Загружаем профиль пользователя
+        console.log('📋 Загружаем профиль пользователя...');
+        
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .maybeSingle(); // Используем maybeSingle вместо single для лучшей обработки
+
+        if (profileError) {
+          console.error('❌ Ошибка загрузки профиля:', profileError);
+          return { 
+            user: null, 
+            error: `Ошибка загрузки профиля: ${profileError.message}` 
+          };
+        }
+
+        let finalProfileData = profileData;
+
+        if (!profileData) {
+          console.error('❌ Профиль пользователя не найден в базе данных');
+          console.log('🔧 Попытка создать профиль автоматически...');
+          
+          // Попытка создать профиль автоматически
+          const { data: newProfile, error: createError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              first_name: data.user.user_metadata?.first_name || '',
+              last_name: data.user.user_metadata?.last_name || '',
+              role: data.user.user_metadata?.role || 'patient',
+              onboarding_completed: false
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error('❌ Не удалось создать профиль:', createError);
+            return { 
+              user: null, 
+              error: 'Профиль пользователя не найден и не может быть создан автоматически. Обратитесь к администратору.' 
+            };
+          }
+
+          console.log('✅ Профиль создан автоматически:', newProfile);
+          finalProfileData = newProfile;
+        }
+
+        console.log('✅ Профиль загружен:', finalProfileData);
+
+        // 3. Формируем объект пользователя
+        const user = this.transformSupabaseUser(data.user, finalProfileData);
+
+        // 4. Проверяем и корректируем статус регистрации для старых пользователей
+        if (!user.registrationCompleted && user.email && user.firstName) {
+          console.log('🔧 Обновляем статус регистрации для существующего пользователя');
+          await this.updateProfile(user.id, { registrationCompleted: true });
+          user.registrationCompleted = true;
+        }
+
+        console.log('✅ Вход выполнен успешно для пользователя:', user.email);
+        
+        // Логируем успешный вход и сбрасываем rate limit
+        await authAuditService.logLoginAttempt(credentials.email, true, undefined, user.id);
+        await rateLimitService.recordAttempt('login', true, credentials.email);
+        
+        return { user, error: null };
+
+      } catch (error: any) {
+        console.error(`💥 Критическая ошибка в процессе входа (попытка ${attempt + 1}):`, error);
+        
+        // Проверяем, является ли ошибка сетевой
+        const isNetworkError = error.message.includes('Load failed') || 
+                              error.message.includes('Network timeout') ||
+                              error.message.includes('fetch') ||
+                              error.name === 'AuthRetryableFetchError' ||
+                              error.name === 'TypeError';
+
+        if (isNetworkError && attempt < MAX_RETRIES) {
+          console.warn(`🔄 Сетевая ошибка на попытке ${attempt + 1}, повторяем через ${RETRY_DELAY * (attempt + 1)}мс...`);
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (attempt + 1)));
+          continue; // Пробуем снова
+        }
+        
         await authAuditService.logLoginAttempt(credentials.email, false, error.message);
         
-        // Показываем более понятное сообщение
-        if (error.message === 'Invalid login credentials') {
+        if (isNetworkError) {
           return { 
             user: null, 
-            error: 'Неверный email или пароль. Проверьте данные или восстановите пароль.' 
+            error: 'Проблема с подключением к серверу. Проверьте интернет-соединение и попробуйте еще раз.' 
           };
         }
         
         return { 
           user: null, 
-          error: `Ошибка входа: ${error.message}` 
+          error: `Произошла неожиданная ошибка: ${error.message}` 
         };
       }
-
-      if (!data.user) {
-        console.error('❌ Пользователь не получен после аутентификации');
-        await authAuditService.logLoginAttempt(credentials.email, false, 'Пользователь не получен');
-        return { 
-          user: null, 
-          error: 'Не удалось получить данные пользователя' 
-        };
-      }
-
-      console.log('✅ Аутентификация успешна, ID пользователя:', data.user.id);
-
-      // 2. Загружаем профиль пользователя
-      console.log('📋 Загружаем профиль пользователя...');
-      
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .maybeSingle(); // Используем maybeSingle вместо single для лучшей обработки
-
-      if (profileError) {
-        console.error('❌ Ошибка загрузки профиля:', profileError);
-        return { 
-          user: null, 
-          error: `Ошибка загрузки профиля: ${profileError.message}` 
-        };
-      }
-
-      let finalProfileData = profileData;
-
-      if (!profileData) {
-        console.error('❌ Профиль пользователя не найден в базе данных');
-        console.log('🔧 Попытка создать профиль автоматически...');
-        
-        // Попытка создать профиль автоматически
-        const { data: newProfile, error: createError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            first_name: data.user.user_metadata?.first_name || '',
-            last_name: data.user.user_metadata?.last_name || '',
-            role: data.user.user_metadata?.role || 'patient',
-            onboarding_completed: false
-          })
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('❌ Не удалось создать профиль:', createError);
-          return { 
-            user: null, 
-            error: 'Профиль пользователя не найден и не может быть создан автоматически. Обратитесь к администратору.' 
-          };
-        }
-
-        console.log('✅ Профиль создан автоматически:', newProfile);
-        finalProfileData = newProfile;
-      }
-
-      console.log('✅ Профиль загружен:', finalProfileData);
-
-      // 3. Формируем объект пользователя
-      const user = this.transformSupabaseUser(data.user, finalProfileData);
-
-      // 4. Проверяем и корректируем статус регистрации для старых пользователей
-      if (!user.registrationCompleted && user.email && user.firstName) {
-        console.log('🔧 Обновляем статус регистрации для существующего пользователя');
-        await this.updateProfile(user.id, { registrationCompleted: true });
-        user.registrationCompleted = true;
-      }
-
-      console.log('✅ Вход выполнен успешно для пользователя:', user.email);
-      
-      // Логируем успешный вход и сбрасываем rate limit
-      await authAuditService.logLoginAttempt(credentials.email, true, undefined, user.id);
-      await rateLimitService.recordAttempt('login', true, credentials.email);
-      
-      return { user, error: null };
-
-    } catch (error: any) {
-      console.error('💥 Критическая ошибка в процессе входа:', error);
-      await authAuditService.logLoginAttempt(credentials.email, false, error.message);
-      return { 
-        user: null, 
-        error: `Произошла неожиданная ошибка: ${error.message}` 
-      };
     }
+
+    // Если все попытки исчерпаны
+    return { 
+      user: null, 
+      error: 'Превышено максимальное количество попыток подключения. Проверьте интернет-соединение и попробуйте позже.' 
+    };
   }
 
   // Выход из системы

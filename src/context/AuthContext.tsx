@@ -185,16 +185,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
 
     try {
-      const { user: authenticatedUser, error: authError } = await authService.login(credentials);
+      const { user: authenticatedUser, error: authError, rateLimited, retryAfter } = await authService.login(credentials);
 
       if (authError) {
         setError(authError);
-        toast({
-          title: 'Ошибка входа',
-          description: authError,
-          variant: 'destructive',
-        });
-        throw new Error(authError);
+        
+        // Show different toast based on error type
+        if (rateLimited) {
+          toast({
+            title: 'Ограничение по времени',
+            description: authError,
+            variant: 'destructive',
+          });
+        } else if (authError.includes('подключением') || authError.includes('интернет')) {
+          toast({
+            title: 'Проблемы с подключением',
+            description: authError,
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Ошибка входа',
+            description: authError,
+            variant: 'destructive',
+          });
+        }
+        
+        // Don't throw error - let the UI handle it gracefully
+        return;
       }
 
       if (!authenticatedUser) {
@@ -205,7 +223,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           description: errorMessage,
           variant: 'destructive',
         });
-        throw new Error(errorMessage);
+        return;
       }
 
       setUser(authenticatedUser);
@@ -229,6 +247,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     } catch (error: any) {
       console.error('Login error:', error);
+      
+      // Handle specific error types with user-friendly messages
+      if (error.message.includes('Load failed') || 
+          error.message.includes('Network timeout') ||
+          error.message.includes('fetch')) {
+        const errorMessage = 'Проблема с подключением к серверу. Проверьте интернет-соединение и попробуйте еще раз.';
+        setError(errorMessage);
+        toast({
+          title: 'Проблемы с подключением',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      } else {
+        const errorMessage = error.message || 'Произошла ошибка при входе';
+        setError(errorMessage);
+        toast({
+          title: 'Ошибка входа',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
