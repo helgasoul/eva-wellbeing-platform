@@ -706,25 +706,6 @@ const PatientOnboarding = () => {
           </div>
         )}
 
-        {/* ✅ НОВОЕ: Отладочная информация для диагностики проблем */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-8 bg-gray-100 p-4 rounded-lg">
-            <h3 className="font-bold text-sm">🔍 Debug Info:</h3>
-            <div className="text-xs space-y-1">
-              <p>Current Step: {currentStep}/{TOTAL_STEPS}</p>
-              <p>Step Title: {stepTitles[currentStep - 1]}</p>
-              <p>Can Go Next: {canGoNext() ? '✅' : '❌'}</p>
-              <p>Form Data Keys: {Object.keys(formData).join(', ')}</p>
-              <p>Data Status: {JSON.stringify(dataLoadingStatus)}</p>
-            </div>
-            <details className="mt-2">
-              <summary className="text-xs font-medium cursor-pointer">View Form Data</summary>
-              <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto max-h-32">
-                {JSON.stringify(formData, null, 2)}
-              </pre>
-            </details>
-          </div>
-        )}
       </div>
     </PatientLayout>
   );
