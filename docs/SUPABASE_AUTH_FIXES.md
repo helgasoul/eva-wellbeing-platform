@@ -2,6 +2,67 @@
 
 This document contains fixes and improvements for Supabase authentication implementation.
 
+## Supabase Client Configuration Fix
+
+### Problem
+The Supabase client configuration in `src/config/supabase.ts` incorrectly includes the unsupported property `additionalRedirectUrls` inside the auth options, which can cause authentication failures.
+
+### Incorrect Configuration (DO NOT USE)
+```typescript
+// src/config/supabase.ts - INCORRECT
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://your-project.supabase.co';
+const supabaseAnonKey = 'your-anon-key';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // This property is NOT supported and will cause issues
+    additionalRedirectUrls: [
+      'http://localhost:3000',
+      'https://your-app.com',
+      'https://your-staging.com'
+    ]
+  }
+});
+```
+
+### Correct Configuration
+```typescript
+// src/config/supabase.ts - CORRECT
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://your-project.supabase.co';
+const supabaseAnonKey = 'your-anon-key';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // Remove additionalRedirectUrls entirely
+    // Only include officially supported auth options
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
+```
+
+### Dashboard Configuration Required
+Instead of using `additionalRedirectUrls` in the client configuration, you must configure redirect URLs in the Supabase Dashboard:
+
+1. Go to your Supabase project Dashboard
+2. Navigate to **Authentication → URL Configuration**
+3. Add all necessary redirect URLs to the **Redirect URLs** field:
+   - `http://localhost:3000` (for development)
+   - `https://your-app.com` (for production)
+   - `https://your-staging.com` (for staging)
+   - Any other domains your app uses
+
+### Important Notes
+- The `additionalRedirectUrls` property is not part of the official Supabase client API
+- Redirect URLs must be configured server-side through the Dashboard for security
+- Client-side redirect URL configuration is not supported and will be ignored
+- Always test authentication flows after updating redirect URLs in the Dashboard
+
 ## Authentication Error Logging
 
 ### Problem
