@@ -369,8 +369,12 @@ class EvaErrorHandler {
    */
   savePatientDataEmergency() {
     try {
+      // Check and clean old emergency data first
+      this.cleanOldEmergencyData();
+      
       const forms = document.querySelectorAll('.eva-medical-form');
       const emergencyData = {};
+      const timestamp = new Date().toISOString();
       
       forms.forEach((form, index) => {
         const formData = new FormData(form);
@@ -381,10 +385,45 @@ class EvaErrorHandler {
         }
       });
       
-      localStorage.setItem('eva-emergency-data', JSON.stringify(emergencyData));
+      // Encrypt sensitive data before storing
+      const encryptedData = {
+        timestamp,
+        data: this.encryptData(emergencyData),
+        checksum: this.generateChecksum(emergencyData)
+      };
+      
+      localStorage.setItem('eva-emergency-data', JSON.stringify(encryptedData));
       console.log('Emergency patient data saved');
     } catch (error) {
       console.error('Failed to save emergency patient data:', error);
+    }
+  }
+
+  // Add encryption method (implement with proper crypto library)
+  encryptData(data) {
+    // TODO: Implement proper encryption using Web Crypto API or similar
+    console.warn('Emergency data encryption not implemented - this is a security risk!');
+    return btoa(JSON.stringify(data)); // Base64 is NOT encryption - replace this!
+  }
+
+  generateChecksum(data) {
+    // Generate checksum for data integrity verification
+    return JSON.stringify(data).length; // Replace with proper checksum
+  }
+
+  cleanOldEmergencyData() {
+    const existing = localStorage.getItem('eva-emergency-data');
+    if (existing) {
+      try {
+        const parsed = JSON.parse(existing);
+        const age = Date.now() - new Date(parsed.timestamp).getTime();
+        // Remove data older than 24 hours
+        if (age > 24 * 60 * 60 * 1000) {
+          localStorage.removeItem('eva-emergency-data');
+        }
+      } catch (e) {
+        localStorage.removeItem('eva-emergency-data');
+      }
     }
   }
 
