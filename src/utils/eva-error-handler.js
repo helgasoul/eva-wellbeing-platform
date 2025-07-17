@@ -7,11 +7,18 @@
  */
 class EvaErrorHandler {
   constructor() {
-    this.auditLogger = new EvaAuditLogger();
-    this.setupGlobalErrorHandlers();
-    this.errorQueue = [];
-    this.isOnline = navigator.onLine;
-    this.setupNetworkMonitoring();
+    try {
+      this.auditLogger = new EvaAuditLogger();
+      this.errorQueue = [];
+      this.isOnline = navigator?.onLine ?? true;
+      this.setupGlobalErrorHandlers();
+      this.setupNetworkMonitoring();
+    } catch (error) {
+      console.error('Failed to initialize EvaErrorHandler:', error);
+      // Ensure basic functionality even if initialization partially fails
+      this.errorQueue = [];
+      this.isOnline = true;
+    }
   }
 
   /**
