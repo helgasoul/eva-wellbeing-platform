@@ -216,6 +216,23 @@ export const autoRepairOnboarding = async (userId: string): Promise<{ repaired: 
       }
     }
 
+    // Generate missing menopause analysis if user has sufficient data
+    if (!diagnostics.checks.hasMenopauseAnalysis && 
+        diagnostics.checks.onboardingCompleted && 
+        diagnostics.validation.completionPercentage >= 70) {
+      
+      // Lazy import to avoid circular dependency
+      const { onboardingService } = await import('../services/onboardingService');
+      const { error, generated } = await onboardingService.generateMissingAnalysis(userId);
+      
+      if (generated) {
+        actions.push('Generated missing menopause analysis');
+        repaired = true;
+      } else if (error) {
+        actions.push(`Failed to generate analysis: ${error}`);
+      }
+    }
+
     return { repaired, actions };
 
   } catch (error: any) {

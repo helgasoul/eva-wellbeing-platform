@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { CheckCircle, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, RefreshCw, Wrench } from 'lucide-react';
 import { logger } from '@/utils/logger';
+import { onboardingService } from '@/services/onboardingService';
+import { runOnboardingDiagnostics, autoRepairOnboarding } from '@/utils/onboardingDiagnostics';
 
 const DatabaseCheck = () => {
   const [checks, setChecks] = useState({
     userProfiles: { status: 'loading', data: null, error: null },
     currentUser: { status: 'loading', data: null, error: null },
-    consistency: { status: 'loading', data: null, error: null }
+    consistency: { status: 'loading', data: null, error: null },
+    onboardingDiagnostics: { status: 'loading', data: null, error: null }
   });
 
   const runChecks = async () => {
@@ -61,7 +64,7 @@ const DatabaseCheck = () => {
     }
 
     // 3. Проверка консистентности данных (после небольшой задержки)
-    setTimeout(() => {
+    setTimeout(async () => {
       const session = checks.currentUser.data;
       const profiles = checks.userProfiles.data || [];
       
@@ -99,6 +102,38 @@ const DatabaseCheck = () => {
           error: null
         }
       }));
+
+      // 4. Расширенная диагностика онбординга
+      if (session?.user) {
+        try {
+          const diagnostics = await runOnboardingDiagnostics(session.user.id);
+          
+          let diagnosticsStatus = 'success';
+          if (diagnostics.systemStatus === 'error') {
+            diagnosticsStatus = 'error';
+          } else if (diagnostics.systemStatus === 'warning') {
+            diagnosticsStatus = 'warning';
+          }
+
+          setChecks(prev => ({
+            ...prev,
+            onboardingDiagnostics: {
+              status: diagnosticsStatus,
+              data: diagnostics,
+              error: null
+            }
+          }));
+        } catch (error: any) {
+          setChecks(prev => ({
+            ...prev,
+            onboardingDiagnostics: {
+              status: 'error',
+              data: null,
+              error: error.message
+            }
+          }));
+        }
+      }
     }, 1000);
   };
 
@@ -211,6 +246,67 @@ const DatabaseCheck = () => {
             )}
           </div>
         </div>
+
+        {/* Onboarding Diagnostics */}
+        {checks.currentUser.data?.user && (
+          <div className="flex items-center gap-3 p-4 border border-border rounded-lg">
+            {getStatusIcon(checks.onboardingDiagnostics.status)}
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground">Диагностика онбординга</h3>
+              {checks.onboardingDiagnostics.data && (
+                <div className="text-sm text-muted-foreground">
+                  <p>Статус системы: <span className={
+                    checks.onboardingDiagnostics.data.systemStatus === 'healthy' ? 'text-green-600' :
+                    checks.onboardingDiagnostics.data.systemStatus === 'warning' ? 'text-yellow-600' : 'text-red-600'
+                  }>{checks.onboardingDiagnostics.data.systemStatus}</span></p>
+                  <p>Онбординг завершен: {checks.onboardingDiagnostics.data.checks.onboardingCompleted ? 'Да' : 'Нет'}</p>
+                  <p>Есть анализ менопаузы: {checks.onboardingDiagnostics.data.checks.hasMenopauseAnalysis ? 'Да' : 'Нет'}</p>
+                  <p>Процент завершения: {checks.onboardingDiagnostics.data.validation.completionPercentage}%</p>
+                  <p>Количество шагов: {checks.onboardingDiagnostics.data.dataIntegrity.onboardingDataCount}</p>
+                  
+                  {checks.onboardingDiagnostics.data.recommendations.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-medium">Рекомендации:</p>
+                      <ul className="list-disc list-inside text-xs">
+                        {checks.onboardingDiagnostics.data.recommendations.map((rec, idx) => (
+                          <li key={idx}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {checks.onboardingDiagnostics.data.systemStatus !== 'healthy' && (
+                    <button
+                      onClick={async () => {
+                        const session = checks.currentUser.data;
+                        if (session?.user) {
+                          try {
+                            const repair = await autoRepairOnboarding(session.user.id);
+                            if (repair.repaired) {
+                              alert(`Исправлено: ${repair.actions.join(', ')}`);
+                              setTimeout(runChecks, 1000);
+                            } else {
+                              alert('Нет проблем для исправления');
+                            }
+                          } catch (error: any) {
+                            alert(`Ошибка автоисправления: ${error.message}`);
+                          }
+                        }
+                      }}
+                      className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 flex items-center gap-1"
+                    >
+                      <Wrench className="w-3 h-3" />
+                      Автоисправление
+                    </button>
+                  )}
+                </div>
+              )}
+              {checks.onboardingDiagnostics.error && (
+                <p className="text-sm text-destructive">{checks.onboardingDiagnostics.error}</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Детальная информация */}

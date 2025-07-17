@@ -42,6 +42,12 @@ export const useOnboardingCheck = () => {
       return;
     }
 
+    // Prevent cyclical redirects - if user is already on onboarding, don't redirect again
+    if (location.pathname === '/patient/onboarding') {
+      console.log('🔄 User already on onboarding page, skipping redirect check');
+      return;
+    }
+
     // Enhanced onboarding check with validation
     const validateAndRedirect = async () => {
       setOnboardingState(prev => ({ ...prev, isValidating: true }));
@@ -55,7 +61,8 @@ export const useOnboardingCheck = () => {
           currentPath: location.pathname,
           flagStatus: user.onboardingCompleted,
           validationResult: completionCheck.completed,
-          progress: completionCheck.progress
+          progress: completionCheck.progress,
+          diagnostics: completionCheck.diagnostics
         });
 
         const shouldGoToDashboard = shouldRedirectToDashboard({
@@ -75,14 +82,27 @@ export const useOnboardingCheck = () => {
           isValidating: false
         });
 
-        // Only perform redirects if user is on a page that requires redirect
-        // This prevents conflicts with manual navigation
-        if (shouldGoToDashboard && location.pathname === '/') {
-          console.log('✅ User has sufficient onboarding data - redirecting to dashboard');
-          navigate('/patient/dashboard', { replace: true });
-        } else if (shouldGoToOnboarding && location.pathname === '/') {
-          console.log('🔄 User needs to complete onboarding - redirecting to onboarding');
-          navigate('/patient/onboarding', { replace: true });
+        // Enhanced redirect logic - only redirect from root or if user is in wrong state
+        const currentlyOnOnboarding = location.pathname === '/patient/onboarding';
+        const currentlyOnDashboard = location.pathname.startsWith('/patient/dashboard');
+        const isOnRoot = location.pathname === '/';
+        
+        if (shouldGoToDashboard) {
+          // User should be on dashboard
+          if (isOnRoot || currentlyOnOnboarding) {
+            console.log('✅ User has sufficient onboarding data - redirecting to dashboard');
+            navigate('/patient/dashboard', { replace: true });
+          } else {
+            console.log('✅ User has sufficient data and is on appropriate page');
+          }
+        } else if (shouldGoToOnboarding) {
+          // User needs onboarding
+          if (isOnRoot || currentlyOnDashboard) {
+            console.log('🔄 User needs to complete onboarding - redirecting to onboarding');
+            navigate('/patient/onboarding', { replace: true });
+          } else {
+            console.log('🔄 User needs onboarding and is on appropriate page');
+          }
         } else {
           console.log('🔄 Validation complete, staying on current page:', location.pathname);
         }

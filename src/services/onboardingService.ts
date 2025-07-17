@@ -104,6 +104,15 @@ class OnboardingService {
       if (profile.onboarding_completed) {
         const validation = await validateOnboardingCompleteness(userId);
         
+        // Check menopause analysis separately - it's important but not critical
+        const { data: analysis } = await supabase
+          .from('menopause_analysis')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        const hasMenopauseAnalysis = !!analysis;
+        
         // If validation fails but flag is true, this indicates data corruption
         if (!validation.isValid && validation.errors.some(e => e.includes('Missing'))) {
           console.warn('⚠️ Onboarding marked complete but validation failed:', validation.errors);
@@ -114,18 +123,28 @@ class OnboardingService {
             console.log('✅ Auto-repaired onboarding issues:', repair.actions);
           }
           
+          // If user has essential data AND onboarding steps, consider them complete
+          // even without menopause analysis (can be generated later)
+          const canProceed = validation.progress.hasEssentialData && validation.progress.completedSteps >= 4;
+          
           return { 
-            completed: validation.progress.hasEssentialData, // Use validation result
+            completed: canProceed, // Allow completion with essential data
             error: null,
             progress: validation.progress,
-            diagnostics: { autoRepaired: repair.repaired, actions: repair.actions }
+            diagnostics: { 
+              autoRepaired: repair.repaired, 
+              actions: repair.actions,
+              hasMenopauseAnalysis,
+              canGenerateAnalysis: canProceed && !hasMenopauseAnalysis
+            }
           };
         }
 
         return { 
           completed: true, 
           error: null,
-          progress: validation.progress 
+          progress: validation.progress,
+          diagnostics: { hasMenopauseAnalysis }
         };
       }
 
@@ -402,6 +421,88 @@ class OnboardingService {
   // Validate data completeness
   async validateCompleteness(userId: string, onboardingData?: OnboardingData) {
     return await validateOnboardingCompleteness(userId, onboardingData);
+  }
+
+  // Generate missing menopause analysis for completed users
+  async generateMissingAnalysis(userId: string): Promise<{ error: string | null; generated: boolean }> {
+    try {
+      // Check if analysis already exists
+      const { data: existingAnalysis } = await supabase
+        .from('menopause_analysis')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingAnalysis) {
+        return { error: null, generated: false };
+      }
+
+      // Load onboarding data to generate analysis
+      const { data: onboardingData, error: loadError } = await this.loadUserOnboarding(userId);
+      if (loadError || !onboardingData) {
+        return { error: 'No onboarding data found to generate analysis', generated: false };
+      }
+
+      // Generate a basic analysis based on available data
+      const basicInfo = onboardingData.basicInfo || {};
+      const menstrualHistory = onboardingData.menstrualHistory || {};
+      const symptoms = onboardingData.symptoms || {};
+
+      // Simple analysis logic based on age and menstrual status
+      let menopausePhase = 'unknown';
+      let confidence = 0.7;
+
+      // Safely access properties with type checking
+      const userAge = (basicInfo as any)?.age;
+      const menstrualStatus = (menstrualHistory as any)?.menstrualStatus;
+      const primarySymptoms = (symptoms as any)?.primarySymptoms;
+
+      if (userAge) {
+        const age = parseInt(userAge);
+        if (age < 45) {
+          menopausePhase = 'premenopause';
+        } else if (age < 55) {
+          menopausePhase = 'perimenopause';
+        } else {
+          menopausePhase = 'postmenopause';
+        }
+      }
+
+      if (menstrualStatus === 'stopped') {
+        menopausePhase = 'postmenopause';
+        confidence = 0.9;
+      } else if (menstrualStatus === 'irregular') {
+        menopausePhase = 'perimenopause';
+        confidence = 0.8;
+      }
+
+      const analysis: MenopauseAnalysisResult = {
+        menopause_phase: menopausePhase,
+        phase_confidence: confidence,
+        risk_factors: {
+          age: userAge,
+          menstrualStatus: menstrualStatus,
+          symptoms: primarySymptoms || []
+        },
+        recommendations: {
+          immediate: ['Track symptoms daily', 'Maintain healthy lifestyle'],
+          lifestyle: ['Regular exercise', 'Balanced nutrition', 'Stress management'],
+          medical: ['Consult healthcare provider for personalized advice']
+        }
+      };
+
+      const { error: saveError } = await this.saveAnalysis(userId, analysis);
+      if (saveError) {
+        return { error: saveError, generated: false };
+      }
+
+      console.log(`✅ Generated missing menopause analysis for user ${userId}`);
+      return { error: null, generated: true };
+
+    } catch (error: any) {
+      console.error('❌ Generate missing analysis error:', error);
+      return { error: error.message || 'Failed to generate analysis', generated: false };
+    }
   }
 }
 
