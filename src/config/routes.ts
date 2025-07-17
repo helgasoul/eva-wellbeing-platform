@@ -50,6 +50,7 @@ const AdminSettings = React.lazy(() => import('@/pages/admin/AdminSettings'));
 const AdminSecurity = React.lazy(() => import('@/pages/admin/AdminSecurity'));
 const AdminReports = React.lazy(() => import('@/pages/admin/AdminReports'));
 const AdminLogs = React.lazy(() => import('@/pages/admin/AdminLogs'));
+const NavigationDashboard = React.lazy(() => import('@/components/navigation/NavigationDashboard'));
 
 export interface RouteConfig {
   path: string;
@@ -107,6 +108,7 @@ export const ROUTE_CONFIG: RouteConfig[] = [
   { path: '/admin/security', component: AdminSecurity, allowedRoles: [UserRole.ADMIN] },
   { path: '/admin/reports', component: AdminReports, allowedRoles: [UserRole.ADMIN] },
   { path: '/admin/logs', component: AdminLogs, allowedRoles: [UserRole.ADMIN] },
+  { path: '/admin/navigation', component: NavigationDashboard, allowedRoles: [UserRole.ADMIN] },
 ];
 
 // Функция для извлечения всех путей из роутов

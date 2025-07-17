@@ -1,31 +1,5 @@
 import { extractRoutesFromNavigation } from '@/config/navigation';
-
-// Временно используем существующие роуты для валидации
-const EXISTING_ROUTES = [
-  '/patient/dashboard',
-  '/patient/symptoms', 
-  '/patient/nutrition',
-  '/patient/recipes',
-  '/patient/nutrition-plan',
-  '/patient/nutrition-analysis',
-  '/patient/academy',
-  '/patient/cycle',
-  '/patient/calendar',
-  '/patient/sleep-dashboard',
-  '/patient/data-sources',
-  '/patient/diagnostics',
-  '/patient/health-data-integrations',
-  '/patient/doctor-booking',
-  '/patient/lab-tests',
-  '/patient/ai-chat',
-  '/patient/documents',
-  '/patient/advanced-recommendations',
-  '/patient/community',
-  '/patient/settings',
-  '/doctor/dashboard',
-  '/doctor/embedded-calculators',
-  '/admin/dashboard'
-];
+import { extractAllRoutes } from '@/config/routes';
 
 export interface ValidationResult {
   missingRoutes: string[];
@@ -35,7 +9,7 @@ export interface ValidationResult {
 
 export const validateRouteConsistency = (): ValidationResult => {
   const navigationRoutes = extractRoutesFromNavigation();
-  const appRoutes = EXISTING_ROUTES;
+  const appRoutes = extractAllRoutes();
   
   const missingRoutes = navigationRoutes.filter(route => !appRoutes.includes(route));
   const orphanRoutes = appRoutes.filter(route => !navigationRoutes.includes(route));

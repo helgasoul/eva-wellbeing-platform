@@ -1,11 +1,13 @@
 
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/roles';
 import { TopNavbar } from './TopNavbar';
 import { Breadcrumbs, BreadcrumbItem } from './Breadcrumbs';
 import { QuickActions } from './QuickActions';
 import { logger } from '@/utils/logger';
+import { generateBreadcrumbs } from '@/utils/breadcrumbGenerator';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -27,6 +29,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onQuickAction
 }) => {
   const { user, logout } = useAuth();
+  const location = useLocation();
+  
+  // Auto-generate breadcrumbs if not provided
+  const displayBreadcrumbs = breadcrumbs?.length > 0 ? breadcrumbs : generateBreadcrumbs(location.pathname);
 
   const handleQuickAction = (actionType: string) => {
     if (onQuickAction) {
@@ -80,7 +86,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <main className="flex-1">
         <div className="container mx-auto px-4 py-6">
           {/* Breadcrumbs */}
-          <Breadcrumbs items={breadcrumbs} />
+          <Breadcrumbs items={displayBreadcrumbs} />
           
           {/* Quick Actions */}
           {quickActions && userRole && (
