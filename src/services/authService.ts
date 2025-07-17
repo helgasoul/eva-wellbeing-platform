@@ -23,7 +23,7 @@ class AuthService {
       email: supabaseUser.email!,
       firstName: profileData?.first_name || '',
       lastName: profileData?.last_name || '',
-      role: (profileData?.user_role as UserRole) || UserRole.PATIENT,
+      role: (profileData?.role as UserRole) || UserRole.PATIENT, // Fixed: use 'role' not 'user_role'
       phone: profileData?.phone,
       emailVerified: supabaseUser.email_confirmed_at ? true : false,
       phoneVerified: profileData?.phone_verified || false,
@@ -279,30 +279,64 @@ class AuthService {
           console.error('❌ Профиль пользователя не найден в базе данных');
           console.log('🔧 Попытка создать профиль автоматически...');
           
-          // Попытка создать профиль автоматически
-          const { data: newProfile, error: createError } = await supabase
+          // Check if profile was created by trigger but query timing issue
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const { data: retryProfile, error: retryError } = await supabase
             .from('user_profiles')
-            .insert({
-              id: data.user.id,
-              email: data.user.email,
-              first_name: data.user.user_metadata?.first_name || '',
-              last_name: data.user.user_metadata?.last_name || '',
-              role: data.user.user_metadata?.role || 'patient',
-              onboarding_completed: false
-            })
-            .select()
-            .single();
+            .select('*')
+            .eq('id', data.user.id)
+            .maybeSingle();
+            
+          if (retryProfile) {
+            console.log('✅ Profile found on retry');
+            finalProfileData = retryProfile;
+          } else {
+            // Only try to create if retry also failed
+            const { data: newProfile, error: createError } = await supabase
+              .from('user_profiles')
+              .insert({
+                id: data.user.id,
+                email: data.user.email,
+                first_name: data.user.user_metadata?.first_name || '',
+                last_name: data.user.user_metadata?.last_name || '',
+                role: data.user.user_metadata?.role || 'patient',
+                onboarding_completed: false
+              })
+              .select()
+              .maybeSingle(); // Use maybeSingle to handle duplicates gracefully
 
-          if (createError) {
-            console.error('❌ Не удалось создать профиль:', createError);
-            return { 
-              user: null, 
-              error: 'Профиль пользователя не найден и не может быть создан автоматически. Обратитесь к администратору.' 
-            };
+            if (createError) {
+              // If error is due to duplicate key, try to fetch the existing profile
+              if (createError.code === '23505') {
+                console.log('🔄 Profile already exists, fetching it...');
+                const { data: existingProfile } = await supabase
+                  .from('user_profiles')
+                  .select('*')
+                  .eq('id', data.user.id)
+                  .maybeSingle();
+                  
+                if (existingProfile) {
+                  finalProfileData = existingProfile;
+                } else {
+                  console.error('❌ Cannot fetch existing profile after duplicate error');
+                  return { 
+                    user: null, 
+                    error: 'Ошибка загрузки профиля пользователя. Попробуйте войти снова.' 
+                  };
+                }
+              } else {
+                console.error('❌ Не удалось создать профиль:', createError);
+                return { 
+                  user: null, 
+                  error: 'Ошибка создания профиля пользователя. Обратитесь к администратору.' 
+                };
+              }
+            } else {
+              console.log('✅ Профиль создан автоматически:', newProfile);
+              finalProfileData = newProfile;
+            }
           }
-
-          console.log('✅ Профиль создан автоматически:', newProfile);
-          finalProfileData = newProfile;
         }
 
         console.log('✅ Профиль загружен:', finalProfileData);
@@ -402,12 +436,33 @@ class AuthService {
         return { user: null, error: null };
       }
 
-      // 2. Загружаем профиль
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .maybeSingle();
+      // 2. Загружаем профиль с retry logic
+      let profileData = null;
+      let profileError = null;
+      
+      // Try up to 3 times with delays for profile loading
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
+          
+        if (data) {
+          profileData = data;
+          break;
+        }
+        
+        if (error) {
+          profileError = error;
+          break;
+        }
+        
+        // If no data and no error, wait and retry
+        if (attempt < 2) {
+          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+        }
+      }
 
       if (profileError) {
         console.error('Profile fetch error:', profileError);

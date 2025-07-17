@@ -235,7 +235,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Redirect based on role and onboarding status
       if (authenticatedUser.role === UserRole.PATIENT) {
-        if (authenticatedUser.onboardingCompleted) {
+        // Double-check onboarding status with the onboarding service
+        console.log('🔍 Verifying onboarding status before redirect...');
+        const onboardingCheck = await onboardingService.isOnboardingComplete(authenticatedUser.id);
+        
+        console.log('📊 Onboarding verification result:', {
+          profileFlag: authenticatedUser.onboardingCompleted,
+          serviceCheck: onboardingCheck.completed,
+          hasEssentialData: onboardingCheck.progress?.hasEssentialData
+        });
+        
+        // Use the service check result instead of just the profile flag
+        if (onboardingCheck.completed) {
           navigate('/patient/dashboard');
         } else {
           navigate('/patient/onboarding');
