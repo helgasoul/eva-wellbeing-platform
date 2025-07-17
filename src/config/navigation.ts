@@ -19,7 +19,7 @@ import {
   Brain,
   Link as LinkIcon,
   GraduationCap,
-  Navigation
+  MapPin
 } from 'lucide-react';
 import { UserRole } from '@/types/roles';
 
@@ -83,7 +83,7 @@ export const NAVIGATION_CONFIG: Record<UserRole, NavigationItem[]> = {
     { name: 'Безопасность', href: '/admin/security', icon: Shield },
     { name: 'Отчеты', href: '/admin/reports', icon: FileText },
     { name: 'Логи системы', href: '/admin/logs', icon: Database },
-    { name: 'Навигация', href: '/admin/navigation', icon: Navigation },
+    { name: 'Навигация', href: '/admin/navigation', icon: MapPin },
   ]
 };
 
