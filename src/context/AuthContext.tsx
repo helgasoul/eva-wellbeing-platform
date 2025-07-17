@@ -27,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [syncInProgress, setSyncInProgress] = useState(false);
   const navigate = useNavigate();
 
   // Initialize auth state with enhanced monitoring and retry logic

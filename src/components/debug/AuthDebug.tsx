@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { diagnoseAuthState, clearAuthStorage } from '../../utils/auth-diagnostics';
+import { logger } from '../../utils/logger';
 
 const AuthDebug = () => {
   // Только показываем в development режиме
@@ -93,10 +95,33 @@ const AuthDebug = () => {
           </div>
         </div>
 
-        <div className="pt-2 border-t">
+        <div className="pt-2 border-t space-y-2">
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                const result = await diagnoseAuthState();
+                logger.info('Full diagnostic:', result);
+                alert(`Diagnostics complete. Check console for details. Issues: ${result.inconsistencies.length}`);
+              }}
+              className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+            >
+              Full Diagnostic
+            </button>
+            <button
+              onClick={() => {
+                if (confirm('Clear all auth storage?')) {
+                  clearAuthStorage();
+                  window.location.reload();
+                }
+              }}
+              className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+            >
+              Clear Storage
+            </button>
+          </div>
           <a 
             href="/login-safe" 
-            className="text-blue-600 hover:text-blue-800 text-xs underline"
+            className="text-blue-600 hover:text-blue-800 text-xs underline block"
           >
             → Перейти к безопасному входу
           </a>
