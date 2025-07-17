@@ -48,6 +48,8 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
             ...options,
             signal: controller.signal,
             headers: {
+              'apikey': SUPABASE_PUBLISHABLE_KEY,
+              'Authorization': options.headers?.Authorization || `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
               ...(options.headers || {}),
               'Keep-Alive': 'timeout=60, max=100',
               'Connection': 'keep-alive'
