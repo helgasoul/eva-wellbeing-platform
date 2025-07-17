@@ -105,8 +105,14 @@ export const validateOnboardingCompleteness = async (
                  );
         }
         
-        // Handle other fields normally
-        return !fieldValue;
+        // Special handling for symptoms - frequency fields can be "never"
+        if (stepName === 'symptoms' && typeof fieldValue === 'object' && fieldValue !== null) {
+          // For symptom objects with frequency, "never" is acceptable
+          return !fieldValue.frequency;
+        }
+        
+        // Handle other fields normally (including 0 as valid)
+        return !fieldValue && fieldValue !== 0;
       });
 
       if (missingRequired.length > 0) {
@@ -195,7 +201,7 @@ export const getNextOnboardingStep = (progress: OnboardingProgress): string | nu
 };
 
 /**
- * Validate specific step data
+ * Enhanced validation for specific step data with better "none of the above" handling
  */
 export const validateStep = (stepName: string, stepData: any): { isValid: boolean; errors: string[] } => {
   const schema = STEP_SCHEMAS[stepName as keyof typeof STEP_SCHEMAS];
@@ -224,8 +230,15 @@ export const validateStep = (stepName: string, stepData: any): { isValid: boolea
         errors.push(`Required field missing: ${field}`);
       }
     }
+    // Special handling for symptoms step - frequency fields can be "never"
+    else if (stepName === 'symptoms' && typeof fieldValue === 'object' && fieldValue !== null) {
+      // For symptom objects with frequency, "never" is acceptable
+      if (!fieldValue.frequency) {
+        errors.push(`Required field missing: ${field}.frequency`);
+      }
+    }
     // Handle other fields normally
-    else if (!fieldValue) {
+    else if (!fieldValue && fieldValue !== 0) {
       errors.push(`Required field missing: ${field}`);
     }
   }

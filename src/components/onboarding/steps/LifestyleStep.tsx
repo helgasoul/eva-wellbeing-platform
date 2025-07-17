@@ -42,6 +42,18 @@ export const LifestyleStep: React.FC<LifestyleStepProps> = ({
 
   return (
     <div className="space-y-8">
+      <div className="text-sm text-muted-foreground bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div className="flex items-start space-x-3">
+          <div className="text-green-500 text-lg">🌟</div>
+          <div>
+            <p className="font-medium text-green-900 mb-1">Ваш образ жизни:</p>
+            <p className="text-green-800">
+              Информация о ваших привычках поможет создать реалистичные рекомендации. 
+              Отвечайте честно - даже "не занимаюсь" или "никогда" являются важными ответами.
+            </p>
+          </div>
+        </div>
+      </div>
       {/* Exercise Frequency */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium text-foreground">Физическая активность</h3>
@@ -241,8 +253,8 @@ export const LifestyleStep: React.FC<LifestyleStepProps> = ({
 
       <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
         <p>
-          💡 <strong>Образ жизни важен:</strong> Информация о ваших привычках поможет создать 
-          реалистичные и персонализированные рекомендации по улучшению самочувствия.
+          ✅ <strong>Отлично!</strong> Ваш профиль образа жизни составлен. 
+          Эти данные помогут адаптировать рекомендации под ваши текущие привычки и возможности.
         </p>
       </div>
     </div>

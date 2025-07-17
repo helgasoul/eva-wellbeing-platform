@@ -52,6 +52,18 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
 
   return (
     <div className="space-y-8">
+      <div className="text-sm text-muted-foreground bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-start space-x-3">
+          <div className="text-blue-500 text-lg">💡</div>
+          <div>
+            <p className="font-medium text-blue-900 mb-1">Важно знать:</p>
+            <p className="text-blue-800">
+              Если вы не испытываете какой-то симптом, это тоже важная информация для вашего анализа. 
+              Выбирайте "Никогда" или "Ничего из перечисленного" - это поможет нам лучше понять ваше состояние.
+            </p>
+          </div>
+        </div>
+      </div>
       {/* Hot Flashes */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium text-foreground">Приливы</h3>
@@ -291,8 +303,8 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
 
       <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
         <p>
-          💡 <strong>Помните:</strong> Если вы не испытываете какой-то симптом, это тоже важная информация. 
-          Отвечайте честно - это поможет нам лучше понять ваше состояние.
+          ✅ <strong>Готово!</strong> Вы заполнили все необходимые разделы о симптомах. 
+          Эта информация поможет создать персонализированные рекомендации для вашего здоровья.
         </p>
       </div>
     </div>

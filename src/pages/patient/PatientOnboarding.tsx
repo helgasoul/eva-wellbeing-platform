@@ -484,46 +484,83 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ ИСПРАВЛЕНО: Правильная валидация для 7-шагового процесса
+  // ✅ ИСПРАВЛЕНО: Правильная валидация для 7-шагового процесса с улучшенным логированием
   const canGoNext = () => {
+    console.log(`🔍 Validating step ${currentStep}:`, {
+      step: currentStep,
+      formData: formData,
+      stepName: ONBOARDING_STEPS[currentStep - 1]?.title
+    });
+
     switch (currentStep) {
       case 1:
         return true; // Welcome step
       case 2:
         // BasicInfoStep - требуются обязательные поля
-        return formData.basicInfo && 
+        const basicValid = formData.basicInfo && 
                formData.basicInfo.age > 0 && 
                formData.basicInfo.height > 0 && 
                formData.basicInfo.weight > 0;
+        console.log(`📊 BasicInfo validation:`, { basicValid, data: formData.basicInfo });
+        return basicValid;
       case 3:
         // MenstrualHistoryStep - требуется возраст первой менструации
-        return formData.menstrualHistory && 
+        const menstrualValid = formData.menstrualHistory && 
                formData.menstrualHistory.ageOfFirstPeriod > 0;
+        console.log(`🩸 MenstrualHistory validation:`, { menstrualValid, data: formData.menstrualHistory });
+        return menstrualValid;
       case 4:
-        // SymptomsStep - требуется хотя бы заполнение базовых симптомов
-        return formData.symptoms && (
-          formData.symptoms.hotFlashes?.frequency !== undefined ||
-          formData.symptoms.nightSweats?.frequency !== undefined ||
-          formData.symptoms.sleepProblems?.frequency !== undefined ||
-          formData.symptoms.moodChanges?.frequency !== undefined
+        // SymptomsStep - считается завершенным если:
+        // 1. Заполнена хотя бы одна частота симптомов (включая "never") ИЛИ
+        // 2. Выбрано "ничего из перечисленного" для физических/когнитивных симптомов
+        const symptomsValid = formData.symptoms && (
+          // Проверяем частотные симптомы
+          (formData.symptoms.hotFlashes?.frequency !== undefined ||
+           formData.symptoms.nightSweats?.frequency !== undefined ||
+           formData.symptoms.sleepProblems?.frequency !== undefined ||
+           formData.symptoms.moodChanges?.frequency !== undefined) ||
+          // Или проверяем наличие данных о симптомах (включая "none_of_the_above")
+          (formData.symptoms.physicalSymptoms?.length > 0 ||
+           formData.symptoms.cognitiveSymptoms?.length > 0)
         );
+        console.log(`😷 Symptoms validation:`, { 
+          symptomsValid, 
+          hasFrequencyData: !!(formData.symptoms?.hotFlashes?.frequency !== undefined ||
+                              formData.symptoms?.nightSweats?.frequency !== undefined ||
+                              formData.symptoms?.sleepProblems?.frequency !== undefined ||
+                              formData.symptoms?.moodChanges?.frequency !== undefined),
+          hasSymptomArrays: !!(formData.symptoms?.physicalSymptoms?.length > 0 ||
+                              formData.symptoms?.cognitiveSymptoms?.length > 0),
+          data: formData.symptoms 
+        });
+        return symptomsValid;
       case 5:
         // MedicalHistoryStep - принимаем любые данные (даже пустые массивы)
-        return formData.medicalHistory !== undefined;
+        const medicalValid = formData.medicalHistory !== undefined;
+        console.log(`🏥 MedicalHistory validation:`, { medicalValid, data: formData.medicalHistory });
+        return medicalValid;
       case 6:
-        // LifestyleStep - требуется заполнение основных полей
-        return formData.lifestyle && 
+        // LifestyleStep - считается завершенным если заполнены ключевые поля
+        // Пользователь может пропустить детали, если выбрал базовые параметры
+        const lifestyleValid = formData.lifestyle && 
                formData.lifestyle.exerciseFrequency !== undefined &&
                formData.lifestyle.dietType !== undefined &&
                formData.lifestyle.smokingStatus !== undefined &&
-               formData.lifestyle.alcoholConsumption !== undefined;
+               formData.lifestyle.alcoholConsumption !== undefined &&
+               formData.lifestyle.stressLevel !== undefined &&
+               formData.lifestyle.sleepHours !== undefined;
+        console.log(`🏃‍♀️ Lifestyle validation:`, { lifestyleValid, data: formData.lifestyle });
+        return lifestyleValid;
       case 7:
         // GoalsStep - требуется выбор хотя бы одной цели или заботы
-        return formData.goals && (
+        const goalsValid = formData.goals && (
           (formData.goals.primaryConcerns && formData.goals.primaryConcerns.length > 0) ||
           (formData.goals.goals && formData.goals.goals.length > 0)
         );
+        console.log(`🎯 Goals validation:`, { goalsValid, data: formData.goals });
+        return goalsValid;
       default:
+        console.warn(`⚠️ Unknown step ${currentStep}`);
         return false;
     }
   };
