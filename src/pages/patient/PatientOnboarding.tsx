@@ -657,7 +657,7 @@ const PatientOnboarding = () => {
   };
 
   return (
-    <PatientLayout title={onboardingPresets ? `Персональная анкета для "${getPersonaTitle(onboardingPresets.persona.id)}"` : "Онбординг без | паузы"} hideSidebar={true}>
+    <PatientLayout title={onboardingPresets ? `Персональная анкета для "${getPersonaTitle(onboardingPresets.persona.id)}"` : "Знакомство без | паузы"} hideSidebar={true}>
       <div className="min-h-screen">
         {/* ✅ НОВОЕ: Индикатор загрузки данных */}
         {(dataLoadingStatus.dataBridge || dataLoadingStatus.registration) && (

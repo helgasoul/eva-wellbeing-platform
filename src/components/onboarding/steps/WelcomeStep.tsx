@@ -106,7 +106,7 @@ export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext }) => {
           size="lg"
           className="bg-bloom-dusty-rose hover:bg-bloom-mauve text-white px-8 py-3 text-lg"
         >
-          <span>Начать анкету</span>
+          <span>Начать Знакомство</span>
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
       </div>
