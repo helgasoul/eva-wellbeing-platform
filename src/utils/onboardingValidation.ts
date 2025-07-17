@@ -89,15 +89,64 @@ export const validateOnboardingCompleteness = async (
       }
     }
 
+    const totalSteps = Object.keys(STEP_SCHEMAS).length;
+    const completionPercentage = dbCompletionData.completion_percentage || 0;
+    const completedSteps: string[] = dbCompletionData.completed_steps || [];
+    
+    // PRIORITY 1: Trust database completion data
+    if (completionPercentage >= 100) {
+      console.log(`✅ User ${userId} onboarding complete (${completionPercentage}%) - trusting database data`);
+      
+      const progress: OnboardingProgress = {
+        isComplete: true,
+        completedSteps: completedSteps.length || totalSteps,
+        totalSteps,
+        missingSteps: [],
+        completionPercentage,
+        hasEssentialData: true,
+        lastUpdated: new Date().toISOString()
+      };
+
+      return {
+        isValid: true,
+        errors: [],
+        warnings: [],
+        progress
+      };
+    }
+
+    // PRIORITY 2: Trust completed steps from database if available
+    if (completedSteps.length > 0) {
+      const missingSteps = Object.keys(STEP_SCHEMAS).filter(step => !completedSteps.includes(step));
+      const hasEssentialData = completedSteps.length >= Math.ceil(totalSteps * 0.7);
+      
+      console.log(`📊 User ${userId} has ${completedSteps.length}/${totalSteps} steps from database`);
+      
+      const progress: OnboardingProgress = {
+        isComplete: missingSteps.length === 0,
+        completedSteps: completedSteps.length,
+        totalSteps,
+        missingSteps,
+        completionPercentage,
+        hasEssentialData,
+        lastUpdated: new Date().toISOString()
+      };
+
+      return {
+        isValid: missingSteps.length === 0,
+        errors: missingSteps.map(step => `Missing ${step} data`),
+        warnings: [],
+        progress
+      };
+    }
+
+    // PRIORITY 3: Fallback to detailed field validation
+    console.log(`🔍 User ${userId} - performing detailed field validation (no database completion data)`);
+    
     const errors: string[] = [];
     const warnings: string[] = [];
-    const completedSteps: string[] = dbCompletionData.completed_steps || [];
     const missingSteps: string[] = [];
-
-    // Use database completion percentage if available, otherwise calculate
-    const completionPercentage = dbCompletionData.completion_percentage || 0;
-    const totalSteps = Object.keys(STEP_SCHEMAS).length;
-    const isComplete = completionPercentage >= 100;
+    const isComplete = false;
 
     // Validate each step for detailed errors/warnings
     for (const [stepName, schema] of Object.entries(STEP_SCHEMAS)) {
