@@ -58,9 +58,30 @@ export const validateOnboardingCompleteness = async (
   onboardingData?: OnboardingData
 ): Promise<OnboardingValidationResult> => {
   try {
+    // First check user_profiles for completion status
+    const { data: profileData, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('onboarding_completed, onboarding_completion_percentage, onboarding_phase_result, last_onboarding_step')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error('❌ Error fetching user profile:', profileError);
+      throw profileError;
+    }
+
+    let dbCompletionData: { completed_steps?: string[], completion_percentage?: number, onboarding_completed?: boolean } = {};
+    
+    if (profileData) {
+      dbCompletionData = {
+        onboarding_completed: profileData.onboarding_completed,
+        completion_percentage: profileData.onboarding_completion_percentage || 0,
+        completed_steps: (profileData.onboarding_phase_result as any)?.completed_steps || []
+      };
+    }
+
     // Load onboarding data if not provided
     let data = onboardingData;
-    let dbCompletionData: { completed_steps?: string[], completion_percentage?: number } = {};
     
     if (!data) {
       const { data: onboardingRow } = await supabase
@@ -74,11 +95,14 @@ export const validateOnboardingCompleteness = async (
         // Use type casting to handle the new column structure
         const row = onboardingRow as any;
         
-        // Store completion data from database
-        dbCompletionData = {
-          completed_steps: row.completed_steps || [],
-          completion_percentage: row.completion_percentage || 0
-        };
+        // Merge completion data from onboarding_data table if available
+        if (row.completed_steps || row.completion_percentage) {
+          dbCompletionData = {
+            ...dbCompletionData,
+            completed_steps: row.completed_steps || dbCompletionData.completed_steps || [],
+            completion_percentage: row.completion_percentage || dbCompletionData.completion_percentage || 0
+          };
+        }
         
         if (row.basic_info) data.basicInfo = row.basic_info;
         if (row.menstrual_history) data.menstrualHistory = row.menstrual_history;
@@ -94,15 +118,15 @@ export const validateOnboardingCompleteness = async (
     const completedSteps: string[] = dbCompletionData.completed_steps || [];
     
     // PRIORITY 1: Trust database completion data
-    if (completionPercentage >= 100) {
-      console.log(`✅ User ${userId} onboarding complete (${completionPercentage}%) - trusting database data`);
+    if (dbCompletionData.onboarding_completed || completionPercentage >= 100) {
+      console.log(`✅ User ${userId} onboarding complete (completed=${dbCompletionData.onboarding_completed}, ${completionPercentage}%) - trusting database data`);
       
       const progress: OnboardingProgress = {
         isComplete: true,
         completedSteps: completedSteps.length || totalSteps,
         totalSteps,
         missingSteps: [],
-        completionPercentage,
+        completionPercentage: dbCompletionData.onboarding_completed ? 100 : completionPercentage,
         hasEssentialData: true,
         lastUpdated: new Date().toISOString()
       };
