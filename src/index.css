@@ -674,3 +674,137 @@ p {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
+
+/* Eva Error Modal Styles */
+.eva-error-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.eva-error-modal-content {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) * 1.5);
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.eva-error-modal h3 {
+  color: hsl(var(--foreground));
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.eva-error-modal p {
+  color: hsl(var(--muted-foreground));
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.eva-error-details {
+  background: hsl(var(--muted));
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin: 1rem 0;
+  font-family: monospace;
+  font-size: 0.875rem;
+}
+
+.eva-error-details p {
+  margin: 0.5rem 0;
+  color: hsl(var(--foreground));
+}
+
+.eva-error-details strong {
+  color: hsl(var(--primary));
+}
+
+.eva-error-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.eva-error-report-btn,
+.eva-error-close-btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.eva-error-report-btn {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+.eva-error-report-btn:hover {
+  background: hsl(var(--primary) / 0.9);
+  transform: translateY(-1px);
+}
+
+.eva-error-close-btn {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+}
+
+.eva-error-close-btn:hover {
+  background: hsl(var(--secondary) / 0.8);
+}
+
+.eva-error-confirmation {
+  background: hsl(var(--success));
+  color: hsl(var(--success-foreground));
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .eva-error-modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+  
+  .eva-error-buttons {
+    flex-direction: column;
+  }
+  
+  .eva-error-report-btn,
+  .eva-error-close-btn {
+    width: 100%;
+  }
+}

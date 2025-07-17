@@ -1,0 +1,668 @@
+/* 🏗️ EVA PLATFORM LAYOUT SYSTEM - Responsive & Medical-Focused */
+
+/* ===== БАЗОВЫЕ ПЕРЕМЕННЫЕ ===== */
+:root {
+  /* Layout Spacing */
+  --eva-spacing-xs: 4px;
+  --eva-spacing-sm: 8px;
+  --eva-spacing-md: 16px;
+  --eva-spacing-lg: 24px;
+  --eva-spacing-xl: 32px;
+  --eva-spacing-xxl: 48px;
+  
+  /* Container Widths */
+  --eva-container-sm: 640px;
+  --eva-container-md: 768px;
+  --eva-container-lg: 1024px;
+  --eva-container-xl: 1280px;
+  --eva-container-max: 1400px;
+  
+  /* Grid Breakpoints */
+  --eva-breakpoint-sm: 640px;
+  --eva-breakpoint-md: 768px;
+  --eva-breakpoint-lg: 1024px;
+  --eva-breakpoint-xl: 1280px;
+  
+  /* Medical Layout Heights */
+  --eva-header-height: 80px;
+  --eva-footer-height: 120px;
+  --eva-sidebar-width: 280px;
+  --eva-content-max-width: 800px;
+}
+
+/* ===== КОНТЕЙНЕРЫ ===== */
+.eva-container {
+  width: 100%;
+  max-width: var(--eva-container-max);
+  margin: 0 auto;
+  padding-left: var(--eva-spacing-lg);
+  padding-right: var(--eva-spacing-lg);
+  box-sizing: border-box;
+}
+
+.eva-container--sm {
+  max-width: var(--eva-container-sm);
+}
+
+.eva-container--md {
+  max-width: var(--eva-container-md);
+}
+
+.eva-container--lg {
+  max-width: var(--eva-container-lg);
+}
+
+.eva-container--xl {
+  max-width: var(--eva-container-xl);
+}
+
+.eva-container--full {
+  max-width: none;
+}
+
+/* ===== БАЗОВЫЙ LAYOUT ===== */
+.eva-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--eva-bg-primary, #ffffff);
+}
+
+.eva-layout__header {
+  background: var(--eva-bg-primary, #ffffff);
+  border-bottom: 2px solid var(--eva-primary, #2563eb);
+  padding: var(--eva-spacing-md) 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: var(--eva-header-height);
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.eva-layout__main {
+  flex: 1;
+  padding: var(--eva-spacing-lg) 0;
+  min-height: calc(100vh - var(--eva-header-height) - var(--eva-footer-height));
+}
+
+.eva-layout__footer {
+  background: var(--eva-bg-secondary, #f9fafb);
+  border-top: 1px solid var(--eva-bg-tertiary, #f3f4f6);
+  padding: var(--eva-spacing-xl) 0;
+  margin-top: auto;
+}
+
+/* ===== GRID SYSTEM ===== */
+.eva-grid {
+  display: grid;
+  gap: var(--eva-spacing-lg);
+  width: 100%;
+}
+
+.eva-grid--cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.eva-grid--cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.eva-grid--cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.eva-grid--cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.eva-grid--cols-auto {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.eva-grid--gap-sm {
+  gap: var(--eva-spacing-sm);
+}
+
+.eva-grid--gap-md {
+  gap: var(--eva-spacing-md);
+}
+
+.eva-grid--gap-lg {
+  gap: var(--eva-spacing-lg);
+}
+
+.eva-grid--gap-xl {
+  gap: var(--eva-spacing-xl);
+}
+
+/* ===== МЕДИЦИНСКИЙ LAYOUT ===== */
+.eva-medical-layout {
+  display: grid;
+  grid-template-areas: 
+    "sidebar header"
+    "sidebar main"
+    "sidebar footer";
+  grid-template-columns: var(--eva-sidebar-width) 1fr;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  gap: 0;
+}
+
+.eva-medical-layout__sidebar {
+  grid-area: sidebar;
+  background: var(--eva-bg-secondary, #f9fafb);
+  border-right: 2px solid var(--eva-bg-tertiary, #f3f4f6);
+  padding: var(--eva-spacing-lg);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--eva-primary, #2563eb) transparent;
+}
+
+.eva-medical-layout__header {
+  grid-area: header;
+  background: var(--eva-bg-primary, #ffffff);
+  border-bottom: 2px solid var(--eva-primary, #2563eb);
+  padding: var(--eva-spacing-md) var(--eva-spacing-lg);
+  display: flex;
+  align-items: center;
+  height: var(--eva-header-height);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.eva-medical-layout__main {
+  grid-area: main;
+  padding: var(--eva-spacing-lg);
+  background: var(--eva-bg-primary, #ffffff);
+  overflow-x: hidden;
+}
+
+.eva-medical-layout__footer {
+  grid-area: footer;
+  background: var(--eva-bg-secondary, #f9fafb);
+  border-top: 1px solid var(--eva-bg-tertiary, #f3f4f6);
+  padding: var(--eva-spacing-lg);
+}
+
+/* ===== FLEXBOX UTILITIES ===== */
+.eva-flex {
+  display: flex;
+}
+
+.eva-flex--column {
+  flex-direction: column;
+}
+
+.eva-flex--row {
+  flex-direction: row;
+}
+
+.eva-flex--wrap {
+  flex-wrap: wrap;
+}
+
+.eva-flex--nowrap {
+  flex-wrap: nowrap;
+}
+
+.eva-flex--center {
+  justify-content: center;
+  align-items: center;
+}
+
+.eva-flex--between {
+  justify-content: space-between;
+}
+
+.eva-flex--around {
+  justify-content: space-around;
+}
+
+.eva-flex--start {
+  justify-content: flex-start;
+}
+
+.eva-flex--end {
+  justify-content: flex-end;
+}
+
+.eva-flex--items-center {
+  align-items: center;
+}
+
+.eva-flex--items-start {
+  align-items: flex-start;
+}
+
+.eva-flex--items-end {
+  align-items: flex-end;
+}
+
+.eva-flex--items-stretch {
+  align-items: stretch;
+}
+
+/* ===== SPACING UTILITIES ===== */
+.eva-m-0 { margin: 0; }
+.eva-m-xs { margin: var(--eva-spacing-xs); }
+.eva-m-sm { margin: var(--eva-spacing-sm); }
+.eva-m-md { margin: var(--eva-spacing-md); }
+.eva-m-lg { margin: var(--eva-spacing-lg); }
+.eva-m-xl { margin: var(--eva-spacing-xl); }
+.eva-m-xxl { margin: var(--eva-spacing-xxl); }
+
+.eva-mt-0 { margin-top: 0; }
+.eva-mt-xs { margin-top: var(--eva-spacing-xs); }
+.eva-mt-sm { margin-top: var(--eva-spacing-sm); }
+.eva-mt-md { margin-top: var(--eva-spacing-md); }
+.eva-mt-lg { margin-top: var(--eva-spacing-lg); }
+.eva-mt-xl { margin-top: var(--eva-spacing-xl); }
+.eva-mt-xxl { margin-top: var(--eva-spacing-xxl); }
+
+.eva-mb-0 { margin-bottom: 0; }
+.eva-mb-xs { margin-bottom: var(--eva-spacing-xs); }
+.eva-mb-sm { margin-bottom: var(--eva-spacing-sm); }
+.eva-mb-md { margin-bottom: var(--eva-spacing-md); }
+.eva-mb-lg { margin-bottom: var(--eva-spacing-lg); }
+.eva-mb-xl { margin-bottom: var(--eva-spacing-xl); }
+.eva-mb-xxl { margin-bottom: var(--eva-spacing-xxl); }
+
+.eva-ml-0 { margin-left: 0; }
+.eva-ml-xs { margin-left: var(--eva-spacing-xs); }
+.eva-ml-sm { margin-left: var(--eva-spacing-sm); }
+.eva-ml-md { margin-left: var(--eva-spacing-md); }
+.eva-ml-lg { margin-left: var(--eva-spacing-lg); }
+.eva-ml-xl { margin-left: var(--eva-spacing-xl); }
+.eva-ml-xxl { margin-left: var(--eva-spacing-xxl); }
+
+.eva-mr-0 { margin-right: 0; }
+.eva-mr-xs { margin-right: var(--eva-spacing-xs); }
+.eva-mr-sm { margin-right: var(--eva-spacing-sm); }
+.eva-mr-md { margin-right: var(--eva-spacing-md); }
+.eva-mr-lg { margin-right: var(--eva-spacing-lg); }
+.eva-mr-xl { margin-right: var(--eva-spacing-xl); }
+.eva-mr-xxl { margin-right: var(--eva-spacing-xxl); }
+
+.eva-p-0 { padding: 0; }
+.eva-p-xs { padding: var(--eva-spacing-xs); }
+.eva-p-sm { padding: var(--eva-spacing-sm); }
+.eva-p-md { padding: var(--eva-spacing-md); }
+.eva-p-lg { padding: var(--eva-spacing-lg); }
+.eva-p-xl { padding: var(--eva-spacing-xl); }
+.eva-p-xxl { padding: var(--eva-spacing-xxl); }
+
+.eva-pt-0 { padding-top: 0; }
+.eva-pt-xs { padding-top: var(--eva-spacing-xs); }
+.eva-pt-sm { padding-top: var(--eva-spacing-sm); }
+.eva-pt-md { padding-top: var(--eva-spacing-md); }
+.eva-pt-lg { padding-top: var(--eva-spacing-lg); }
+.eva-pt-xl { padding-top: var(--eva-spacing-xl); }
+.eva-pt-xxl { padding-top: var(--eva-spacing-xxl); }
+
+.eva-pb-0 { padding-bottom: 0; }
+.eva-pb-xs { padding-bottom: var(--eva-spacing-xs); }
+.eva-pb-sm { padding-bottom: var(--eva-spacing-sm); }
+.eva-pb-md { padding-bottom: var(--eva-spacing-md); }
+.eva-pb-lg { padding-bottom: var(--eva-spacing-lg); }
+.eva-pb-xl { padding-bottom: var(--eva-spacing-xl); }
+.eva-pb-xxl { padding-bottom: var(--eva-spacing-xxl); }
+
+.eva-pl-0 { padding-left: 0; }
+.eva-pl-xs { padding-left: var(--eva-spacing-xs); }
+.eva-pl-sm { padding-left: var(--eva-spacing-sm); }
+.eva-pl-md { padding-left: var(--eva-spacing-md); }
+.eva-pl-lg { padding-left: var(--eva-spacing-lg); }
+.eva-pl-xl { padding-left: var(--eva-spacing-xl); }
+.eva-pl-xxl { padding-left: var(--eva-spacing-xxl); }
+
+.eva-pr-0 { padding-right: 0; }
+.eva-pr-xs { padding-right: var(--eva-spacing-xs); }
+.eva-pr-sm { padding-right: var(--eva-spacing-sm); }
+.eva-pr-md { padding-right: var(--eva-spacing-md); }
+.eva-pr-lg { padding-right: var(--eva-spacing-lg); }
+.eva-pr-xl { padding-right: var(--eva-spacing-xl); }
+.eva-pr-xxl { padding-right: var(--eva-spacing-xxl); }
+
+/* ===== ТАБЛИЦЫ МЕДИЦИНСКИХ ДАННЫХ ===== */
+.eva-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--eva-bg-tertiary, #f3f4f6);
+  background: var(--eva-bg-primary, #ffffff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.eva-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.eva-table th {
+  background: var(--eva-bg-secondary, #f9fafb);
+  color: var(--eva-text-primary, #1f2937);
+  font-weight: 600;
+  padding: var(--eva-spacing-md);
+  text-align: left;
+  border-bottom: 2px solid var(--eva-primary, #2563eb);
+  white-space: nowrap;
+}
+
+.eva-table td {
+  padding: var(--eva-spacing-md);
+  border-bottom: 1px solid var(--eva-bg-tertiary, #f3f4f6);
+  color: var(--eva-text-primary, #1f2937);
+}
+
+.eva-table tr:hover {
+  background: var(--eva-bg-secondary, #f9fafb);
+}
+
+.eva-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== КАРТОЧКИ МЕДИЦИНСКИХ ДАННЫХ ===== */
+.eva-card {
+  background: var(--eva-bg-primary, #ffffff);
+  border-radius: 8px;
+  border: 1px solid var(--eva-bg-tertiary, #f3f4f6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--eva-spacing-lg);
+  margin-bottom: var(--eva-spacing-md);
+}
+
+.eva-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--eva-spacing-md);
+  padding-bottom: var(--eva-spacing-sm);
+  border-bottom: 1px solid var(--eva-bg-tertiary, #f3f4f6);
+}
+
+.eva-card__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--eva-text-primary, #1f2937);
+  margin: 0;
+}
+
+.eva-card__subtitle {
+  font-size: 14px;
+  color: var(--eva-text-secondary, #6b7280);
+  margin: 0;
+}
+
+.eva-card__content {
+  margin-bottom: var(--eva-spacing-md);
+}
+
+.eva-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--eva-spacing-md);
+  padding-top: var(--eva-spacing-sm);
+  border-top: 1px solid var(--eva-bg-tertiary, #f3f4f6);
+}
+
+/* ===== OVERFLOW FIXES ===== */
+.eva-overflow-hidden {
+  overflow: hidden;
+}
+
+.eva-overflow-auto {
+  overflow: auto;
+}
+
+.eva-overflow-x-auto {
+  overflow-x: auto;
+}
+
+.eva-overflow-y-auto {
+  overflow-y: auto;
+}
+
+.eva-overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.eva-overflow-y-hidden {
+  overflow-y: hidden;
+}
+
+.eva-text-overflow-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Mobile First - до 640px */
+@media (max-width: 639px) {
+  .eva-container {
+    padding-left: var(--eva-spacing-md);
+    padding-right: var(--eva-spacing-md);
+  }
+  
+  .eva-medical-layout {
+    grid-template-areas: 
+      "header"
+      "main"
+      "sidebar"
+      "footer";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto auto;
+  }
+  
+  .eva-medical-layout__sidebar {
+    position: static;
+    height: auto;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .eva-grid--cols-2,
+  .eva-grid--cols-3,
+  .eva-grid--cols-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .eva-table-container {
+    font-size: 12px;
+  }
+  
+  .eva-table th,
+  .eva-table td {
+    padding: var(--eva-spacing-sm);
+  }
+  
+  .eva-card {
+    padding: var(--eva-spacing-md);
+  }
+}
+
+/* Tablet - 640px до 768px */
+@media (min-width: 640px) and (max-width: 767px) {
+  .eva-grid--cols-3,
+  .eva-grid--cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .eva-medical-layout {
+    grid-template-areas: 
+      "header header"
+      "sidebar main"
+      "sidebar footer";
+    grid-template-columns: 240px 1fr;
+  }
+  
+  .eva-medical-layout__sidebar {
+    width: 240px;
+  }
+}
+
+/* Desktop - 768px и больше */
+@media (min-width: 768px) {
+  .eva-grid--cols-auto {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+  
+  .eva-medical-layout__sidebar {
+    width: var(--eva-sidebar-width);
+  }
+}
+
+/* Large Desktop - 1024px и больше */
+@media (min-width: 1024px) {
+  .eva-grid--cols-auto {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+  
+  .eva-container {
+    padding-left: var(--eva-spacing-xl);
+    padding-right: var(--eva-spacing-xl);
+  }
+}
+
+/* XL Desktop - 1280px и больше */
+@media (min-width: 1280px) {
+  .eva-grid--cols-auto {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+/* ===== ПЕЧАТЬ ===== */
+@media print {
+  .eva-layout__header,
+  .eva-layout__footer,
+  .eva-medical-layout__sidebar {
+    display: none;
+  }
+  
+  .eva-layout__main,
+  .eva-medical-layout__main {
+    padding: 0;
+  }
+  
+  .eva-card {
+    border: 1px solid #000;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+  
+  .eva-table {
+    font-size: 12px;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.eva-full-width {
+  width: 100%;
+}
+
+.eva-full-height {
+  height: 100%;
+}
+
+.eva-full-viewport-height {
+  height: 100vh;
+}
+
+.eva-center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.eva-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.eva-relative {
+  position: relative;
+}
+
+.eva-absolute {
+  position: absolute;
+}
+
+.eva-fixed {
+  position: fixed;
+}
+
+.eva-z-10 {
+  z-index: 10;
+}
+
+.eva-z-20 {
+  z-index: 20;
+}
+
+.eva-z-30 {
+  z-index: 30;
+}
+
+.eva-z-40 {
+  z-index: 40;
+}
+
+.eva-z-50 {
+  z-index: 50;
+}
+
+.eva-z-100 {
+  z-index: 100;
+}
+
+.eva-z-1000 {
+  z-index: 1000;
+}
+
+/* ===== ANTI-PATTERNS FIXES ===== */
+/* Исправление распространенных проблем layout */
+
+/* Предотвращение горизонтального скролла */
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Исправление box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Исправление изображений */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Исправление таблиц */
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Исправление длинных слов */
+.eva-break-words {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}

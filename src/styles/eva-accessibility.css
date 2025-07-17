@@ -194,6 +194,99 @@ button:focus {
 }
 
 /* ===== КОНТЕНТ ТОЛЬКО ДЛЯ SCREEN READER ===== */
+
+/* Eva Accessibility Styles */
+
+/* General accessibility improvements */
+*:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Button focus states */
+button:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Link focus states */
+a:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Input focus states */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground)) !important;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Specific symptom-related button styles - more targeted selectors */
+.symptom-tracker button.symptom-button,
+.symptom-form button[data-symptom],
+.symptom-list .symptom-item button {
+  position: relative;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground)) !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.symptom-tracker button.symptom-button:hover,
+.symptom-form button[data-symptom]:hover,
+.symptom-list .symptom-item button:hover {
+  background: hsl(var(--secondary) / 0.8);
+  border-color: hsl(var(--border));
+  transform: translateY(-1px);
+}
+
+.symptom-tracker button.symptom-button:active,
+.symptom-form button[data-symptom]:active,
+.symptom-list .symptom-item button:active {
+  transform: translateY(0);
+}
+
+/* Specific symptom-related link styles - more targeted selectors */
+.symptom-nav a[href*="symptom"],
+.symptom-breadcrumb a[data-symptom-link],
+.symptom-reference a.symptom-link {
+  color: hsl(var(--primary)) !important;
+  text-decoration: underline;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.symptom-nav a[href*="symptom"]:hover,
+.symptom-breadcrumb a[data-symptom-link]:hover,
+.symptom-reference a.symptom-link:hover {
+  color: hsl(var(--primary) / 0.8);
+  text-decoration: none;
+}
+
+/* Screen reader only text */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -378,5 +471,184 @@ button:focus {
     background: var(--eva-primary) !important;
     color: var(--eva-text-on-primary) !important;
     border-color: var(--eva-primary) !important;
+=======
+/* Eva color tokens for theming */
+:root {
+  --eva-primary: hsl(var(--primary));
+  --eva-primary-hover: hsl(var(--primary) / 0.8);
+  --eva-primary-dark: hsl(var(--primary) / 0.9);
+  --eva-primary-active: hsl(var(--primary) / 0.7);
+  --eva-secondary: hsl(var(--secondary));
+  --eva-secondary-hover: hsl(var(--secondary) / 0.8);
+  --eva-secondary-dark: hsl(var(--secondary) / 0.9);
+  --eva-accent: hsl(var(--accent));
+  --eva-accent-hover: hsl(var(--accent) / 0.8);
+  --eva-accent-dark: hsl(var(--accent) / 0.9);
+  --eva-background: hsl(var(--background));
+  --eva-foreground: hsl(var(--foreground));
+  --eva-muted: hsl(var(--muted));
+  --eva-muted-foreground: hsl(var(--muted-foreground));
+  --eva-border: hsl(var(--border));
+  --eva-input: hsl(var(--input));
+  --eva-ring: hsl(var(--ring));
+  --eva-destructive: hsl(var(--destructive));
+  --eva-destructive-foreground: hsl(var(--destructive-foreground));
+  --eva-warning: hsl(var(--warning));
+  --eva-warning-foreground: hsl(var(--warning-foreground));
+  --eva-success: hsl(var(--success));
+  --eva-success-foreground: hsl(var(--success-foreground));
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --eva-primary: #0000ff;
+    --eva-primary-hover: #0000cc;
+    --eva-primary-dark: #000099;
+    --eva-primary-active: #000066;
+    --eva-secondary: #666666;
+    --eva-secondary-hover: #555555;
+    --eva-secondary-dark: #444444;
+    --eva-accent: #800080;
+    --eva-accent-hover: #660066;
+    --eva-accent-dark: #4d004d;
+    --eva-background: #ffffff;
+    --eva-foreground: #000000;
+    --eva-muted: #f0f0f0;
+    --eva-muted-foreground: #333333;
+    --eva-border: #000000;
+    --eva-input: #ffffff;
+    --eva-ring: #0000ff;
+    --eva-destructive: #cc0000;
+    --eva-destructive-foreground: #ffffff;
+    --eva-warning: #ff8800;
+    --eva-warning-foreground: #000000;
+    --eva-success: #008800;
+    --eva-success-foreground: #ffffff;
+  }
+  
+  button,
+  .btn {
+    border: 2px solid currentColor;
+  }
+  
+  a {
+    text-decoration: underline;
+  }
+  
+  /* Ensure sufficient contrast for interactive elements */
+  .symptom-tracker button.symptom-button,
+  .symptom-form button[data-symptom],
+  .symptom-list .symptom-item button {
+    background: var(--eva-secondary);
+    color: var(--eva-foreground);
+    border: 2px solid var(--eva-border);
+  }
+  
+  .symptom-tracker button.symptom-button:hover,
+  .symptom-form button[data-symptom]:hover,
+  .symptom-list .symptom-item button:hover {
+    background: var(--eva-secondary-hover);
+    border-color: var(--eva-primary);
+  }
+  
+  .symptom-tracker button.symptom-button:active,
+  .symptom-form button[data-symptom]:active,
+  .symptom-list .symptom-item button:active {
+    background: var(--eva-primary-active);
+    color: var(--eva-background);
+  }
+}
+
+/* Windows high contrast mode support */
+@media (forced-colors: active) {
+  :root {
+    --eva-primary: ButtonText;
+    --eva-primary-hover: Highlight;
+    --eva-primary-dark: ButtonText;
+    --eva-primary-active: HighlightText;
+    --eva-secondary: ButtonFace;
+    --eva-secondary-hover: ButtonText;
+    --eva-secondary-dark: ButtonShadow;
+    --eva-accent: Highlight;
+    --eva-accent-hover: HighlightText;
+    --eva-accent-dark: ButtonText;
+    --eva-background: Canvas;
+    --eva-foreground: CanvasText;
+    --eva-muted: ButtonFace;
+    --eva-muted-foreground: GrayText;
+    --eva-border: ButtonText;
+    --eva-input: Field;
+    --eva-ring: Highlight;
+    --eva-destructive: ButtonText;
+    --eva-destructive-foreground: Canvas;
+    --eva-warning: ButtonText;
+    --eva-warning-foreground: Canvas;
+    --eva-success: ButtonText;
+    --eva-success-foreground: Canvas;
+  }
+  
+  button,
+  .btn {
+    forced-color-adjust: none;
+    background: ButtonFace;
+    color: ButtonText;
+    border: 2px solid ButtonText;
+  }
+  
+  button:hover,
+  .btn:hover {
+    background: Highlight;
+    color: HighlightText;
+    border-color: HighlightText;
+  }
+  
+  button:active,
+  .btn:active {
+    background: ButtonText;
+    color: ButtonFace;
+  }
+  
+  a {
+    color: LinkText;
+    forced-color-adjust: none;
+  }
+  
+  a:visited {
+    color: VisitedText;
+  }
+  
+  a:hover,
+  a:focus {
+    color: Highlight;
+    background: HighlightText;
+  }
+  
+  /* Ensure form elements work properly */
+  input,
+  textarea,
+  select {
+    forced-color-adjust: none;
+    background: Field;
+    color: FieldText;
+    border: 2px solid ButtonText;
+  }
+  
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
   }
 }
