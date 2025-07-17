@@ -78,6 +78,7 @@ export const LifestyleStep: React.FC<LifestyleStepProps> = ({
                   <Checkbox
                     id={exercise.value}
                     checked={data.exerciseTypes.includes(exercise.value)}
+                    disabled={data.exerciseTypes.includes('none_of_the_above')}
                     onCheckedChange={(checked) => {
                       const updated = toggleArrayItem(data.exerciseTypes, exercise.value);
                       updateField('exerciseTypes', updated);
@@ -86,6 +87,24 @@ export const LifestyleStep: React.FC<LifestyleStepProps> = ({
                   <Label htmlFor={exercise.value}>{exercise.label}</Label>
                 </div>
               ))}
+            </div>
+            <div className="border-t pt-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="exercise_none"
+                  checked={data.exerciseTypes.includes('none_of_the_above')}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      updateField('exerciseTypes', ['none_of_the_above']);
+                    } else {
+                      updateField('exerciseTypes', []);
+                    }
+                  }}
+                />
+                <Label htmlFor="exercise_none" className="text-muted-foreground">
+                  Ничего из перечисленного
+                </Label>
+              </div>
             </div>
           </div>
         )}
@@ -190,6 +209,7 @@ export const LifestyleStep: React.FC<LifestyleStepProps> = ({
               <Checkbox
                 id={supplement}
                 checked={data.supplementsUsed.includes(supplement)}
+                disabled={data.supplementsUsed.includes('none_of_the_above')}
                 onCheckedChange={(checked) => {
                   const updated = toggleArrayItem(data.supplementsUsed, supplement);
                   updateField('supplementsUsed', updated);
@@ -198,6 +218,24 @@ export const LifestyleStep: React.FC<LifestyleStepProps> = ({
               <Label htmlFor={supplement}>{supplement}</Label>
             </div>
           ))}
+        </div>
+        <div className="border-t pt-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="supplements_none"
+              checked={data.supplementsUsed.includes('none_of_the_above')}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  updateField('supplementsUsed', ['none_of_the_above']);
+                } else {
+                  updateField('supplementsUsed', []);
+                }
+              }}
+            />
+            <Label htmlFor="supplements_none" className="text-muted-foreground">
+              Ничего из перечисленного
+            </Label>
+          </div>
         </div>
       </div>
 

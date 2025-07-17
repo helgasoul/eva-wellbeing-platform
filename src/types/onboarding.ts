@@ -39,8 +39,8 @@ export interface MenopauseSymptoms {
     frequency: 'never' | 'rarely' | 'sometimes' | 'often' | 'daily';
     types: string[]; // ['irritability', 'anxiety', 'depression', 'mood_swings']
   };
-  physicalSymptoms: string[]; // ['joint_pain', 'headaches', 'fatigue', 'weight_gain', 'dry_skin']
-  cognitiveSymptoms: string[]; // ['memory_issues', 'concentration_problems', 'brain_fog']
+  physicalSymptoms: string[]; // ['joint_pain', 'headaches', 'fatigue', 'weight_gain', 'dry_skin', 'none_of_the_above']
+  cognitiveSymptoms: string[]; // ['memory_issues', 'concentration_problems', 'brain_fog', 'none_of_the_above']
 }
 
 export interface MedicalHistory {
@@ -55,26 +55,27 @@ export interface MedicalHistory {
     startDate: string;
     satisfaction: number; // 1-10
   };
-  chronicConditions: string[]; // ['diabetes', 'hypertension', 'thyroid', 'heart_disease']
+  chronicConditions: string[]; // ['diabetes', 'hypertension', 'thyroid', 'heart_disease', 'none_of_the_above']
   familyHistory: {
     breastCancer: boolean;
     ovairianCancer: boolean;
     heartDisease: boolean;
     osteoporosis: boolean;
     earlyMenopause: boolean;
+    noneOfTheAbove: boolean; // New field for "none of the above"
   };
-  surgicalHistory: string[]; // ['hysterectomy', 'ovary_removal', 'breast_surgery']
+  surgicalHistory: string[]; // ['hysterectomy', 'ovary_removal', 'breast_surgery', 'none_of_the_above']
 }
 
 export interface LifestyleInfo {
   exerciseFrequency: 'never' | 'rarely' | '1-2_weekly' | '3-4_weekly' | 'daily';
-  exerciseTypes: string[]; // ['cardio', 'strength', 'yoga', 'walking']
+  exerciseTypes: string[]; // ['cardio', 'strength', 'yoga', 'walking', 'none_of_the_above']
   dietType: 'regular' | 'vegetarian' | 'vegan' | 'keto' | 'mediterranean' | 'other';
   smokingStatus: 'never' | 'former' | 'current';
   alcoholConsumption: 'never' | 'rarely' | 'moderate' | 'frequent';
   stressLevel: number; // 1-10
   sleepHours: number;
-  supplementsUsed: string[];
+  supplementsUsed: string[]; // ['Витамин D', 'Кальций', 'Магний', 'Омега-3', 'Мультивитамины', 'Фитоэстрогены', 'none_of_the_above']
 }
 
 export interface GoalsAndPriorities {

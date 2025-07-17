@@ -33,16 +33,16 @@ const STEP_SCHEMAS = {
     optional: ['cycleLength', 'periodLength']  
   },
   symptoms: {
-    required: ['primarySymptoms'],
-    optional: ['secondarySymptoms', 'symptomsSeverity']
+    required: ['physicalSymptoms', 'cognitiveSymptoms'],
+    optional: ['hotFlashes', 'nightSweats', 'sleepProblems', 'moodChanges']
   },
   medicalHistory: {
-    required: ['currentMedications', 'chronicConditions'],
-    optional: ['allergies', 'surgeries']
+    required: ['chronicConditions', 'familyHistory', 'surgicalHistory'],
+    optional: ['currentMedications', 'isOnHRT', 'hrtDetails']
   },
   lifestyle: {
-    required: ['exerciseFrequency', 'sleepHours'],
-    optional: ['diet', 'stressLevel', 'smokingStatus']
+    required: ['exerciseFrequency', 'sleepHours', 'exerciseTypes', 'supplementsUsed'],
+    optional: ['dietType', 'stressLevel', 'smokingStatus', 'alcoholConsumption']
   },
   goals: {
     required: ['primaryGoals'],
@@ -88,11 +88,26 @@ export const validateOnboardingCompleteness = async (
         continue;
       }
 
-      // Check required fields
-      const missingRequired = schema.required.filter(field => 
-        !stepData[field] || 
-        (Array.isArray(stepData[field]) && stepData[field].length === 0)
-      );
+      // Check required fields with support for "none_of_the_above" options
+      const missingRequired = schema.required.filter(field => {
+        const fieldValue = stepData[field];
+        
+        // Handle arrays - consider valid if contains "none_of_the_above" or has other values
+        if (Array.isArray(fieldValue)) {
+          return fieldValue.length === 0;
+        }
+        
+        // Handle family history object - consider valid if noneOfTheAbove is true
+        if (field === 'familyHistory' && fieldValue && typeof fieldValue === 'object') {
+          return !fieldValue.noneOfTheAbove && 
+                 !Object.keys(fieldValue).some(key => 
+                   key !== 'noneOfTheAbove' && fieldValue[key] === true
+                 );
+        }
+        
+        // Handle other fields normally
+        return !fieldValue;
+      });
 
       if (missingRequired.length > 0) {
         errors.push(`Step ${stepName} missing required fields: ${missingRequired.join(', ')}`);
@@ -190,9 +205,27 @@ export const validateStep = (stepName: string, stepData: any): { isValid: boolea
 
   const errors: string[] = [];
   
-  // Check required fields
+  // Check required fields with support for "none_of_the_above" options
   for (const field of schema.required) {
-    if (!stepData[field] || (Array.isArray(stepData[field]) && stepData[field].length === 0)) {
+    const fieldValue = stepData[field];
+    
+    // Handle arrays - consider valid if contains "none_of_the_above" or has other values
+    if (Array.isArray(fieldValue)) {
+      if (fieldValue.length === 0) {
+        errors.push(`Required field missing: ${field}`);
+      }
+    }
+    // Handle family history object - consider valid if noneOfTheAbove is true
+    else if (field === 'familyHistory' && fieldValue && typeof fieldValue === 'object') {
+      if (!fieldValue.noneOfTheAbove && 
+          !Object.keys(fieldValue).some(key => 
+            key !== 'noneOfTheAbove' && fieldValue[key] === true
+          )) {
+        errors.push(`Required field missing: ${field}`);
+      }
+    }
+    // Handle other fields normally
+    else if (!fieldValue) {
       errors.push(`Required field missing: ${field}`);
     }
   }

@@ -22,7 +22,8 @@ const defaultData: MedicalHistory = {
     ovairianCancer: false,
     heartDisease: false,
     osteoporosis: false,
-    earlyMenopause: false
+    earlyMenopause: false,
+    noneOfTheAbove: false
   },
   surgicalHistory: []
 };
@@ -181,6 +182,7 @@ export const MedicalHistoryStep: React.FC<MedicalHistoryStepProps> = ({
               <Checkbox
                 id={condition.value}
                 checked={data.chronicConditions.includes(condition.value)}
+                disabled={data.chronicConditions.includes('none_of_the_above')}
                 onCheckedChange={(checked) => {
                   const updated = toggleArrayItem(data.chronicConditions, condition.value);
                   updateField('chronicConditions', updated);
@@ -189,6 +191,24 @@ export const MedicalHistoryStep: React.FC<MedicalHistoryStepProps> = ({
               <Label htmlFor={condition.value}>{condition.label}</Label>
             </div>
           ))}
+        </div>
+        <div className="border-t pt-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="chronic_none"
+              checked={data.chronicConditions.includes('none_of_the_above')}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  updateField('chronicConditions', ['none_of_the_above']);
+                } else {
+                  updateField('chronicConditions', []);
+                }
+              }}
+            />
+            <Label htmlFor="chronic_none" className="text-muted-foreground">
+              Ничего из перечисленного
+            </Label>
+          </div>
         </div>
       </div>
 
@@ -207,6 +227,7 @@ export const MedicalHistoryStep: React.FC<MedicalHistoryStepProps> = ({
               <Checkbox
                 id={item.key}
                 checked={data.familyHistory[item.key as keyof typeof data.familyHistory]}
+                disabled={data.familyHistory.noneOfTheAbove}
                 onCheckedChange={(checked) => updateFamilyHistory(
                   item.key as keyof typeof data.familyHistory, 
                   !!checked
@@ -215,6 +236,31 @@ export const MedicalHistoryStep: React.FC<MedicalHistoryStepProps> = ({
               <Label htmlFor={item.key}>{item.label}</Label>
             </div>
           ))}
+        </div>
+        <div className="border-t pt-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="family_none"
+              checked={data.familyHistory.noneOfTheAbove}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  updateField('familyHistory', {
+                    breastCancer: false,
+                    ovairianCancer: false,
+                    heartDisease: false,
+                    osteoporosis: false,
+                    earlyMenopause: false,
+                    noneOfTheAbove: true
+                  });
+                } else {
+                  updateFamilyHistory('noneOfTheAbove', false);
+                }
+              }}
+            />
+            <Label htmlFor="family_none" className="text-muted-foreground">
+              Ничего из перечисленного
+            </Label>
+          </div>
         </div>
       </div>
 
@@ -231,6 +277,7 @@ export const MedicalHistoryStep: React.FC<MedicalHistoryStepProps> = ({
               <Checkbox
                 id={surgery.value}
                 checked={data.surgicalHistory.includes(surgery.value)}
+                disabled={data.surgicalHistory.includes('none_of_the_above')}
                 onCheckedChange={(checked) => {
                   const updated = toggleArrayItem(data.surgicalHistory, surgery.value);
                   updateField('surgicalHistory', updated);
@@ -239,6 +286,24 @@ export const MedicalHistoryStep: React.FC<MedicalHistoryStepProps> = ({
               <Label htmlFor={surgery.value}>{surgery.label}</Label>
             </div>
           ))}
+        </div>
+        <div className="border-t pt-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="surgical_none"
+              checked={data.surgicalHistory.includes('none_of_the_above')}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  updateField('surgicalHistory', ['none_of_the_above']);
+                } else {
+                  updateField('surgicalHistory', []);
+                }
+              }}
+            />
+            <Label htmlFor="surgical_none" className="text-muted-foreground">
+              Ничего из перечисленного
+            </Label>
+          </div>
         </div>
       </div>
     </div>

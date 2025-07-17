@@ -215,6 +215,7 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
               <Checkbox
                 id={option.value}
                 checked={data.physicalSymptoms.includes(option.value)}
+                disabled={data.physicalSymptoms.includes('none_of_the_above')}
                 onCheckedChange={(checked) => {
                   const newSymptoms = toggleArrayItem(data.physicalSymptoms, option.value);
                   updateField('physicalSymptoms', newSymptoms);
@@ -223,6 +224,24 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
               <Label htmlFor={option.value}>{option.label}</Label>
             </div>
           ))}
+        </div>
+        <div className="border-t pt-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="physical_none"
+              checked={data.physicalSymptoms.includes('none_of_the_above')}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  updateField('physicalSymptoms', ['none_of_the_above']);
+                } else {
+                  updateField('physicalSymptoms', []);
+                }
+              }}
+            />
+            <Label htmlFor="physical_none" className="text-muted-foreground">
+              Ничего из перечисленного
+            </Label>
+          </div>
         </div>
       </div>
 
@@ -240,6 +259,7 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
               <Checkbox
                 id={option.value}
                 checked={data.cognitiveSymptoms.includes(option.value)}
+                disabled={data.cognitiveSymptoms.includes('none_of_the_above')}
                 onCheckedChange={(checked) => {
                   const newSymptoms = toggleArrayItem(data.cognitiveSymptoms, option.value);
                   updateField('cognitiveSymptoms', newSymptoms);
@@ -248,6 +268,24 @@ export const SymptomsStep: React.FC<SymptomsStepProps> = ({ data = defaultSympto
               <Label htmlFor={option.value}>{option.label}</Label>
             </div>
           ))}
+        </div>
+        <div className="border-t pt-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="cognitive_none"
+              checked={data.cognitiveSymptoms.includes('none_of_the_above')}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  updateField('cognitiveSymptoms', ['none_of_the_above']);
+                } else {
+                  updateField('cognitiveSymptoms', []);
+                }
+              }}
+            />
+            <Label htmlFor="cognitive_none" className="text-muted-foreground">
+              Ничего из перечисленного
+            </Label>
+          </div>
         </div>
       </div>
 
