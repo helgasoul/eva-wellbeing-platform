@@ -54,27 +54,20 @@ export const runOnboardingDiagnostics = async (userId: string): Promise<Onboardi
     }
 
     // Check onboarding data
-    const { data: onboardingSteps, error: onboardingError } = await supabase
+    const { data: onboardingData, error: onboardingError } = await supabase
       .from('onboarding_data')
       .select('*')
       .eq('user_id', userId);
 
-    const hasOnboardingData = !!onboardingSteps && onboardingSteps.length > 0 && !onboardingError;
-    const onboardingDataCount = onboardingSteps?.length || 0;
+    const hasOnboardingData = !!onboardingData && onboardingData.length > 0 && !onboardingError;
+    const onboardingDataCount = onboardingData?.length || 0;
 
-    // Check for duplicate steps
-    const stepCounts = new Map<string, number>();
-    onboardingSteps?.forEach(step => {
-      const count = stepCounts.get(step.step_name) || 0;
-      stepCounts.set(step.step_name, count + 1);
-    });
+    // Check for duplicate records (there should only be one record per user)
+    const duplicateSteps: string[] = [];
     
-    const duplicateSteps = Array.from(stepCounts.entries())
-      .filter(([_, count]) => count > 1)
-      .map(([stepName, _]) => stepName);
-
-    if (duplicateSteps.length > 0) {
-      recommendations.push(`Found duplicate steps: ${duplicateSteps.join(', ')}`);
+    if (onboardingDataCount > 1) {
+      duplicateSteps.push('Multiple onboarding records found');
+      recommendations.push(`Found ${onboardingDataCount} onboarding records - should be only one per user`);
       systemStatus = 'warning';
     }
 
@@ -103,8 +96,8 @@ export const runOnboardingDiagnostics = async (userId: string): Promise<Onboardi
     }
 
     // Performance recommendations
-    if (onboardingDataCount > 20) {
-      recommendations.push('High number of onboarding data records - consider cleanup');
+    if (onboardingDataCount > 1) {
+      recommendations.push('Multiple onboarding records found - consider cleanup');
     }
 
     if (validation.progress.completionPercentage > 50 && validation.progress.completionPercentage < 100) {
@@ -191,27 +184,24 @@ export const autoRepairOnboarding = async (userId: string): Promise<{ repaired: 
       }
     }
 
-    // Remove duplicate steps (keep the latest)
+    // Remove duplicate records (keep the latest)
     if (diagnostics.dataIntegrity.duplicateSteps.length > 0) {
-      for (const stepName of diagnostics.dataIntegrity.duplicateSteps) {
-        const { data: steps } = await supabase
+      const { data: records } = await supabase
+        .from('onboarding_data')
+        .select('id, updated_at')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false });
+
+      if (records && records.length > 1) {
+        const duplicateIds = records.slice(1).map(record => record.id);
+        const { error } = await supabase
           .from('onboarding_data')
-          .select('id, completed_at')
-          .eq('user_id', userId)
-          .eq('step_name', stepName)
-          .order('completed_at', { ascending: false });
+          .delete()
+          .in('id', duplicateIds);
 
-        if (steps && steps.length > 1) {
-          const duplicateIds = steps.slice(1).map(step => step.id);
-          const { error } = await supabase
-            .from('onboarding_data')
-            .delete()
-            .in('id', duplicateIds);
-
-          if (!error) {
-            actions.push(`Removed ${duplicateIds.length} duplicate ${stepName} entries`);
-            repaired = true;
-          }
+        if (!error) {
+          actions.push(`Removed ${duplicateIds.length} duplicate onboarding records`);
+          repaired = true;
         }
       }
     }

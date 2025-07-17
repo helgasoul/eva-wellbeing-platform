@@ -6169,28 +6169,52 @@ export type Database = {
       }
       onboarding_data: {
         Row: {
-          completed_at: string | null
+          basic_info: Json | null
+          completed_steps: string[] | null
+          completion_percentage: number | null
+          created_at: string
+          goals: Json | null
           id: string
-          step_data: Json
-          step_name: string
-          step_number: number | null
-          user_id: string | null
+          lifestyle: Json | null
+          medical_history: Json | null
+          menstrual_history: Json | null
+          phase_result: Json | null
+          recommendations: Json | null
+          symptoms: Json | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          completed_at?: string | null
+          basic_info?: Json | null
+          completed_steps?: string[] | null
+          completion_percentage?: number | null
+          created_at?: string
+          goals?: Json | null
           id?: string
-          step_data: Json
-          step_name: string
-          step_number?: number | null
-          user_id?: string | null
+          lifestyle?: Json | null
+          medical_history?: Json | null
+          menstrual_history?: Json | null
+          phase_result?: Json | null
+          recommendations?: Json | null
+          symptoms?: Json | null
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          completed_at?: string | null
+          basic_info?: Json | null
+          completed_steps?: string[] | null
+          completion_percentage?: number | null
+          created_at?: string
+          goals?: Json | null
           id?: string
-          step_data?: Json
-          step_name?: string
-          step_number?: number | null
-          user_id?: string | null
+          lifestyle?: Json | null
+          medical_history?: Json | null
+          menstrual_history?: Json | null
+          phase_result?: Json | null
+          recommendations?: Json | null
+          symptoms?: Json | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

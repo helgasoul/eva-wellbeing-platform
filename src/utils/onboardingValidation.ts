@@ -60,6 +60,8 @@ export const validateOnboardingCompleteness = async (
   try {
     // Load onboarding data if not provided
     let data = onboardingData;
+    let dbCompletionData: { completed_steps?: string[], completion_percentage?: number } = {};
+    
     if (!data) {
       const { data: onboardingRow } = await supabase
         .from('onboarding_data')
@@ -72,6 +74,12 @@ export const validateOnboardingCompleteness = async (
         // Use type casting to handle the new column structure
         const row = onboardingRow as any;
         
+        // Store completion data from database
+        dbCompletionData = {
+          completed_steps: row.completed_steps || [],
+          completion_percentage: row.completion_percentage || 0
+        };
+        
         if (row.basic_info) data.basicInfo = row.basic_info;
         if (row.menstrual_history) data.menstrualHistory = row.menstrual_history;
         if (row.symptoms) data.symptoms = row.symptoms;
@@ -83,16 +91,23 @@ export const validateOnboardingCompleteness = async (
 
     const errors: string[] = [];
     const warnings: string[] = [];
-    const completedSteps: string[] = [];
+    const completedSteps: string[] = dbCompletionData.completed_steps || [];
     const missingSteps: string[] = [];
 
-    // Validate each step
+    // Use database completion percentage if available, otherwise calculate
+    const completionPercentage = dbCompletionData.completion_percentage || 0;
+    const totalSteps = Object.keys(STEP_SCHEMAS).length;
+    const isComplete = completionPercentage >= 100;
+
+    // Validate each step for detailed errors/warnings
     for (const [stepName, schema] of Object.entries(STEP_SCHEMAS)) {
       const stepData = data[stepName];
       
       if (!stepData) {
-        missingSteps.push(stepName);
-        errors.push(`Missing ${stepName} data`);
+        if (!completedSteps.includes(stepName)) {
+          missingSteps.push(stepName);
+          errors.push(`Missing ${stepName} data`);
+        }
         continue;
       }
 
@@ -125,9 +140,9 @@ export const validateOnboardingCompleteness = async (
 
       if (missingRequired.length > 0) {
         errors.push(`Step ${stepName} missing required fields: ${missingRequired.join(', ')}`);
-        missingSteps.push(stepName);
-      } else {
-        completedSteps.push(stepName);
+        if (!missingSteps.includes(stepName)) {
+          missingSteps.push(stepName);
+        }
       }
 
       // Check optional fields for warnings
@@ -137,12 +152,18 @@ export const validateOnboardingCompleteness = async (
       }
     }
 
-    const totalSteps = Object.keys(STEP_SCHEMAS).length;
-    const completionPercentage = Math.round((completedSteps.length / totalSteps) * 100);
+    // Add missing steps that aren't in completed_steps
+    const allSteps = Object.keys(STEP_SCHEMAS);
+    for (const step of allSteps) {
+      if (!completedSteps.includes(step) && !missingSteps.includes(step)) {
+        missingSteps.push(step);
+      }
+    }
+
     const hasEssentialData = completedSteps.length >= Math.ceil(totalSteps * 0.7); // 70% minimum
 
     const progress: OnboardingProgress = {
-      isComplete: errors.length === 0 && completedSteps.length === totalSteps,
+      isComplete,
       completedSteps: completedSteps.length,
       totalSteps,
       missingSteps,
@@ -150,6 +171,15 @@ export const validateOnboardingCompleteness = async (
       hasEssentialData,
       lastUpdated: new Date().toISOString()
     };
+
+    console.log(`🔍 Onboarding validation for user ${userId}:`, {
+      completionPercentage,
+      completedSteps: completedSteps.length,
+      totalSteps,
+      isComplete,
+      errors: errors.length,
+      warnings: warnings.length
+    });
 
     return {
       isValid: errors.length === 0,
