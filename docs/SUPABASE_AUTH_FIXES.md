@@ -81,6 +81,59 @@ export async function handleAuthError(
 }
 ```
 
+### User Profile Creation with Race Condition Fix
+
+The `createUserProfile` function should use upsert operations to prevent race conditions:
+
+```typescript
+// Fixed version - uses upsert to prevent race conditions
+async function createUserProfile(
+  userId: string,
+  profileData: {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    role?: string;
+  }
+): Promise<void> {
+  try {
+    // Use upsert operation to handle concurrent requests safely
+    const { error } = await supabase
+      .from('user_profiles')
+      .upsert({
+        id: userId,
+        email: profileData.email,
+        first_name: profileData.first_name,
+        last_name: profileData.last_name,
+        role: profileData.role || 'patient',
+        onboarding_completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'id'
+      });
+
+    if (error) {
+      console.error('Failed to create/update user profile:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error creating user profile:', error);
+    throw error;
+  }
+}
+
+// Usage in auth signup handler
+export async function handleUserSignup(user: any) {
+  await createUserProfile(user.id, {
+    email: user.email,
+    first_name: user.user_metadata?.first_name,
+    last_name: user.user_metadata?.last_name,
+    role: user.user_metadata?.role
+  });
+}
+```
+
 ### Key Changes Made
 
 1. **Added Supabase import**: `import { supabase } from '@/integrations/supabase/client';`
