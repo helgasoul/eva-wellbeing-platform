@@ -422,6 +422,36 @@ function App() {
                         <DoctorDashboard />
                       </ProtectedRoute>
                     } />
+                    <Route path="/doctor/patients" element={
+                      <ProtectedRoute allowedRoles={[UserRole.DOCTOR]}>
+                        <DoctorPatients />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/doctor/search" element={
+                      <ProtectedRoute allowedRoles={[UserRole.DOCTOR]}>
+                        <DoctorSearch />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/doctor/analytics" element={
+                      <ProtectedRoute allowedRoles={[UserRole.DOCTOR]}>
+                        <DoctorAnalytics />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/doctor/knowledge" element={
+                      <ProtectedRoute allowedRoles={[UserRole.DOCTOR]}>
+                        <DoctorKnowledge />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/doctor/consultations" element={
+                      <ProtectedRoute allowedRoles={[UserRole.DOCTOR]}>
+                        <DoctorConsultations />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/doctor/settings" element={
+                      <ProtectedRoute allowedRoles={[UserRole.DOCTOR]}>
+                        <DoctorSettings />
+                      </ProtectedRoute>
+                    } />
 
                     {/* ADMIN ROUTES */}
                     <Route path="/admin/dashboard" element={
