@@ -23,35 +23,36 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
   return (
     <>
       <TestModeIndicator />
-      <AppLayout 
-        title={title} 
-        role={UserRole.PATIENT}
-        breadcrumbs={breadcrumbs}
-        quickActions={true}
-      >
-      <div className="flex min-h-screen bg-gradient-to-br from-bloom-cream via-bloom-vanilla to-bloom-warm-cream">
-        {/* Sidebar */}
-        <div className="flex">
-          <Sidebar 
-            role={UserRole.PATIENT} 
-            isCollapsed={isSidebarCollapsed}
-            onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          />
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-bloom-cream via-bloom-vanilla to-bloom-warm-cream">
+        <AppLayout 
+          title={title} 
+          role={UserRole.PATIENT}
+          breadcrumbs={breadcrumbs}
+          quickActions={true}
+          showNavigation={true}
+        >
+          <div className="flex min-h-screen">
+            {/* Sidebar */}
+            <Sidebar 
+              role={UserRole.PATIENT} 
+              isCollapsed={isSidebarCollapsed}
+              onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            />
 
-        {/* Main Content */}
-        <div className="flex flex-col flex-1">
-          <main className="flex-1 p-6 pb-20 md:pb-6">
-            <div className="max-w-7xl mx-auto">
-              {children}
+            {/* Main Content */}
+            <div className="flex flex-col flex-1">
+              <main className="flex-1 p-6 pb-20 md:pb-6">
+                <div className="max-w-7xl mx-auto">
+                  {children}
+                </div>
+              </main>
             </div>
-          </main>
-        </div>
+          </div>
+        </AppLayout>
+        
+        {/* Mobile Navigation */}
+        <MobileNavigation role={UserRole.PATIENT} />
       </div>
-      
-      {/* Mobile Navigation */}
-      <MobileNavigation role={UserRole.PATIENT} />
-      </AppLayout>
     </>
   );
 };
