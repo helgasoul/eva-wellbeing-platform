@@ -25,15 +25,22 @@ class EvaErrorHandler {
    * Настройка глобальных обработчиков ошибок
    */
   setupGlobalErrorHandlers() {
-    // Глобальные JavaScript ошибки
-    window.addEventListener('error', (event) => {
+    // Prevent duplicate registrations
+    if (this.handlersRegistered) return;
+    this.handlersRegistered = true;
+
+    // Store references for cleanup
+    this.errorHandler = (event) => {
       this.handleError(event.error, 'global_error', {
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
         message: event.message
       });
-    });
+    };
+
+    // Глобальные JavaScript ошибки
+    window.addEventListener('error', this.errorHandler);
 
     // Нехваченные Promise rejections
     window.addEventListener('unhandledrejection', (event) => {
@@ -47,7 +54,8 @@ class EvaErrorHandler {
       this.handleError(event.detail.error, 'api_error', {
         endpoint: event.detail.endpoint,
         method: event.detail.method,
-        patientId: event.detail.patientId
+        // Sanitize patient ID for logs
+        patientId: this.sanitizePatientId(event.detail.patientId)
       });
     });
 
@@ -58,6 +66,21 @@ class EvaErrorHandler {
         action: event.detail.action
       });
     });
+  }
+
+  // Add cleanup method
+  cleanup() {
+    if (this.errorHandler) {
+      window.removeEventListener('error', this.errorHandler);
+    }
+    // Remove other listeners...
+  }
+
+  // Add sanitization method
+  sanitizePatientId(patientId) {
+    if (!patientId) return 'anonymous';
+    // Hash or truncate patient ID for privacy
+    return `patient_${patientId.substring(0, 4)}***`;
   }
 
   /**
