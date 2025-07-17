@@ -56,9 +56,22 @@ import { Academy } from './pages/patient/Academy';
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";
+import DoctorPatients from "./pages/doctor/DoctorPatients";
+import DoctorSearch from "./pages/doctor/DoctorSearch";
+import DoctorAnalytics from "./pages/doctor/DoctorAnalytics";
+import DoctorKnowledge from "./pages/doctor/DoctorKnowledge";
+import DoctorConsultations from "./pages/doctor/DoctorConsultations";
+import DoctorSettings from "./pages/doctor/DoctorSettings";
 
 // Admin pages
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminModeration from "./pages/admin/AdminModeration";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminSecurity from "./pages/admin/AdminSecurity";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminLogs from "./pages/admin/AdminLogs";
 
 // Landing and other pages
 import Home from "./pages/Home";
