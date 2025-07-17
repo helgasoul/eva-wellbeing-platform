@@ -568,7 +568,7 @@ const PatientOnboarding = () => {
   // ✅ НОВОЕ: Рендеринг геолокационного шага
   if (showGeolocation) {
     return (
-      <PatientLayout title="Настройка персонализации">
+      <PatientLayout title="Настройка персонализации" hideSidebar={true}>
         <div className="max-w-2xl mx-auto">
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-playfair font-bold text-foreground mb-2">
@@ -591,7 +591,7 @@ const PatientOnboarding = () => {
 
   if (showResults && phaseResult && recommendations) {
     return (
-      <PatientLayout title="Результаты онбординга">
+      <PatientLayout title="Результаты онбординга" hideSidebar={true}>
         <OnboardingResults
           phaseResult={phaseResult}
           recommendations={recommendations}
@@ -657,7 +657,7 @@ const PatientOnboarding = () => {
   };
 
   return (
-    <PatientLayout title={onboardingPresets ? `Персональная анкета для "${getPersonaTitle(onboardingPresets.persona.id)}"` : "Онбординг без | паузы"}>
+    <PatientLayout title={onboardingPresets ? `Персональная анкета для "${getPersonaTitle(onboardingPresets.persona.id)}"` : "Онбординг без | паузы"} hideSidebar={true}>
       <div className="min-h-screen">
         {/* ✅ НОВОЕ: Индикатор загрузки данных */}
         {(dataLoadingStatus.dataBridge || dataLoadingStatus.registration) && (

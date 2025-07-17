@@ -11,12 +11,14 @@ interface PatientLayoutProps {
   children: React.ReactNode;
   title?: string;
   breadcrumbs?: BreadcrumbItem[];
+  hideSidebar?: boolean;
 }
 
 export const PatientLayout: React.FC<PatientLayoutProps> = ({ 
   children, 
   title = 'без | паузы - Ваш персональный помощник',
-  breadcrumbs = []
+  breadcrumbs = [],
+  hideSidebar = false
 }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -32,12 +34,14 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
           showNavigation={true}
         >
           <div className="flex min-h-screen">
-            {/* Sidebar */}
-            <Sidebar 
-              role={UserRole.PATIENT} 
-              isCollapsed={isSidebarCollapsed}
-              onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            />
+            {/* Sidebar - conditionally rendered */}
+            {!hideSidebar && (
+              <Sidebar 
+                role={UserRole.PATIENT} 
+                isCollapsed={isSidebarCollapsed}
+                onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              />
+            )}
 
             {/* Main Content */}
             <div className="flex flex-col flex-1">
@@ -50,8 +54,8 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
           </div>
         </AppLayout>
         
-        {/* Mobile Navigation */}
-        <MobileNavigation role={UserRole.PATIENT} />
+        {/* Mobile Navigation - conditionally rendered */}
+        {!hideSidebar && <MobileNavigation role={UserRole.PATIENT} />}
       </div>
     </>
   );
