@@ -12,13 +12,15 @@ interface PatientLayoutProps {
   title?: string;
   breadcrumbs?: BreadcrumbItem[];
   hideSidebar?: boolean;
+  hideQuickActions?: boolean;
 }
 
 export const PatientLayout: React.FC<PatientLayoutProps> = ({ 
   children, 
   title = 'без | паузы - Ваш персональный помощник',
   breadcrumbs = [],
-  hideSidebar = false
+  hideSidebar = false,
+  hideQuickActions = false
 }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
@@ -30,7 +32,7 @@ export const PatientLayout: React.FC<PatientLayoutProps> = ({
           title={title} 
           role={UserRole.PATIENT}
           breadcrumbs={breadcrumbs}
-          quickActions={true}
+          quickActions={!hideQuickActions}
           showNavigation={true}
         >
           <div className="flex min-h-screen">
