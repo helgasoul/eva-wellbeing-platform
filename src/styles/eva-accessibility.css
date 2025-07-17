@@ -1,0 +1,382 @@
+/* 🚨 КРИТИЧЕСКИЕ ИСПРАВЛЕНИЯ ACCESSIBILITY - Eva Platform */
+
+/* ===== ЦВЕТОВАЯ СХЕМА EVA MEDICAL PLATFORM ===== */
+:root {
+  /* Primary - Medical Blue */
+  --eva-primary: #2563eb;
+  --eva-primary-hover: #1d4ed8;
+  --eva-primary-light: #dbeafe;
+  --eva-primary-dark: #1e40af;
+  
+  /* Secondary - Healthcare Green */
+  --eva-secondary: #059669;
+  --eva-secondary-hover: #047857;
+  --eva-secondary-light: #d1fae5;
+  
+  /* Accent - Women Health Pink */
+  --eva-accent: #ec4899;
+  --eva-accent-hover: #db2777;
+  --eva-accent-light: #fce7f3;
+  
+  /* Text Colors - WCAG AA Compliant */
+  --eva-text-primary: #1f2937;
+  --eva-text-secondary: #6b7280;
+  --eva-text-muted: #9ca3af;
+  --eva-text-on-primary: #ffffff;
+  --eva-text-on-secondary: #ffffff;
+  
+  /* Background Colors */
+  --eva-bg-primary: #ffffff;
+  --eva-bg-secondary: #f9fafb;
+  --eva-bg-tertiary: #f3f4f6;
+  
+  /* Medical Status Colors */
+  --eva-success: #10b981;
+  --eva-warning: #f59e0b;
+  --eva-error: #ef4444;
+  --eva-info: #3b82f6;
+}
+
+/* ===== ИСПРАВЛЕНИЕ КРИТИЧЕСКОЙ ПРОБЛЕМЫ: БЕЛЫЙ ТЕКСТ НА БЕЛОМ ФОНЕ ===== */
+
+/* Кнопка "Мои симптомы" - ОСНОВНОЕ ИСПРАВЛЕНИЕ */
+.eva-symptom-button,
+.symptoms-button,
+.nav-button[data-symptom],
+button[class*="symptom"],
+a[href*="symptom"] {
+  background: var(--eva-primary) !important;
+  color: var(--eva-text-on-primary) !important;
+  border: 2px solid var(--eva-primary) !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  min-height: 44px !important; /* Touch target accessibility */
+  min-width: 44px !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: all 0.3s ease !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  cursor: pointer !important;
+}
+
+.eva-symptom-button:hover,
+.symptoms-button:hover,
+.nav-button[data-symptom]:hover,
+button[class*="symptom"]:hover,
+a[href*="symptom"]:hover {
+  background: var(--eva-primary-hover) !important;
+  color: var(--eva-text-on-primary) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+}
+
+.eva-symptom-button:focus,
+.symptoms-button:focus,
+.nav-button[data-symptom]:focus,
+button[class*="symptom"]:focus,
+a[href*="symptom"]:focus {
+  outline: 3px solid var(--eva-primary-light) !important;
+  outline-offset: 2px !important;
+  color: var(--eva-text-on-primary) !important;
+}
+
+.eva-symptom-button:active,
+.symptoms-button:active,
+.nav-button[data-symptom]:active,
+button[class*="symptom"]:active,
+a[href*="symptom"]:active {
+  transform: translateY(0) !important;
+  background: var(--eva-primary-dark) !important;
+  color: var(--eva-text-on-primary) !important;
+}
+
+/* ===== ОБЩИЕ ACCESSIBILITY ИСПРАВЛЕНИЯ ===== */
+
+/* Все кнопки платформы */
+.eva-button,
+.btn,
+button:not([class*="unstyled"]) {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 12px 20px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.eva-button:focus,
+.btn:focus,
+button:focus {
+  outline: 3px solid var(--eva-primary-light);
+  outline-offset: 2px;
+}
+
+/* Первичные кнопки */
+.eva-button--primary,
+.btn-primary {
+  background: var(--eva-primary);
+  color: var(--eva-text-on-primary);
+  border-color: var(--eva-primary);
+}
+
+.eva-button--primary:hover,
+.btn-primary:hover {
+  background: var(--eva-primary-hover);
+  border-color: var(--eva-primary-hover);
+}
+
+/* Вторичные кнопки */
+.eva-button--secondary,
+.btn-secondary {
+  background: var(--eva-secondary);
+  color: var(--eva-text-on-secondary);
+  border-color: var(--eva-secondary);
+}
+
+.eva-button--secondary:hover,
+.btn-secondary:hover {
+  background: var(--eva-secondary-hover);
+  border-color: var(--eva-secondary-hover);
+}
+
+/* Кнопки с обводкой */
+.eva-button--outline,
+.btn-outline {
+  background: transparent;
+  color: var(--eva-primary);
+  border-color: var(--eva-primary);
+}
+
+.eva-button--outline:hover,
+.btn-outline:hover {
+  background: var(--eva-primary);
+  color: var(--eva-text-on-primary);
+}
+
+/* ===== ВЫСОКИЙ КОНТРАСТ ===== */
+@media (prefers-contrast: high) {
+  :root {
+    --eva-text-primary: #000000;
+    --eva-bg-primary: #ffffff;
+    --eva-primary: #0000ff;
+    --eva-secondary: #008000;
+    --eva-error: #ff0000;
+  }
+  
+  .eva-symptom-button,
+  .symptoms-button,
+  .nav-button[data-symptom] {
+    border-width: 3px !important;
+    font-weight: 700 !important;
+  }
+}
+
+/* ===== УМЕНЬШЕННАЯ АНИМАЦИЯ ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== КОНТЕНТ ТОЛЬКО ДЛЯ SCREEN READER ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== ИНДИКАТОРЫ СОСТОЯНИЯ ДЛЯ МЕДИЦИНСКИХ ДАННЫХ ===== */
+.eva-status-healthy {
+  background: var(--eva-success);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.eva-status-attention {
+  background: var(--eva-warning);
+  color: #1f2937;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.eva-status-critical {
+  background: var(--eva-error);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* ===== НАВИГАЦИЯ ACCESSIBILITY ===== */
+.eva-nav-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 16px;
+}
+
+.eva-nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.eva-nav-link {
+  color: var(--eva-text-primary);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.eva-nav-link:hover {
+  background: var(--eva-bg-secondary);
+  color: var(--eva-primary);
+}
+
+.eva-nav-link:focus {
+  outline: 3px solid var(--eva-primary-light);
+  outline-offset: 2px;
+}
+
+.eva-nav-link.active {
+  background: var(--eva-primary);
+  color: var(--eva-text-on-primary);
+}
+
+/* ===== ФОРМЫ ACCESSIBILITY ===== */
+.eva-form-group {
+  margin-bottom: 16px;
+}
+
+.eva-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--eva-text-primary);
+}
+
+.eva-input,
+.eva-textarea,
+.eva-select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--eva-bg-tertiary);
+  border-radius: 6px;
+  font-size: 16px;
+  color: var(--eva-text-primary);
+  background: var(--eva-bg-primary);
+  transition: border-color 0.2s ease;
+  min-height: 44px;
+}
+
+.eva-input:focus,
+.eva-textarea:focus,
+.eva-select:focus {
+  outline: none;
+  border-color: var(--eva-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.eva-input:invalid,
+.eva-textarea:invalid,
+.eva-select:invalid {
+  border-color: var(--eva-error);
+}
+
+/* ===== ТАБЛИЦЫ МЕДИЦИНСКИХ ДАННЫХ ===== */
+.eva-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.eva-table th,
+.eva-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--eva-bg-tertiary);
+}
+
+.eva-table th {
+  background: var(--eva-bg-secondary);
+  font-weight: 600;
+  color: var(--eva-text-primary);
+}
+
+.eva-table tr:hover {
+  background: var(--eva-bg-secondary);
+}
+
+/* ===== МОБИЛЬНАЯ ACCESSIBILITY ===== */
+@media (max-width: 768px) {
+  .eva-symptom-button,
+  .symptoms-button,
+  .nav-button[data-symptom] {
+    font-size: 14px !important;
+    padding: 10px 16px !important;
+    min-height: 48px !important; /* Увеличенный touch target на мобильных */
+  }
+  
+  .eva-nav-list {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .eva-nav-link {
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+}
+
+/* ===== ТЕМНАЯ ТЕМА (если поддерживается) ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --eva-text-primary: #f9fafb;
+    --eva-text-secondary: #d1d5db;
+    --eva-text-muted: #9ca3af;
+    --eva-bg-primary: #1f2937;
+    --eva-bg-secondary: #374151;
+    --eva-bg-tertiary: #4b5563;
+  }
+  
+  .eva-symptom-button,
+  .symptoms-button,
+  .nav-button[data-symptom] {
+    background: var(--eva-primary) !important;
+    color: var(--eva-text-on-primary) !important;
+    border-color: var(--eva-primary) !important;
+  }
+}
