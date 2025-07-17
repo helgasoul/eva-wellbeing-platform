@@ -520,7 +520,21 @@ class EvaErrorHandler {
 class EvaAuditLogger {
   constructor() {
     this.logs = [];
-    this.maxLogs = 1000;
+    this.maxLogsInMemory = 1000;
+    this.maxLogsInStorage = 1000; // Increase for compliance
+    this.initializeFromStorage();
+  }
+
+  initializeFromStorage() {
+    try {
+      const stored = localStorage.getItem('eva-audit-logs');
+      if (stored) {
+        this.logs = JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error('Failed to load audit logs:', error);
+      this.logs = [];
+    }
   }
 
   /**
@@ -528,15 +542,18 @@ class EvaAuditLogger {
    */
   logError(errorInfo) {
     const logEntry = {
+      id: this.generateLogId(),
       type: 'error',
       timestamp: new Date().toISOString(),
       data: errorInfo,
-      complianceLevel: this.getComplianceLevel(errorInfo)
+      complianceLevel: this.getComplianceLevel(errorInfo),
+      signature: this.generateLogSignature(errorInfo)
     };
 
     this.logs.push(logEntry);
     this.maintainLogSize();
     this.persistLog(logEntry);
+    this.sendToComplianceServer(logEntry);
   }
 
   /**
@@ -561,20 +578,53 @@ class EvaAuditLogger {
    * Определение уровня compliance
    */
   getComplianceLevel(errorInfo) {
-    if (errorInfo.context.includes('patient') || 
-        errorInfo.context.includes('medical')) {
+    if (
+      errorInfo.context.includes('patient') ||
+      errorInfo.context.includes('medical')
+    ) {
       return 'high';
     }
     return 'medium';
+  }
+
+  generateLogId() {
+    return `LOG-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+  }
+
+  generateLogSignature(data) {
+    // Generate cryptographic signature for tamper detection
+    // TODO: Implement proper HMAC or digital signature
+    return 'signature-placeholder';
+  }
+
+  async sendToComplianceServer(logEntry) {
+    try {
+      // Send to secure compliance server for permanent storage
+      await fetch('/api/compliance/audit-log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Audit-Signature': logEntry.signature
+        },
+        body: JSON.stringify(logEntry)
+      });
+    } catch (error) {
+      console.error('Failed to send audit log to compliance server:', error);
+      // Queue for later sending
+      this.queueAuditLog(logEntry);
+    }
   }
 
   /**
    * Поддержание размера логов
    */
   maintainLogSize() {
-    if (this.logs.length > this.maxLogs) {
-      const removed = this.logs.shift();
-      this.archiveLog(removed);
+    if (this.logs.length > this.maxLogsInMemory) {
+      // Archive oldest 100 logs
+      const toArchive = this.logs.splice(0, 100);
+      this.archiveLogs(toArchive);
     }
   }
 
@@ -583,26 +633,58 @@ class EvaAuditLogger {
    */
   persistLog(logEntry) {
     try {
-      const existingLogs = JSON.parse(localStorage.getItem('eva-audit-logs') || '[]');
+      const existingLogs = JSON.parse(
+        localStorage.getItem('eva-audit-logs') || '[]'
+      );
       existingLogs.push(logEntry);
-      
+
       // Ограничиваем количество логов в localStorage
       if (existingLogs.length > 100) {
         existingLogs.shift();
       }
-      
-      localStorage.setItem('eva-audit-logs', JSON.stringify(existingLogs));
+
+      localStorage.setItem(
+        'eva-audit-logs',
+        JSON.stringify(existingLogs)
+      );
     } catch (error) {
       console.error('Failed to persist audit log:', error);
     }
   }
 
-  /**
-   * Архивирование старых логов
-   */
-  archiveLog(logEntry) {
-    // В реальной системе это отправлялось бы в архив
-    console.log('Archiving log entry:', logEntry);
+  async archiveLogs(logs) {
+    try {
+      // Compress logs before archiving
+      const compressed = this.compressLogs(logs);
+
+      // Send to archive storage
+      await fetch('/api/compliance/archive', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Encoding': 'gzip'
+        },
+        body: compressed
+      });
+    } catch (error) {
+      console.error('Failed to archive logs:', error);
+    }
+  }
+
+  compressLogs(logs) {
+    // TODO: Implement actual compression (e.g., using pako library)
+    return JSON.stringify(logs);
+  }
+
+  queueAuditLog(logEntry) {
+    const queue = JSON.parse(
+      localStorage.getItem('eva-audit-queue') || '[]'
+    );
+    queue.push(logEntry);
+    localStorage.setItem(
+      'eva-audit-queue',
+      JSON.stringify(queue)
+    );
   }
 }
 
