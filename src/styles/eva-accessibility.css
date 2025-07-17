@@ -471,32 +471,7 @@ select:focus {
     background: var(--eva-primary) !important;
     color: var(--eva-text-on-primary) !important;
     border-color: var(--eva-primary) !important;
-=======
-/* Eva color tokens for theming */
-:root {
-  --eva-primary: hsl(var(--primary));
-  --eva-primary-hover: hsl(var(--primary) / 0.8);
-  --eva-primary-dark: hsl(var(--primary) / 0.9);
-  --eva-primary-active: hsl(var(--primary) / 0.7);
-  --eva-secondary: hsl(var(--secondary));
-  --eva-secondary-hover: hsl(var(--secondary) / 0.8);
-  --eva-secondary-dark: hsl(var(--secondary) / 0.9);
-  --eva-accent: hsl(var(--accent));
-  --eva-accent-hover: hsl(var(--accent) / 0.8);
-  --eva-accent-dark: hsl(var(--accent) / 0.9);
-  --eva-background: hsl(var(--background));
-  --eva-foreground: hsl(var(--foreground));
-  --eva-muted: hsl(var(--muted));
-  --eva-muted-foreground: hsl(var(--muted-foreground));
-  --eva-border: hsl(var(--border));
-  --eva-input: hsl(var(--input));
-  --eva-ring: hsl(var(--ring));
-  --eva-destructive: hsl(var(--destructive));
-  --eva-destructive-foreground: hsl(var(--destructive-foreground));
-  --eva-warning: hsl(var(--warning));
-  --eva-warning-foreground: hsl(var(--warning-foreground));
-  --eva-success: hsl(var(--success));
-  --eva-success-foreground: hsl(var(--success-foreground));
+  }
 }
 
 /* High contrast mode support */
