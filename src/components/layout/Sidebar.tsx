@@ -28,11 +28,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
     switch (userRole) {
       case UserRole.PATIENT:
         return {
-          gradient: 'from-soft-pink to-soft-purple',
-          bg: 'bg-white/80 backdrop-blur-sm border-soft-pink/20',
-          activeGradient: 'from-soft-pink to-soft-purple',
-          hoverBg: 'hover:bg-soft-pink/20 hover:text-soft-pink-foreground',
-          iconColor: 'text-soft-pink-foreground'
+          gradient: 'from-primary to-primary-foreground',
+          bg: 'bg-background/95 backdrop-blur-sm border-primary/20',
+          activeGradient: 'from-primary to-primary-foreground',
+          hoverBg: 'hover:bg-primary/10 hover:text-primary',
+          iconColor: 'text-primary',
+          textColor: 'text-primary'
         };
       case UserRole.DOCTOR:
         return {
@@ -40,7 +41,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           bg: 'bg-white border-blue-200',
           activeGradient: 'from-blue-600 to-green-600',
           hoverBg: 'hover:bg-blue-50 hover:text-blue-700',
-          iconColor: 'text-blue-600'
+          iconColor: 'text-blue-600',
+          textColor: 'text-blue-600'
         };
       case UserRole.ADMIN:
         return {
@@ -48,7 +50,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           bg: 'bg-white border-gray-200',
           activeGradient: 'from-gray-600 to-blue-600',
           hoverBg: 'hover:bg-gray-50 hover:text-gray-900',
-          iconColor: 'text-gray-600'
+          iconColor: 'text-gray-600',
+          textColor: 'text-gray-600'
         };
       default:
         return {
@@ -56,7 +59,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           bg: 'bg-white',
           activeGradient: 'from-primary to-primary',
           hoverBg: 'hover:bg-gray-50',
-          iconColor: 'text-primary'
+          iconColor: 'text-primary',
+          textColor: 'text-primary'
         };
     }
   };
@@ -72,15 +76,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
           <nav className="flex-1 px-2 space-y-2">
             {filteredNavigation.map((item) => {
               const Icon = item.icon;
+              const isSymptomButton = item.href.includes('/symptoms');
+              const linkClasses = isSymptomButton 
+                ? `eva-symptom-button group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                    isActive(item.href)
+                      ? `bg-gradient-to-r ${styles.activeGradient} text-white shadow-md`
+                      : `${styles.hoverBg}`
+                  }`
+                : `group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                    isActive(item.href)
+                      ? `bg-gradient-to-r ${styles.activeGradient} text-white shadow-md`
+                      : `${styles.textColor} ${styles.hoverBg}`
+                  }`;
+
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
-                    isActive(item.href)
-                      ? `bg-gradient-to-r ${styles.activeGradient} text-white shadow-md`
-                      : `text-gray-700 ${styles.hoverBg}`
-                  }`}
+                  className={linkClasses}
+                  data-symptom={isSymptomButton ? 'true' : undefined}
                 >
                   <Icon className={`${isCollapsed ? 'mr-0' : 'mr-3'} h-5 w-5 ${
                     isActive(item.href) ? 'text-white' : styles.iconColor
