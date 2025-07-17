@@ -720,8 +720,12 @@ class EvaPerformanceMonitor {
       pageLoadTime: 0,
       apiResponseTimes: [],
       errorRate: 0,
-      userInteractions: 0
+      userInteractions: 0,
+      aggregatedMetrics: {}
     };
+    this.originalFetch = window.fetch;
+    this.metricsBuffer = [];
+    this.aggregationInterval = null;
     this.setupPerformanceMonitoring();
   }
 
@@ -730,68 +734,186 @@ class EvaPerformanceMonitor {
    */
   setupPerformanceMonitoring() {
     // Время загрузки страницы
-    window.addEventListener('load', () => {
+    this.loadHandler = () => {
       this.metrics.pageLoadTime = performance.now();
       this.reportMetric('page_load_time', this.metrics.pageLoadTime);
-    });
+    };
+    window.addEventListener('load', this.loadHandler);
 
     // Мониторинг API вызовов
     this.interceptFetch();
 
-    // Мониторинг взаимодействий пользователя
-    this.trackUserInteractions();
+    // Мониторинг взаимодействений пользователя
+    // Only track if user consents
+    if (this.hasUserConsent()) {
+      this.trackUserInteractions();
+    }
+
+    // Start metric aggregation
+    this.startMetricAggregation();
   }
 
   /**
    * Перехват fetch запросов
    */
   interceptFetch() {
-    const originalFetch = window.fetch;
+    if (!this.originalFetch) return;
     
     window.fetch = async (...args) => {
       const startTime = performance.now();
+      const url = args[0]?.url || args[0];
       
       try {
-        const response = await originalFetch(...args);
+        const response = await this.originalFetch.apply(window, args);
         const endTime = performance.now();
         const responseTime = endTime - startTime;
         
-        this.metrics.apiResponseTimes.push(responseTime);
-        this.reportMetric('api_response_time', responseTime);
+        // Buffer metrics for aggregation
+        this.metricsBuffer.push({
+          type: 'api_response_time',
+          value: responseTime,
+          url: this.sanitizeUrl(url),
+          timestamp: Date.now()
+        });
         
         return response;
       } catch (error) {
         this.metrics.errorRate++;
-        this.reportMetric('api_error_rate', this.metrics.errorRate);
+        this.metricsBuffer.push({
+          type: 'api_error',
+          url: this.sanitizeUrl(url),
+          timestamp: Date.now()
+        });
         throw error;
       }
     };
+  }
+
+  sanitizeUrl(url) {
+    // Remove sensitive query parameters
+    try {
+      const urlObj = new URL(url, window.location.origin);
+      return urlObj.pathname;
+    } catch {
+      return 'unknown';
+    }
+  }
+
+  hasUserConsent() {
+    // Check if user has consented to performance tracking
+    return localStorage.getItem('eva-performance-consent') === 'true';
   }
 
   /**
    * Отслеживание взаимодействий пользователя
    */
   trackUserInteractions() {
-    ['click', 'keydown', 'scroll'].forEach(eventType => {
-      document.addEventListener(eventType, () => {
-        this.metrics.userInteractions++;
-      });
+    // Use passive listeners and throttle scroll events
+    this.interactionHandlers = {
+      click: () => this.metrics.userInteractions++,
+      keydown: () => this.metrics.userInteractions++,
+      scroll: this.throttle(() => this.metrics.userInteractions++, 1000)
+    };
+
+    Object.entries(this.interactionHandlers).forEach(([event, handler]) => {
+      document.addEventListener(event, handler, { passive: true });
     });
+  }
+
+  throttle(func, delay) {
+    let lastExec = 0;
+    return function(...args) {
+      const now = Date.now();
+      if (now - lastExec >= delay) {
+        func.apply(this, args);
+        lastExec = now;
+      }
+    };
+  }
+
+  startMetricAggregation() {
+    // Aggregate and report metrics every 30 seconds
+    this.aggregationInterval = setInterval(() => {
+      this.aggregateAndReportMetrics();
+    }, 30000);
+  }
+
+  aggregateAndReportMetrics() {
+    if (this.metricsBuffer.length === 0) return;
+
+    const aggregated = this.metricsBuffer.reduce((acc, metric) => {
+      if (!acc[metric.type]) {
+        acc[metric.type] = { count: 0, total: 0, values: [] };
+      }
+      acc[metric.type].count++;
+      if (metric.value != null) {
+        acc[metric.type].total += metric.value;
+        acc[metric.type].values.push(metric.value);
+      }
+      return acc;
+    }, {});
+
+    // Calculate statistics
+    Object.entries(aggregated).forEach(([type, data]) => {
+      if (data.values.length > 0) {
+        data.average = data.total / data.values.length;
+        data.median = this.calculateMedian(data.values);
+      }
+      this.reportMetric(type, data);
+    });
+
+    // Clear buffer
+    this.metricsBuffer = [];
+  }
+
+  calculateMedian(values) {
+    const sorted = values.slice().sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
+  }
+
+  cleanup() {
+    // Restore original fetch
+    if (this.originalFetch) {
+      window.fetch = this.originalFetch;
+    }
+
+    // Remove event listeners
+    if (this.loadHandler) {
+      window.removeEventListener('load', this.loadHandler);
+    }
+
+    if (this.interactionHandlers) {
+      Object.entries(this.interactionHandlers).forEach(([event, handler]) => {
+        document.removeEventListener(event, handler);
+      });
+    }
+
+    // Clear aggregation interval
+    if (this.aggregationInterval) {
+      clearInterval(this.aggregationInterval);
+    }
   }
 
   /**
    * Отчет о метрике
    */
   reportMetric(metricName, value) {
-    console.log(`Eva Performance Metric - ${metricName}: ${value}`);
+    console.log(`Eva Performance Metric - ${metricName}:`, value);
     
     // В реальной системе это отправлялось бы в систему мониторинга
     if (window.evaErrorHandler) {
-      window.evaErrorHandler.auditLogger.logMedicalEvent('performance_metric', 'system', {
-        metric: metricName,
-        value: value,
-        timestamp: new Date().toISOString()
-      });
+      window.evaErrorHandler.auditLogger.logMedicalEvent(
+        'performance_metric',
+        'system',
+        {
+          metric: metricName,
+          value: value,
+          timestamp: new Date().toISOString()
+        }
+      );
     }
   }
 }
