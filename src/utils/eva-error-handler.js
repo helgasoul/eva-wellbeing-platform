@@ -213,18 +213,46 @@ class EvaErrorHandler {
    */
   async reportToMonitoring(errorInfo) {
     try {
+      // Sanitize error info before sending
+      const sanitizedError = this.sanitizeErrorForReporting(errorInfo);
+
+      // Add timeout using AbortController
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       await fetch('/api/monitoring/error', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Eva-Session': this.getSessionId()
+          'X-Eva-Session': this.getSessionId(),
+          'Authorization': `Bearer ${this.getAuthToken()}`
         },
-        body: JSON.stringify(errorInfo)
+        body: JSON.stringify(sanitizedError),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
     } catch (monitoringError) {
-      console.error('Failed to report error to monitoring:', monitoringError);
+      if (monitoringError.name === 'AbortError') {
+        console.error('Monitoring request timed out');
+      } else {
+        console.error('Failed to report error to monitoring:', monitoringError);
+      }
       this.queueErrorForLater(errorInfo);
     }
+  }
+
+  sanitizeErrorForReporting(errorInfo) {
+    // Remove or hash sensitive data before sending to monitoring
+    const sanitized = { ...errorInfo };
+    if (sanitized.additional?.patientId) {
+      sanitized.additional.patientId = this.sanitizePatientId(sanitized.additional.patientId);
+    }
+    return sanitized;
+  }
+
+  getAuthToken() {
+    return localStorage.getItem('eva-auth-token') || '';
   }
 
   /**
