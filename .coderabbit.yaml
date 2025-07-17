@@ -1,0 +1,255 @@
+# CodeRabbit Configuration for Eva Wellbeing Platform
+# AI-powered code review configuration
+
+# Reviews configuration
+reviews:
+  # Enable automatic reviews
+  auto_review:
+    enabled: true
+    
+  # Review settings
+  review:
+    # Filter files for review
+    path_filters:
+      - "!node_modules/**"
+      - "!dist/**"
+      - "!build/**"
+      - "!coverage/**"
+      - "!.next/**"
+      - "!*.min.js"
+      - "!*.min.css"
+      - "!package-lock.json"
+      - "!yarn.lock"
+      - "!*.log"
+    
+    # Focus on these file types
+    include_patterns:
+      - "**/*.ts"
+      - "**/*.tsx" 
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.css"
+      - "**/*.scss"
+      - "**/*.md"
+      - "**/*.json"
+      - "**/*.yaml"
+      - "**/*.yml"
+
+# Language-specific settings
+language:
+  typescript:
+    # TypeScript specific rules
+    rules:
+      - "prefer-const"
+      - "no-unused-vars"
+      - "explicit-function-return-type"
+      - "strict-type-checking"
+      - "no-any-usage"
+    
+    # Check for proper typing
+    type_checking: true
+    
+    # React/Next.js specific
+    react:
+      - "hooks-rules"
+      - "jsx-key"
+      - "jsx-no-bind"
+      - "prefer-stateless-function"
+
+# Medical/Healthcare specific checks
+custom_rules:
+  healthcare:
+    # Patient data privacy checks
+    - name: "patient-data-security"
+      description: "Check for proper patient data handling"
+      pattern: "(patient|medical|health).*data"
+      severity: "high"
+      
+    - name: "sensitive-information"
+      description: "Flag potential sensitive information exposure"
+      pattern: "(password|token|key|secret)"
+      severity: "critical"
+      
+    - name: "hipaa-compliance"
+      description: "HIPAA compliance checks"
+      pattern: "(personal.*info|medical.*record|health.*data)"
+      severity: "high"
+
+# Code quality settings
+quality:
+  # Complexity thresholds
+  complexity:
+    cyclomatic: 10
+    cognitive: 15
+    
+  # Code duplication detection
+  duplication:
+    threshold: 50
+    
+  # Security vulnerability scanning
+  security:
+    enabled: true
+    level: "strict"
+    
+  # Performance analysis
+  performance:
+    enabled: true
+    check_patterns:
+      - "large-bundle-size"
+      - "unnecessary-re-renders"
+      - "memory-leaks"
+
+# Comment and documentation
+documentation:
+  # Require documentation for public APIs
+  public_api_docs: true
+  
+  # Check for TODOs and FIXMEs
+  todo_tracking: true
+  
+  # Medical platform specific documentation
+  medical_docs:
+    - "user-safety-notes"
+    - "data-privacy-statements"
+    - "accessibility-requirements"
+
+# Testing requirements
+testing:
+  # Require tests for critical functions
+  coverage:
+    minimum: 70
+    critical_functions: 90
+    
+  # Test file patterns
+  test_patterns:
+    - "**/*.test.ts"
+    - "**/*.test.tsx"
+    - "**/*.spec.ts"
+    - "**/*.spec.tsx"
+    
+  # Medical platform critical testing
+  critical_areas:
+    - "authentication"
+    - "patient-data"
+    - "symptom-tracking"
+    - "ai-chat"
+
+# AI Review focus areas
+ai_focus:
+  # Prioritize these aspects
+  priority_checks:
+    - "security-vulnerabilities"
+    - "accessibility-compliance"
+    - "performance-optimization"
+    - "code-maintainability"
+    - "medical-data-privacy"
+    
+  # Medical platform specific AI checks
+  healthcare_specific:
+    - "patient-consent-validation"
+    - "medical-data-encryption"
+    - "user-input-sanitization"
+    - "error-handling-patient-safety"
+
+# Pull Request settings
+pull_requests:
+  # Auto-assign reviewers
+  auto_assign: true
+  
+  # Review checklist
+  checklist:
+    - "Security review completed"
+    - "Accessibility tested"
+    - "Patient data privacy verified"
+    - "Mobile responsiveness checked"
+    - "Error handling implemented"
+    - "Tests added/updated"
+    
+  # Branch protection
+  require_review: true
+  dismiss_stale_reviews: true
+
+# Notifications
+notifications:
+  # Slack/Discord integration (optional)
+  slack:
+    enabled: false
+    # webhook_url: "your-slack-webhook"
+    
+  # Email notifications
+  email:
+    enabled: true
+    on_critical: true
+    on_security: true
+
+# Exclude specific paths from review
+exclude:
+  - ".git/**"
+  - "node_modules/**"
+  - "dist/**"
+  - "build/**"
+  - ".next/**"
+  - "coverage/**"
+  - "public/**"
+  - "*.min.*"
+  - "vendor/**"
+
+# Medical compliance settings
+compliance:
+  hipaa:
+    enabled: true
+    check_patterns:
+      - "patient.*data.*logging"
+      - "unencrypted.*medical.*data"
+      - "public.*health.*info"
+      
+  gdpr:
+    enabled: true
+    check_patterns:
+      - "personal.*data.*collection"
+      - "user.*consent.*missing"
+      - "data.*retention.*policy"
+
+# Performance monitoring
+performance:
+  bundle_size:
+    max_size: "500kb"
+    warn_size: "300kb"
+    
+  lighthouse:
+    enabled: true
+    thresholds:
+      performance: 90
+      accessibility: 95
+      best_practices: 90
+      seo: 85
+
+# Custom prompts for AI reviewer
+ai_prompts:
+  security: "Pay special attention to patient data security and medical information privacy"
+  accessibility: "Ensure the platform is accessible for users with disabilities and various medical conditions"
+  performance: "Optimize for users who may have limited internet or older devices"
+  medical: "Review code for medical accuracy and patient safety considerations"
+
+# Version control integration
+git:
+  # Commit message format
+  commit_format:
+    pattern: "^(feat|fix|docs|style|refactor|test|chore|medical|security)(\(.+\))?: .+"
+    
+  # Branch naming
+  branch_naming:
+    pattern: "^(feature|fix|hotfix|medical|security)/.+"
+
+# Review scheduling
+schedule:
+  # Auto-review timing
+  auto_review_delay: "5m"
+  
+  # Priority review for critical files
+  priority_files:
+    - "**/auth/**"
+    - "**/patient/**" 
+    - "**/medical/**"
+    - "**/security/**"
+    - "**/api/**"
