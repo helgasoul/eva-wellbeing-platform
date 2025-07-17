@@ -22,21 +22,47 @@ class OnboardingService {
   // Сохранение шага онбординга
   async saveStep(userId: string, stepNumber: number, stepName: string, stepData: any): Promise<{ error: string | null }> {
     try {
+      // Try to insert/update to the new onboarding_data table structure
+      const updateData: any = {
+        user_id: userId,
+        updated_at: new Date().toISOString()
+      };
+
+      // Map step data to the appropriate column
+      switch (stepName) {
+        case 'basicInfo':
+          updateData.basic_info = stepData;
+          break;
+        case 'menstrualHistory':
+          updateData.menstrual_history = stepData;
+          break;
+        case 'symptoms':
+          updateData.symptoms = stepData;
+          break;
+        case 'medicalHistory':
+          updateData.medical_history = stepData;
+          break;
+        case 'lifestyle':
+          updateData.lifestyle = stepData;
+          break;
+        case 'goals':
+          updateData.goals = stepData;
+          break;
+        default:
+          console.warn(`Unknown step name: ${stepName}`);
+          return { error: `Unknown step: ${stepName}` };
+      }
+
       const { error } = await supabase
         .from('onboarding_data')
-        .upsert({
-          user_id: userId,
-          step_number: stepNumber,
-          step_name: stepName,
-          step_data: stepData
-        });
+        .upsert(updateData, { onConflict: 'user_id' });
 
       if (error) {
         console.error('Save step error:', error);
         return { error: error.message };
       }
 
-      console.log(`✅ Onboarding step ${stepNumber} saved for user ${userId}`);
+      console.log(`✅ Onboarding step ${stepName} saved for user ${userId}`);
       return { error: null };
 
     } catch (error: any) {
@@ -48,26 +74,35 @@ class OnboardingService {
   // Загрузка всех шагов онбординга пользователя
   async loadUserOnboarding(userId: string): Promise<{ data: OnboardingData | null, error: string | null }> {
     try {
-      const { data: steps, error } = await supabase
+      const { data: onboardingRow, error } = await supabase
         .from('onboarding_data')
         .select('*')
         .eq('user_id', userId)
-        .order('step_number');
+        .maybeSingle();
 
       if (error) {
         console.error('Load onboarding error:', error);
         return { data: null, error: error.message };
       }
 
-      // Преобразуем данные в формат OnboardingData
+      if (!onboardingRow) {
+        return { data: null, error: null };
+      }
+
+      // Transform the database row into OnboardingData format
       const onboardingData: OnboardingData = {};
       
-      steps?.forEach((step: OnboardingStep) => {
-        const stepName = step.step_name;
-        onboardingData[stepName] = step.step_data;
-      });
+      // Use type casting to handle the new column structure
+      const row = onboardingRow as any;
+      
+      if (row.basic_info) onboardingData.basicInfo = row.basic_info;
+      if (row.menstrual_history) onboardingData.menstrualHistory = row.menstrual_history;
+      if (row.symptoms) onboardingData.symptoms = row.symptoms;
+      if (row.medical_history) onboardingData.medicalHistory = row.medical_history;
+      if (row.lifestyle) onboardingData.lifestyle = row.lifestyle;
+      if (row.goals) onboardingData.goals = row.goals;
 
-      console.log(`✅ Loaded ${steps?.length || 0} onboarding steps for user ${userId}`);
+      console.log(`✅ Loaded onboarding data for user ${userId}`);
       return { data: onboardingData, error: null };
 
     } catch (error: any) {
@@ -87,7 +122,7 @@ class OnboardingService {
       // 1. Check profile flag
       const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
-        .select('onboarding_completed, registration_completed')
+        .select('onboarding_completed, registration_completed, onboarding_completion_percentage')
         .eq('id', userId)
         .maybeSingle();
 
@@ -117,12 +152,6 @@ class OnboardingService {
         if (!validation.isValid && validation.errors.some(e => e.includes('Missing'))) {
           console.warn('⚠️ Onboarding marked complete but validation failed:', validation.errors);
           
-          // Auto-repair if possible
-          const repair = await autoRepairOnboarding(userId);
-          if (repair.repaired) {
-            console.log('✅ Auto-repaired onboarding issues:', repair.actions);
-          }
-          
           // If user has essential data AND onboarding steps, consider them complete
           // even without menopause analysis (can be generated later)
           const canProceed = validation.progress.hasEssentialData && validation.progress.completedSteps >= 4;
@@ -132,8 +161,6 @@ class OnboardingService {
             error: null,
             progress: validation.progress,
             diagnostics: { 
-              autoRepaired: repair.repaired, 
-              actions: repair.actions,
               hasMenopauseAnalysis,
               canGenerateAnalysis: canProceed && !hasMenopauseAnalysis
             }
@@ -154,18 +181,17 @@ class OnboardingService {
       if (validation.progress.hasEssentialData) {
         console.log('🔧 User has sufficient data but flag is false - fixing...');
         
-        // Update the flag
-        const { error: updateError } = await supabase
-          .from('user_profiles')
-          .update({ 
-            onboarding_completed: true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', userId);
+        // Update the flag using the sync function
+        await supabase.rpc('sync_onboarding_completion_status', {
+          p_user_id: userId,
+          p_completion_percentage: validation.progress.completionPercentage,
+          p_phase_result: {},
+          p_completed_steps: Object.keys(STEP_SCHEMAS).filter(step => 
+            !validation.progress.missingSteps.includes(step)
+          )
+        });
 
-        if (!updateError) {
-          return { completed: true, error: null, progress: validation.progress };
-        }
+        return { completed: true, error: null, progress: validation.progress };
       }
 
       return { 
@@ -217,7 +243,10 @@ class OnboardingService {
     try {
       console.log('🚀 Starting enhanced onboarding completion process...');
       
-      // 1. Pre-completion validation
+      // 1. Save all onboarding data to database first
+      await this.saveAllOnboardingData(userId, onboardingData);
+      
+      // 2. Pre-completion validation
       const validation = await validateOnboardingCompleteness(userId, onboardingData);
       
       if (!validation.isValid) {
@@ -231,7 +260,7 @@ class OnboardingService {
         console.log('✅ Proceeding with essential data despite minor validation issues');
       }
 
-      // 2. Save analysis if provided
+      // 3. Save analysis if provided
       if (analysis) {
         console.log('🔄 Saving menopause analysis...', { 
           phase: analysis.menopause_phase, 
@@ -247,47 +276,21 @@ class OnboardingService {
         console.log('✅ Analysis saved successfully');
       }
 
-      // 3. Update profile with comprehensive data
-      console.log('🔄 Updating user profile completion status...');
-      
-      const profileUpdate = {
-        onboarding_completed: true,
-        registration_completed: true,
-        menopause_phase: analysis?.menopause_phase,
-        onboarding_completion_percentage: validation.progress.completionPercentage,
-        updated_at: new Date().toISOString()
-      };
-
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .update(profileUpdate)
-        .eq('id', userId);
-
-      if (profileError) {
-        console.error('❌ Profile update failed:', profileError);
-        return { error: `Ошибка обновления профиля: ${profileError.message}` };
-      }
-
-      // 4. Verify completion with enhanced diagnostics  
-      const diagnostics = await runOnboardingDiagnostics(userId);
-      
-      if (diagnostics.systemStatus === 'error') {
-        console.error('❌ Post-completion diagnostics failed:', diagnostics.recommendations);
-        return { error: 'Onboarding completion verification failed' };
-      }
-
-      // 5. Auto-repair any issues found
-      if (diagnostics.systemStatus === 'warning') {
-        console.log('🔧 Running auto-repair for minor issues...');
-        const repair = await autoRepairOnboarding(userId);
-        if (repair.repaired) {
-          console.log('✅ Auto-repaired issues:', repair.actions);
-        }
-      }
+      // 4. Use the sync function to update user profile
+      await supabase.rpc('sync_onboarding_completion_status', {
+        p_user_id: userId,
+        p_completion_percentage: validation.progress.completionPercentage,
+        p_phase_result: analysis ? {
+          menopause_phase: analysis.menopause_phase,
+          phase_confidence: analysis.phase_confidence
+        } : {},
+        p_completed_steps: validation.progress.missingSteps.length === 0 ? 
+          ['basicInfo', 'menstrualHistory', 'symptoms', 'medicalHistory', 'lifestyle', 'goals'] : 
+          Object.keys(onboardingData)
+      });
 
       console.log(`✅ Enhanced onboarding completed successfully for user ${userId}`, {
         completionPercentage: validation.progress.completionPercentage,
-        systemStatus: diagnostics.systemStatus,
         hasEssentialData: validation.progress.hasEssentialData
       });
       
@@ -296,6 +299,36 @@ class OnboardingService {
     } catch (error: any) {
       console.error('❌ Enhanced onboarding completion error:', error);
       return { error: error.message || 'Ошибка завершения онбординга' };
+    }
+  }
+
+  // Save all onboarding data at once
+  private async saveAllOnboardingData(userId: string, onboardingData: OnboardingData): Promise<void> {
+    try {
+      const updateData: any = {
+        user_id: userId,
+        updated_at: new Date().toISOString()
+      };
+
+      // Map all onboarding data to database columns
+      if (onboardingData.basicInfo) updateData.basic_info = onboardingData.basicInfo;
+      if (onboardingData.menstrualHistory) updateData.menstrual_history = onboardingData.menstrualHistory;
+      if (onboardingData.symptoms) updateData.symptoms = onboardingData.symptoms;
+      if (onboardingData.medicalHistory) updateData.medical_history = onboardingData.medicalHistory;
+      if (onboardingData.lifestyle) updateData.lifestyle = onboardingData.lifestyle;
+      if (onboardingData.goals) updateData.goals = onboardingData.goals;
+
+      // Set completed steps
+      updateData.completed_steps = Object.keys(onboardingData);
+
+      await supabase
+        .from('onboarding_data')
+        .upsert(updateData, { onConflict: 'user_id' });
+
+      console.log('✅ All onboarding data saved to database');
+    } catch (error) {
+      console.error('❌ Save all onboarding data error:', error);
+      throw error;
     }
   }
 
@@ -308,9 +341,9 @@ class OnboardingService {
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (error) {
         console.error('Get latest analysis error:', error);
         return { data: null, error: error.message };
       }
@@ -334,41 +367,15 @@ class OnboardingService {
       }
 
       const onboardingData: OnboardingData = JSON.parse(localData);
-      let migratedSteps = 0;
-
-      // Маппинг данных в шаги
-      const stepMapping = [
-        { key: 'basicInfo', stepNumber: 2, stepName: 'basicInfo' },
-        { key: 'menstrualHistory', stepNumber: 3, stepName: 'menstrualHistory' },
-        { key: 'symptoms', stepNumber: 4, stepName: 'symptoms' },
-        { key: 'medicalHistory', stepNumber: 5, stepName: 'medicalHistory' },
-        { key: 'lifestyle', stepNumber: 6, stepName: 'lifestyle' },
-        { key: 'goals', stepNumber: 7, stepName: 'goals' }
-      ];
-
-      // Сохраняем каждый шаг
-      for (const mapping of stepMapping) {
-        if (onboardingData[mapping.key]) {
-          const { error } = await this.saveStep(
-            userId,
-            mapping.stepNumber,
-            mapping.stepName,
-            onboardingData[mapping.key]
-          );
-
-          if (!error) {
-            migratedSteps++;
-          }
-        }
-      }
-
-      // Очищаем localStorage после миграции
-      if (migratedSteps > 0) {
-        localStorage.removeItem(STORAGE_KEY);
-        console.log(`✅ Migrated ${migratedSteps} onboarding steps from localStorage`);
-      }
-
-      return { migrated: migratedSteps, error: null };
+      
+      // Save all data at once using the new structure
+      await this.saveAllOnboardingData(userId, onboardingData);
+      
+      // Clear localStorage after migration
+      localStorage.removeItem(STORAGE_KEY);
+      console.log(`✅ Migrated onboarding data from localStorage for user ${userId}`);
+      
+      return { migrated: Object.keys(onboardingData).length, error: null };
 
     } catch (error: any) {
       console.error('Migration from localStorage error:', error);
@@ -391,7 +398,11 @@ class OnboardingService {
 
       const { error: profileError } = await supabase
         .from('user_profiles')
-        .update({ onboarding_completed: false, menopause_phase: null })
+        .update({ 
+          onboarding_completed: false, 
+          menopause_phase: null,
+          onboarding_completion_percentage: 0
+        })
         .eq('id', userId);
 
       if (dataError || analysisError || profileError) {
@@ -505,5 +516,33 @@ class OnboardingService {
     }
   }
 }
+
+// Step schemas for validation
+const STEP_SCHEMAS = {
+  basicInfo: {
+    required: ['age', 'height', 'weight'],
+    optional: ['occupation', 'education']
+  },
+  menstrualHistory: {
+    required: ['menstrualStatus', 'lastPeriodDate'],
+    optional: ['cycleLength', 'periodLength']  
+  },
+  symptoms: {
+    required: ['physicalSymptoms', 'cognitiveSymptoms'],
+    optional: ['hotFlashes', 'nightSweats', 'sleepProblems', 'moodChanges']
+  },
+  medicalHistory: {
+    required: ['chronicConditions', 'familyHistory', 'surgicalHistory'],
+    optional: ['currentMedications', 'isOnHRT', 'hrtDetails']
+  },
+  lifestyle: {
+    required: ['exerciseFrequency', 'sleepHours', 'exerciseTypes', 'supplementsUsed'],
+    optional: ['dietType', 'stressLevel', 'smokingStatus', 'alcoholConsumption']
+  },
+  goals: {
+    required: ['primaryGoals'],
+    optional: ['preferences', 'priorities']
+  }
+};
 
 export const onboardingService = new OnboardingService();

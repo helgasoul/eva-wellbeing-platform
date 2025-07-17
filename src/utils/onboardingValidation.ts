@@ -61,16 +61,24 @@ export const validateOnboardingCompleteness = async (
     // Load onboarding data if not provided
     let data = onboardingData;
     if (!data) {
-      const { data: steps } = await supabase
+      const { data: onboardingRow } = await supabase
         .from('onboarding_data')
         .select('*')
         .eq('user_id', userId)
-        .order('step_number');
+        .maybeSingle();
       
       data = {};
-      steps?.forEach(step => {
-        data![step.step_name] = step.step_data;
-      });
+      if (onboardingRow) {
+        // Use type casting to handle the new column structure
+        const row = onboardingRow as any;
+        
+        if (row.basic_info) data.basicInfo = row.basic_info;
+        if (row.menstrual_history) data.menstrualHistory = row.menstrual_history;
+        if (row.symptoms) data.symptoms = row.symptoms;
+        if (row.medical_history) data.medicalHistory = row.medical_history;
+        if (row.lifestyle) data.lifestyle = row.lifestyle;
+        if (row.goals) data.goals = row.goals;
+      }
     }
 
     const errors: string[] = [];

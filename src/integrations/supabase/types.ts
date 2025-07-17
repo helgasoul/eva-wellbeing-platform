@@ -8383,8 +8383,12 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          last_onboarding_step: string | null
           menopause_phase: string | null
           onboarding_completed: boolean | null
+          onboarding_completed_at: string | null
+          onboarding_completion_percentage: number | null
+          onboarding_phase_result: Json | null
           phone: string | null
           phone_verified: boolean | null
           registration_completed: boolean | null
@@ -8400,8 +8404,12 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          last_onboarding_step?: string | null
           menopause_phase?: string | null
           onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
+          onboarding_completion_percentage?: number | null
+          onboarding_phase_result?: Json | null
           phone?: string | null
           phone_verified?: boolean | null
           registration_completed?: boolean | null
@@ -8417,8 +8425,12 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          last_onboarding_step?: string | null
           menopause_phase?: string | null
           onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
+          onboarding_completion_percentage?: number | null
+          onboarding_phase_result?: Json | null
           phone?: string | null
           phone_verified?: boolean | null
           registration_completed?: boolean | null
@@ -8856,6 +8868,15 @@ export type Database = {
       perform_health_check: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      sync_onboarding_completion_status: {
+        Args: {
+          p_user_id: string
+          p_completion_percentage: number
+          p_phase_result?: Json
+          p_completed_steps?: string[]
+        }
+        Returns: undefined
       }
       update_health_sync_log_secure: {
         Args: {

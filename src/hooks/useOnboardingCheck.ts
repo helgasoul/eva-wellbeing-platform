@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/roles';
 import { onboardingService } from '@/services/onboardingService';
 import { shouldRedirectToOnboarding, shouldRedirectToDashboard } from '@/utils/onboardingUtils';
+import { useOnboardingMigration } from './useOnboardingMigration';
 
 /**
  * Enhanced hook for onboarding status checking with comprehensive validation
@@ -18,6 +19,7 @@ export const useOnboardingCheck = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { migrationStatus } = useOnboardingMigration();
   const [onboardingState, setOnboardingState] = useState<{
     needsOnboarding: boolean;
     hasCompletedOnboarding: boolean;
@@ -45,6 +47,12 @@ export const useOnboardingCheck = () => {
     // Prevent cyclical redirects - if user is already on onboarding, don't redirect again
     if (location.pathname === '/patient/onboarding') {
       console.log('🔄 User already on onboarding page, skipping redirect check');
+      return;
+    }
+
+    // Wait for migration to complete before checking onboarding
+    if (!migrationStatus.isCompleted) {
+      console.log('🔄 Waiting for migration to complete...');
       return;
     }
 
