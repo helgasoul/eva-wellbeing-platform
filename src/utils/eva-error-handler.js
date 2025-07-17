@@ -100,25 +100,54 @@ class EvaErrorHandler {
   /**
    * Определение серьезности ошибки
    */
+  // Add constants at class level
+  static CONTEXTS = {
+    PATIENT_DATA: 'patient_data',
+    MEDICAL_RECORD: 'medical_record',
+    AUTH_ERROR: 'auth_error',
+    API_ERROR: 'api_error',
+    // ... other contexts
+  };
+
+  static SEVERITY_LEVELS = {
+    CRITICAL: 'critical',
+    HIGH: 'high',
+    MEDIUM: 'medium',
+    LOW: 'low'
+  };
+
   determineSeverity(error, context) {
+    // Ensure context is a string
+    const contextStr = String(context || '').toLowerCase();
+    
     // Критические ошибки для медицинской платформы
-    if (context.includes('patient_data') || 
-        context.includes('medical_record') ||
-        context.includes('auth_error') ||
-        error?.message?.includes('data loss')) {
-      return 'critical';
+    const criticalContexts = [
+      EvaErrorHandler.CONTEXTS.PATIENT_DATA,
+      EvaErrorHandler.CONTEXTS.MEDICAL_RECORD,
+      EvaErrorHandler.CONTEXTS.AUTH_ERROR
+    ];
+    
+    if (
+      criticalContexts.some(ctx => contextStr === ctx) ||
+      error?.message?.toLowerCase().includes('data loss')
+    ) {
+      return EvaErrorHandler.SEVERITY_LEVELS.CRITICAL;
     }
     
     // Высокий приоритет
-    if (context.includes('api_error') || 
-        context.includes('navigation') ||
-        error?.message?.includes('network')) {
+    if (
+      context.includes('api_error') ||
+      context.includes('navigation') ||
+      error?.message?.includes('network')
+    ) {
       return 'high';
     }
     
     // Средний приоритет
-    if (context.includes('ui_error') || 
-        context.includes('validation')) {
+    if (
+      context.includes('ui_error') ||
+      context.includes('validation')
+    ) {
       return 'medium';
     }
     
