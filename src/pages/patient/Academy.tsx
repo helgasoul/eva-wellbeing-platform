@@ -41,7 +41,7 @@ const difficultyOptions = [
   { value: 'advanced', label: 'Продвинутый' }
 ];
 
-export const Academy: React.FC = () => {
+const Academy: React.FC = () => {
   const { user } = useAuth();
   const { executeWithErrorHandling, isLoading: errorHandlerLoading } = useSupabaseErrorHandler();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -413,3 +413,5 @@ export const Academy: React.FC = () => {
     </PatientLayout>
   );
 };
+
+export default Academy;

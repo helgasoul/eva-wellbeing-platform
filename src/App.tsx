@@ -52,7 +52,7 @@ import Calendar from "./pages/patient/Calendar";
 import AdvancedRecommendations from "./pages/patient/AdvancedRecommendations";
 import HealthDataIntegrations from "./pages/patient/HealthDataIntegrations";
 import MedicalDigitalTwin from './pages/patient/MedicalDigitalTwin';
-import { Academy } from './pages/patient/Academy';
+import Academy from './pages/patient/Academy';
 
 // Doctor pages
 import DoctorDashboard from "./pages/DoctorDashboard";

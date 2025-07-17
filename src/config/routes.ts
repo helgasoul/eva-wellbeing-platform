@@ -2,7 +2,7 @@ import React from 'react';
 import { UserRole } from '@/types/roles';
 
 // Lazy load components
-const PatientDashboard = React.lazy(() => import('@/pages/patient/PatientDashboard'));
+const PatientDashboard = React.lazy(() => import('@/pages/PatientDashboard'));
 const SymptomTracker = React.lazy(() => import('@/pages/patient/SymptomTracker'));
 const NutritionTracker = React.lazy(() => import('@/pages/patient/NutritionTracker'));
 const Recipes = React.lazy(() => import('@/pages/patient/Recipes'));
@@ -18,16 +18,16 @@ const DataDiagnostics = React.lazy(() => import('@/pages/patient/DataDiagnostics
 const HealthDataIntegrations = React.lazy(() => import('@/pages/patient/HealthDataIntegrations'));
 const DoctorBooking = React.lazy(() => import('@/pages/patient/DoctorBooking'));
 const LabTests = React.lazy(() => import('@/pages/patient/LabTests'));
-const Insights = React.lazy(() => import('@/pages/patient/Insights'));
-const AiChat = React.lazy(() => import('@/pages/patient/AiChat'));
+const Insights = React.lazy(() => import('@/pages/patient/PatientInsights'));
+const AiChat = React.lazy(() => import('@/pages/patient/AIChat'));
 const Documents = React.lazy(() => import('@/pages/patient/Documents'));
-const Recommendations = React.lazy(() => import('@/pages/patient/Recommendations'));
+const Recommendations = React.lazy(() => import('@/pages/patient/PatientRecommendations'));
 const AdvancedRecommendations = React.lazy(() => import('@/pages/patient/AdvancedRecommendations'));
 const Community = React.lazy(() => import('@/pages/patient/Community'));
 const PatientSettings = React.lazy(() => import('@/pages/patient/Settings'));
 
 // Doctor pages
-const DoctorDashboard = React.lazy(() => import('@/pages/doctor/DoctorDashboard'));
+const DoctorDashboard = React.lazy(() => import('@/pages/DoctorDashboard'));
 const DoctorPatients = React.lazy(() => import('@/pages/doctor/DoctorPatients'));
 const DoctorSearch = React.lazy(() => import('@/pages/doctor/DoctorSearch'));
 const EmbeddedCalculators = React.lazy(() => import('@/pages/doctor/EmbeddedCalculators'));
@@ -42,7 +42,7 @@ const ExpertArticles = React.lazy(() => import('@/pages/expert/ExpertArticles'))
 const ExpertSettings = React.lazy(() => import('@/pages/expert/ExpertSettings'));
 
 // Admin pages
-const AdminDashboard = React.lazy(() => import('@/pages/admin/AdminDashboard'));
+const AdminDashboard = React.lazy(() => import('@/pages/AdminDashboard'));
 const AdminUsers = React.lazy(() => import('@/pages/admin/AdminUsers'));
 const AdminAnalytics = React.lazy(() => import('@/pages/admin/AdminAnalytics'));
 const AdminModeration = React.lazy(() => import('@/pages/admin/AdminModeration'));
