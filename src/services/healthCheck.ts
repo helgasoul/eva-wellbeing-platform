@@ -20,12 +20,12 @@ export class HealthCheckService {
   static async performHealthCheck(): Promise<HealthStatus> {
     console.log('🔍 Starting health check...');
     
-    const results = {
+    const results: HealthStatus = {
       supabaseConnection: false,
       userSession: false,
       dataIntegrity: false,
       localStorage: false,
-      overall: 'critical' as const,
+      overall: 'critical',
       details: {}
     };
     
@@ -64,7 +64,12 @@ export class HealthCheckService {
     }
     
     // Определение общего состояния
-    const healthyCount = Object.values(results).filter(v => v === true).length;
+    const healthyCount = [
+      results.supabaseConnection,
+      results.userSession,
+      results.dataIntegrity,
+      results.localStorage
+    ].filter(v => v === true).length;
     
     if (healthyCount >= 3) {
       results.overall = 'healthy';

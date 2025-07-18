@@ -1,12 +1,25 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/types/auth';
+import { UserRole } from '@/types/roles';
 
 export interface RecoveryResult {
   success: boolean;
   user?: User;
   source?: string;
   error?: string;
+}
+
+// Интерфейс для Supabase профиля
+interface SupabaseProfile {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  onboarding_completed: boolean;
+  avatar_url?: string;
+  created_at: string;
 }
 
 export class EmergencyRecoveryService {
@@ -57,7 +70,7 @@ export class EmergencyRecoveryService {
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .single() as { data: SupabaseProfile | null };
         
       if (profile) {
         return {
@@ -65,10 +78,9 @@ export class EmergencyRecoveryService {
           email: user.email!,
           firstName: profile.first_name || '',
           lastName: profile.last_name || '',
-          role: profile.role || 'patient',
+          role: this.normalizeRole(profile.role || 'patient'),
           onboardingCompleted: profile.onboarding_completed || false,
-          createdAt: new Date(profile.created_at),
-          onboardingData: profile.onboarding_data || null
+          createdAt: new Date(profile.created_at)
         };
       }
       
@@ -76,6 +88,21 @@ export class EmergencyRecoveryService {
     } catch (error) {
       console.log('Supabase recovery failed:', error);
       return null;
+    }
+  }
+  
+  // Нормализация роли из строки в enum
+  private static normalizeRole(roleString: string): UserRole {
+    switch (roleString?.toLowerCase()) {
+      case 'patient':
+        return UserRole.PATIENT;
+      case 'doctor':
+        return UserRole.DOCTOR;
+      case 'admin':
+        return UserRole.ADMIN;
+      default:
+        console.warn(`Unknown role: ${roleString}, defaulting to PATIENT`);
+        return UserRole.PATIENT;
     }
   }
   
@@ -101,7 +128,7 @@ export class EmergencyRecoveryService {
               email: parsed.email,
               firstName: parsed.firstName || parsed.first_name || '',
               lastName: parsed.lastName || parsed.last_name || '',
-              role: parsed.role || 'patient',
+              role: this.normalizeRole(parsed.role || 'patient'),
               onboardingCompleted: parsed.onboardingCompleted || false,
               createdAt: new Date(parsed.createdAt || Date.now()),
               onboardingData: parsed.onboardingData || null
@@ -129,10 +156,9 @@ export class EmergencyRecoveryService {
           email: parsed.email,
           firstName: parsed.firstName || '',
           lastName: parsed.lastName || '',
-          role: parsed.role || 'patient',
+          role: this.normalizeRole(parsed.role || 'patient'),
           onboardingCompleted: false,
-          createdAt: new Date(parsed.createdAt || Date.now()),
-          onboardingData: null
+          createdAt: new Date(parsed.createdAt || Date.now())
         };
       }
       return null;
@@ -155,7 +181,7 @@ export class EmergencyRecoveryService {
             email: parsed.user.email,
             firstName: parsed.user.firstName || '',
             lastName: parsed.user.lastName || '',
-            role: parsed.user.role || 'patient',
+            role: this.normalizeRole(parsed.user.role || 'patient'),
             onboardingCompleted: parsed.completed || false,
             createdAt: new Date(parsed.user.createdAt || Date.now()),
             onboardingData: parsed
