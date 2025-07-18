@@ -25,7 +25,7 @@ import { DataBridge, OnboardingPresets } from '@/services/DataBridge';
 import { onboardingService } from '@/services/onboardingService';
 import { migrateOnboardingData } from '@/utils/onboardingMigration';
 
-// ✅ ИСПРАВЛЕНО: Правильная 7-шаговая структура онбординга
+// ✅ ИСПРАВЛЕНО: Убираем геолокацию из онбординга - делаем 7 шагов
 const TOTAL_STEPS = 7;
 const STORAGE_KEY = 'bloom-onboarding-data';
 
@@ -89,15 +89,13 @@ const PatientOnboarding = () => {
   const [formData, setFormData] = useState<OnboardingData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [showGeolocation, setShowGeolocation] = useState(false); // ✅ НОВОЕ: состояние для геолокации
   const [phaseResult, setPhaseResult] = useState(null);
   const [recommendations, setRecommendations] = useState(null);
   const [onboardingPresets, setOnboardingPresets] = useState<OnboardingPresets | null>(null);
   const [dataLoadingStatus, setDataLoadingStatus] = useState({
     registration: false,
     onboarding: false,
-    dataBridge: false,
-    geolocation: false // ✅ НОВОЕ: статус геолокации
+    dataBridge: false
   });
   
   const { user, completeOnboarding, updateUser, saveUserData, loadUserData } = useAuth();
@@ -329,78 +327,13 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ НОВОЕ: Обработка геолокационного шага после основного онбординга
-  const handleGeolocationComplete = async (data: { location: any, weather: any }) => {
-    try {
-      const { location, weather } = data;
-      
-      const geolocationData = {
-        location,
-        weather,
-        recordedAt: new Date().toISOString()
-      };
-
-      // Обновляем данные формы
-      updateFormData({ geolocation: geolocationData });
-
-      // Сохраняем местоположение пользователя в базу данных
-      if (user?.id) {
-        const { error: locationError } = await supabase
-          .from('user_locations')
-          .upsert({
-            user_id: user.id,
-            location_data: location,
-            is_active: true
-          });
-
-        if (locationError) {
-          console.error('Error saving user location:', locationError);
-        }
-
-        // Сохраняем погодные данные
-        await weatherService.saveWeatherData(user.id, location, weather);
-        
-        console.log('✅ Location and weather data saved for user:', user.id);
-      }
-
-      setDataLoadingStatus(prev => ({ ...prev, geolocation: true }));
-      setShowGeolocation(false);
-      setShowResults(true); // ✅ ИСПРАВЛЕНО: возвращаемся к результатам
-      
-      toast({
-        title: 'Геолокация настроена!',
-        description: 'Теперь вы будете получать персонализированные рекомендации на основе климата.',
-      });
-
-    } catch (error) {
-      console.error('Error handling geolocation completion:', error);
-      toast({
-        title: 'Ошибка геолокации',
-        description: 'Не удалось сохранить данные местоположения. Вы можете настроить это позже.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleStartGeolocation = () => {
-    setShowResults(false);
-    setShowGeolocation(true);
-  };
-
-  const handleSkipGeolocation = () => {
-    console.log('📍 User skipped geolocation setup');
-    setShowGeolocation(false);
-    setShowResults(true); // ✅ ИСПРАВЛЕНО: возвращаемся к результатам без геолокации
-  };
-
   const handleOnboardingComplete = async () => {
     try {
       console.log('🎯 Starting onboarding completion process', {
         userId: user?.id,
         hasPhaseResult: !!phaseResult,
         hasRecommendations: !!recommendations,
-        hasFormData: !!formData,
-        hasGeolocation: !!formData.geolocation
+        hasFormData: !!formData
       });
 
       // Clear forced onboarding flag
@@ -415,7 +348,7 @@ const PatientOnboarding = () => {
         completedAt: new Date().toISOString()
       };
       
-      // 1. Сохраняем финальные данные через DataBridge
+      // 1. Сохраняем финальные данные через AuthContext
       await saveUserData('onboarding_data', {
         ...formData,
         phaseResult,
@@ -433,35 +366,30 @@ const PatientOnboarding = () => {
       // 3. Сохраняем в localStorage для совместимости
       localStorage.setItem('onboardingCompleted', 'true');
       localStorage.setItem('onboardingData', JSON.stringify(onboardingSummary));
+
+      // 4. Используем completeOnboarding для финальной записи в базу
+      await completeOnboarding(onboardingSummary);
+
+      console.log('✅ Onboarding completed successfully, redirecting to profile setup');
       
-      // 4. Асинхронно завершаем онбординг в Supabase
-      try {
-        await completeOnboarding(onboardingSummary);
-        console.log('✅ Onboarding saved to Supabase');
-      } catch (supabaseError) {
-        console.warn('⚠️ Failed to save onboarding to Supabase, but user updated locally:', supabaseError);
-      }
-      
-      // 5. Очищаем временные данные
-      const dataBridge = DataBridge.getInstance();
-      dataBridge.cleanupTransferData();
-      await saveUserData('onboarding_progress', null); // Очищаем прогресс
-      localStorage.removeItem(STORAGE_KEY);
-      
-      console.log('✅ Onboarding completion successful, navigating to dashboard');
-      
-      // 5. Перенаправляем на dashboard
-      navigate('/patient/dashboard', { replace: true });
-      
+      toast({
+        title: 'Поздравляем!',
+        description: 'Анкета завершена. Переходим к настройке профиля.',
+      });
+
+      // 5. Редирект на настройку профиля (геолокация)
+      navigate('/patient/profile-setup', { replace: true });
+
     } catch (error) {
       console.error('❌ Error completing onboarding:', error);
       toast({
-        title: 'Ошибка',
-        description: 'Произошла ошибка при завершении онбординга. Попробуйте еще раз.',
+        title: 'Ошибка сохранения',
+        description: 'Произошла ошибка при сохранении данных. Попробуйте еще раз.',
         variant: 'destructive',
       });
     }
   };
+
 
   // ✅ ИСПРАВЛЕНО: Правильная валидация для 7-шагового процесса с улучшенным логированием
   const canGoNext = () => {
@@ -544,151 +472,123 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ НОВОЕ: Рендеринг геолокационного шага
-  if (showGeolocation) {
+  // Show the onboarding results without geolocation step
+  if (showResults) {
     return (
-      <PatientLayout title="Настройка персонализации" hideSidebar={true} hideQuickActions={true}>
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6 text-center">
-            <h2 className="text-2xl font-playfair font-bold text-foreground mb-2">
-              Последний шаг - настроим геолокацию
-            </h2>
-            <p className="text-muted-foreground">
-              Это поможет получать персонализированные рекомендации на основе климата и окружающей среды
-            </p>
-          </div>
-          
-          <GeolocationStep
-            data={formData.geolocation}
-            onChange={handleGeolocationComplete}
-            onSkip={handleSkipGeolocation}
-          />
-        </div>
-      </PatientLayout>
-    );
-  }
-
-  if (showResults && phaseResult && recommendations) {
-    return (
-      <PatientLayout title="Результаты онбординга" hideSidebar={true}>
+      <PatientLayout>
         <OnboardingResults
           phaseResult={phaseResult}
           recommendations={recommendations}
           onboardingData={formData}
           onComplete={handleOnboardingComplete}
-          onSetupGeolocation={handleStartGeolocation}
-          hasGeolocation={!!formData.geolocation}
         />
       </PatientLayout>
     );
   }
 
-  // ✅ ИСПРАВЛЕНО: Правильная последовательность шагов 1-7
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 1:
-        return <WelcomeStep onNext={handleNext} />;
-      case 2:
-        return (
-          <BasicInfoStep
-            data={formData.basicInfo}
-            onChange={(data) => updateFormData({ basicInfo: data })}
-          />
-        );
-      case 3:
-        return (
-          <MenstrualHistoryStep
-            data={formData.menstrualHistory}
-            onChange={(data) => updateFormData({ menstrualHistory: data })}
-          />
-        );
-      case 4:
-        return (
-          <SymptomsStep
-            data={formData.symptoms}
-            onChange={(data) => updateFormData({ symptoms: data })}
-          />
-        );
-      case 5:
-        return (
-          <MedicalHistoryStep
-            data={formData.medicalHistory}
-            onChange={(data) => updateFormData({ medicalHistory: data })}
-          />
-        );
-      case 6:
-        return (
-          <LifestyleStep
-            data={formData.lifestyle}
-            onChange={(data) => updateFormData({ lifestyle: data })}
-          />
-        );
-      case 7:
-        return (
-          <GoalsStep
-            data={formData.goals}
-            onChange={(data) => updateFormData({ goals: data })}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
-    <PatientLayout title={onboardingPresets ? `Персональная анкета для "${getPersonaTitle(onboardingPresets.persona.id)}"` : "Знакомство без | паузы"} hideSidebar={true} hideQuickActions={true}>
-      <div className="min-h-screen">
-        {/* ✅ НОВОЕ: Индикатор загрузки данных */}
-        {(dataLoadingStatus.dataBridge || dataLoadingStatus.registration) && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center space-x-2 text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-green-800">
-                ✅ Данные из регистрации загружены
-                {onboardingPresets && ` • ${onboardingPresets.onboardingConfig.estimatedDuration}`}
-              </span>
-            </div>
-          </div>
-        )}
-
-        <OnboardingProgress
-          currentStep={currentStep}
-          totalSteps={TOTAL_STEPS}
-          stepTitles={stepTitles}
-        />
-
-        {currentStep === 1 ? (
-          renderCurrentStep()
-        ) : (
-          <StepWrapper
-            title={stepTitles[currentStep - 1]}
-            description={onboardingPresets ? 
-              `Персонализированные вопросы для вашего профиля "${getPersonaTitle(onboardingPresets.persona.id)}"` :
-              "Пожалуйста, заполните информацию для персонализации вашего опыта"
-            }
-            onNext={handleNext}
-            onPrev={handlePrev}
-            canGoNext={canGoNext()}
-            isFirstStep={currentStep === 1}
-            isLastStep={currentStep === TOTAL_STEPS}
+    <PatientLayout>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <OnboardingProgress 
+            currentStep={currentStep} 
+            totalSteps={TOTAL_STEPS}
+            stepTitles={stepTitles}
+          />
+          
+          <div className="space-y-6"
           >
-            {renderCurrentStep()}
-          </StepWrapper>
-        )}
+            {/* Шаг 1: Добро пожаловать */}
+            {currentStep === 1 && (
+              <WelcomeStep 
+                onNext={handleNext}
+              />
+            )}
 
-        {isLoading && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bloom-dusty-rose mx-auto mb-4"></div>
-              <p className="text-foreground">Анализируем ваши данные...</p>
-            </div>
+            {/* Шаги 2-7: С навигацией */}
+            {currentStep > 1 && (
+              <div className="space-y-6">
+                <div className="bloom-card p-6">
+                  <h2 className="text-2xl font-playfair font-bold text-foreground mb-6">
+                    {stepTitles[currentStep - 1]}
+                  </h2>
+                  
+                  {/* Шаг 2: Базовая информация */}
+                  {currentStep === 2 && (
+                    <BasicInfoStep
+                      data={formData.basicInfo}
+                      onChange={(data) => updateFormData({ basicInfo: data })}
+                    />
+                  )}
+
+                  {/* Шаг 3: Менструальная история */}
+                  {currentStep === 3 && (
+                    <MenstrualHistoryStep
+                      data={formData.menstrualHistory}
+                      onChange={(data) => updateFormData({ menstrualHistory: data })}
+                    />
+                  )}
+
+                  {/* Шаг 4: Симптомы */}
+                  {currentStep === 4 && (
+                    <SymptomsStep
+                      data={formData.symptoms}
+                      onChange={(data) => updateFormData({ symptoms: data })}
+                    />
+                  )}
+
+                  {/* Шаг 5: Медицинская история */}
+                  {currentStep === 5 && (
+                    <MedicalHistoryStep
+                      data={formData.medicalHistory}
+                      onChange={(data) => updateFormData({ medicalHistory: data })}
+                    />
+                  )}
+
+                  {/* Шаг 6: Образ жизни */}
+                  {currentStep === 6 && (
+                    <LifestyleStep
+                      data={formData.lifestyle}
+                      onChange={(data) => updateFormData({ lifestyle: data })}
+                    />
+                  )}
+
+                  {/* Шаг 7: Цели */}
+                  {currentStep === 7 && (
+                    <GoalsStep
+                      data={formData.goals}
+                      onChange={(data) => updateFormData({ goals: data })}
+                    />
+                  )}
+                  
+                  {/* Навигационные кнопки */}
+                  <div className="flex justify-between mt-8">
+                    <button
+                      onClick={handlePrev}
+                      disabled={currentStep === 1}
+                      className="px-6 py-2 border border-muted-foreground/20 text-muted-foreground rounded-lg hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Назад
+                    </button>
+                    
+                    <button
+                      onClick={currentStep === TOTAL_STEPS ? handleComplete : handleNext}
+                      disabled={!canGoNext()}
+                      className="px-6 py-2 bloom-button disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? 'Загрузка...' : currentStep === TOTAL_STEPS ? 'Завершить' : 'Далее'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-
+        </div>
       </div>
     </PatientLayout>
   );
 };
+
 
 // ✅ НОВОЕ: Вспомогательная функция для получения названия персоны
 const getPersonaTitle = (personaId: string) => {

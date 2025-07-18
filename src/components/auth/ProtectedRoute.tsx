@@ -97,7 +97,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     
     // Если пользователь уже авторизован (НЕ recovery), редиректим
     if (user) {
-      const defaultRedirect = getDashboardByRole(user.role);
+      const defaultRedirect = getUserRedirectPath(user);
       return <Navigate to={redirectTo || defaultRedirect} replace />;
     }
     
