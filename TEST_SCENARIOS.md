@@ -5,7 +5,7 @@
 ### 1. Тест потери данных в RegistrationComplete
 ```typescript
 // __tests__/RegistrationComplete.test.tsx
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import { RegistrationComplete } from '../components/auth/registration/RegistrationComplete';
 
 describe('RegistrationComplete Data Flow', () => {
