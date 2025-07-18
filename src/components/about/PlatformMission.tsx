@@ -126,7 +126,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Shield className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
                   </div>
                   <h4 className="text-lg font-semibold text-foreground mb-2">Поддержка</h4>
