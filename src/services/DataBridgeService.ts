@@ -943,6 +943,7 @@ export const useDataBridge = () => {
     restoreFromBackup: dataBridgeService.restoreFromBackup.bind(dataBridgeService),
     performHealthCheck: dataBridgeService.performHealthCheck.bind(dataBridgeService),
     getMetrics: dataBridgeService.getMetrics.bind(dataBridgeService),
+    getAuditTrail: dataBridgeService.getAuditTrail.bind(dataBridgeService),
     exportData: dataBridgeService.exportData.bind(dataBridgeService),
     importData: dataBridgeService.importData.bind(dataBridgeService),
     addEventListener: dataBridgeService.addEventListener.bind(dataBridgeService),

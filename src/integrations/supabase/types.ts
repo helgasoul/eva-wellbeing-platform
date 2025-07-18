@@ -1311,6 +1311,216 @@ export type Database = {
         }
         Relationships: []
       }
+      data_bridge_audit_log: {
+        Row: {
+          action: string
+          affected_keys: string[] | null
+          created_at: string
+          data_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          affected_keys?: string[] | null
+          created_at?: string
+          data_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          affected_keys?: string[] | null
+          created_at?: string
+          data_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_bridge_backups: {
+        Row: {
+          backup_data: Json
+          backup_size: number
+          checksum: string
+          created_at: string
+          data_type: string
+          expires_at: string | null
+          id: string
+          is_compressed: boolean | null
+          is_encrypted: boolean | null
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          backup_data: Json
+          backup_size: number
+          checksum: string
+          created_at?: string
+          data_type: string
+          expires_at?: string | null
+          id?: string
+          is_compressed?: boolean | null
+          is_encrypted?: boolean | null
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          backup_data?: Json
+          backup_size?: number
+          checksum?: string
+          created_at?: string
+          data_type?: string
+          expires_at?: string | null
+          id?: string
+          is_compressed?: boolean | null
+          is_encrypted?: boolean | null
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_bridge_health_reports: {
+        Row: {
+          check_duration_ms: number | null
+          created_at: string
+          id: string
+          issues: Json | null
+          metrics: Json | null
+          overall_status: string
+          recommendations: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          check_duration_ms?: number | null
+          created_at?: string
+          id?: string
+          issues?: Json | null
+          metrics?: Json | null
+          overall_status: string
+          recommendations?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          check_duration_ms?: number | null
+          created_at?: string
+          id?: string
+          issues?: Json | null
+          metrics?: Json | null
+          overall_status?: string
+          recommendations?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      data_bridge_metrics: {
+        Row: {
+          average_transfer_time: number | null
+          created_at: string
+          data_integrity_score: number | null
+          error_rate: number | null
+          failed_transfers: number | null
+          id: string
+          last_backup_time: string | null
+          storage_utilization: number | null
+          successful_transfers: number | null
+          total_transfers: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          average_transfer_time?: number | null
+          created_at?: string
+          data_integrity_score?: number | null
+          error_rate?: number | null
+          failed_transfers?: number | null
+          id?: string
+          last_backup_time?: string | null
+          storage_utilization?: number | null
+          successful_transfers?: number | null
+          total_transfers?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          average_transfer_time?: number | null
+          created_at?: string
+          data_integrity_score?: number | null
+          error_rate?: number | null
+          failed_transfers?: number | null
+          id?: string
+          last_backup_time?: string | null
+          storage_utilization?: number | null
+          successful_transfers?: number | null
+          total_transfers?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      data_bridge_transfers: {
+        Row: {
+          backup_id: string | null
+          created_at: string
+          data_payload: Json
+          duration_ms: number | null
+          errors: string[] | null
+          from_source: string
+          id: string
+          to_destination: string
+          transfer_status: string
+          transferred_keys: string[] | null
+          updated_at: string
+          user_id: string
+          validation_result: Json | null
+          warnings: string[] | null
+        }
+        Insert: {
+          backup_id?: string | null
+          created_at?: string
+          data_payload: Json
+          duration_ms?: number | null
+          errors?: string[] | null
+          from_source: string
+          id?: string
+          to_destination: string
+          transfer_status?: string
+          transferred_keys?: string[] | null
+          updated_at?: string
+          user_id: string
+          validation_result?: Json | null
+          warnings?: string[] | null
+        }
+        Update: {
+          backup_id?: string | null
+          created_at?: string
+          data_payload?: Json
+          duration_ms?: number | null
+          errors?: string[] | null
+          from_source?: string
+          id?: string
+          to_destination?: string
+          transfer_status?: string
+          transferred_keys?: string[] | null
+          updated_at?: string
+          user_id?: string
+          validation_result?: Json | null
+          warnings?: string[] | null
+        }
+        Relationships: []
+      }
       data_exports: {
         Row: {
           completed_at: string | null
