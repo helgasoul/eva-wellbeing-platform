@@ -68,7 +68,7 @@ const HeroSection: React.FC = () => {
           </div>
           
           <div className="flex flex-col gap-6 justify-center items-center mb-8 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-            <Link to="/register">
+            <Link to="/how-we-help">
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground px-12 py-6 rounded-3xl font-semibold text-lg shadow-elegant hover:shadow-soft hover:scale-105 transition-all duration-300 group border border-primary/20"
