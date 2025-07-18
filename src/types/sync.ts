@@ -40,7 +40,7 @@ export interface SyncStatus {
   isOnline: boolean;
   lastSync: number | null;
   pendingChanges: number;
-  isSimcing: boolean;
+  isSyncing: boolean;
   syncProgress: number;
   errors: SyncError[];
 }
