@@ -70,7 +70,7 @@ export class DataBridge {
     return DataBridge.instance;
   }
 
-  transferData(data: any): void {
+  transferData(data: OnboardingPresets): void {
     const bridgeData = {
       ...data,
       timestamp: new Date().toISOString()
