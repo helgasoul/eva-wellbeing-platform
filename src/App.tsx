@@ -2,12 +2,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from 'react';
+import { supabase } from './integrations/supabase/client';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "@/utils/productionDebugger"; // Initialize production debugging
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { UserRole } from "@/types/roles";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import AuthDebug from "./components/debug/AuthDebug";
 import DatabaseCheck from "./components/debug/DatabaseCheck";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./components/ui/dialog";
@@ -110,6 +112,93 @@ function App() {
   const [showDebug, setShowDebug] = useState(false);
   const [showDatabaseCheck, setShowDatabaseCheck] = useState(false);
   const [showPasswordDebug, setShowPasswordDebug] = useState(false);
+
+  // 🔍 ЭКСТРЕННАЯ ДИАГНОСТИКА - ДОБАВИТЬ ПЕРЕД RETURN
+  useEffect(() => {
+    const runEmergencyDiagnostics = async () => {
+      console.clear();
+      console.log('🚨 EMERGENCY DIAGNOSTICS STARTING...');
+      console.log('='.repeat(50));
+      
+      // 1. Проверка Supabase подключения
+      try {
+        const { data, error } = await supabase.from('user_profiles').select('count').limit(1);
+        console.log('✅ Supabase connection:', error ? '❌ FAILED' : '✅ OK');
+        if (error) console.error('Supabase error:', error);
+      } catch (e) {
+        console.error('❌ Supabase connection FAILED:', e);
+      }
+      
+      // 2. Проверка текущей сессии
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        console.log('👤 Current session:', user ? '✅ LOGGED IN' : '❌ NOT LOGGED IN');
+        if (user) {
+          console.log('User email:', user.email);
+          console.log('User ID:', user.id);
+        }
+        if (error) console.error('Session error:', error);
+      } catch (e) {
+        console.error('❌ Session check FAILED:', e);
+      }
+      
+      // 3. Проверка профиля пользователя
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile, error } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+            
+          console.log('👥 User profile:', profile ? '✅ EXISTS' : '❌ MISSING');
+          if (profile) {
+            console.log('Profile data:', {
+              first_name: profile.first_name,
+              last_name: profile.last_name,
+              user_role: profile.user_role,
+              onboarding_completed: profile.onboarding_completed
+            });
+          }
+          if (error) console.error('Profile error:', error);
+        }
+      } catch (e) {
+        console.error('❌ Profile check FAILED:', e);
+      }
+      
+      // 4. Проверка localStorage
+      console.log('💾 LocalStorage data:');
+      const keys = [
+        'eva_user_backup',
+        'eva_emergency_backup',
+        'eva_user_data',
+        'eva_registration_data'
+      ];
+      
+      keys.forEach(key => {
+        const data = localStorage.getItem(key);
+        console.log(`  ${key}:`, data ? '✅ EXISTS' : '❌ MISSING');
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            console.log(`    Content:`, parsed);
+          } catch (e) {
+            console.log(`    Content (raw):`, data.substring(0, 100) + '...');
+          }
+        }
+      });
+      
+      // 5. Проверка AuthContext
+      console.log('🔐 AuthContext check will appear when context loads...');
+      
+      console.log('='.repeat(50));
+      console.log('🚨 EMERGENCY DIAGNOSTICS COMPLETE');
+      console.log('📋 Please screenshot these results and share them');
+    };
+    
+    runEmergencyDiagnostics();
+  }, []);
 
   // Добавляем обработчик для комбинации клавиш
   useEffect(() => {

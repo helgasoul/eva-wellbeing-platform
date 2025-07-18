@@ -35,6 +35,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Гибридная инициализация авторизации
   useEffect(() => {
     const initializeAuth = async (retryCount = 0) => {
+      console.log('🔐 AuthContext: Starting initialization...');
+      
       try {
         setIsLoading(true);
         console.log('🔐 Initializing hybrid authentication...', { retryCount });
@@ -56,18 +58,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         if (session?.user) {
           console.log('✅ Found active Supabase session');
-          const { user: currentUser } = await authService.getCurrentUser();
-          if (currentUser) {
-            setUser(currentUser);
-            EmergencyRecoveryService.createMultipleBackups(currentUser);
-            console.log('✅ User authenticated via Supabase', { 
-              email: currentUser.email,
-              role: currentUser.role,
-              id: currentUser.id
-            });
+          console.log('🔐 AuthContext: Supabase user:', session.user ? '✅ Found' : '❌ Not found');
+          
+          if (session.user) {
+            console.log('🔐 AuthContext: Loading profile for user:', session.user.id);
+            
+            // Загрузка профиля
+            const { user: currentUser } = await authService.getCurrentUser();
+            console.log('🔐 AuthContext: Profile loaded:', currentUser);
+            
+            if (currentUser) {
+              setUser(currentUser);
+              EmergencyRecoveryService.createMultipleBackups(currentUser);
+              console.log('🔐 AuthContext: ✅ User set successfully');
+              console.log('✅ User authenticated via Supabase', { 
+                email: currentUser.email,
+                role: currentUser.role,
+                id: currentUser.id
+              });
+            } else {
+              console.log('🔐 AuthContext: ❌ Failed to load profile');
+            }
           }
         } else {
           console.log('ℹ️ No active Supabase session, attempting recovery...');
+          // Попытка восстановления из localStorage
+          console.log('🔐 AuthContext: Attempting localStorage recovery...');
+          const backupUser = localStorage.getItem('eva_user_backup');
+          
+          if (backupUser) {
+            const parsed = JSON.parse(backupUser);
+            console.log('🔐 AuthContext: Found backup user:', parsed);
+            setUser(parsed);
+            console.log('🔐 AuthContext: ✅ User restored from backup');
+          } else {
+            console.log('🔐 AuthContext: ❌ No backup found');
+          }
           
           // 2. Попытка восстановления из localStorage и других источников
           const recovery = await EmergencyRecoveryService.recoverUserSession();
@@ -87,6 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
         
       } catch (error) {
+        console.error('🔐 AuthContext: ❌ Initialization failed:', error);
         console.error('❌ Auth initialization error:', error, { retryCount });
         
         // Попытка экстренного восстановления при ошибке
@@ -136,6 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
       } finally {
         setIsLoading(false);
+        console.log('🔐 AuthContext: Initialization complete');
         console.log('🏁 Auth initialization complete');
       }
     };
