@@ -27,7 +27,12 @@ const handleComplete = () => {
   });
   
   // Backup в localStorage
-  localStorage.setItem('onboarding-presets', JSON.stringify(bridgeData));
+  try {
+    localStorage.setItem('onboarding-presets', JSON.stringify(bridgeData));
+  } catch (err) {
+    console.error('Failed to persist onboarding presets', err);
+    // fallback / telemetry / user notification goes here
+  }
   
   // Теперь можно сбрасывать
   resetRegistration();
