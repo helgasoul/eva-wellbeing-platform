@@ -1,15 +1,18 @@
 
 import React from 'react';
-import { RegisterForm } from '@/components/auth/RegisterForm';
+import { useAuth } from '@/context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
+// Simplified Register page for m4p version - always redirect to dashboard
 const Register = () => {
-  return (
-    <div className="min-h-screen bloom-gradient flex items-center justify-center py-12 px-4">
-      <div className="w-full max-w-lg animate-fade-in">
-        <RegisterForm />
-      </div>
-    </div>
-  );
+  const { user } = useAuth();
+  
+  // Since user is always logged in, redirect to dashboard
+  if (user) {
+    return <Navigate to="/patient/dashboard" replace />;
+  }
+
+  return null;
 };
 
 export default Register;

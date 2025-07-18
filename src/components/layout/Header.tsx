@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Heart, Cloud, User, Crown } from 'lucide-react';
@@ -9,10 +10,9 @@ import { Logo } from '@/components/ui/logo';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [isNavigating, setIsNavigating] = React.useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user } = useAuth();
   const { currentPlan } = useSubscription();
 
   // Helper function to get plan display info
@@ -48,58 +48,10 @@ export const Header = () => {
     { path: '/contact', label: 'Написать команде' }
   ];
 
-  // Smart navigation for "Мой профиль" button with enhanced error handling
-  const handleMyProfileClick = React.useCallback(async () => {
-    if (isNavigating || authLoading) {
-      console.log('🔄 Navigation blocked: already navigating or loading auth');
-      return;
-    }
-    
-    setIsNavigating(true);
-    console.log('🚀 Starting navigation:', { user: !!user, userRole: user?.role, currentPath: location.pathname });
-    
-    try {
-      // Add a small delay to ensure auth state is stable
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
-      if (user) {
-        // User is authenticated - go to dashboard
-        const dashboardPath = user.role === 'doctor' ? '/doctor/dashboard' 
-                            : user.role === 'admin' ? '/admin/dashboard' 
-                            : '/patient/dashboard';
-        
-        console.log('✅ Navigating authenticated user:', { 
-          userId: user.id, 
-          role: user.role, 
-          path: dashboardPath 
-        });
-        
-        navigate(dashboardPath);
-      } else {
-        // User is not authenticated - go to registration for new users
-        console.log('➡️ Navigating unauthenticated user to registration');
-        navigate('/register');
-      }
-    } catch (error) {
-      console.error('❌ Navigation error:', error);
-      
-      // Enhanced fallback with user feedback
-      try {
-        console.log('🔄 Attempting fallback navigation');
-        navigate('/register');
-      } catch (fallbackError) {
-        console.error('❌ Fallback navigation also failed:', fallbackError);
-        // Force page reload as last resort
-        window.location.href = '/register';
-      }
-    } finally {
-      // Reset navigation state after a reasonable delay
-      setTimeout(() => {
-        setIsNavigating(false);
-        console.log('🏁 Navigation state reset');
-      }, 1000);
-    }
-  }, [user, navigate, isNavigating, authLoading, location.pathname]);
+  // Simplified navigation for m4p version - always go to patient dashboard
+  const handleMyProfileClick = React.useCallback(() => {
+    navigate('/patient/dashboard');
+  }, [navigate]);
 
   return (
     <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-[100] shadow-elegant">
@@ -152,111 +104,55 @@ export const Header = () => {
               variant="ghost"
               className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
               onClick={handleMyProfileClick}
-              disabled={isNavigating}
             >
-              {user ? (
-                <User className="mr-2 h-4 w-4" />
-              ) : null}
-              {user ? 'Мой профиль' : 'Мой профиль'}
+              <User className="mr-2 h-4 w-4" />
+              Мой профиль
             </Button>
             
-            {!user && (
-              <div className="flex flex-col items-center">
-                <Link to="/register">
-                  <Button 
-                    className="bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground font-semibold px-8 py-3 rounded-2xl transition-all duration-300 shadow-elegant hover:shadow-soft hover:scale-105 group border border-primary/20"
-                  >
-                    <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
-                    С заботой о себе
-                  </Button>
-                </Link>
-                <p className="text-xs text-muted-foreground mt-1 italic">
-                  Сделайте шаг к спокойствию
-                </p>
-              </div>
-            )}
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-foreground hover:bg-muted/50 rounded-xl"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            </div>
           </div>
-
-          {/* Мобильное меню */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Открыть меню"
-          >
-            {isMenuOpen ? (
-              <X className="h-5 w-5 text-foreground" /> 
-            ) : (
-              <Menu className="h-5 w-5 text-foreground" />
-            )}
-          </button>
         </div>
 
-        {/* Мобильная навигация */}
+        {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-6 border-t border-border/30 animate-fade-in bg-card/95 backdrop-blur-sm rounded-b-xl relative z-50">
-            <nav className="flex flex-col space-y-4">
+          <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
+            <div className="px-2 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
-                <div key={item.path} className="relative">
-                  <Link
-                    to={item.path}
-                    className={`flex items-center text-base font-medium px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActive(item.path) 
-                        ? 'text-primary bg-primary/10' 
-                        : 'text-foreground hover:text-primary hover:bg-primary/5'
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                </div>
-              ))}
-              
-              <div className="flex flex-col space-y-3 pt-4 border-t border-border/30">
-                {/* Отображение текущего тарифа в мобильной версии */}
-                {user && planInfo && (
-                  <Link 
-                    to="/how-we-help" 
-                    className="group"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <div className={`bg-gradient-to-r ${planInfo.color} px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg cursor-pointer flex items-center justify-center gap-2 w-full`} style={{color: planInfo.textColor}}>
-                      <span className="text-base">{planInfo.icon}</span>
-                      <span>Мой тариф: {planInfo.name}</span>
-                      <Crown className="h-3 w-3 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </Link>
-                )}
-
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-center py-3 font-medium rounded-xl"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    handleMyProfileClick();
-                  }}
-                  disabled={isNavigating}
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`block px-3 py-2 rounded-xl text-base font-medium transition-colors ${
+                    isActive(item.path)
+                      ? 'text-primary bg-primary/10'
+                      : 'text-foreground/80 hover:text-foreground hover:bg-muted/50'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  {user ? (
-                    <User className="mr-2 h-4 w-4" />
-                  ) : null}
-                  {user ? 'Мой профиль' : 'Мой профиль'}
-                </Button>
-                
-                {!user && (
-                  <div className="flex flex-col items-center">
-                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-primary/90 via-primary to-primary/85 text-primary-foreground py-3 font-semibold group rounded-2xl border border-primary/20">
-                        <Cloud className="mr-2 h-4 w-4 transition-all duration-300 group-hover:animate-gentle-float" />
-                        С заботой о себе
-                      </Button>
-                    </Link>
-                    <p className="text-xs text-muted-foreground mt-1 italic">
-                      Сделайте шаг к спокойствию
-                    </p>
-                  </div>
-                )}
-              </div>
-            </nav>
+                  {item.label}
+                </Link>
+              ))}
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-3 py-2 rounded-xl"
+                onClick={() => {
+                  handleMyProfileClick();
+                  setIsMenuOpen(false);
+                }}
+              >
+                <User className="mr-2 h-4 w-4" />
+                Мой профиль
+              </Button>
+            </div>
           </div>
         )}
       </div>

@@ -1,26 +1,18 @@
 
 import React from 'react';
-import { LoginForm } from '@/components/auth/LoginForm';
+import { useAuth } from '@/context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
+// Simplified Login page for m4p version - always redirect to dashboard
 const Login = () => {
+  const { user } = useAuth();
   
-  return (
-    <div className="min-h-screen bloom-gradient flex items-center justify-center py-12 px-4">
-      <div className="w-full max-w-md animate-fade-in">
-        {/* EMERGENCY NOTICE */}
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-xs text-red-800 text-center">
-            ⚠️ Если возникают проблемы с входом, попробуйте{' '}
-            <a href="/login-safe" className="underline font-medium">
-              безопасную версию входа
-            </a>
-          </p>
-        </div>
-        
-        <LoginForm />
-      </div>
-    </div>
-  );
+  // Since user is always logged in, redirect to dashboard
+  if (user) {
+    return <Navigate to="/patient/dashboard" replace />;
+  }
+
+  return null;
 };
 
 export default Login;

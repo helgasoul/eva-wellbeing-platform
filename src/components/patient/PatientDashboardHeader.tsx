@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +13,9 @@ export const PatientDashboardHeader = () => {
       <p className="text-gray-600">
         Ваша персональная платформа поддержки в период менопаузы
       </p>
+      <div className="mt-4 text-sm text-muted-foreground">
+        <p>M4P Demo версия - тестовый пользователь активен</p>
+      </div>
     </div>
   );
 };
