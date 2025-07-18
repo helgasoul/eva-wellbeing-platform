@@ -17,36 +17,10 @@
 
 ### 1. Конфигурация Supabase URLs
 
-```typescript
-// src/config/supabase.ts
-export const supabaseConfig = {
-  url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  
-  // Исправленные настройки аутентификации
-  auth: {
-    // Правильные redirect URLs для Eva платформы
-    redirectTo: process.env.NODE_ENV === 'production' 
-      ? 'https://eva-wellbeing-platform.vercel.app/auth/callback'
-      : 'http://localhost:3000/auth/callback',
-    
-    // Настройки для медицинской платформы
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    
-    // Безопасность для медицинских данных
-    flowType: 'pkce',
-    
-    // Дополнительные домены для разработки
-    additionalRedirectUrls: [
-      'http://localhost:3000/patient/dashboard',
-      'http://localhost:3000/doctor/dashboard', 
-      'http://localhost:3000/admin/dashboard'
-    ]
-  }
-};
-```
+Используйте клиент Supabase без свойства `additionalRedirectUrls`. Все
+redirect URL должны быть указаны в **Supabase Dashboard** в разделе
+`Authentication → URL Configuration`. Пример корректной конфигурации
+приведен ниже в разделе **Supabase Client Configuration Fix**.
 
 ### 2. Исправление создания профиля пользователя
 
