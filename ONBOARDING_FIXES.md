@@ -62,13 +62,16 @@ interface User {
 // 3. Создать src/services/dataBridge.ts
 export class DataBridge {
   private static instance: DataBridge;
-  
+
+  private constructor() {}      // Hide the constructor
+
   public static getInstance(): DataBridge {
     if (!DataBridge.instance) {
       DataBridge.instance = new DataBridge();
     }
     return DataBridge.instance;
   }
+}
 
   transferData(data: OnboardingPresets): void {
     const bridgeData = {
