@@ -420,7 +420,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const updateUser = (updates: Partial<User>) => {
+  const updateUser = async (updates: Partial<User>): Promise<void> => {
     if (!user) {
       console.warn('⚠️ updateUser: No authenticated user');
       return;
@@ -431,11 +431,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const updatedUser = { ...user, ...updates };
     setUser(updatedUser);
     
-    // Async update to Supabase without blocking UI
+    // Wait for Supabase update to complete to ensure data consistency
     if (user.id && !user.id.startsWith('temp-')) {
-      authService.updateProfile(user.id, updates).catch(error => {
+      try {
+        await authService.updateProfile(user.id, updates);
+        console.log('✅ User update synced to Supabase', { userId: updatedUser.id });
+      } catch (error) {
         console.error('❌ Failed to sync user update to Supabase:', error);
-      });
+        throw error; // Throw error to indicate update failed
+      }
     }
     
     console.log('User updated locally', { userId: updatedUser.id });

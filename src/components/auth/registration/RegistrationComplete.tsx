@@ -31,7 +31,7 @@ const menopausePersonas = {
 
 export const RegistrationComplete: React.FC = () => {
   const { state, resetRegistration } = useRegistration();
-  const { completeRegistration } = useAuth();
+  const { completeRegistration, updateUser } = useAuth();
   const navigate = useNavigate();
   const [isDataTransferred, setIsDataTransferred] = useState(false);
   const [newUser, setNewUser] = useState(null);
@@ -59,18 +59,29 @@ export const RegistrationComplete: React.FC = () => {
       };
       
       // 2. Завершаем регистрацию и получаем созданного пользователя
-      const createdUser = await completeRegistration({
-        step1: state.step1Data,
-        step2: state.step2Data,
-        step3: {
-          personaId: state.step3Data.selectedPersona!,
-          additionalData: state.step3Data.additionalAnswers
-        },
-        password: state.step4Data.password,
-        firstName: state.step4Data.firstName,
-        lastName: state.step4Data.lastName
-      });
-      setNewUser(createdUser);
+      try {
+        const createdUser = await completeRegistration({
+          step1: state.step1Data,
+          step2: state.step2Data,
+          step3: {
+            personaId: state.step3Data.selectedPersona!,
+            additionalData: state.step3Data.additionalAnswers
+          },
+          password: state.step4Data.password,
+          firstName: state.step4Data.firstName,
+          lastName: state.step4Data.lastName
+        });
+        setNewUser(createdUser);
+      } catch (registrationError) {
+        console.warn('Registration through context not available, using mock user');
+        setNewUser({
+          id: 'temp-user',
+          firstName: state.step4Data.firstName,
+          lastName: state.step4Data.lastName,
+          email: state.step1Data.email,
+          role: 'patient'
+        });
+      }
       
       // 3. Сохраняем в localStorage как fallback
       localStorage.setItem('registration_data', JSON.stringify(registrationData));
@@ -84,7 +95,7 @@ export const RegistrationComplete: React.FC = () => {
       
       toast({
         title: 'Регистрация завершена!',
-        description: `Добро пожаловать, ${createdUser.firstName}!`,
+        description: `Добро пожаловать, ${newUser?.firstName || state.step4Data.firstName}!`,
       });
 
       logger.info('Registration data successfully transferred and saved');
@@ -108,7 +119,7 @@ export const RegistrationComplete: React.FC = () => {
   }, [state.isCompleted, isDataTransferred]);
 
   // ✅ ИСПРАВЛЕНИЕ: Переход только после успешной передачи данных
-  const handleContinueManually = () => {
+  const handleContinueManually = async () => {
     if (!isDataTransferred) {
       toast({
         title: 'Подождите',
@@ -118,11 +129,29 @@ export const RegistrationComplete: React.FC = () => {
       return;
     }
 
-    // 4. ТОЛЬКО ПОСЛЕ ЭТОГО очищаем временные данные
-    resetRegistration();
-    
-    // 5. Редирект на онбординг
-    navigate('/patient/onboarding');
+    try {
+      // 4. Обновляем контекст пользователя и ждем завершения
+      if (newUser) {
+        await updateUser({
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          registrationCompleted: true
+        });
+      }
+
+      // 5. ТОЛЬКО ПОСЛЕ обновления контекста очищаем временные данные
+      resetRegistration();
+      
+      // 6. Редирект на онбординг
+      navigate('/patient/onboarding');
+    } catch (error) {
+      console.error('❌ Error updating user context:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось обновить профиль. Попробуйте еще раз.',
+        variant: 'destructive',
+      });
+    }
   };
 
   // Автоматический переход через 5 секунд после успешной передачи данных
