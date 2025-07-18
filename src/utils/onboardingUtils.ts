@@ -20,13 +20,16 @@ export const getOnboardingStatus = (user: any): OnboardingStatus => {
     };
   }
 
+  // Priority 1: Check database completion flag
+  const isCompleted = Boolean(user.onboarding_completed || user.onboardingCompleted);
+  
   const hasGeolocation = Boolean(user.onboardingData?.geolocation) || 
                         Boolean(localStorage.getItem('eva-user-location'));
   
   return {
-    isCompleted: Boolean(user.onboardingCompleted),
+    isCompleted,
     hasGeolocation,
-    completedAt: user.onboardingData?.completedAt,
+    completedAt: user.onboarding_completed_at || user.onboardingData?.completedAt,
     geolocationData: user.onboardingData?.geolocation || 
                     JSON.parse(localStorage.getItem('eva-user-location') || 'null')
   };
@@ -74,16 +77,10 @@ export const shouldRedirectToOnboarding = (user: any): boolean => {
     return false;
   }
   
-  // Primary check: onboarding completion flag
-  if (user.onboardingCompleted) {
-    return false;
-  }
-  
-  // Secondary check: does user have essential data anyway?
-  const status = getOnboardingStatus(user);
-  if (status.isCompleted && status.hasGeolocation) {
-    // User has data but flag might be wrong - let them proceed
-    console.log('🔧 User has essential data but flag shows incomplete');
+  // Primary check: database completion flag - this is definitive
+  const isCompleted = Boolean(user.onboarding_completed || user.onboardingCompleted);
+  if (isCompleted) {
+    console.log('✅ User onboarding complete - skipping redirect');
     return false;
   }
   
@@ -96,12 +93,9 @@ export const shouldRedirectToOnboarding = (user: any): boolean => {
 export const shouldRedirectToDashboard = (user: any): boolean => {
   if (!user || user.role !== 'patient') return false;
   
-  // Primary check: completion flag
-  if (user.onboardingCompleted) return true;
-  
-  // Secondary check: essential data present
-  const status = getOnboardingStatus(user);
-  return status.isCompleted && status.hasGeolocation;
+  // Primary check: database completion flag - this is definitive
+  const isCompleted = Boolean(user.onboarding_completed || user.onboardingCompleted);
+  return isCompleted;
 };
 
 /**
