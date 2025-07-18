@@ -1848,6 +1848,45 @@ export type Database = {
         }
         Relationships: []
       }
+      encrypted_medical_data: {
+        Row: {
+          access_level: string
+          created_at: string | null
+          data_hash: string
+          data_type: string
+          encrypted_content: string
+          encryption_metadata: Json
+          expires_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_level?: string
+          created_at?: string | null
+          data_hash: string
+          data_type: string
+          encrypted_content: string
+          encryption_metadata: Json
+          expires_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_level?: string
+          created_at?: string | null
+          data_hash?: string
+          data_type?: string
+          encrypted_content?: string
+          encryption_metadata?: Json
+          expires_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_materials: {
         Row: {
           available_after: boolean | null
@@ -5080,6 +5119,45 @@ export type Database = {
           reminder_minutes?: number | null
           title?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medical_data_access_log: {
+        Row: {
+          access_result: string
+          access_type: string
+          accessed_at: string | null
+          data_type: string
+          failure_reason: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          access_result: string
+          access_type: string
+          accessed_at?: string | null
+          data_type: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          access_result?: string
+          access_type?: string
+          accessed_at?: string | null
+          data_type?: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
@@ -8802,6 +8880,10 @@ export type Database = {
           last_sign_in: string
         }[]
       }
+      cleanup_expired_medical_data: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       cleanup_old_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -8889,9 +8971,32 @@ export type Database = {
         }
         Returns: undefined
       }
+      log_medical_data_access: {
+        Args: {
+          p_user_id: string
+          p_access_type: string
+          p_data_type: string
+          p_access_result?: string
+          p_failure_reason?: string
+          p_metadata?: Json
+        }
+        Returns: string
+      }
       perform_health_check: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      save_encrypted_medical_data: {
+        Args: {
+          p_user_id: string
+          p_data_type: string
+          p_encrypted_content: string
+          p_encryption_metadata: Json
+          p_data_hash: string
+          p_expires_at?: string
+          p_access_level?: string
+        }
+        Returns: string
       }
       sync_onboarding_completion_status: {
         Args: {

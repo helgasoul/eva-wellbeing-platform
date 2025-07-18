@@ -3,6 +3,8 @@
  * Соответствует стандартам HIPAA/GDPR
  */
 
+import { SafeStorage } from './storageUtils';
+
 interface EncryptionConfig {
   algorithm: 'AES-GCM';
   keyLength: 256;
