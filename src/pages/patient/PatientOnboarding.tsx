@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -24,6 +23,7 @@ import { toast } from '@/hooks/use-toast';
 import { DataBridge, OnboardingPresets } from '@/services/DataBridge';
 import { onboardingService } from '@/services/onboardingService';
 import { migrateOnboardingData } from '@/utils/onboardingMigration';
+import { EmergencyRecoveryService } from '@/services/emergencyRecovery';
 
 // ✅ ИСПРАВЛЕНО: Убираем геолокацию из онбординга - делаем 7 шагов
 const TOTAL_STEPS = 7;
@@ -101,86 +101,222 @@ const PatientOnboarding = () => {
   const { user, completeOnboarding, updateUser, saveUserData, loadUserData } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Проверка статуса онбординга при загрузке
+  // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Улучшенная проверка с восстановлением
   useEffect(() => {
-    if (!user) return;
-
-    // Проверяем, завершен ли онбординг в профиле пользователя
-    if (user.onboardingCompleted) {
-      console.log('✅ User has already completed onboarding, redirecting to dashboard');
-      navigate('/patient/dashboard', { replace: true });
+    if (!user) {
+      console.log('🔄 User not found, attempting emergency recovery...');
+      
+      const attemptRecovery = async () => {
+        try {
+          setIsLoading(true);
+          
+          const recovery = await EmergencyRecoveryService.recoverUserSession();
+          
+          if (recovery.success && recovery.user) {
+            console.log('✅ User recovered, continuing onboarding');
+            
+            // Обновляем пользователя через AuthContext
+            await updateUser(recovery.user);
+            
+            toast({
+              title: 'Сессия восстановлена',
+              description: 'Ваши данные были успешно восстановлены. Продолжаем онбординг.',
+            });
+            
+            // Продолжаем с проверкой онбординга
+            await checkOnboardingStatus(recovery.user);
+            
+          } else {
+            console.log('❌ Recovery failed, redirecting to login');
+            navigate('/login', { 
+              state: { 
+                message: 'Сессия истекла. Пожалуйста, войдите снова.',
+                returnPath: '/patient/onboarding' 
+              } 
+            });
+          }
+        } catch (error) {
+          console.error('Recovery attempt failed:', error);
+          navigate('/login');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      attemptRecovery();
       return;
     }
 
-    // Проверяем миграцию данных из localStorage
-    const migrationResult = migrateOnboardingData();
-    if (migrationResult.migrationPerformed && migrationResult.onboardingCompleted) {
-      console.log('✅ Migrated onboarding completion from localStorage');
-      
-      // Обновляем пользователя через AuthContext
-      updateUser({ 
-        onboardingCompleted: true,
-        onboardingData: migrationResult.onboardingData
-      });
-      
-      // Показываем уведомление и перенаправляем
-      toast({
-        title: 'Добро пожаловать обратно!',
-        description: 'Ваши данные онбординга восстановлены',
-      });
-      
-      navigate('/patient/dashboard', { replace: true });
-      return;
-    }
-
-    console.log('🔄 User needs to complete onboarding');
+    // Проверяем, завершен ли онбординг
+    checkOnboardingStatus(user);
   }, [user, navigate, updateUser]);
 
-  // ✅ ИСПРАВЛЕНИЕ: Инициализация данных онбординга
-  useEffect(() => {
-    // Загружаем данные из всех источников
-    loadOnboardingData();
-  }, [user]);
-
-  const loadOnboardingData = () => {
+  // ✅ УЛУЧШЕННАЯ функция проверки онбординга из всех источников
+  const checkOnboardingStatus = async (currentUser: any) => {
     try {
+      setIsLoading(true);
+      
+      // 1. Проверяем флаг пользователя
+      if (currentUser.onboardingCompleted) {
+        console.log('✅ User has completed onboarding according to profile');
+        navigate('/patient/dashboard', { replace: true });
+        return;
+      }
+      
+      // 2. Проверяем миграцию данных из localStorage
+      const migrationResult = migrateOnboardingData();
+      if (migrationResult.migrationPerformed && migrationResult.onboardingCompleted) {
+        console.log('✅ Migrated onboarding completion from localStorage');
+        
+        await updateUser({ 
+          onboardingCompleted: true,
+          onboardingData: migrationResult.onboardingData
+        });
+        
+        toast({
+          title: 'Данные восстановлены',
+          description: 'Ваши данные онбординга были успешно восстановлены',
+        });
+        
+        navigate('/patient/dashboard', { replace: true });
+        return;
+      }
+      
+      // 3. Проверяем статус в Supabase
+      const onboardingCheck = await onboardingService.isOnboardingComplete(currentUser.id);
+      
+      if (onboardingCheck.completed) {
+        console.log('✅ Onboarding completed according to Supabase');
+        
+        // Синхронизируем локальные данные
+        await updateUser({ 
+          onboardingCompleted: true,
+          onboardingData: onboardingCheck.progress 
+        });
+        
+        navigate('/patient/dashboard', { replace: true });
+        return;
+      }
+      
+      // 4. Проверяем данные в различных источниках localStorage
+      const sources = [
+        'onboarding_data',
+        'eva_onboarding_data',
+        `onboarding_progress_${currentUser.id}`,
+        'bloom-onboarding-data'
+      ];
+      
+      for (const source of sources) {
+        try {
+          const data = localStorage.getItem(source);
+          if (data) {
+            const parsed = JSON.parse(data);
+            if (parsed.completed || parsed.onboardingCompleted) {
+              console.log(`✅ Found completed onboarding in ${source}`);
+              
+              // Синхронизируем с Supabase
+              await updateUser({ 
+                onboardingCompleted: true,
+                onboardingData: parsed 
+              });
+              
+              toast({
+                title: 'Онбординг найден',
+                description: 'Ваши данные онбординга были найдены и восстановлены',
+              });
+              
+              navigate('/patient/dashboard', { replace: true });
+              return;
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to parse ${source}:`, error);
+        }
+      }
+      
+      console.log('🔄 User needs to complete onboarding');
+      
+      // Загружаем частичные данные если есть
+      loadOnboardingData();
+      
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      toast({
+        title: 'Ошибка проверки',
+        description: 'Произошла ошибка при проверке статуса онбординга',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ✅ УЛУЧШЕННАЯ функция загрузки данных онбординга
+  const loadOnboardingData = async () => {
+    try {
+      console.log('📥 Loading onboarding data from all sources...');
+      
       // 1. Данные из AuthContext (приоритет)
       const userData = user;
       
-      // 2. Данные из localStorage
-      const registrationData = JSON.parse(localStorage.getItem('registration_data') || '{}');
-      const onboardingPresets = JSON.parse(localStorage.getItem('onboarding_presets') || '{}');
-      const savedProgress = JSON.parse(localStorage.getItem(`onboarding_progress_${user?.id}`) || '{}');
+      // 2. Данные из различных источников localStorage
+      const sources = [
+        'registration_data',
+        'onboarding_presets',
+        `onboarding_progress_${user?.id}`,
+        'eva_registration_data',
+        'bloom-registration-data'
+      ];
       
-      // 3. Объединяем данные
-      const mergedData = {
-        // Базовая информация из регистрации
-        firstName: userData?.firstName || registrationData.firstName,
-        lastName: userData?.lastName || registrationData.lastName,
-        email: userData?.email || registrationData.email,
-        selectedPersona: (userData as any)?.selectedPersona || onboardingPresets.persona,
-        
-        // Прогресс онбординга
-        ...savedProgress,
-        
-        // Предзаполненные поля на основе персоны
-        ...getPersonaDefaults(onboardingPresets.persona)
+      let mergedData: any = {
+        firstName: userData?.firstName,
+        lastName: userData?.lastName,
+        email: userData?.email
       };
+      
+      // Загружаем данные из всех источников
+      for (const source of sources) {
+        try {
+          const data = localStorage.getItem(source);
+          if (data) {
+            const parsed = JSON.parse(data);
+            mergedData = { ...mergedData, ...parsed };
+            console.log(`📥 Loaded data from ${source}`);
+          }
+        } catch (error) {
+          console.warn(`Failed to load ${source}:`, error);
+        }
+      }
+      
+      // 3. Предзаполненные поля на основе персоны
+      if (mergedData.persona || mergedData.selectedPersona) {
+        const personaDefaults = getPersonaDefaults(mergedData.persona || mergedData.selectedPersona);
+        mergedData = { ...mergedData, ...personaDefaults };
+      }
       
       // 4. Устанавливаем данные и текущий шаг
       setFormData(prev => ({ ...prev, ...mergedData }));
       
-      // Если есть сохраненный прогресс и онбординг не завершен
-      if (savedProgress.currentStep && !savedProgress.completed) {
-        setCurrentStep(savedProgress.currentStep);
-      } else if (onboardingPresets.startStep) {
-        setCurrentStep(onboardingPresets.startStep);
+      // Определяем текущий шаг на основе сохраненного прогресса
+      if (mergedData.currentStep && mergedData.currentStep <= TOTAL_STEPS) {
+        setCurrentStep(mergedData.currentStep);
+      } else if (mergedData.startStep && mergedData.startStep <= TOTAL_STEPS) {
+        setCurrentStep(mergedData.startStep);
       }
       
-      console.log('Данные онбординга загружены:', mergedData);
+      console.log('✅ Onboarding data loaded successfully:', {
+        hasData: Object.keys(mergedData).length > 3,
+        currentStep: currentStep,
+        dataKeys: Object.keys(mergedData)
+      });
       
     } catch (error) {
-      console.error('Ошибка загрузки данных онбординга:', error);
+      console.error('Error loading onboarding data:', error);
+      toast({
+        title: 'Предупреждение',
+        description: 'Некоторые данные не удалось загрузить. Вы можете продолжить онбординг.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -206,23 +342,40 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ УЛУЧШЕННОЕ АВТОСОХРАНЕНИЕ: Через DataBridge с резервированием в Supabase
+  // ✅ УЛУЧШЕННОЕ АВТОСОХРАНЕНИЕ с множественным резервированием
   useEffect(() => {
     const saveOnboardingData = async () => {
       if (!user?.id || Object.keys(formData).length === 0) return;
       
       try {
-        // 1. Автосохранение прогресса через DataBridge
-        await saveUserData('onboarding_progress', {
+        const saveData = {
           data: formData,
           currentStep,
-          timestamp: new Date().toISOString()
-        });
-
-        // 2. Резервное сохранение в localStorage
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+          timestamp: new Date().toISOString(),
+          userId: user.id,
+          version: '1.0'
+        };
         
-        // 3. Определяем какой шаг сохранять в Supabase
+        // 1. Сохранение через DataBridge
+        await saveUserData('onboarding_progress', saveData);
+
+        // 2. Множественное резервирование в localStorage
+        const backupKeys = [
+          'bloom-onboarding-data',
+          `onboarding_progress_${user.id}`,
+          'eva_onboarding_progress',
+          'onboarding_backup'
+        ];
+        
+        backupKeys.forEach(key => {
+          try {
+            localStorage.setItem(key, JSON.stringify(saveData));
+          } catch (error) {
+            console.warn(`Failed to save to ${key}:`, error);
+          }
+        });
+        
+        // 3. Асинхронная синхронизация с Supabase
         const stepMapping = [
           { key: 'basicInfo', stepNumber: 2, stepName: 'basicInfo' },
           { key: 'menstrualHistory', stepNumber: 3, stepName: 'menstrualHistory' },
@@ -232,7 +385,6 @@ const PatientOnboarding = () => {
           { key: 'goals', stepNumber: 7, stepName: 'goals' }
         ];
         
-        // 4. Асинхронно сохраняем в Supabase (не блокируем UI)
         const currentStepData = stepMapping.find(s => s.stepNumber === currentStep);
         if (currentStepData && formData[currentStepData.key]) {
           onboardingService.saveStep(
@@ -245,22 +397,31 @@ const PatientOnboarding = () => {
           });
         }
         
-        console.log('💾 Onboarding data auto-saved:', {
+        console.log('💾 Onboarding data saved with multiple backups:', {
           step: currentStep,
           dataKeys: Object.keys(formData),
-          timestamp: new Date().toISOString()
+          backupCount: backupKeys.length
         });
         
       } catch (error) {
         console.error('Error saving onboarding data:', error);
-        // Показываем уведомление только при критической ошибке
-        if (!localStorage.getItem(STORAGE_KEY)) {
-          showNotification('Ошибка сохранения прогресса', 'warning');
+        
+        // Экстренное сохранение в случае ошибки
+        try {
+          localStorage.setItem('emergency_onboarding_backup', JSON.stringify({
+            formData,
+            currentStep,
+            timestamp: new Date().toISOString(),
+            userId: user.id
+          }));
+        } catch (emergencyError) {
+          console.error('Emergency backup also failed:', emergencyError);
+          showNotification('Критическая ошибка сохранения данных', 'error');
         }
       }
     };
     
-    // Дебаунсим сохранение для избежания избыточных запросов
+    // Дебаунсим сохранение
     const timeoutId = setTimeout(saveOnboardingData, 1000);
     return () => clearTimeout(timeoutId);
   }, [formData, currentStep, user?.id, saveUserData]);
@@ -327,6 +488,7 @@ const PatientOnboarding = () => {
     }
   };
 
+  // ✅ УЛУЧШЕННОЕ завершение онбординга с восстановлением
   const handleOnboardingComplete = async () => {
     try {
       console.log('🎯 Starting onboarding completion process', {
@@ -338,58 +500,99 @@ const PatientOnboarding = () => {
 
       // Clear forced onboarding flag
       sessionStorage.removeItem('forcedOnboarding');
-      console.log('🧹 Cleared forced onboarding flag');
 
-      // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Сначала обновляем статус в AuthContext
       const onboardingSummary = {
         phaseResult,
         recommendations,
         formData,
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
+        version: '1.0'
       };
       
-      // 1. Сохраняем финальные данные через AuthContext
-      await saveUserData('onboarding_data', {
+      // 1. Множественное сохранение финальных данных
+      const finalData = {
         ...formData,
         phaseResult,
         recommendations,
         completedAt: new Date().toISOString(),
-        version: '1.0'
-      });
-
-      // 2. Обновляем пользователя локально для немедленного эффекта
-      await updateUser({ 
-        onboardingCompleted: true,
-        onboardingData: onboardingSummary
+        version: '1.0',
+        completed: true
+      };
+      
+      // Сохранение в множественных источниках
+      const savePromises = [
+        saveUserData('onboarding_data', finalData),
+        updateUser({ 
+          onboardingCompleted: true,
+          onboardingData: onboardingSummary
+        })
+      ];
+      
+      // Сохранение в localStorage резервы
+      const backupKeys = [
+        'onboardingCompleted',
+        'onboardingData',
+        'bloom-onboarding-completed',
+        'eva_onboarding_completed'
+      ];
+      
+      backupKeys.forEach(key => {
+        try {
+          if (key === 'onboardingCompleted') {
+            localStorage.setItem(key, 'true');
+          } else {
+            localStorage.setItem(key, JSON.stringify(finalData));
+          }
+        } catch (error) {
+          console.warn(`Failed to save ${key}:`, error);
+        }
       });
       
-      // 3. Сохраняем в localStorage для совместимости
-      localStorage.setItem('onboardingCompleted', 'true');
-      localStorage.setItem('onboardingData', JSON.stringify(onboardingSummary));
-
-      // 4. Используем completeOnboarding для финальной записи в базу
+      // 2. Завершение через AuthContext
+      await Promise.all(savePromises);
+      
+      // 3. Завершение в Supabase
       await completeOnboarding(onboardingSummary);
 
-      console.log('✅ Onboarding completed successfully, redirecting to profile setup');
+      console.log('✅ Onboarding completed successfully with multiple backups');
       
       toast({
         title: 'Поздравляем!',
         description: 'Анкета завершена. Переходим к настройке профиля.',
       });
 
-      // 5. Редирект на настройку профиля (геолокация)
+      // 4. Редирект на настройку профиля
       navigate('/patient/profile-setup', { replace: true });
 
     } catch (error) {
       console.error('❌ Error completing onboarding:', error);
-      toast({
-        title: 'Ошибка сохранения',
-        description: 'Произошла ошибка при сохранении данных. Попробуйте еще раз.',
-        variant: 'destructive',
-      });
+      
+      // Экстренное сохранение при ошибке
+      try {
+        localStorage.setItem('emergency_onboarding_complete', JSON.stringify({
+          formData,
+          phaseResult,
+          recommendations,
+          completedAt: new Date().toISOString(),
+          completed: true,
+          emergency: true
+        }));
+        
+        toast({
+          title: 'Данные сохранены',
+          description: 'Онбординг сохранен локально. Попробуйте обновить страницу.',
+          variant: 'destructive',
+        });
+      } catch (emergencyError) {
+        console.error('Emergency save failed:', emergencyError);
+        toast({
+          title: 'Критическая ошибка',
+          description: 'Не удалось сохранить данные. Пожалуйста, повторите попытку.',
+          variant: 'destructive',
+        });
+      }
     }
   };
-
 
   // ✅ ИСПРАВЛЕНО: Правильная валидация для 7-шагового процесса с улучшенным логированием
   const canGoNext = () => {
@@ -471,6 +674,21 @@ const PatientOnboarding = () => {
         return false;
     }
   };
+
+  // Show loading state during recovery
+  if (isLoading) {
+    return (
+      <PatientLayout>
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold text-gray-700 mb-2">Восстанавливаем ваши данные...</h2>
+            <p className="text-gray-500">Пожалуйста, подождите</p>
+          </div>
+        </div>
+      </PatientLayout>
+    );
+  }
 
   // Show the onboarding results without geolocation step
   if (showResults) {

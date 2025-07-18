@@ -8,6 +8,8 @@ import { authService } from '@/services/authService';
 import { onboardingService } from '@/services/onboardingService';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthErrorBoundary } from '@/components/auth/AuthErrorBoundary';
+import { EmergencyRecoveryService } from '@/services/emergencyRecovery';
+import { HealthCheckService } from '@/services/healthCheck';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -30,34 +32,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [syncInProgress, setSyncInProgress] = useState(false);
   const navigate = useNavigate();
 
-  // Initialize auth state with enhanced monitoring and retry logic
+  // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Гибридная инициализация авторизации
   useEffect(() => {
     const initializeAuth = async (retryCount = 0) => {
       try {
         setIsLoading(true);
-        console.log('🔐 Initializing authentication...', { retryCount });
+        console.log('🔐 Initializing hybrid authentication...', { retryCount });
         
-        // Get current user from Supabase with extended timeout
+        // Запуск health check в фоновом режиме
+        HealthCheckService.performHealthCheck().then(status => {
+          if (status.overall === 'critical') {
+            console.warn('🚨 Critical system issues detected during auth init');
+          }
+        });
+        
+        // 1. Попробовать восстановить из Supabase
         const sessionPromise = supabase.auth.getSession();
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session timeout')), 30000) // Increased to 30 seconds
+          setTimeout(() => reject(new Error('Session timeout')), 30000)
         );
         
         const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         
-        console.log('📊 Session status:', { 
-          hasSession: !!session, 
-          hasUser: !!session?.user,
-          userEmail: session?.user?.email,
-          environment: window.location.hostname
-        });
-        
         if (session?.user) {
-          // Get user profile data
-          console.log('👤 Fetching user profile...');
+          console.log('✅ Found active Supabase session');
           const { user: currentUser } = await authService.getCurrentUser();
           if (currentUser) {
             setUser(currentUser);
+            EmergencyRecoveryService.createMultipleBackups(currentUser);
             console.log('✅ User authenticated via Supabase', { 
               email: currentUser.email,
               role: currentUser.role,
@@ -65,13 +67,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             });
           }
         } else {
-          console.log('ℹ️ No active session found');
+          console.log('ℹ️ No active Supabase session, attempting recovery...');
+          
+          // 2. Попытка восстановления из localStorage и других источников
+          const recovery = await EmergencyRecoveryService.recoverUserSession();
+          
+          if (recovery.success && recovery.user) {
+            console.log(`✅ User recovered from ${recovery.source}`);
+            setUser(recovery.user);
+            EmergencyRecoveryService.createMultipleBackups(recovery.user);
+            
+            toast({
+              title: 'Сессия восстановлена',
+              description: `Ваши данные были успешно восстановлены из ${recovery.source}`,
+            });
+          } else {
+            console.log('ℹ️ No recovery options available');
+          }
         }
         
       } catch (error) {
         console.error('❌ Auth initialization error:', error, { retryCount });
         
-        // Implement retry logic with exponential backoff for network-related errors
+        // Попытка экстренного восстановления при ошибке
+        if (retryCount === 0) {
+          console.log('🆘 Attempting emergency recovery...');
+          try {
+            const recovery = await EmergencyRecoveryService.recoverUserSession();
+            if (recovery.success && recovery.user) {
+              setUser(recovery.user);
+              toast({
+                title: 'Экстренное восстановление',
+                description: 'Ваши данные были восстановлены из резервной копии',
+                variant: 'destructive',
+              });
+            }
+          } catch (recoveryError) {
+            console.error('Emergency recovery failed:', recoveryError);
+          }
+        }
+        
+        // Retry логика для сетевых ошибок
         const maxRetries = 3;
         const isNetworkError = error instanceof Error && (
           error.message.includes('timeout') || 
@@ -80,32 +116,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         );
         
         if (isNetworkError && retryCount < maxRetries) {
-          const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Exponential backoff, max 10s
+          const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
           console.warn(`🔄 Retrying auth initialization in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries + 1})`);
           
           setTimeout(() => {
             initializeAuth(retryCount + 1);
           }, retryDelay);
-          return; // Don't set loading to false yet
+          return;
         }
         
-        // Set appropriate error message based on error type
+        // Установка соответствующей ошибки
         if (error instanceof Error && error.message.includes('timeout')) {
-          setError('Медленное соединение. Попробуйте обновить страницу.');
+          setError('Медленное соединение. Ваши данные могут быть восстановлены из резервной копии.');
         } else if (isNetworkError) {
-          setError('Проблемы с сетью. Проверьте подключение к интернету.');
+          setError('Проблемы с сетью. Работаем в режиме восстановления.');
         } else {
           setError('Ошибка инициализации авторизации');
         }
         
-        // Try to clear potentially corrupted session data only on non-network errors
-        if (!isNetworkError) {
-          try {
-            await supabase.auth.signOut();
-          } catch (signOutError) {
-            console.error('Failed to clear session:', signOutError);
-          }
-        }
       } finally {
         setIsLoading(false);
         console.log('🏁 Auth initialization complete');
@@ -114,7 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initializeAuth();
 
-    // Subscribe to auth state changes with enhanced logging and retry logic
+    // ✅ УЛУЧШЕННАЯ подписка на изменения авторизации
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state change:', { 
         event, 
@@ -124,14 +152,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (event === 'SIGNED_IN' && session?.user) {
-        // Use setTimeout to avoid blocking the auth state change handler
         setTimeout(async () => {
           try {
             console.log('👤 Processing sign in...');
             const { user: authenticatedUser } = await authService.getCurrentUser();
             if (authenticatedUser) {
               setUser(authenticatedUser);
-              setError(null); // Clear any previous errors
+              EmergencyRecoveryService.createMultipleBackups(authenticatedUser);
+              setError(null);
               console.log('✅ User logged in successfully', { 
                 email: authenticatedUser.email,
                 role: authenticatedUser.role
@@ -139,25 +167,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
           } catch (error) {
             console.error('❌ Error getting user profile after sign in:', error);
-            // Don't immediately set error - user might still be authenticated
-            // The error boundary will handle this if it persists
             
-            // Try to recover by checking session again after a short delay
+            // Попытка восстановления при ошибке
             setTimeout(async () => {
               try {
-                const { data: { session: currentSession } } = await supabase.auth.getSession();
-                if (currentSession?.user) {
-                  console.log('🔄 Attempting to recover user profile...');
-                  const { user: recoveredUser } = await authService.getCurrentUser();
-                  if (recoveredUser) {
-                    setUser(recoveredUser);
-                    setError(null);
-                    console.log('✅ Successfully recovered user profile');
-                  }
+                const recovery = await EmergencyRecoveryService.recoverUserSession();
+                if (recovery.success && recovery.user) {
+                  setUser(recovery.user);
+                  setError(null);
+                  console.log('✅ Successfully recovered user profile');
                 }
               } catch (recoveryError) {
                 console.error('❌ Failed to recover user profile:', recoveryError);
-                setError('Ошибка получения профиля пользователя. Попробуйте обновить страницу.');
+                setError('Ошибка получения профиля. Перезагрузите страницу.');
               }
             }, 2000);
           }
@@ -168,7 +190,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('👋 User logged out');
       } else if (event === 'TOKEN_REFRESHED') {
         console.log('🔄 Token refreshed successfully');
-        // Clear any previous errors when token is successfully refreshed
         if (error) {
           setError(null);
         }
@@ -180,6 +201,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       subscription.unsubscribe();
     };
   }, []);
+
+  // ✅ ИСПРАВЛЕННАЯ функция обновления с множественным резервированием
+  const updateUserWithBackup = async (updates: Partial<User>): Promise<void> => {
+    if (!user) {
+      console.warn('⚠️ updateUser: No authenticated user');
+      return;
+    }
+
+    console.log('Updating user with backup', { updates });
+    
+    const updatedUser = { ...user, ...updates };
+    setUser(updatedUser);
+    
+    // Создание множественных резервных копий
+    EmergencyRecoveryService.createMultipleBackups(updatedUser);
+    
+    // Синхронизация с Supabase
+    if (user.id && !user.id.startsWith('temp-')) {
+      try {
+        await authService.updateProfile(user.id, updates);
+        console.log('✅ User update synced to Supabase', { userId: updatedUser.id });
+      } catch (error) {
+        console.error('❌ Failed to sync user update to Supabase:', error);
+        // Не выбрасываем ошибку - данные сохранены локально
+        toast({
+          title: 'Предупреждение',
+          description: 'Данные сохранены локально. Синхронизация произойдет при следующем входе.',
+          variant: 'destructive',
+        });
+      }
+    }
+    
+    console.log('User updated with backup', { userId: updatedUser.id });
+  };
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     setIsLoading(true);
@@ -212,7 +267,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           });
         }
         
-        // Don't throw error - let the UI handle it gracefully
         return;
       }
 
@@ -228,6 +282,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       setUser(authenticatedUser);
+      EmergencyRecoveryService.createMultipleBackups(authenticatedUser);
 
       toast({
         title: 'Добро пожаловать!',
@@ -236,17 +291,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Redirect based on role and onboarding status
       if (authenticatedUser.role === UserRole.PATIENT) {
-        // Double-check onboarding status with the onboarding service
-        console.log('🔍 Verifying onboarding status before redirect...');
         const onboardingCheck = await onboardingService.isOnboardingComplete(authenticatedUser.id);
         
-        console.log('📊 Onboarding verification result:', {
-          profileFlag: authenticatedUser.onboardingCompleted,
-          serviceCheck: onboardingCheck.completed,
-          hasEssentialData: onboardingCheck.progress?.hasEssentialData
-        });
-        
-        // Use the service check result instead of just the profile flag
         if (onboardingCheck.completed) {
           navigate('/patient/dashboard');
         } else {
@@ -260,11 +306,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('Login error:', error);
       
-      // Handle specific error types with user-friendly messages
       if (error.message.includes('Load failed') || 
           error.message.includes('Network timeout') ||
           error.message.includes('fetch')) {
-        const errorMessage = 'Проблема с подключением к серверу. Проверьте интернет-соединение и попробуйте еще раз.';
+        const errorMessage = 'Проблема с подключением к серверу. Проверьте интернет-соединение.';
         setError(errorMessage);
         toast({
           title: 'Проблемы с подключением',
@@ -314,6 +359,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       setUser(newUser);
+      EmergencyRecoveryService.createMultipleBackups(newUser);
 
       toast({
         title: 'Добро пожаловать в без | паузы!',
@@ -385,6 +431,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (updatedUser) {
         setUser(updatedUser);
+        EmergencyRecoveryService.createMultipleBackups(updatedUser);
       }
 
       return { user: updatedUser };
@@ -418,31 +465,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       navigate('/');
     }
-  };
-
-  const updateUser = async (updates: Partial<User>): Promise<void> => {
-    if (!user) {
-      console.warn('⚠️ updateUser: No authenticated user');
-      return;
-    }
-
-    console.log('Updating user', { updates });
-    
-    const updatedUser = { ...user, ...updates };
-    setUser(updatedUser);
-    
-    // Wait for Supabase update to complete to ensure data consistency
-    if (user.id && !user.id.startsWith('temp-')) {
-      try {
-        await authService.updateProfile(user.id, updates);
-        console.log('✅ User update synced to Supabase', { userId: updatedUser.id });
-      } catch (error) {
-        console.error('❌ Failed to sync user update to Supabase:', error);
-        throw error; // Throw error to indicate update failed
-      }
-    }
-    
-    console.log('User updated locally', { userId: updatedUser.id });
   };
 
   const completeOnboarding = async (onboardingData: any): Promise<void> => {
@@ -492,17 +514,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const updatedUser = { ...user, ...onboardingUpdate };
       setUser(updatedUser);
+      EmergencyRecoveryService.createMultipleBackups(updatedUser);
       
       toast({
         title: 'Онбординг завершен!',
         description: 'Добро пожаловать в без | паузы! Теперь у вас есть доступ ко всем функциям платформы.',
-      });
-      
-      console.log('✅ Onboarding completed successfully', {
-        userId: user.id,
-        hasGeolocation: !!onboardingData.formData?.geolocation,
-        hasAnalysis: !!analysis,
-        timestamp: new Date().toISOString()
       });
       
     } catch (error: any) {
@@ -518,7 +534,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Simplified methods for compatibility
   const completeRegistration = async (data: any): Promise<User> => {
     throw new Error('Multi-step registration not implemented in simplified auth');
   };
@@ -574,7 +589,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     completeRegistration,
-    updateUser,
+    updateUser: updateUserWithBackup,
     completeOnboarding,
     logout,
     forgotPassword,
