@@ -18,12 +18,14 @@ export interface AuthResponse {
 class AuthService {
   // Преобразование Supabase User в наш User тип
   private transformSupabaseUser(supabaseUser: SupabaseUser, profileData?: any): User {
-    return {
+    console.log('🔧 DEBUG: transformSupabaseUser called', { supabaseUser, profileData });
+    
+    const user = {
       id: supabaseUser.id,
       email: supabaseUser.email!,
       firstName: profileData?.first_name || '',
       lastName: profileData?.last_name || '',
-      role: (profileData?.role as UserRole) || UserRole.PATIENT, // Fixed: use 'role' not 'user_role'
+      role: (profileData?.user_role as UserRole) || UserRole.PATIENT,
       phone: profileData?.phone,
       emailVerified: supabaseUser.email_confirmed_at ? true : false,
       phoneVerified: profileData?.phone_verified || false,
@@ -32,6 +34,18 @@ class AuthService {
       avatar: profileData?.avatar_url,
       createdAt: new Date(supabaseUser.created_at)
     };
+    
+    console.log('✅ User transformed:', {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      roleType: typeof user.role,
+      onboardingCompleted: user.onboardingCompleted,
+      profileDataUserRole: profileData?.user_role,
+      profileDataRole: profileData?.role
+    });
+    
+    return user;
   }
 
   // Регистрация пользователя
@@ -124,7 +138,7 @@ class AuthService {
       const user = this.transformSupabaseUser(data.user, {
         first_name: profileData?.first_name || userData.firstName,
         last_name: profileData?.last_name || userData.lastName,
-        role: profileData?.role || userData.role,
+        user_role: profileData?.user_role || userData.role,
         onboarding_completed: profileData?.onboarding_completed || false,
         registration_completed: true
       });
@@ -300,7 +314,7 @@ class AuthService {
                 email: data.user.email,
                 first_name: data.user.user_metadata?.first_name || '',
                 last_name: data.user.user_metadata?.last_name || '',
-                role: data.user.user_metadata?.role || 'patient',
+                user_role: data.user.user_metadata?.role || 'patient',
                 onboarding_completed: false
               })
               .select()

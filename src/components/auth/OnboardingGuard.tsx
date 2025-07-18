@@ -1,8 +1,10 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { logger } from '@/utils/logger';
+import { UserRole } from '@/types/roles';
 
 interface OnboardingGuardProps {
   children: React.ReactNode;
@@ -35,8 +37,20 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
       return;
     }
 
+    // 🔍 ДИАГНОСТИКА: Проверяем логику OnboardingGuard после исправления
+    console.group('🔍 ONBOARDING GUARD DEBUG');
+    console.log('1. User:', user);
+    console.log('2. User role:', user.role);
+    console.log('3. User role type:', typeof user.role);
+    console.log('4. Is patient?', user.role === UserRole.PATIENT);
+    console.log('5. Onboarding completed?', user.onboardingCompleted);
+    console.log('6. Current path:', location.pathname);
+    console.log('7. Should redirect to onboarding?', 
+      user.role === UserRole.PATIENT && !user.onboardingCompleted);
+    console.groupEnd();
+
     // Проверка только для пациенток
-    if (user.role === 'patient') {
+    if (user.role === UserRole.PATIENT) {
       // ✅ ИСПРАВЛЕНО: Проверяем текущий маршрут - не редиректим если уже на онбординге
       if (location.pathname === '/patient/onboarding') {
         logger.debug('OnboardingGuard: Already on onboarding page, allowing access');
@@ -96,6 +110,7 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
           registrationCompleted: user.registrationCompleted,
           isPasswordRecovery
         });
+        console.log('🔄 Redirecting to onboarding...');
         navigate('/patient/onboarding', { replace: true });
         return;
       }
@@ -137,7 +152,7 @@ export const OnboardingGuard: React.FC<OnboardingGuardProps> = ({ children }) =>
                           user.onboardingData || 
                           Boolean(user.menopausePhase);
                           
-  if (user.role === 'patient' && !user.onboardingCompleted && !hasEssentialData) {
+  if (user.role === UserRole.PATIENT && !user.onboardingCompleted && !hasEssentialData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
