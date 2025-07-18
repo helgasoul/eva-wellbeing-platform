@@ -28,10 +28,23 @@ export const DataBridgeMonitor: React.FC = () => {
   const [auditTrail, setAuditTrail] = useState<DataAuditEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [auditFilters, setAuditFilters] = useState({
+    userId: '',
+    action: '',
+    dataType: '',
+    limit: 50
+  });
 
   useEffect(() => {
     loadDashboardData();
   }, []);
+
+  // Effect to reload audit trail when filters change
+  useEffect(() => {
+    if (auditFilters.userId || auditFilters.action || auditFilters.dataType) {
+      loadAuditTrail();
+    }
+  }, [auditFilters]);
 
   const loadDashboardData = async () => {
     setIsLoading(true);
@@ -51,6 +64,20 @@ export const DataBridgeMonitor: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadAuditTrail = async () => {
+    try {
+      const filters: any = {};
+      if (auditFilters.userId) filters.userId = auditFilters.userId;
+      if (auditFilters.action) filters.action = auditFilters.action;
+      if (auditFilters.dataType) filters.dataType = auditFilters.dataType;
+      
+      const audit = await dataBridge.getAuditTrail(filters);
+      setAuditTrail(audit.slice(0, auditFilters.limit));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load audit trail');
     }
   };
 
@@ -317,21 +344,97 @@ export const DataBridgeMonitor: React.FC = () => {
         <TabsContent value="audit" className="space-y-4">
           <Card>
             <CardHeader>
+              <CardTitle>Audit Filters</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">User ID</label>
+                  <input
+                    type="text"
+                    value={auditFilters.userId}
+                    onChange={(e) => setAuditFilters(prev => ({ ...prev, userId: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    placeholder="All users"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Action</label>
+                  <select 
+                    value={auditFilters.action}
+                    onChange={(e) => setAuditFilters(prev => ({ ...prev, action: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value="">All actions</option>
+                    <option value="create">Create</option>
+                    <option value="read">Read</option>
+                    <option value="update">Update</option>
+                    <option value="delete">Delete</option>
+                    <option value="transfer">Transfer</option>
+                    <option value="backup">Backup</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Data Type</label>
+                  <input
+                    type="text"
+                    value={auditFilters.dataType}
+                    onChange={(e) => setAuditFilters(prev => ({ ...prev, dataType: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    placeholder="All types"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Limit</label>
+                  <select 
+                    value={auditFilters.limit}
+                    onChange={(e) => setAuditFilters(prev => ({ ...prev, limit: Number(e.target.value) }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
               {auditTrail.length ? (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
+                <div className="space-y-3 max-h-96 overflow-y-auto">
                   {auditTrail.map((entry, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-2 border rounded">
-                      <Badge variant="outline">{entry.action}</Badge>
-                      <span className="text-sm">{entry.dataType}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(entry.timestamp).toLocaleString()}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {entry.affectedKeys.length} keys
-                      </span>
+                    <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-3">
+                          <div className="p-1 rounded-full bg-blue-100">
+                            <Activity className="h-4 w-4 text-blue-600" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2">
+                              <Badge variant="outline">{entry.action}</Badge>
+                              <span className="font-medium">{entry.dataType}</span>
+                            </div>
+                            <div className="text-sm text-gray-600 mt-1">
+                              User: {entry.userId} • Keys: {entry.affectedKeys.join(', ')}
+                            </div>
+                            {entry.metadata && Object.keys(entry.metadata).length > 0 && (
+                              <div className="text-xs text-gray-500 mt-2 bg-gray-100 p-2 rounded">
+                                <pre className="whitespace-pre-wrap">
+                                  {JSON.stringify(entry.metadata, null, 2)}
+                                </pre>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(entry.timestamp).toLocaleString()}
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
