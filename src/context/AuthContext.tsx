@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, AuthContextType, LoginCredentials, RegisterData } from '@/types/auth';
 import { UserRole } from '@/types/roles';
@@ -31,6 +31,55 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialAuthState);
   const navigate = useNavigate();
 
+  // 🔍 DIAGNOSTIC COUNTERS for race condition detection
+  const [initCallCount, setInitCallCount] = useState(0);
+  const [authStateChangeCount, setAuthStateChangeCount] = useState(0);
+  const [subscriptionCount, setSubscriptionCount] = useState(0);
+
+  // 🔍 DIAGNOSTIC: Debug Supabase state function
+  const debugSupabaseState = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    console.log('📊 SUPABASE SESSION DEBUG:', {
+      hasSession: !!session,
+      sessionError: error,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email,
+      tokenExpiry: session?.expires_at,
+      refreshToken: !!session?.refresh_token,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Check user_profiles table
+    if (session?.user?.id) {
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .maybeSingle();
+        
+      console.log('👤 USER PROFILE DEBUG:', {
+        profileExists: !!profile,
+        profileError: profileError,
+        onboardingCompleted: profile?.onboarding_completed,
+        userRole: profile?.user_role,
+        profileData: profile,
+        timestamp: new Date().toISOString()
+      });
+    }
+  };
+
+  // 🔍 DIAGNOSTIC: Log current auth state
+  console.log('🔐 AUTH DEBUG - Current State:', {
+    user: state.user,
+    isLoading: state.isLoading,
+    error: state.error,
+    isAuthenticated: state.isAuthenticated,
+    initializationComplete: state.initializationComplete,
+    sessionRecoveryAttempted: state.sessionRecoveryAttempted,
+    retryCount: state.retryCount,
+    timestamp: new Date().toISOString()
+  });
+
   // Circuit breaker for retry logic
   const { canExecute, onSuccess, onFailure, isOpen } = useCircuitBreaker(
     state.circuitBreakerState,
@@ -44,8 +93,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeAuth = useCallback(async () => {
     if (state.initializationComplete) return;
 
+    // 🔍 DIAGNOSTIC: Track initialization calls
+    const currentCount = initCallCount + 1;
+    setInitCallCount(currentCount);
+    
+    console.log('🏃 initializeAuth CALL #', currentCount, 'at:', new Date().toISOString());
+    
+    if (currentCount > 1) {
+      console.warn('⚠️ RACE CONDITION DETECTED: Multiple init calls!', {
+        callCount: currentCount,
+        currentState: state,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     console.log('🔐 Starting auth initialization');
     dispatch({ type: 'SET_LOADING', payload: true });
+
+    // 🔍 DIAGNOSTIC: Debug Supabase state before init
+    await debugSupabaseState();
 
     try {
       // Check if circuit breaker allows execution
@@ -130,18 +196,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Initialize auth system
   useEffect(() => {
+    console.log('🏗️ AuthProvider MOUNTED - initializeAuth useEffect triggered at:', new Date().toISOString());
     initializeAuth();
+    
+    return () => {
+      console.log('🏗️ AuthProvider initializeAuth useEffect CLEANUP at:', new Date().toISOString());
+    };
   }, [initializeAuth]);
 
   // Auth state change subscription
   useEffect(() => {
+    const currentSubCount = subscriptionCount + 1;
+    setSubscriptionCount(currentSubCount);
+    
+    console.log('🔌 AUTH SUBSCRIPTION CREATED #', currentSubCount, 'at:', new Date().toISOString());
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔄 Auth state change:', { event, hasSession: !!session });
+      const currentAuthStateCount = authStateChangeCount + 1;
+      setAuthStateChangeCount(currentAuthStateCount);
+      
+      console.log('🔄 Auth state change #', currentAuthStateCount, ':', { 
+        event, 
+        hasSession: !!session,
+        sessionUserId: session?.user?.id,
+        sessionUserEmail: session?.user?.email,
+        timestamp: new Date().toISOString()
+      });
       
       if (event === 'SIGNED_IN' && session?.user) {
+        console.log('✅ SIGNED_IN event - setting timeout for profile load');
         setTimeout(async () => {
           try {
+            console.log('📞 Calling authService.getCurrentUser after SIGNED_IN...');
             const { user } = await authService.getCurrentUser();
+            console.log('📋 authService.getCurrentUser result:', {
+              hasUser: !!user,
+              userId: user?.id,
+              userEmail: user?.email,
+              timestamp: new Date().toISOString()
+            });
+            
             if (user) {
               dispatch({ type: 'SET_USER', payload: user });
               authRecoveryService.createBackup(user);
@@ -153,24 +247,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }, 100);
       } else if (event === 'SIGNED_OUT') {
+        console.log('🚪 SIGNED_OUT event - clearing user state');
         dispatch({ type: 'SET_USER', payload: null });
         dispatch({ type: 'SET_ERROR', payload: null });
         authRecoveryService.reset();
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      console.log('🔌 AUTH SUBSCRIPTION CLEANUP #', currentSubCount, 'at:', new Date().toISOString());
+      subscription.unsubscribe();
+    };
+  }, [authStateChangeCount, subscriptionCount]);
 
   // Process queued migrations on network recovery
   useEffect(() => {
+    console.log('🌐 Network recovery useEffect setup at:', new Date().toISOString());
+    
     const handleOnline = () => {
       console.log('🌐 Network restored, processing queued migrations');
       asyncJITMigrationService.processQueuedMigrations();
     };
 
     window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
+    return () => {
+      console.log('🌐 Network recovery useEffect cleanup at:', new Date().toISOString());
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []);
+
+  // 🔍 DIAGNOSTIC: Track component mount/unmount
+  useEffect(() => {
+    console.log('🏗️ AuthProvider MOUNTED at:', new Date().toISOString());
+    
+    // 🔍 DIAGNOSTIC: Check all data sources
+    const allDataSources = {
+      localStorage: Object.fromEntries(Object.entries(localStorage)),
+      sessionStorage: Object.fromEntries(Object.entries(sessionStorage)),
+      urlParams: new URLSearchParams(window.location.search).toString(),
+      currentUrl: window.location.href
+    };
+    
+    console.log('📊 ALL DATA SOURCES ON MOUNT:', allDataSources);
+    
+    return () => {
+      console.log('🏗️ AuthProvider UNMOUNTED at:', new Date().toISOString());
+    };
   }, []);
 
   const updateUser = useCallback(async (updates: Partial<User>): Promise<void> => {
@@ -196,6 +318,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [state.user]);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<void> => {
+    console.log('🚀 AuthContext.login START:', {
+      email: credentials.email,
+      hasPassword: !!credentials.password,
+      rememberMe: credentials.rememberMe,
+      timestamp: new Date().toISOString()
+    });
+
     if (!canExecute()) {
       throw new Error('Система временно недоступна. Попробуйте позже.');
     }
@@ -204,7 +333,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_ERROR', payload: null });
 
     try {
+      console.log('📞 Calling authService.login...');
       const { user: authenticatedUser, error: authError } = await authService.login(credentials);
+      
+      console.log('📋 authService.login result:', {
+        hasUser: !!authenticatedUser,
+        userId: authenticatedUser?.id,
+        userEmail: authenticatedUser?.email,
+        hasError: !!authError,
+        errorMessage: authError,
+        timestamp: new Date().toISOString()
+      });
 
       if (authError) {
         // Check if this might be a JIT migration case
@@ -269,7 +408,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
     } catch (error: any) {
-      console.error('❌ Login error:', error);
+      console.error('❌ AuthContext.login error:', {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        timestamp: new Date().toISOString(),
+        authContextState: {
+          user: state.user,
+          isLoading: state.isLoading,
+          error: state.error,
+          isAuthenticated: state.isAuthenticated
+        }
+      });
+      
+      // 🔍 DIAGNOSTIC: Check localStorage for legacy data
+      const legacyData = localStorage.getItem('eva_user_data');
+      console.log('🗂️ LEGACY DATA CHECK:', {
+        hasLegacyData: !!legacyData,
+        legacyEmail: legacyData ? JSON.parse(legacyData).email : null,
+        emailMatches: legacyData ? JSON.parse(legacyData).email === credentials.email : false,
+        timestamp: new Date().toISOString()
+      });
+      
       onFailure();
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;

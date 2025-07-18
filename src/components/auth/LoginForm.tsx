@@ -42,27 +42,50 @@ export const LoginForm = () => {
   const rememberMe = watch('rememberMe');
 
   const onSubmit = async (data: LoginFormData) => {
+    console.log('🚀 LOGIN ATTEMPT START:', {
+      email: data.email,
+      hasPassword: !!data.password,
+      rememberMe: data.rememberMe,
+      timestamp: new Date().toISOString()
+    });
+
     try {
+      console.log('📞 CALLING AuthContext.login...');
       await login({
         email: data.email,
         password: data.password,
         rememberMe: data.rememberMe,
       });
+      
+      console.log('✅ LOGIN SUCCESS from LoginForm');
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.log('❌ LOGIN ERROR DETAILS:', {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        timestamp: new Date().toISOString()
+      });
       
       // Check if migration is required
       if (error.message === 'MIGRATION_REQUIRED') {
+        console.log('🔄 Migration required - showing migration form');
         setShowMigrationForm(true);
         return;
       }
       
       // Check for legacy data as fallback
-      const localUser = localStorage.getItem('eva_user_data');
-      if (localUser && error.message?.includes('Неверный email или пароль')) {
+      const legacyData = localStorage.getItem('eva_user_data');
+      console.log('🗂️ LEGACY DATA CHECK:', {
+        hasLegacyData: !!legacyData,
+        legacyEmail: legacyData ? JSON.parse(legacyData).email : null,
+        emailMatches: legacyData ? JSON.parse(legacyData).email === data.email : false,
+        timestamp: new Date().toISOString()
+      });
+      
+      if (legacyData && error.message?.includes('Неверный email или пароль')) {
         try {
-          const userData = JSON.parse(localUser);
+          const userData = JSON.parse(legacyData);
           if (userData.email === data.email) {
+            console.log('🔄 Legacy data matches - showing migration form');
             setShowMigrationForm(true);
             return;
           }
@@ -76,6 +99,12 @@ export const LoginForm = () => {
   const handleMigration = async () => {
     const formData = watch();
     
+    console.log('🔄 MIGRATION ATTEMPT START:', {
+      email: formData.email,
+      hasNewPassword: !!migrationPassword,
+      timestamp: new Date().toISOString()
+    });
+    
     if (!formData.email || !migrationPassword) {
       toast({
         title: "Ошибка",
@@ -87,10 +116,18 @@ export const LoginForm = () => {
     
     setIsMigrating(true);
     try {
+      console.log('🔄 Calling asyncJITMigrationService.performUIBasedMigration...');
       const result = await asyncJITMigrationService.performUIBasedMigration(
         formData.email, 
         migrationPassword
       );
+      
+      console.log('🔄 Migration result:', {
+        success: result.success,
+        hasError: !!result.error,
+        error: result.error,
+        timestamp: new Date().toISOString()
+      });
       
       if (result.success) {
         toast({
@@ -98,6 +135,7 @@ export const LoginForm = () => {
           description: "Аккаунт успешно обновлен!",
         });
         
+        console.log('🔄 Migration successful - now logging in with new password');
         // Now login with the new password
         await login({
           email: formData.email,
@@ -108,7 +146,11 @@ export const LoginForm = () => {
         throw new Error(result.error || 'Migration failed');
       }
     } catch (error: any) {
-      console.error('Migration error:', error);
+      console.error('❌ Migration error:', {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      });
       toast({
         title: "Ошибка",
         description: error.message || "Ошибка обновления аккаунта",

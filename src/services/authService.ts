@@ -145,10 +145,24 @@ class AuthService {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    console.log('🔐 authService.login ENTRY:', {
+      email: credentials.email,
+      hasPassword: !!credentials.password,
+      timestamp: new Date().toISOString()
+    });
+
     try {
       // Check rate limiting
+      console.log('⏱️ Checking rate limiting...');
       const rateLimitResult = await rateLimitService.checkRateLimit('login', credentials.email);
+      console.log('⏱️ Rate limit result:', {
+        allowed: rateLimitResult.allowed,
+        retryAfter: rateLimitResult.retryAfter,
+        timestamp: new Date().toISOString()
+      });
+      
       if (!rateLimitResult.allowed) {
+        console.log('🚫 Rate limit exceeded for:', credentials.email);
         await authAuditService.logLoginAttempt(credentials.email, false, 'Rate limit exceeded');
         return {
           user: null,
@@ -159,18 +173,45 @@ class AuthService {
       }
 
       // Try Supabase authentication
+      console.log('📞 Calling supabase.auth.signInWithPassword...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
       });
 
+      console.log('📋 SUPABASE SIGNIN RESULT:', {
+        hasData: !!data,
+        hasUser: !!data?.user,
+        hasSession: !!data?.session,
+        userId: data?.user?.id,
+        userEmail: data?.user?.email,
+        error: error?.message,
+        errorCode: error?.code,
+        timestamp: new Date().toISOString()
+      });
+
       if (error) {
+        console.log('🔍 ERROR ANALYSIS:', {
+          isInvalidCredentials: error.message === 'Invalid login credentials',
+          shouldTryJIT: error.message === 'Invalid login credentials',
+          errorDetails: error,
+          timestamp: new Date().toISOString()
+        });
+
         // Check if this might be a JIT migration case
         if (error.message === 'Invalid login credentials') {
+          console.log('🔄 ATTEMPTING JIT MIGRATION...');
           const migrationResult = await asyncJITMigrationService.attemptJITMigration(
             credentials.email,
             credentials.password
           );
+          
+          console.log('🔄 JIT MIGRATION RESULT:', {
+            success: migrationResult.success,
+            requiresUI: migrationResult.requiresUI,
+            hasUser: !!migrationResult.user,
+            timestamp: new Date().toISOString()
+          });
           
           if (migrationResult.success) {
             return { user: migrationResult.user, error: null };
@@ -196,18 +237,28 @@ class AuthService {
       }
 
       if (!data.user) {
+        console.log('❌ No user data received from Supabase');
         await authAuditService.logLoginAttempt(credentials.email, false, 'Пользователь не получен');
         return { user: null, error: 'Не удалось получить данные пользователя' };
       }
 
       // Load profile with retry logic
+      console.log('👤 LOADING USER PROFILE for userId:', data.user.id);
       let profileData = null;
       for (let attempt = 0; attempt < 3; attempt++) {
+        console.log(`👤 Profile load attempt ${attempt + 1}/3`);
         const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('id', data.user.id)
           .maybeSingle();
+          
+        console.log(`👤 Profile load attempt ${attempt + 1} result:`, {
+          hasProfile: !!profile,
+          profileError: profileError,
+          profileData: profile,
+          timestamp: new Date().toISOString()
+        });
           
         if (profile) {
           profileData = profile;
@@ -220,11 +271,14 @@ class AuthService {
         }
         
         if (attempt < 2) {
-          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+          const delay = 500 * (attempt + 1);
+          console.log(`👤 Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
 
       if (!profileData) {
+        console.log('👤 No profile found, attempting to create one...');
         // Try to create profile
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
@@ -239,6 +293,13 @@ class AuthService {
           .select()
           .maybeSingle();
 
+        console.log('👤 Profile creation result:', {
+          hasNewProfile: !!newProfile,
+          createError: createError,
+          isDuplicateError: createError?.code === '23505',
+          timestamp: new Date().toISOString()
+        });
+
         if (createError && createError.code !== '23505') {
           console.error('Profile creation error:', createError);
           return { user: null, error: 'Ошибка создания профиля пользователя' };
@@ -247,10 +308,23 @@ class AuthService {
         profileData = newProfile;
       }
 
+      console.log('🔄 Transforming Supabase user to app user...');
       const user = this.transformSupabaseUser(data.user, profileData);
+
+      console.log('👤 FINAL USER OBJECT:', {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        registrationCompleted: user.registrationCompleted,
+        onboardingCompleted: user.onboardingCompleted,
+        timestamp: new Date().toISOString()
+      });
 
       // Update registration status for old users
       if (!user.registrationCompleted && user.email && user.firstName) {
+        console.log('🔄 Updating registration status for old user...');
         await this.updateProfile(user.id, { registrationCompleted: true });
         user.registrationCompleted = true;
       }
@@ -258,10 +332,15 @@ class AuthService {
       await authAuditService.logLoginAttempt(credentials.email, true, undefined, user.id);
       await rateLimitService.recordAttempt('login', true, credentials.email);
       
+      console.log('✅ LOGIN SUCCESS - returning user');
       return { user, error: null };
 
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('💥 CRITICAL LOGIN ERROR:', {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      });
       await authAuditService.logLoginAttempt(credentials.email, false, error.message);
       return { user: null, error: error.message };
     }
