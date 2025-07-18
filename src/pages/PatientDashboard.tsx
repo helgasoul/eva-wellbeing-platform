@@ -920,7 +920,7 @@ const PatientDashboard = () => {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">
-                Добро пожаловать в bloom, {user?.firstName || 'дорогая'}! 🌸
+                Добро пожаловать в без | паузы, {user?.firstName || 'дорогая'}! 🌸
               </h1>
               <p className="text-white/95 text-lg leading-relaxed">
                 Сегодня — идеальный день для заботы о себе

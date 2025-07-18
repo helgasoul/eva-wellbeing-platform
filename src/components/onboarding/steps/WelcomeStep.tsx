@@ -24,8 +24,8 @@ export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext }) => {
         </div>
         <h1 className="text-3xl font-playfair font-bold text-foreground mb-4">
           {presets ? 
-            `Добро пожаловать в bloom, ${presets.user.firstName}!` : 
-            'Добро пожаловать в bloom!'
+            `Добро пожаловать в без | паузы, ${presets.user.firstName}!` : 
+            'Добро пожаловать в без | паузы!'
           }
         </h1>
         <p className="text-lg text-muted-foreground">
@@ -90,7 +90,7 @@ export const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext }) => {
       <div className="text-sm text-muted-foreground bg-gray-50 rounded-lg p-4">
         <p>
           🔒 <strong>Конфиденциальность:</strong> Вся информация надежно защищена и используется 
-          только для персонализации вашего опыта в bloom
+          только для персонализации вашего опыта в без | паузы
         </p>
         {analytics && (
           <p className="text-xs text-green-600 mt-2">
