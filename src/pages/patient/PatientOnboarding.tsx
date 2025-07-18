@@ -136,11 +136,11 @@ const PatientOnboarding = () => {
     console.log('🔄 User needs to complete onboarding');
   }, [user, navigate, updateUser]);
 
-  // ДОБАВИТЬ в начало компонента:
+  // ✅ ИСПРАВЛЕНИЕ: Инициализация данных онбординга
   useEffect(() => {
     // Загружаем данные из всех источников
     loadOnboardingData();
-  }, []);
+  }, [user]);
 
   const loadOnboardingData = () => {
     try {
