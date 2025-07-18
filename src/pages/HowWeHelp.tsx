@@ -95,7 +95,10 @@ const HowWeHelp: React.FC = () => {
                     Всё, что обычно стоит десятки тысяч в частных клиниках, теперь становится ближе — от 2 990 ₽ в год
                   </p>
                 </div>
-                <button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-elegant hover:shadow-soft transform hover:-translate-y-1 group">
+                <button 
+                  onClick={() => navigate('/register')}
+                  className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-elegant hover:shadow-soft transform hover:-translate-y-1 group"
+                >
                   <Heart className="mr-3 h-5 w-5 group-hover:animate-pulse transition-all duration-300" />
                   Начать путь с без|паузы
                 </button>
