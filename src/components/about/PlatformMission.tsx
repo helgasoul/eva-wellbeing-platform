@@ -1,6 +1,6 @@
 import React from 'react';
 import { AdminEditableSection } from './AdminEditableSection';
-import { Heart, Users, Sparkles } from 'lucide-react';
+import { Heart, Shield, Star } from 'lucide-react';
 import caringIllustration from '@/assets/caring-support-illustration.jpg';
 
 interface PlatformMissionProps {
@@ -50,7 +50,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
                     <Heart className="w-6 h-6 text-white" />
                   </div>
                   <div className="absolute -bottom-4 -left-4 w-10 h-10 bg-gradient-to-br from-accent to-accent/80 rounded-full flex items-center justify-center animate-pulse">
-                    <Sparkles className="w-5 h-5 text-white" />
+                    <Star className="w-5 h-5 text-white" />
                   </div>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
               <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-sm rounded-2xl p-8 mb-10 border border-primary/20 shadow-elegant animate-fade-in" style={{ animationDelay: '0.4s' }}>
                 <div className="flex items-center justify-center lg:justify-start mb-4">
                   <Heart className="w-8 h-8 text-primary mr-3 animate-pulse" />
-                  <Users className="w-8 h-8 text-secondary animate-pulse" />
+                  <Shield className="w-8 h-8 text-secondary animate-pulse" />
                 </div>
                 <p className="text-xl md:text-2xl font-medium italic text-foreground leading-relaxed">
                   "Мы верим, что каждая женщина заслуживает заботы, поддержки и индивидуального внимания — в любой момент жизни."
@@ -127,7 +127,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Users className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
+                    <Shield className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
                   </div>
                   <h4 className="text-lg font-semibold text-foreground mb-2">Поддержка</h4>
                   <p className="text-muted-foreground">Вы никогда не остаётесь одна</p>
@@ -135,7 +135,7 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Sparkles className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
+                    <Star className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
                   </div>
                   <h4 className="text-lg font-semibold text-foreground mb-2">Индивидуальность</h4>
                   <p className="text-muted-foreground">Решения специально для вас</p>
