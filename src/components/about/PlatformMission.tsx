@@ -118,24 +118,24 @@ export const PlatformMission: React.FC<PlatformMissionProps> = ({
               {/* Три ключевых элемента */}
               <div className="grid md:grid-cols-3 gap-8 mt-10">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Heart className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Heart className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
                   </div>
                   <h4 className="text-lg font-semibold text-foreground mb-2">Забота</h4>
                   <p className="text-muted-foreground">Каждое взаимодействие наполнено теплом</p>
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/80 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Users className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
                   </div>
                   <h4 className="text-lg font-semibold text-foreground mb-2">Поддержка</h4>
                   <p className="text-muted-foreground">Вы никогда не остаётесь одна</p>
                 </div>
                 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-gradient-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Sparkles className="w-8 h-8 text-white fill-current" style={{ display: 'block' }} />
                   </div>
                   <h4 className="text-lg font-semibold text-foreground mb-2">Индивидуальность</h4>
                   <p className="text-muted-foreground">Решения специально для вас</p>
