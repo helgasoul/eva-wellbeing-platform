@@ -118,7 +118,7 @@ export const RegistrationComplete: React.FC = () => {
     }
   }, [state.isCompleted, isDataTransferred]);
 
-  // ✅ ИСПРАВЛЕНИЕ: Переход только после успешной передачи данных
+  // ✅ ИСПРАВЛЕНО: Переход только после полного сохранения данных
   const handleContinueManually = async () => {
     if (!isDataTransferred) {
       toast({
@@ -139,16 +139,24 @@ export const RegistrationComplete: React.FC = () => {
         });
       }
 
-      // 5. ТОЛЬКО ПОСЛЕ обновления контекста очищаем временные данные
+      // 5. Финальная проверка сохранности данных перед очисткой
+      const savedData = localStorage.getItem('registration_data');
+      const savedPresets = localStorage.getItem('onboarding_presets');
+      
+      if (!savedData || !savedPresets) {
+        throw new Error('Данные регистрации не сохранены');
+      }
+
+      // 6. ТОЛЬКО ПОСЛЕ полной гарантии сохранности данных очищаем временные данные
       resetRegistration();
       
-      // 6. Редирект на онбординг
+      // 7. Редирект на онбординг
       navigate('/patient/onboarding');
     } catch (error) {
-      console.error('❌ Error updating user context:', error);
+      console.error('❌ Error completing registration:', error);
       toast({
         title: 'Ошибка',
-        description: 'Не удалось обновить профиль. Попробуйте еще раз.',
+        description: 'Не удалось завершить регистрацию. Попробуйте еще раз.',
         variant: 'destructive',
       });
     }

@@ -19,8 +19,26 @@ export interface User {
   registrationCompleted?: boolean;
   onboardingCompleted?: boolean;
   
-  // ✅ ДОБАВЛЕНО: Поле для фазы менопаузы
+  // ✅ ДОБАВЛЕНО: Поля для персонализации и пресетов
   menopausePhase?: string;
+  selectedPersona?: string;
+  onboardingPresets?: OnboardingPresets;
+}
+
+// ✅ ДОБАВЛЕНО: Типизация для OnboardingPresets  
+export interface OnboardingPresets {
+  persona: string;
+  userName: string;
+  startStep: number;
+  user?: {
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+  consents?: {
+    terms: boolean;
+    privacy: boolean;
+  };
 }
 
 export interface UserDataSummary {
