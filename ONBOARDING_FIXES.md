@@ -146,7 +146,7 @@ const PatientOnboarding = () => {
       default:
         return getDefaultQuestions(currentStep);
     }
-  }, [currentStep, formData.selectedPersona]);
+  }, [currentStep, formData.selectedPersona, user?.selectedPersona]);
 
   // Остальная логика...
 };
