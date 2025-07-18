@@ -76,9 +76,8 @@ export class DataBridge {
     }
     return DataBridge.instance;
   }
-}
 
-  transferData(data: OnboardingPresets): void {
+  public transferData(data: OnboardingPresets): void {
     const bridgeData = {
       ...data,
       timestamp: new Date().toISOString()
@@ -86,23 +85,24 @@ export class DataBridge {
     localStorage.setItem('onboarding-presets', JSON.stringify(bridgeData));
   }
 
-  loadPresets(): any {
+  public loadPresets(): OnboardingPresets | null {
     const presets = localStorage.getItem('onboarding-presets');
-    return presets ? JSON.parse(presets) : null;
+    return presets ? (JSON.parse(presets) as OnboardingPresets) : null;
   }
 
-  validateIntegrity(): boolean {
+  public validateIntegrity(): boolean {
     const presets = localStorage.getItem('onboarding-presets');
     const user = localStorage.getItem('user');
     return !!(presets || user);
   }
 
-  cleanup(): void {
+  public cleanup(): void {
     localStorage.removeItem('onboarding-presets');
     localStorage.removeItem('onboarding-progress');
   }
 }
 
+export const dataBridge = DataBridge.getInstance();
 export const dataBridge = DataBridge.getInstance();
 
 // 4. Обновить src/pages/patient/PatientOnboarding.tsx
