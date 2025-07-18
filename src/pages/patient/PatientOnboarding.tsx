@@ -138,96 +138,75 @@ const PatientOnboarding = () => {
     console.log('🔄 User needs to complete onboarding');
   }, [user, navigate, updateUser]);
 
-  // ✅ УЛУЧШЕННАЯ ЗАГРУЗКА: Загружаем данные через DataBridge
+  // ДОБАВИТЬ в начало компонента:
   useEffect(() => {
-    const loadOnboardingData = async () => {
-      if (!user?.id) return;
-      
-      try {
-        console.log('🔄 PatientOnboarding: Загрузка данных через DataBridge...');
-        
-        // 1. Сначала пытаемся загрузить сохраненный прогресс
-        const savedProgress = await loadUserData('onboarding_progress');
-        if (savedProgress) {
-          setFormData(prev => ({ ...prev, ...savedProgress.data }));
-          setCurrentStep(savedProgress.currentStep || 1);
-          setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
-          console.log(`📥 PatientOnboarding: Восстановлен прогресс на шаге ${savedProgress.currentStep}`);
-          
-          toast({
-            title: 'Прогресс восстановлен',
-            description: 'Ваши данные онбординга загружены',
-          });
-          return;
-        }
-
-        // 2. Загружаем данные из Supabase
-        const { data: supabaseData } = await onboardingService.loadUserOnboarding(user.id);
-        
-        if (supabaseData && Object.keys(supabaseData).length > 0) {
-          console.log('✅ Loading onboarding data from Supabase:', Object.keys(supabaseData));
-          setFormData(supabaseData);
-          setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
-          
-          toast({
-            title: 'Прогресс восстановлен',
-            description: 'Ваши данные онбординга загружены из облака',
-          });
-        } else {
-          // 3. Fallback: пытаемся загрузить данные через DataBridge
-          const dataBridge = DataBridge.getInstance();
-          const presets = dataBridge.getOnboardingPresets();
-          
-          if (presets) {
-            console.log('✅ Loading data via DataBridge:', presets);
-            setOnboardingPresets(presets);
-            
-            const presetsFormData = {
-              basicInfo: {
-                age: 0,
-                height: 0,
-                weight: 0,
-                location: '',
-                occupation: '',
-                hasChildren: false,
-                ...presets.prefills.basicInfo
-              },
-              registrationPersona: presets.persona.id,
-              fromRegistration: true,
-              expectedPath: presets.persona.onboardingPath,
-              onboardingConfig: presets.onboardingConfig
-            };
-            
-            setFormData(presetsFormData);
-            setDataLoadingStatus(prev => ({ ...prev, dataBridge: true }));
-            
-            toast({
-              title: 'Персональная анкета готова!',
-              description: `Анкета адаптирована для профиля "${getPersonaTitle(presets.persona.id)}" • ${presets.onboardingConfig.estimatedDuration}`,
-            });
-          } else {
-            // 4. Последний fallback: localStorage
-            const savedOnboardingData = localStorage.getItem(STORAGE_KEY);
-            if (savedOnboardingData) {
-              try {
-                const saved = JSON.parse(savedOnboardingData);
-                setFormData(saved);
-                setDataLoadingStatus(prev => ({ ...prev, onboarding: true }));
-                console.log('✅ Loading saved onboarding progress from localStorage');
-              } catch (error) {
-                console.error('Failed to load saved onboarding data:', error);
-              }
-            }
-          }
-        }
-        
-      } catch (error) {
-        console.error('Error loading onboarding data:', error);
-      }
-    };
-    
+    // Загружаем данные из всех источников
     loadOnboardingData();
-  }, [user?.id, loadUserData]);
+  }, []);
+
+  const loadOnboardingData = () => {
+    try {
+      // 1. Данные из AuthContext (приоритет)
+      const userData = user;
+      
+      // 2. Данные из localStorage
+      const registrationData = JSON.parse(localStorage.getItem('registration_data') || '{}');
+      const onboardingPresets = JSON.parse(localStorage.getItem('onboarding_presets') || '{}');
+      const savedProgress = JSON.parse(localStorage.getItem(`onboarding_progress_${user?.id}`) || '{}');
+      
+      // 3. Объединяем данные
+      const mergedData = {
+        // Базовая информация из регистрации
+        firstName: userData?.firstName || registrationData.firstName,
+        lastName: userData?.lastName || registrationData.lastName,
+        email: userData?.email || registrationData.email,
+        selectedPersona: (userData as any)?.selectedPersona || onboardingPresets.persona,
+        
+        // Прогресс онбординга
+        ...savedProgress,
+        
+        // Предзаполненные поля на основе персоны
+        ...getPersonaDefaults(onboardingPresets.persona)
+      };
+      
+      // 4. Устанавливаем данные и текущий шаг
+      setFormData(prev => ({ ...prev, ...mergedData }));
+      
+      // Если есть сохраненный прогресс и онбординг не завершен
+      if (savedProgress.currentStep && !savedProgress.completed) {
+        setCurrentStep(savedProgress.currentStep);
+      } else if (onboardingPresets.startStep) {
+        setCurrentStep(onboardingPresets.startStep);
+      }
+      
+      console.log('Данные онбординга загружены:', mergedData);
+      
+    } catch (error) {
+      console.error('Ошибка загрузки данных онбординга:', error);
+    }
+  };
+
+  // Функция персонализированных дефолтов:
+  const getPersonaDefaults = (persona: string) => {
+    switch(persona) {
+      case 'first_signs':
+        return {
+          expectedSymptoms: ['irregular_periods', 'mood_swings', 'sleep_issues'],
+          phase: 'perimenopause'
+        };
+      case 'active_phase': 
+        return {
+          expectedSymptoms: ['hot_flashes', 'night_sweats', 'mood_changes'],
+          phase: 'menopause'
+        };
+      case 'postmenopause':
+        return {
+          expectedSymptoms: ['bone_density', 'heart_health', 'cognitive_health'],
+          phase: 'postmenopause'
+        };
+      default: return {};
+    }
+  };
 
   // ✅ УЛУЧШЕННОЕ АВТОСОХРАНЕНИЕ: Через DataBridge с резервированием в Supabase
   useEffect(() => {

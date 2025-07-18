@@ -36,92 +36,76 @@ export const RegistrationComplete: React.FC = () => {
   const [isDataTransferred, setIsDataTransferred] = useState(false);
   const [newUser, setNewUser] = useState(null);
   const [transferResult, setTransferResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const selectedPersona = state.step3Data.selectedPersona 
     ? menopausePersonas[state.step3Data.selectedPersona]
     : null;
 
+  const handleCompleteRegistration = async () => {
+    try {
+      setIsLoading(true);
+      
+      // 1. СНАЧАЛА передаем данные в AuthContext
+      const registrationData = {
+        firstName: state.step4Data.firstName,
+        lastName: state.step4Data.lastName, 
+        email: state.step1Data.email,
+        role: 'patient',
+        selectedPersona: state.step3Data.selectedPersona, // Важно сохранить выбранную персону!
+        agreedToTerms: true,
+        agreedToPrivacy: true,
+        registrationCompleted: true
+      };
+      
+      // 2. Завершаем регистрацию и получаем созданного пользователя
+      const createdUser = await completeRegistration({
+        step1: state.step1Data,
+        step2: state.step2Data,
+        step3: {
+          personaId: state.step3Data.selectedPersona!,
+          additionalData: state.step3Data.additionalAnswers
+        },
+        password: state.step4Data.password,
+        firstName: state.step4Data.firstName,
+        lastName: state.step4Data.lastName
+      });
+      setNewUser(createdUser);
+      
+      // 3. Сохраняем в localStorage как fallback
+      localStorage.setItem('registration_data', JSON.stringify(registrationData));
+      localStorage.setItem('onboarding_presets', JSON.stringify({
+        persona: state.step3Data.selectedPersona,
+        userName: state.step4Data.firstName,
+        startStep: getPersonaStartStep(state.step3Data.selectedPersona)
+      }));
+      
+      setIsDataTransferred(true);
+      
+      toast({
+        title: 'Регистрация завершена!',
+        description: `Добро пожаловать, ${createdUser.firstName}!`,
+      });
+
+      logger.info('Registration data successfully transferred and saved');
+      
+    } catch (error) {
+      console.error('❌ Error completing registration:', error);
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Произошла ошибка при завершении регистрации',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // ✅ ИСПРАВЛЕНИЕ: Завершаем регистрацию и сохраняем данные ПЕРЕД очисткой
-    const completeAuthRegistration = async () => {
-      if (!state.isCompleted || isDataTransferred) return;
-
-      try {
-        const registrationData = {
-          step1: state.step1Data,
-          step2: state.step2Data,
-          step3: {
-            personaId: state.step3Data.selectedPersona!,
-            additionalData: state.step3Data.additionalAnswers
-          },
-          password: state.step4Data.password,
-          firstName: state.step4Data.firstName,
-          lastName: state.step4Data.lastName
-        };
-
-        // Завершаем регистрацию и получаем созданного пользователя
-        const createdUser = await completeRegistration(registrationData);
-        setNewUser(createdUser);
-        
-        // ✅ НОВОЕ: Используем DataBridge для безопасной передачи данных
-        const dataBridge = DataBridge.getInstance();
-        const result = dataBridge.transferRegistrationToOnboarding(createdUser, {
-          step1: state.step1Data,
-          step2: state.step2Data,
-          step3: state.step3Data
-        });
-        
-        setTransferResult(result);
-        
-        if (result.success) {
-          setIsDataTransferred(true);
-          
-          // Логируем успешную передачу с аналитикой
-          const analytics = dataBridge.getTransferAnalytics();
-          logger.debug('DataBridge analytics processed', { analyticsGenerated: !!analytics });
-        } else {
-          console.error('❌ DataBridge transfer failed:', result.errors);
-          // Fallback to old method
-          const onboardingPresets = {
-            fromRegistration: true,
-            personaId: state.step3Data.selectedPersona,
-            registrationTimestamp: new Date().toISOString(),
-            basicInfo: {
-              firstName: state.step4Data.firstName,
-              lastName: state.step4Data.lastName,
-              email: state.step1Data.email,
-              phone: state.step1Data.phone
-            },
-            consents: {
-              ...state.step2Data,
-              timestamp: new Date().toISOString()
-            },
-            expectedOnboardingPath: getOnboardingPathByPersona(state.step3Data.selectedPersona)
-          };
-          
-          localStorage.setItem('eva_onboarding_presets', JSON.stringify(onboardingPresets));
-          setIsDataTransferred(true);
-        }
-        
-        toast({
-          title: 'Регистрация завершена!',
-          description: `Добро пожаловать, ${createdUser.firstName}!`,
-        });
-
-        logger.info('Registration data successfully transferred and saved');
-        
-      } catch (error) {
-        console.error('❌ Error completing registration:', error);
-        toast({
-          title: 'Ошибка',
-          description: error instanceof Error ? error.message : 'Произошла ошибка при завершении регистрации',
-          variant: 'destructive',
-        });
-      }
-    };
-
-    completeAuthRegistration();
-  }, [state, completeRegistration, isDataTransferred]);
+    if (state.isCompleted && !isDataTransferred) {
+      handleCompleteRegistration();
+    }
+  }, [state.isCompleted, isDataTransferred]);
 
   // ✅ ИСПРАВЛЕНИЕ: Переход только после успешной передачи данных
   const handleContinueManually = () => {
@@ -134,8 +118,10 @@ export const RegistrationComplete: React.FC = () => {
       return;
     }
 
-    // Теперь безопасно очищаем регистрационные данные
+    // 4. ТОЛЬКО ПОСЛЕ ЭТОГО очищаем временные данные
     resetRegistration();
+    
+    // 5. Редирект на онбординг
     navigate('/patient/onboarding');
   };
 
@@ -280,6 +266,16 @@ export const RegistrationComplete: React.FC = () => {
       </div>
     </div>
   );
+};
+
+// Добавить функцию определения стартового шага:
+const getPersonaStartStep = (persona: string) => {
+  switch(persona) {
+    case 'first_signs': return 1;
+    case 'active_phase': return 2; 
+    case 'postmenopause': return 3;
+    default: return 1;
+  }
 };
 
 // ✅ НОВОЕ: Вспомогательные функции для определения пути онбординга

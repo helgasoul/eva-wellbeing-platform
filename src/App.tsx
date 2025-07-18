@@ -30,6 +30,7 @@ import MultiStepRegistration from "./pages/auth/MultiStepRegistration";
 // Patient pages
 import PatientDashboard from "./pages/PatientDashboard";
 import PatientOnboarding from "./pages/patient/PatientOnboarding";
+import ProfileSetup from "./pages/patient/ProfileSetup";
 import SymptomTracker from "./pages/patient/SymptomTracker";
 import PatientInsights from "./pages/patient/PatientInsights";
 import AIChat from "./pages/patient/AIChat";
@@ -229,6 +230,13 @@ function App() {
                     <Route path="/patient/onboarding" element={
                       <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
                         <PatientOnboarding />
+                      </ProtectedRoute>
+                    } />
+                    
+                    {/* Настройка профиля БЕЗ OnboardingGuard */}
+                    <Route path="/patient/profile-setup" element={
+                      <ProtectedRoute allowedRoles={[UserRole.PATIENT]}>
+                        <ProfileSetup />
                       </ProtectedRoute>
                     } />
                     

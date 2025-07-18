@@ -141,6 +141,30 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   return <>{children}</>;
 };
 
+// Вспомогательная функция для определения пути редиректа
+const getUserRedirectPath = (user: any) => {
+  // Если нет пользователя - на логин
+  if (!user) return '/login';
+  
+  // Если регистрация не завершена
+  if (!user.registrationCompleted) {
+    return '/register'; 
+  }
+  
+  // Если онбординг не завершен ИЛИ нет геолокации - на онбординг
+  if (!user.onboardingCompleted) {
+    return '/patient/onboarding';
+  }
+  
+  // Если все завершено, но нет геолокации - на настройку профиля  
+  if (!user.locationData) {
+    return '/patient/profile-setup'; // Новая страница
+  }
+  
+  // Все завершено - в дашборд
+  return '/patient/dashboard';
+};
+
 // Вспомогательная функция для определения дашборда по роли
 const getDashboardByRole = (role: string): string => {
   switch (role) {
