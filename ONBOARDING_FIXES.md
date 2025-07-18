@@ -108,6 +108,7 @@ const PatientOnboarding = () => {
     const presets = dataBridge.loadPresets();
     const authData = user?.onboardingData;
     const fromRegistration = location.state?.fromRegistration;
+  }, [user, location.state?.fromRegistration]);
 
     const initialData = {
       // Данные из регистрации
