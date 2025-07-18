@@ -7,6 +7,8 @@ import { CheckCircle, Sparkles, Heart, Shield, ArrowRight, Clock } from 'lucide-
 import { toast } from '@/hooks/use-toast';
 import { DataBridge } from '@/services/DataBridge';
 import { logger } from '@/utils/logger';
+import { SafeStorage, SafeTimer, useSafeEffect } from '@/utils/storageUtils';
+import type { PersonaType } from '@/types/auth';
 
 const menopausePersonas = {
   first_signs: {
@@ -37,9 +39,15 @@ export const RegistrationComplete: React.FC = () => {
   const [newUser, setNewUser] = useState(null);
   const [transferResult, setTransferResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { safeSetTimeout, cleanup } = useSafeEffect();
+  
+  // ✅ БЕЗОПАСНАЯ ТИПИЗАЦИЯ: Проверяем тип персоны
+  const validatePersona = (persona: string): persona is PersonaType => {
+    return ['first_signs', 'active_phase', 'postmenopause'].includes(persona);
+  };
   
   const selectedPersona = state.step3Data.selectedPersona 
-    ? menopausePersonas[state.step3Data.selectedPersona]
+    ? menopausePersonas[state.step3Data.selectedPersona as keyof typeof menopausePersonas]
     : null;
 
   const handleCompleteRegistration = async () => {
@@ -83,13 +91,17 @@ export const RegistrationComplete: React.FC = () => {
         });
       }
       
-      // 3. Сохраняем в localStorage как fallback
-      localStorage.setItem('registration_data', JSON.stringify(registrationData));
-      localStorage.setItem('onboarding_presets', JSON.stringify({
+      // 3. ✅ БЕЗОПАСНОЕ сохранение в localStorage с проверкой
+      const registrationSaved = SafeStorage.setItemWithTimestamp('registration_data', registrationData);
+      const presetsSaved = SafeStorage.setItemWithTimestamp('onboarding_presets', {
         persona: state.step3Data.selectedPersona,
         userName: state.step4Data.firstName,
         startStep: getPersonaStartStep(state.step3Data.selectedPersona)
-      }));
+      });
+
+      if (!registrationSaved || !presetsSaved) {
+        throw new Error('Не удалось сохранить данные регистрации');
+      }
       
       setIsDataTransferred(true);
       
@@ -139,12 +151,17 @@ export const RegistrationComplete: React.FC = () => {
         });
       }
 
-      // 5. Финальная проверка сохранности данных перед очисткой
-      const savedData = localStorage.getItem('registration_data');
-      const savedPresets = localStorage.getItem('onboarding_presets');
+      // 5. ✅ БЕЗОПАСНАЯ проверка сохранности данных перед очисткой
+      const savedData = SafeStorage.getItem<{email: string}>('registration_data');
+      const savedPresets = SafeStorage.getItem<{persona: string}>('onboarding_presets');
       
       if (!savedData || !savedPresets) {
-        throw new Error('Данные регистрации не сохранены');
+        throw new Error('Данные регистрации не сохранены корректно');
+      }
+
+      // Дополнительная проверка целостности данных
+      if (!savedData.email || !savedPresets.persona) {
+        throw new Error('Повреждены критически важные данные регистрации');
       }
 
       // 6. ТОЛЬКО ПОСЛЕ полной гарантии сохранности данных очищаем временные данные
@@ -162,15 +179,16 @@ export const RegistrationComplete: React.FC = () => {
     }
   };
 
-  // Автоматический переход через 5 секунд после успешной передачи данных
+  // ✅ БЕЗОПАСНЫЙ автоматический переход с очисткой таймеров
   useEffect(() => {
     if (isDataTransferred) {
-      const timer = setTimeout(() => {
+      safeSetTimeout(() => {
         handleContinueManually();
-      }, 5000);
-      
-      return () => clearTimeout(timer);
+      }, 5000, 'auto-continue-timer');
     }
+    
+    // Очистка таймеров при размонтировании
+    return cleanup;
   }, [isDataTransferred]);
 
   return (

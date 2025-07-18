@@ -19,13 +19,13 @@ export interface User {
   registrationCompleted?: boolean;
   onboardingCompleted?: boolean;
   
-  // ✅ ДОБАВЛЕНО: Поля для персонализации и пресетов
+  // ✅ ИСПРАВЛЕНО: Типизация для персонализации с защитой от undefined
   menopausePhase?: string;
-  selectedPersona?: string;
-  onboardingPresets?: OnboardingPresets;
+  selectedPersona?: string | null;
+  onboardingPresets?: OnboardingPresets | null;
 }
 
-// ✅ ДОБАВЛЕНО: Типизация для OnboardingPresets  
+// ✅ ИСПРАВЛЕНО: Строгая типизация для OnboardingPresets  
 export interface OnboardingPresets {
   persona: string;
   userName: string;
@@ -39,6 +39,16 @@ export interface OnboardingPresets {
     terms: boolean;
     privacy: boolean;
   };
+}
+
+// ✅ ДОБАВЛЕНО: Типы для безопасной работы с данными персонализации
+export type PersonaType = 'first_signs' | 'active_phase' | 'postmenopause';
+
+export interface SafeUserData {
+  selectedPersona: PersonaType | null;
+  onboardingPresets: OnboardingPresets | null;
+  hasValidPersona: boolean;
+  hasValidPresets: boolean;
 }
 
 export interface UserDataSummary {
