@@ -308,7 +308,7 @@ class SyncManager {
       isOnline: this.isOnline,
       lastSync,
       pendingChanges,
-      isSimcing: this.syncInProgress,
+      isSyncing: this.syncInProgress,
       syncProgress: 0, // TODO: реализовать расчет прогресса
       errors: []
     };
@@ -319,7 +319,7 @@ class SyncManager {
       isOnline: this.isOnline,
       lastSync: null,
       pendingChanges: 0,
-      isSimcing: this.syncInProgress,
+      isSyncing: this.syncInProgress,
       syncProgress: 0,
       errors: []
     };
