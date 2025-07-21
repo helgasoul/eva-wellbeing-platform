@@ -31,7 +31,6 @@ export const LoginForm = () => {
     setValue,
     watch,
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',

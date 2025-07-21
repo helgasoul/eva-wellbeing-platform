@@ -15,5 +15,9 @@ export const logger = {
   
   debug: (message: string, data?: any) => {
     console.log(`[DEBUG] ${message}`, data || '');
+  },
+
+  success: (message: string, data?: any) => {
+    console.log(`[SUCCESS] ${message}`, data || '');
   }
 };

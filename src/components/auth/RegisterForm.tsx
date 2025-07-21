@@ -25,7 +25,6 @@ export const RegisterForm = () => {
     setValue,
     watch,
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
     defaultValues: {
       firstName: '',
       lastName: '',

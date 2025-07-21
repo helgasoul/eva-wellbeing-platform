@@ -34,7 +34,6 @@ export default function ResetPassword() {
     handleSubmit,
     formState: { errors }
   } = useForm<ResetPasswordFormData>({
-    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: '',
       confirmPassword: '',
@@ -68,7 +67,7 @@ export default function ResetPassword() {
         return;
       }
 
-      const { user: updatedUser } = await updatePassword(data.password, accessToken, refreshToken);
+      const { user: updatedUser } = await updatePassword(data);
       
       toast({
         title: 'Пароль обновлен',

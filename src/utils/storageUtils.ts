@@ -35,6 +35,16 @@ export const SafeStorage = {
       console.error('Storage removal error:', error);
       return false;
     }
+  },
+
+  setItem: (key: string, data: any): boolean => {
+    try {
+      localStorage.setItem(key, typeof data === 'string' ? data : JSON.stringify(data));
+      return true;
+    } catch (error) {
+      console.error('Storage error:', error);
+      return false;
+    }
   }
 };
 
