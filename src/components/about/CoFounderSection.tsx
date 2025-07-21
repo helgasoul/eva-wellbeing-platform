@@ -33,10 +33,10 @@ export const CoFounderSection: React.FC<CoFounderSectionProps> = ({
         {/* Заголовок секции */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-[#53415B] mb-4 leading-tight animate-fade-in">
-            Со-основательница проекта
+            Со-основательница и главный медицинский консультант
           </h2>
           <p className="text-xl text-[#6B73FF] max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            Технологический гений, который делает заботу о женском здоровье доступнее
+            Опытный врач-онколог, который привносит медицинскую экспертизу в заботу о женском здоровье
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export const CoFounderSection: React.FC<CoFounderSectionProps> = ({
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-indigo-200/30 shadow-lg animate-fade-in" style={{ animationDelay: '0.6s' }}>
                 <div className="text-4xl text-[#6B73FF] mb-4 text-center">"</div>
                 <p className="text-lg text-[#53415B] italic text-center leading-relaxed">
-                  Технологии должны служить человеку, а не наоборот. Каждая женщина заслуживает персонального подхода.
+                  Каждая женщина заслуживает профессиональной медицинской поддержки на всех этапах жизни.
                 </p>
                 <div className="text-4xl text-[#6B73FF] text-right">"</div>
               </div>
@@ -111,7 +111,7 @@ export const CoFounderSection: React.FC<CoFounderSectionProps> = ({
                   <div className="w-12 h-12 bg-gradient-to-br from-indigo-400/80 to-blue-500/80 rounded-xl flex items-center justify-center mr-4">
                     <Brain className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-[#53415B]">Путь в технологиях</h3>
+                  <h3 className="text-xl font-semibold text-[#53415B]">Медицинский путь</h3>
                 </div>
                 <AdminEditableSection
                   title="История присоединения"
@@ -130,7 +130,7 @@ export const CoFounderSection: React.FC<CoFounderSectionProps> = ({
                   <div className="w-12 h-12 bg-gradient-to-br from-violet-400/80 to-purple-500/80 rounded-xl flex items-center justify-center mr-4">
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-[#53415B]">Технологическое видение</h3>
+                  <h3 className="text-xl font-semibold text-[#53415B]">Медицинское видение</h3>
                 </div>
                 <AdminEditableSection
                   title="Видение будущего"
@@ -149,10 +149,10 @@ export const CoFounderSection: React.FC<CoFounderSectionProps> = ({
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-400/80 to-cyan-500/80 rounded-xl flex items-center justify-center mr-4">
                     <Code className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-[#53415B]">Инновации с заботой</h3>
+                  <h3 className="text-xl font-semibold text-[#53415B]">Профессиональная экспертиза</h3>
                 </div>
                 <p className="text-[#6B73FF] leading-relaxed">
-                  Разрабатываю AI-решения, которые понимают потребности каждой женщины. Каждая строчка кода — это шаг к персонализированной медицине.
+                  Как врач-онколог с высшей категорией, привношу медицинскую экспертизу в разработку платформы. Мой опыт в диагностике заболеваний молочной железы помогает создавать действительно полезные инструменты для женщин.
                 </p>
               </div>
             </div>
