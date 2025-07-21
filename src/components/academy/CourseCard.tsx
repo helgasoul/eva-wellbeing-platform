@@ -1,10 +1,14 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Clock, Star, Users, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { Course, UserProgress } from '@/types/academy';
+import { CourseImage } from './CourseImage';
+import { InstructorAvatar } from './InstructorAvatar';
+import { CourseMetaInfo } from './CourseMetaInfo';
+import { CourseProgress } from './CourseProgress';
 
 interface CourseCardProps {
   course: Course;
@@ -45,26 +49,32 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   const isEnrolled = !!progress;
   const isCompleted = progress?.completion_percentage === 100;
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    if (hours > 0) {
-      return `${hours}ч ${remainingMinutes}м`;
-    }
-    return `${minutes}м`;
+  const handleEnrollClick = () => {
+    onEnroll?.(course.id);
+  };
+
+  const handleContinueClick = () => {
+    onContinue?.(course.id);
+  };
+
+  const handlePreviewClick = () => {
+    onPreview?.(course.id);
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-      {/* Превью изображение */}
-      <div className="relative aspect-video overflow-hidden">
-        <img
-          src={course.thumbnail_url || '/placeholder-course.jpg'}
-          alt={course.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    <Card 
+      className="group hover:shadow-lg transition-all duration-300 overflow-hidden"
+      role="article"
+      aria-labelledby={`course-title-${course.id}`}
+    >
+      {/* Course Image */}
+      <div className="relative">
+        <CourseImage
+          src={course.thumbnail_url}
+          alt={`Превью курса: ${course.title}`}
         />
         
-        {/* Badges */}
+        {/* Status Badges */}
         <div className="absolute top-2 left-2 flex gap-1">
           {course.is_featured && (
             <Badge variant="secondary" className="bg-primary text-primary-foreground">
@@ -78,20 +88,21 @@ export const CourseCard: React.FC<CourseCardProps> = ({
           )}
         </div>
 
-        {/* Preview button */}
+        {/* Preview Button */}
         {course.preview_video_url && (
           <Button
             variant="secondary"
             size="sm"
             className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm hover:bg-background/90"
-            onClick={() => onPreview?.(course.id)}
+            onClick={handlePreviewClick}
+            aria-label={`Посмотреть превью курса: ${course.title}`}
           >
-            <Play className="w-4 h-4 mr-1" />
+            <Play className="w-4 h-4 mr-1" aria-hidden="true" />
             Превью
           </Button>
         )}
 
-        {/* Subscription tier indicator */}
+        {/* Subscription Tier */}
         <div className="absolute bottom-2 right-2">
           <Badge 
             variant="outline" 
@@ -103,23 +114,22 @@ export const CourseCard: React.FC<CourseCardProps> = ({
       </div>
 
       <CardHeader className="pb-3">
-        <div className="flex justify-between items-start gap-2">
-          <h3 className="font-semibold text-lg leading-tight line-clamp-2">
-            {course.title}
-          </h3>
-        </div>
+        {/* Course Title */}
+        <h3 
+          id={`course-title-${course.id}`}
+          className="font-semibold text-lg leading-tight line-clamp-2"
+        >
+          {course.title}
+        </h3>
         
+        {/* Course Description */}
         <p className="text-muted-foreground text-sm line-clamp-2">
           {course.description}
         </p>
 
         {/* Instructor */}
         <div className="flex items-center gap-2 mt-2">
-          <img
-            src={course.instructor.photo_url || '/placeholder-avatar.jpg'}
-            alt={course.instructor.name}
-            className="w-6 h-6 rounded-full"
-          />
+          <InstructorAvatar instructor={course.instructor} size="sm" />
           <span className="text-sm text-muted-foreground">
             {course.instructor.name}
           </span>
@@ -127,23 +137,15 @@ export const CourseCard: React.FC<CourseCardProps> = ({
       </CardHeader>
 
       <CardContent className="pt-0">
-        {/* Course meta info */}
-        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-          <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            {formatDuration(course.duration_minutes)}
-          </div>
-          <div className="flex items-center gap-1">
-            <Users className="w-4 h-4" />
-            {course.total_lessons} уроков
-          </div>
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 fill-current text-yellow-400" />
-            {course.average_rating.toFixed(1)}
-          </div>
-        </div>
+        {/* Course Meta Information */}
+        <CourseMetaInfo
+          durationMinutes={course.duration_minutes}
+          totalLessons={course.total_lessons}
+          averageRating={course.average_rating}
+          className="mb-4"
+        />
 
-        {/* Category and difficulty */}
+        {/* Category and Difficulty Badges */}
         <div className="flex gap-2 mb-4">
           <Badge variant="secondary" className="text-xs">
             {categoryLabels[course.category]}
@@ -153,36 +155,30 @@ export const CourseCard: React.FC<CourseCardProps> = ({
           </Badge>
         </div>
 
-        {/* Progress */}
-        {isEnrolled && (
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-1">
-              <span>Прогресс</span>
-              <span>{Math.round(progress.completion_percentage)}%</span>
-            </div>
-            <Progress value={progress.completion_percentage} className="h-2" />
-            {isCompleted && (
-              <p className="text-green-600 text-xs mt-1 font-medium">
-                ✓ Курс завершен
-              </p>
-            )}
-          </div>
+        {/* Progress (for enrolled courses) */}
+        {isEnrolled && progress && (
+          <CourseProgress
+            completionPercentage={progress.completion_percentage}
+            className="mb-4"
+          />
         )}
 
-        {/* Action button */}
+        {/* Action Button */}
         <div className="flex gap-2">
           {!isEnrolled ? (
             <Button 
-              onClick={() => onEnroll?.(course.id)}
+              onClick={handleEnrollClick}
               className="w-full"
+              aria-label={`Записаться на курс: ${course.title}`}
             >
               Записаться на курс
             </Button>
           ) : (
             <Button 
-              onClick={() => onContinue?.(course.id)}
+              onClick={handleContinueClick}
               className="w-full"
               variant={isCompleted ? "outline" : "default"}
+              aria-label={isCompleted ? `Пересмотреть курс: ${course.title}` : `Продолжить курс: ${course.title}`}
             >
               {isCompleted ? 'Пересмотреть' : 'Продолжить'}
             </Button>

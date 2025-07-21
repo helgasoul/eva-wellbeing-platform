@@ -1,22 +1,17 @@
+
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { PatientLayout } from '@/components/layout/PatientLayout';
 import { CourseCard } from '@/components/academy/CourseCard';
+import { CourseCardSkeleton } from '@/components/academy/CourseCardSkeleton';
+import { AcademyFilters } from '@/components/academy/AcademyFilters';
+import { AcademyStats } from '@/components/academy/AcademyStats';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Search, 
-  Filter, 
   BookOpen, 
-  Award, 
-  Clock, 
   TrendingUp,
-  Star,
-  Users
+  Search
 } from 'lucide-react';
 import { Course, UserProgress, LearningStats } from '@/types/academy';
 import { AcademyService } from '@/services/academyService';
@@ -24,26 +19,9 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { useSupabaseErrorHandler } from '@/hooks/useSupabaseErrorHandler';
 
-const categoryOptions = [
-  { value: 'all', label: 'Все категории' },
-  { value: 'menopause_basics', label: 'Основы менопаузы' },
-  { value: 'hormones', label: 'Гормоны' },
-  { value: 'nutrition', label: 'Питание' },
-  { value: 'mental_health', label: 'Психическое здоровье' },
-  { value: 'sexuality', label: 'Сексуальность' },
-  { value: 'lifestyle', label: 'Образ жизни' }
-];
-
-const difficultyOptions = [
-  { value: 'all', label: 'Все уровни' },
-  { value: 'beginner', label: 'Начальный' },
-  { value: 'intermediate', label: 'Средний' },
-  { value: 'advanced', label: 'Продвинутый' }
-];
-
 const Academy: React.FC = () => {
   const { user } = useAuth();
-  const { executeWithErrorHandling, isLoading: errorHandlerLoading } = useSupabaseErrorHandler();
+  const { executeWithErrorHandling } = useSupabaseErrorHandler();
   const [courses, setCourses] = useState<Course[]>([]);
   const [userProgress, setUserProgress] = useState<Record<string, UserProgress>>({});
   const [learningStats, setLearningStats] = useState<LearningStats | null>(null);
@@ -80,7 +58,7 @@ const Academy: React.FC = () => {
         console.log('📚 Academy: Loaded courses:', coursesData.length);
         setCourses(coursesData);
 
-        // Загружаем прогресс пользователя
+        // Load user progress
         const progressPromises = coursesData.map(course => 
           executeWithErrorHandling(
             () => AcademyService.getUserProgress(course.id, user.id),
@@ -99,7 +77,7 @@ const Academy: React.FC = () => {
         setUserProgress(progressMap);
         console.log('📚 Academy: Loaded progress for courses:', Object.keys(progressMap).length);
 
-        // Загружаем статистику обучения
+        // Load learning stats
         const stats = await executeWithErrorHandling(
           () => AcademyService.getLearningStats(user.id),
           null,
@@ -137,12 +115,10 @@ const Academy: React.FC = () => {
   };
 
   const handleContinueCourse = (courseId: string) => {
-    // Перенаправляем на страницу курса
     window.location.href = `/academy/course/${courseId}`;
   };
 
   const handlePreviewCourse = (courseId: string) => {
-    // Показываем превью курса
     console.log('Preview course:', courseId);
     toast.info('Функция превью будет доступна скоро');
   };
@@ -167,14 +143,31 @@ const Academy: React.FC = () => {
   const enrolledCourses = courses.filter(course => userProgress[course.id]);
   const featuredCourses = courses.filter(course => course.is_featured);
 
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setSelectedDifficulty('all');
+  };
+
   if (loading) {
     return (
       <PatientLayout title="Академия без|паузы">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-64 mb-4"></div>
+        <div>
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="w-8 h-8 text-primary" />
+              <h1 className="text-3xl font-bold">Академия без|паузы</h1>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Образовательная платформа для женского здоровья и благополучия
+            </p>
+          </div>
+
+          {/* Loading skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-80 bg-muted rounded-lg"></div>
+              <CourseCardSkeleton key={i} />
             ))}
           </div>
         </div>
@@ -183,7 +176,6 @@ const Academy: React.FC = () => {
   }
 
   if (!user) {
-    console.log('📚 Academy: No user found, showing auth required message');
     return (
       <PatientLayout title="Академия без|паузы">
         <div className="text-center py-12">
@@ -219,85 +211,18 @@ const Academy: React.FC = () => {
 
         {/* Stats */}
         {learningStats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-card rounded-lg p-4 border">
-              <div className="flex items-center gap-2 mb-1">
-                <BookOpen className="w-4 h-4 text-primary" />
-                <span className="text-sm text-muted-foreground">Курсы</span>
-              </div>
-              <p className="text-2xl font-bold">{learningStats.total_courses_enrolled}</p>
-              <p className="text-xs text-muted-foreground">записано</p>
-            </div>
-            
-            <div className="bg-card rounded-lg p-4 border">
-              <div className="flex items-center gap-2 mb-1">
-                <Award className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-muted-foreground">Завершено</span>
-              </div>
-              <p className="text-2xl font-bold">{learningStats.total_courses_completed}</p>
-              <p className="text-xs text-muted-foreground">курсов</p>
-            </div>
-            
-            <div className="bg-card rounded-lg p-4 border">
-              <div className="flex items-center gap-2 mb-1">
-                <Clock className="w-4 h-4 text-blue-600" />
-                <span className="text-sm text-muted-foreground">Время</span>
-              </div>
-              <p className="text-2xl font-bold">{learningStats.total_hours_watched}</p>
-              <p className="text-xs text-muted-foreground">часов</p>
-            </div>
-            
-            <div className="bg-card rounded-lg p-4 border">
-              <div className="flex items-center gap-2 mb-1">
-                <Star className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm text-muted-foreground">Сертификаты</span>
-              </div>
-              <p className="text-2xl font-bold">{learningStats.certificates_earned}</p>
-              <p className="text-xs text-muted-foreground">получено</p>
-            </div>
-          </div>
+          <AcademyStats stats={learningStats} />
         )}
 
-        {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Поиск курсов..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Категория" />
-            </SelectTrigger>
-            <SelectContent>
-              {categoryOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Уровень" />
-            </SelectTrigger>
-            <SelectContent>
-              {difficultyOptions.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Filters */}
+        <AcademyFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          selectedDifficulty={selectedDifficulty}
+          onDifficultyChange={setSelectedDifficulty}
+        />
 
         {/* Featured Courses */}
         {featuredCourses.length > 0 && activeTab === 'all' && (
@@ -397,14 +322,7 @@ const Academy: React.FC = () => {
             <p className="text-muted-foreground mb-4">
               Попробуйте изменить параметры поиска или фильтры
             </p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
-                setSelectedDifficulty('all');
-              }}
-            >
+            <Button variant="outline" onClick={resetFilters}>
               Сбросить фильтры
             </Button>
           </div>
