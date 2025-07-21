@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Heart, Cloud, User, Crown } from 'lucide-react';
+import { Menu, X, Heart, User, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BackButton } from './BackButton';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { Logo } from '@/components/ui/logo';
 
@@ -35,20 +35,21 @@ export const Header = () => {
 
   const planInfo = getPlanDisplayInfo(currentPlan);
 
-  // Проверяем, нужно ли показывать кнопку "Назад" в хедере
-  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/login-safe', '/emergency-access'].includes(location.pathname);
-  const shouldShowBackButton = !isAuthPage;
+  // Show back button on non-root pages
+  const shouldShowBackButton = location.pathname !== '/';
 
   const isActive = (path: string) => location.pathname === path;
 
+  // Extended navigation for demo
   const navItems = [
-    { path: '/', label: 'Домой' },
-    { path: '/about', label: 'Почему без | паузы' },
+    { path: '/', label: 'Карта сайта' },
+    { path: '/patient/dashboard', label: 'Платформа' },
+    { path: '/about', label: 'О нас' },
     { path: '/how-we-help', label: 'Как мы помогаем' },
-    { path: '/contact', label: 'Написать команде' }
+    { path: '/contact', label: 'Контакты' }
   ];
 
-  // Simplified navigation for m4p version - always go to patient dashboard
+  // Navigate to patient dashboard for profile
   const handleMyProfileClick = React.useCallback(() => {
     navigate('/patient/dashboard');
   }, [navigate]);
@@ -57,19 +58,18 @@ export const Header = () => {
     <header className="bg-background/98 backdrop-blur-md border-b border-border sticky top-0 z-[100] shadow-elegant">
       <div className="container mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Кнопка назад и логотип */}
+          {/* Back button and logo */}
           <div className="flex items-center gap-4">
             {shouldShowBackButton && <BackButton />}
             <Link to="/" className="flex items-center group hover:scale-105 transition-transform duration-200">
               <div className="flex items-center relative">
                 <Logo size="md" showText={true} className="group-hover:animate-bloom-glow transition-all duration-300" />
-                {/* Декоративная аура при hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-300 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur-md scale-110"></div>
               </div>
             </Link>
           </div>
 
-          {/* Навигация для десктопа */}
+          {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-10">
             {navItems.map((item) => (
               <div key={item.path} className="relative flex items-center">
@@ -87,11 +87,11 @@ export const Header = () => {
             ))}
           </nav>
 
-          {/* Кнопки действий */}
-          <div className="hidden md:flex items-center space-x-3">
-            {/* Отображение текущего тарифа для авторизованных пользователей */}
+          {/* Action buttons */}
+          <div className="flex items-center space-x-3">
+            {/* Current plan display */}
             {user && planInfo && (
-              <Link to="/how-we-help" className="group">
+              <Link to="/how-we-help" className="group hidden md:block">
                 <div className={`bg-gradient-to-r ${planInfo.color} px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer flex items-center gap-2`} style={{color: planInfo.textColor}}>
                   <span className="text-base">{planInfo.icon}</span>
                   <span>{planInfo.name}</span>
@@ -102,7 +102,7 @@ export const Header = () => {
             
             <Button 
               variant="ghost"
-              className="text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
+              className="hidden md:flex text-foreground/80 hover:text-foreground hover:bg-muted/50 font-medium px-4 py-2 rounded-xl transition-all duration-200"
               onClick={handleMyProfileClick}
             >
               <User className="mr-2 h-4 w-4" />

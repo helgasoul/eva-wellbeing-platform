@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { UserRole } from '@/types/roles';
@@ -34,6 +35,7 @@ interface NavigationItem {
 export const MobileNavigation: React.FC<MobileNavigationProps> = ({ role, className }) => {
   const location = useLocation();
 
+  // Enhanced navigation for demo mode
   const getMainNavigationForRole = (userRole: UserRole): NavigationItem[] => {
     switch (userRole) {
       case UserRole.PATIENT:
@@ -41,9 +43,8 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ role, classN
           { name: 'Главная', href: '/patient/dashboard', icon: Home },
           { name: 'Симптомы', href: '/patient/symptoms', icon: Activity },
           { name: 'Питание', href: '/patient/nutrition', icon: Calculator },
-          { name: 'Академия без|паузы', href: '/patient/academy', icon: GraduationCap },
-          { name: 'ИИ-помощник', href: '/patient/ai-chat', icon: MessageSquare, badge: 2 },
-          { name: 'Настройки', href: '/patient/settings', icon: Settings },
+          { name: 'Академия', href: '/patient/academy', icon: GraduationCap },
+          { name: 'ИИ-чат', href: '/patient/ai-chat', icon: MessageSquare, badge: 2 },
         ];
       
       case UserRole.DOCTOR:
@@ -65,7 +66,12 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ role, classN
         ];
       
       default:
-        return [];
+        return [
+          { name: 'Главная', href: '/patient/dashboard', icon: Home },
+          { name: 'Симптомы', href: '/patient/symptoms', icon: Activity },
+          { name: 'Питание', href: '/patient/nutrition', icon: Calculator },
+          { name: 'ИИ-чат', href: '/patient/ai-chat', icon: MessageSquare },
+        ];
     }
   };
 

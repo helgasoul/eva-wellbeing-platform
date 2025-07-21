@@ -15,14 +15,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, isCollapsed = false }) =
   const navigation = getNavigationForRole(role);
   const isActive = (path: string) => location.pathname === path;
 
-  // Hide dev pages in production
-  const filteredNavigation = navigation.filter(item => {
-    if (process.env.NODE_ENV === 'production') {
-      const devPaths = ['/dev/', '/diagnostics', '/data-sources'];
-      return !devPaths.some(devPath => item.href.includes(devPath));
-    }
-    return true;
-  });
+  // Show all navigation items in demo mode
+  const filteredNavigation = navigation;
 
   const getRoleStyles = (userRole: UserRole) => {
     switch (userRole) {
