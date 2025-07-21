@@ -101,7 +101,6 @@ const PatientOnboarding = () => {
   const { user, completeOnboarding, updateUser, saveUserData, loadUserData } = useAuth();
   const navigate = useNavigate();
 
-  // ✅ КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Улучшенная проверка с восстановлением
   useEffect(() => {
     if (!user) {
       console.log('🔄 User not found, attempting emergency recovery...');
@@ -151,7 +150,6 @@ const PatientOnboarding = () => {
     checkOnboardingStatus(user);
   }, [user, navigate, updateUser]);
 
-  // ✅ УЛУЧШЕННАЯ функция проверки онбординга из всех источников
   const checkOnboardingStatus = async (currentUser: any) => {
     try {
       setIsLoading(true);
@@ -251,7 +249,6 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ УЛУЧШЕННАЯ функция загрузки данных онбординга
   const loadOnboardingData = async () => {
     try {
       console.log('📥 Loading onboarding data from all sources...');
@@ -320,7 +317,6 @@ const PatientOnboarding = () => {
     }
   };
 
-  // Функция персонализированных дефолтов:
   const getPersonaDefaults = (persona: string) => {
     switch(persona) {
       case 'first_signs':
@@ -342,7 +338,6 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ УЛУЧШЕННОЕ АВТОСОХРАНЕНИЕ с множественным резервированием
   useEffect(() => {
     const saveOnboardingData = async () => {
       if (!user?.id || Object.keys(formData).length === 0) return;
@@ -426,7 +421,6 @@ const PatientOnboarding = () => {
     return () => clearTimeout(timeoutId);
   }, [formData, currentStep, user?.id, saveUserData]);
 
-  // ✅ ИСПРАВЛЕНО: Улучшенная функция обновления данных с валидацией
   const updateFormData = (stepData: Partial<OnboardingData>) => {
     setFormData(prev => {
       const newData = { ...prev, ...stepData };
@@ -488,7 +482,6 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ УЛУЧШЕННОЕ завершение онбординга с восстановлением
   const handleOnboardingComplete = async () => {
     try {
       console.log('🎯 Starting onboarding completion process', {
@@ -501,6 +494,20 @@ const PatientOnboarding = () => {
       // Clear forced onboarding flag
       sessionStorage.removeItem('forcedOnboarding');
 
+      const structuredOnboardingData = {
+        menopausePhase: phaseResult?.phase || user?.menopausePhase,
+        symptoms: formData.symptoms ? Object.keys(formData.symptoms).filter(key => 
+          formData.symptoms[key]?.frequency && formData.symptoms[key].frequency !== 'never'
+        ) : [],
+        lifestyle: formData.lifestyle?.exerciseFrequency || 'not_specified',
+        
+        phaseResult,
+        recommendations,
+        formData,
+        completedAt: new Date().toISOString(),
+        version: '1.0'
+      };
+
       const onboardingSummary = {
         phaseResult,
         recommendations,
@@ -509,7 +516,6 @@ const PatientOnboarding = () => {
         version: '1.0'
       };
       
-      // 1. Множественное сохранение финальных данных
       const finalData = {
         ...formData,
         phaseResult,
@@ -519,16 +525,14 @@ const PatientOnboarding = () => {
         completed: true
       };
       
-      // Сохранение в множественных источниках
       const savePromises = [
         saveUserData('onboarding_data', finalData),
         updateUser({ 
           onboardingCompleted: true,
-          onboardingData: onboardingSummary
+          onboardingData: structuredOnboardingData
         })
       ];
       
-      // Сохранение в localStorage резервы
       const backupKeys = [
         'onboardingCompleted',
         'onboardingData',
@@ -548,10 +552,8 @@ const PatientOnboarding = () => {
         }
       });
       
-      // 2. Завершение через AuthContext
       await Promise.all(savePromises);
       
-      // 3. Завершение в Supabase
       await completeOnboarding(onboardingSummary);
 
       console.log('✅ Onboarding completed successfully with multiple backups');
@@ -561,13 +563,11 @@ const PatientOnboarding = () => {
         description: 'Анкета завершена. Переходим к настройке профиля.',
       });
 
-      // 4. Редирект на настройку профиля
       navigate('/patient/profile-setup', { replace: true });
 
     } catch (error) {
       console.error('❌ Error completing onboarding:', error);
       
-      // Экстренное сохранение при ошибке
       try {
         localStorage.setItem('emergency_onboarding_complete', JSON.stringify({
           formData,
@@ -594,7 +594,6 @@ const PatientOnboarding = () => {
     }
   };
 
-  // ✅ ИСПРАВЛЕНО: Правильная валидация для 7-шагового процесса с улучшенным логированием
   const canGoNext = () => {
     console.log(`🔍 Validating step ${currentStep}:`, {
       step: currentStep,
@@ -606,7 +605,6 @@ const PatientOnboarding = () => {
       case 1:
         return true; // Welcome step
       case 2:
-        // BasicInfoStep - требуются обязательные поля
         const basicValid = formData.basicInfo && 
                formData.basicInfo.age > 0 && 
                formData.basicInfo.height > 0 && 
@@ -614,22 +612,16 @@ const PatientOnboarding = () => {
         console.log(`📊 BasicInfo validation:`, { basicValid, data: formData.basicInfo });
         return basicValid;
       case 3:
-        // MenstrualHistoryStep - требуется возраст первой менструации
         const menstrualValid = formData.menstrualHistory && 
                formData.menstrualHistory.ageOfFirstPeriod > 0;
         console.log(`🩸 MenstrualHistory validation:`, { menstrualValid, data: formData.menstrualHistory });
         return menstrualValid;
       case 4:
-        // SymptomsStep - считается завершенным если:
-        // 1. Заполнена хотя бы одна частота симптомов (включая "never") ИЛИ
-        // 2. Выбрано "ничего из перечисленного" для физических/когнитивных симптомов
         const symptomsValid = formData.symptoms && (
-          // Проверяем частотные симптомы
           (formData.symptoms.hotFlashes?.frequency !== undefined ||
            formData.symptoms.nightSweats?.frequency !== undefined ||
            formData.symptoms.sleepProblems?.frequency !== undefined ||
            formData.symptoms.moodChanges?.frequency !== undefined) ||
-          // Или проверяем наличие данных о симптомах (включая "none_of_the_above")
           (formData.symptoms.physicalSymptoms?.length > 0 ||
            formData.symptoms.cognitiveSymptoms?.length > 0)
         );
@@ -645,13 +637,10 @@ const PatientOnboarding = () => {
         });
         return symptomsValid;
       case 5:
-        // MedicalHistoryStep - принимаем любые данные (даже пустые массивы)
         const medicalValid = formData.medicalHistory !== undefined;
         console.log(`🏥 MedicalHistory validation:`, { medicalValid, data: formData.medicalHistory });
         return medicalValid;
       case 6:
-        // LifestyleStep - считается завершенным если заполнены ключевые поля
-        // Пользователь может пропустить детали, если выбрал базовые параметры
         const lifestyleValid = formData.lifestyle && 
                formData.lifestyle.exerciseFrequency !== undefined &&
                formData.lifestyle.dietType !== undefined &&
@@ -662,7 +651,6 @@ const PatientOnboarding = () => {
         console.log(`🏃‍♀️ Lifestyle validation:`, { lifestyleValid, data: formData.lifestyle });
         return lifestyleValid;
       case 7:
-        // GoalsStep - требуется выбор хотя бы одной цели или заботы
         const goalsValid = formData.goals && (
           (formData.goals.primaryConcerns && formData.goals.primaryConcerns.length > 0) ||
           (formData.goals.goals && formData.goals.goals.length > 0)
@@ -675,7 +663,6 @@ const PatientOnboarding = () => {
     }
   };
 
-  // Show loading state during recovery
   if (isLoading) {
     return (
       <PatientLayout>
@@ -690,7 +677,6 @@ const PatientOnboarding = () => {
     );
   }
 
-  // Show the onboarding results without geolocation step
   if (showResults) {
     return (
       <PatientLayout>
@@ -716,14 +702,12 @@ const PatientOnboarding = () => {
           
           <div className="space-y-6"
           >
-            {/* Шаг 1: Добро пожаловать */}
             {currentStep === 1 && (
               <WelcomeStep 
                 onNext={handleNext}
               />
             )}
 
-            {/* Шаги 2-7: С навигацией */}
             {currentStep > 1 && (
               <div className="space-y-6">
                 <div className="bloom-card p-6">
@@ -731,7 +715,6 @@ const PatientOnboarding = () => {
                     {stepTitles[currentStep - 1]}
                   </h2>
                   
-                  {/* Шаг 2: Базовая информация */}
                   {currentStep === 2 && (
                     <BasicInfoStep
                       data={formData.basicInfo}
@@ -739,7 +722,6 @@ const PatientOnboarding = () => {
                     />
                   )}
 
-                  {/* Шаг 3: Менструальная история */}
                   {currentStep === 3 && (
                     <MenstrualHistoryStep
                       data={formData.menstrualHistory}
@@ -747,7 +729,6 @@ const PatientOnboarding = () => {
                     />
                   )}
 
-                  {/* Шаг 4: Симптомы */}
                   {currentStep === 4 && (
                     <SymptomsStep
                       data={formData.symptoms}
@@ -755,7 +736,6 @@ const PatientOnboarding = () => {
                     />
                   )}
 
-                  {/* Шаг 5: Медицинская история */}
                   {currentStep === 5 && (
                     <MedicalHistoryStep
                       data={formData.medicalHistory}
@@ -763,7 +743,6 @@ const PatientOnboarding = () => {
                     />
                   )}
 
-                  {/* Шаг 6: Образ жизни */}
                   {currentStep === 6 && (
                     <LifestyleStep
                       data={formData.lifestyle}
@@ -771,7 +750,6 @@ const PatientOnboarding = () => {
                     />
                   )}
 
-                  {/* Шаг 7: Цели */}
                   {currentStep === 7 && (
                     <GoalsStep
                       data={formData.goals}
@@ -779,7 +757,6 @@ const PatientOnboarding = () => {
                     />
                   )}
                   
-                  {/* Навигационные кнопки */}
                   <div className="flex justify-between mt-8">
                     <button
                       onClick={handlePrev}
@@ -807,8 +784,6 @@ const PatientOnboarding = () => {
   );
 };
 
-
-// ✅ НОВОЕ: Вспомогательная функция для получения названия персоны
 const getPersonaTitle = (personaId: string) => {
   const titles = {
     'first_signs': 'Первые признаки',

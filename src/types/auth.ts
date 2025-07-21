@@ -13,6 +13,12 @@ export interface User {
     menopausePhase?: string;
     symptoms?: string[];
     lifestyle?: string;
+    // New fields to accommodate onboarding summary
+    phaseResult?: any;
+    recommendations?: any;
+    formData?: any;
+    completedAt?: string;
+    version?: string;
   };
   phone?: string;
   emailVerified?: boolean;
