@@ -18,6 +18,10 @@ export interface Course {
   is_featured: boolean;
   is_new: boolean;
   completion_rate: number;
+  // Enhanced image management fields
+  image_keywords?: string[];
+  image_description?: string;
+  generated_image_url?: string;
 }
 
 export interface CourseInstructor {

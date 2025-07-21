@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Course, UserProgress, LearningStats } from '@/types/academy';
 import { AcademyService } from '@/services/academyService';
+import { CourseImageService } from '@/services/courseImageService';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { useSupabaseErrorHandler } from '@/hooks/useSupabaseErrorHandler';
@@ -57,6 +58,11 @@ const Academy: React.FC = () => {
       if (coursesData) {
         console.log('📚 Academy: Loaded courses:', coursesData.length);
         setCourses(coursesData);
+
+        // Enhance course images in the background (non-blocking)
+        CourseImageService.batchGenerateImages(coursesData).catch(error => {
+          console.warn('📚 Academy: Image enhancement failed:', error);
+        });
 
         // Load user progress
         const progressPromises = coursesData.map(course => 

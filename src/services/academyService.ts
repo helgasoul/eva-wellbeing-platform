@@ -53,7 +53,10 @@ export class AcademyService {
         .from('courses')
         .select(`
           *,
-          instructor:instructors(*)
+          instructor:instructors(*),
+          image_keywords,
+          image_description,
+          generated_image_url
         `);
 
       if (filters?.category && filters.category !== 'all') {
@@ -92,7 +95,10 @@ export class AcademyService {
         .from('courses')
         .select(`
           *,
-          instructor:instructors(*)
+          instructor:instructors(*),
+          image_keywords,
+          image_description,
+          generated_image_url
         `)
         .eq('id', courseId)
         .single();

@@ -72,6 +72,10 @@ export const CourseCard: React.FC<CourseCardProps> = ({
         <CourseImage
           src={course.thumbnail_url}
           alt={`Превью курса: ${course.title}`}
+          generatedImageUrl={course.generated_image_url}
+          imageDescription={course.image_description}
+          imageKeywords={course.image_keywords}
+          category={course.category}
         />
         
         {/* Status Badges */}

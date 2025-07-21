@@ -992,6 +992,50 @@ export type Database = {
         }
         Relationships: []
       }
+      course_image_logs: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          created_by: string | null
+          generation_prompt: string | null
+          id: string
+          image_type: string
+          image_url: string
+          is_active: boolean | null
+          keywords: string[] | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          generation_prompt?: string | null
+          id?: string
+          image_type: string
+          image_url: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          generation_prompt?: string | null
+          id?: string
+          image_type?: string
+          image_url?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_image_logs_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           average_rating: number | null
@@ -1001,7 +1045,10 @@ export type Database = {
           description: string | null
           difficulty: Database["public"]["Enums"]["course_difficulty"]
           duration_minutes: number | null
+          generated_image_url: string | null
           id: string
+          image_description: string | null
+          image_keywords: string[] | null
           instructor_id: string | null
           is_featured: boolean | null
           is_new: boolean | null
@@ -1022,7 +1069,10 @@ export type Database = {
           description?: string | null
           difficulty: Database["public"]["Enums"]["course_difficulty"]
           duration_minutes?: number | null
+          generated_image_url?: string | null
           id?: string
+          image_description?: string | null
+          image_keywords?: string[] | null
           instructor_id?: string | null
           is_featured?: boolean | null
           is_new?: boolean | null
@@ -1043,7 +1093,10 @@ export type Database = {
           description?: string | null
           difficulty?: Database["public"]["Enums"]["course_difficulty"]
           duration_minutes?: number | null
+          generated_image_url?: string | null
           id?: string
+          image_description?: string | null
+          image_keywords?: string[] | null
           instructor_id?: string | null
           is_featured?: boolean | null
           is_new?: boolean | null
