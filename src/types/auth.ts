@@ -105,9 +105,12 @@ export interface AuthContextType {
   returnToOriginalRole: () => void;
   isTestingRole: boolean;
   
-  // DataBridge methods
-  saveUserData: (data: any) => Promise<void>;
-  loadUserData: () => Promise<any>;
+  // Updated DataBridge methods with overloaded signatures
+  saveUserData: {
+    (key: string, data: any): Promise<void>;
+    (data: any): Promise<void>;
+  };
+  loadUserData: (key?: string) => Promise<any>;
   getUserDataSummary: () => Promise<any>;
   
   // Diagnostic methods

@@ -1,6 +1,8 @@
+
 import React, { createContext, useContext, ReactNode } from 'react';
 import { User, AuthContextType } from '@/types/auth';
 import { UserRole } from '@/types/roles';
+import { unifiedDataBridge } from '@/services/UnifiedDataBridge';
 
 // Test user data for m4p version
 const TEST_USER: User = {
@@ -52,8 +54,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // No-op for m4p version
     },
     completeRegistration: async () => TEST_USER,
-    updateUser: () => {
-      // No-op for m4p version
+    updateUser: (data: Partial<User>) => {
+      // Update the onboardingData if provided
+      if (data.onboardingData) {
+        Object.assign(TEST_USER.onboardingData || {}, data.onboardingData);
+      }
+      // Update other user fields
+      Object.assign(TEST_USER, data);
     },
     completeOnboarding: async () => {
       // No-op for m4p version
@@ -75,27 +82,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     },
     isTestingRole: false,
     
-    // DataBridge методы
-    saveUserData: async () => {
-      // No-op for m4p version
-    },
-    loadUserData: async () => ({}),
-    getUserDataSummary: async () => ({
-      hasData: true,
-      summary: {
-        onboardingCompleted: true,
-        symptomEntries: [],
-        nutritionEntries: [],
-        aiChatHistory: [],
-        weatherData: []
+    // Updated DataBridge methods with unified interface
+    saveUserData: async (keyOrData: string | any, data?: any) => {
+      if (typeof keyOrData === 'string' && data !== undefined) {
+        await unifiedDataBridge.saveUserData(keyOrData, data);
+      } else {
+        await unifiedDataBridge.saveUserData(keyOrData);
       }
-    }),
+    },
     
-    // Методы диагностики data flow
-    validateUserDataIntegrity: () => ({}),
-    getDataFlowStatus: () => [],
-    repairDataFlow: async () => true,
-    exportUserDataDump: () => ({}),
+    loadUserData: async (key?: string) => {
+      return await unifiedDataBridge.loadUserData(key);
+    },
+    
+    getUserDataSummary: async () => {
+      return await unifiedDataBridge.getUserDataSummary();
+    },
+    
+    // Diagnostic methods
+    validateUserDataIntegrity: () => unifiedDataBridge.validateUserDataIntegrity(),
+    getDataFlowStatus: () => unifiedDataBridge.getDataFlowStatus(),
+    repairDataFlow: async () => await unifiedDataBridge.repairDataFlow(),
+    exportUserDataDump: () => unifiedDataBridge.exportUserDataDump(),
     
     needsMigration: false,
     isAuthenticated: true
