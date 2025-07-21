@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface ContactVerificationData {
@@ -57,27 +58,27 @@ const RegistrationContext = createContext<RegistrationContextType | undefined>(u
 const initialState: RegistrationState = {
   currentStep: 1,
   step1Data: {
-    email: '',
-    phone: '',
-    emailVerified: false,
-    phoneVerified: false,
+    email: 'test@eva-platform.ru',
+    phone: '+7 999 123 45 67',
+    emailVerified: true,
+    phoneVerified: true,
     verificationCodes: {}
   },
   step2Data: {
-    gdpr_basic: false,
-    medical_data: false,
-    ai_analysis: false,
-    research_participation: false,
-    marketing_communications: false
+    gdpr_basic: true,
+    medical_data: true,
+    ai_analysis: true,
+    research_participation: true,
+    marketing_communications: true
   },
   step3Data: {
-    selectedPersona: null,
+    selectedPersona: 'active_phase',
     additionalAnswers: {}
   },
   step4Data: {
     password: '',
-    firstName: '',
-    lastName: ''
+    firstName: 'Анна',
+    lastName: 'Тестова'
   },
   isCompleted: false
 };
@@ -85,32 +86,21 @@ const initialState: RegistrationState = {
 export const RegistrationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<RegistrationState>(initialState);
 
+  // Simplified mock functions for m4p version
   const updateStep1Data = (data: Partial<ContactVerificationData>) => {
-    setState(prev => ({
-      ...prev,
-      step1Data: { ...prev.step1Data, ...data }
-    }));
+    setState(prev => ({ ...prev, step1Data: { ...prev.step1Data, ...data } }));
   };
 
   const updateStep2Data = (data: Partial<LegalConsentsData>) => {
-    setState(prev => ({
-      ...prev,
-      step2Data: { ...prev.step2Data, ...data }
-    }));
+    setState(prev => ({ ...prev, step2Data: { ...prev.step2Data, ...data } }));
   };
 
   const updateStep3Data = (data: Partial<PersonaSelectionData>) => {
-    setState(prev => ({
-      ...prev,
-      step3Data: { ...prev.step3Data, ...data }
-    }));
+    setState(prev => ({ ...prev, step3Data: { ...prev.step3Data, ...data } }));
   };
 
   const updateStep4Data = (data: Partial<{ password: string; firstName: string; lastName: string }>) => {
-    setState(prev => ({
-      ...prev,
-      step4Data: { ...prev.step4Data, ...data }
-    }));
+    setState(prev => ({ ...prev, step4Data: { ...prev.step4Data, ...data } }));
   };
 
   const nextStep = () => {
@@ -128,19 +118,8 @@ export const RegistrationProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const canProceedToStep = (step: number): boolean => {
-    switch (step) {
-      case 1:
-        return true;
-      case 2:
-        return state.step1Data.emailVerified;
-      case 3:
-        const requiredConsents = ['gdpr_basic', 'medical_data', 'ai_analysis'] as const;
-        return requiredConsents.every(consent => state.step2Data[consent]);
-      case 4:
-        return !!state.step3Data.selectedPersona;
-      default:
-        return false;
-    }
+    // Always return true for m4p version
+    return true;
   };
 
   const completeRegistration = () => {

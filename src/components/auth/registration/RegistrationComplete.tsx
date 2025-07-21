@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -5,9 +6,6 @@ import { useRegistration } from '@/context/RegistrationContext';
 import { useAuth } from '@/context/AuthContext';
 import { CheckCircle, Sparkles, Heart, Shield, ArrowRight, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { DataBridge } from '@/services/DataBridge';
-import { logger } from '@/utils/logger';
-import { SafeStorage, SafeTimer, useSafeEffect } from '@/utils/storageUtils';
 import type { PersonaType } from '@/types/auth';
 
 const menopausePersonas = {
@@ -33,18 +31,10 @@ const menopausePersonas = {
 
 export const RegistrationComplete: React.FC = () => {
   const { state, resetRegistration } = useRegistration();
-  const { completeRegistration, updateUser } = useAuth();
+  const { updateUser } = useAuth();
   const navigate = useNavigate();
   const [isDataTransferred, setIsDataTransferred] = useState(false);
-  const [newUser, setNewUser] = useState(null);
-  const [transferResult, setTransferResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { safeSetTimeout, cleanup } = useSafeEffect();
-  
-  // ✅ БЕЗОПАСНАЯ ТИПИЗАЦИЯ: Проверяем тип персоны
-  const validatePersona = (persona: string): persona is PersonaType => {
-    return ['first_signs', 'active_phase', 'postmenopause'].includes(persona);
-  };
   
   const selectedPersona = state.step3Data.selectedPersona 
     ? menopausePersonas[state.step3Data.selectedPersona as keyof typeof menopausePersonas]
@@ -54,69 +44,42 @@ export const RegistrationComplete: React.FC = () => {
     try {
       setIsLoading(true);
       
-      // 1. СНАЧАЛА передаем данные в AuthContext
+      // Mock registration completion for m4p
       const registrationData = {
         firstName: state.step4Data.firstName,
         lastName: state.step4Data.lastName, 
         email: state.step1Data.email,
         role: 'patient',
-        selectedPersona: state.step3Data.selectedPersona, // Важно сохранить выбранную персону!
+        selectedPersona: state.step3Data.selectedPersona,
         agreedToTerms: true,
         agreedToPrivacy: true,
         registrationCompleted: true
       };
       
-      // 2. Завершаем регистрацию и получаем созданного пользователя
+      // Mock data transfer
       try {
-        const createdUser = await completeRegistration({
-          step1: state.step1Data,
-          step2: state.step2Data,
-          step3: {
-            personaId: state.step3Data.selectedPersona!,
-            additionalData: state.step3Data.additionalAnswers
-          },
-          password: state.step4Data.password,
-          firstName: state.step4Data.firstName,
-          lastName: state.step4Data.lastName
-        });
-        setNewUser(createdUser);
-      } catch (registrationError) {
-        console.warn('Registration through context not available, using mock user');
-        setNewUser({
-          id: 'temp-user',
-          firstName: state.step4Data.firstName,
-          lastName: state.step4Data.lastName,
-          email: state.step1Data.email,
-          role: 'patient'
-        });
-      }
-      
-      // 3. ✅ БЕЗОПАСНОЕ сохранение в localStorage с проверкой
-      const registrationSaved = SafeStorage.setItemWithTimestamp('registration_data', registrationData);
-      const presetsSaved = SafeStorage.setItemWithTimestamp('onboarding_presets', {
-        persona: state.step3Data.selectedPersona,
-        userName: state.step4Data.firstName,
-        startStep: getPersonaStartStep(state.step3Data.selectedPersona)
-      });
-
-      if (!registrationSaved || !presetsSaved) {
-        throw new Error('Не удалось сохранить данные регистрации');
+        localStorage.setItem('registration_data', JSON.stringify(registrationData));
+        localStorage.setItem('onboarding_presets', JSON.stringify({
+          persona: state.step3Data.selectedPersona,
+          userName: state.step4Data.firstName,
+          startStep: getPersonaStartStep(state.step3Data.selectedPersona)
+        }));
+      } catch (error) {
+        console.warn('Storage not available, continuing without persistence');
       }
       
       setIsDataTransferred(true);
       
       toast({
         title: 'Регистрация завершена!',
-        description: `Добро пожаловать, ${newUser?.firstName || state.step4Data.firstName}!`,
+        description: `Добро пожаловать, ${state.step4Data.firstName}!`,
       });
-
-      logger.info('Registration data successfully transferred and saved');
       
     } catch (error) {
-      console.error('❌ Error completing registration:', error);
+      console.error('Error completing registration:', error);
       toast({
         title: 'Ошибка',
-        description: error instanceof Error ? error.message : 'Произошла ошибка при завершении регистрации',
+        description: 'Произошла ошибка при завершении регистрации',
         variant: 'destructive',
       });
     } finally {
@@ -130,7 +93,6 @@ export const RegistrationComplete: React.FC = () => {
     }
   }, [state.isCompleted, isDataTransferred]);
 
-  // ✅ ИСПРАВЛЕНО: Переход только после полного сохранения данных
   const handleContinueManually = async () => {
     if (!isDataTransferred) {
       toast({
@@ -142,35 +104,13 @@ export const RegistrationComplete: React.FC = () => {
     }
 
     try {
-      // 4. Обновляем контекст пользователя и ждем завершения
-      if (newUser) {
-        await updateUser({
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-          registrationCompleted: true
-        });
-      }
-
-      // 5. ✅ БЕЗОПАСНАЯ проверка сохранности данных перед очисткой
-      const savedData = SafeStorage.getItem<{email: string}>('registration_data');
-      const savedPresets = SafeStorage.getItem<{persona: string}>('onboarding_presets');
-      
-      if (!savedData || !savedPresets) {
-        throw new Error('Данные регистрации не сохранены корректно');
-      }
-
-      // Дополнительная проверка целостности данных
-      if (!savedData.email || !savedPresets.persona) {
-        throw new Error('Повреждены критически важные данные регистрации');
-      }
-
-      // 6. ТОЛЬКО ПОСЛЕ полной гарантии сохранности данных очищаем временные данные
+      // Clear registration context
       resetRegistration();
       
-      // 7. Редирект на онбординг
-      navigate('/patient/onboarding');
+      // Navigate to dashboard for m4p
+      navigate('/patient/dashboard');
     } catch (error) {
-      console.error('❌ Error completing registration:', error);
+      console.error('Error completing registration:', error);
       toast({
         title: 'Ошибка',
         description: 'Не удалось завершить регистрацию. Попробуйте еще раз.',
@@ -179,23 +119,20 @@ export const RegistrationComplete: React.FC = () => {
     }
   };
 
-  // ✅ БЕЗОПАСНЫЙ автоматический переход с очисткой таймеров
   useEffect(() => {
     if (isDataTransferred) {
-      safeSetTimeout(() => {
+      const timer = setTimeout(() => {
         handleContinueManually();
-      }, 5000, 'auto-continue-timer');
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
-    
-    // Очистка таймеров при размонтировании
-    return cleanup;
   }, [isDataTransferred]);
 
   return (
     <div className="min-h-screen bloom-gradient flex items-center justify-center p-4">
       <div className="max-w-md mx-auto text-center">
         <div className="bloom-card p-8">
-          {/* Иконка успеха */}
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-green-600" />
           </div>
@@ -209,41 +146,25 @@ export const RegistrationComplete: React.FC = () => {
             специально для вашего этапа.
           </p>
 
-          {/* ✅ НОВОЕ: Показываем статус подготовки данных с DataBridge */}
           <div className="bg-card rounded-lg p-4 mb-6 border border-muted">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Подготовка персонализации
+              Статус подготовки
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Сохранение профиля</span>
-                <span className={newUser ? "text-green-600" : "text-yellow-600"}>
-                  {newUser ? "✅" : "⏳"}
-                </span>
+                <span className="text-green-600">✅</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Передача данных</span>
-                <span className={transferResult?.success ? "text-green-600" : "text-yellow-600"}>
-                  {transferResult?.success ? "✅" : "⏳"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Валидация целостности</span>
+                <span className="text-muted-foreground">Подготовка данных</span>
                 <span className={isDataTransferred ? "text-green-600" : "text-yellow-600"}>
                   {isDataTransferred ? "✅" : "⏳"}
                 </span>
               </div>
-              {transferResult?.transferredKeys && (
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Ключей создано: {transferResult.transferredKeys.length}</span>
-                  <span className="text-green-600">✅</span>
-                </div>
-              )}
             </div>
           </div>
           
-          {/* Информация о выбранной персоне */}
           {selectedPersona && (
             <div className={`${selectedPersona.bgColor} rounded-lg p-4 mb-6 border border-muted`}>
               <div className="flex items-center justify-center gap-3 mb-2">
@@ -259,34 +180,7 @@ export const RegistrationComplete: React.FC = () => {
               </p>
             </div>
           )}
-          
-          {/* Что дальше */}
-          <div className="bg-card rounded-lg p-4 mb-6 border border-muted">
-            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <ArrowRight className="h-4 w-4" />
-              Что дальше?
-            </h3>
-            <ul className="text-sm text-muted-foreground text-left space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="text-primary">📋</span>
-                <span>Медицинская анкета (5-7 минут)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">🎯</span>
-                <span>Персональные рекомендации</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">📊</span>
-                <span>Начало отслеживания симптомов</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">💬</span>
-                <span>Доступ к AI-помощнику</span>
-              </li>
-            </ul>
-          </div>
 
-          {/* Кнопка продолжения */}
           <Button
             onClick={handleContinueManually}
             disabled={!isDataTransferred}
@@ -296,12 +190,12 @@ export const RegistrationComplete: React.FC = () => {
                 : 'bg-muted text-muted-foreground cursor-not-allowed'
             }`}
           >
-            {isDataTransferred ? 'Продолжить к персональной анкете' : 'Подготовка данных...'}
+            {isDataTransferred ? 'Перейти к платформе' : 'Подготовка данных...'}
           </Button>
           
           {isDataTransferred ? (
             <p className="text-xs text-muted-foreground">
-              Автоматический переход через 5 секунд...
+              Автоматический переход через 3 секунды...
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">
@@ -309,50 +203,16 @@ export const RegistrationComplete: React.FC = () => {
             </p>
           )}
         </div>
-
-        {/* Мотивирующее сообщение */}
-        <div className="mt-6 p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20">
-          <p className="text-sm text-foreground">
-            <strong>🌟 Вы сделали важный шаг!</strong> <br />
-            {selectedPersona && `Анкета адаптирована для этапа "${selectedPersona.title}". `}
-            Персональные рекомендации уже ждут вас!
-          </p>
-        </div>
       </div>
     </div>
   );
 };
 
-// Добавить функцию определения стартового шага:
-const getPersonaStartStep = (persona: string) => {
+const getPersonaStartStep = (persona: string | null) => {
   switch(persona) {
     case 'first_signs': return 1;
     case 'active_phase': return 2; 
     case 'postmenopause': return 3;
     default: return 1;
   }
-};
-
-// ✅ НОВОЕ: Вспомогательные функции для определения пути онбординга
-const getOnboardingPathByPersona = (personaId: string | null) => {
-  if (!personaId) return { focus: ['general'], priorityQuestions: ['basic_info'] };
-  
-  const paths = {
-    'first_signs': {
-      focus: ['cycle_tracking', 'education', 'prevention'],
-      priorityQuestions: ['menstrual_history', 'family_history', 'lifestyle'],
-      recommendedLength: 'standard'
-    },
-    'active_phase': {
-      focus: ['symptom_management', 'quality_of_life', 'treatment_options'],
-      priorityQuestions: ['current_symptoms', 'impact_assessment', 'treatment_preferences'],
-      recommendedLength: 'detailed'
-    },
-    'postmenopause': {
-      focus: ['long_term_health', 'prevention', 'wellness'],
-      priorityQuestions: ['health_screening', 'bone_health', 'cardiovascular_health'],
-      recommendedLength: 'comprehensive'
-    }
-  };
-  return paths[personaId as keyof typeof paths] || paths['active_phase'];
 };
