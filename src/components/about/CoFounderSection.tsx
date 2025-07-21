@@ -54,7 +54,7 @@ export const CoFounderSection: React.FC<CoFounderSectionProps> = ({
                       isEditing={isEditing}
                       onImageUpdate={(imageUrl) => onUpdate('photo', imageUrl)}
                       alt={data.name}
-                      className="w-full h-full object-cover object-center"
+                      className="w-full h-full object-cover object-top"
                     />
                   </div>
                   {/* Декоративные элементы вокруг фото */}
