@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { aboutPlatformApi } from '@/services/aboutPlatformApi';
+import veraPhoto from '@/assets/vera-didenko-photo.jpg';
 
 export interface AboutPlatformData {
   mission: {
@@ -8,6 +9,14 @@ export interface AboutPlatformData {
     heroImage?: string;
   };
   founder: {
+    name: string;
+    story: string;
+    experience: string;
+    vision: string;
+    photo?: string;
+    bio: string;
+  };
+  cofounder: {
     name: string;
     story: string;
     experience: string;
@@ -80,6 +89,14 @@ const defaultData: AboutPlatformData = {
     experience: "10+ лет в женском digital health, мама двоих детей",
     vision: "Мечтаю о мире, где каждая женщина чувствует себя услышанной и поддержанной в любой момент жизни",
     photo: "/lovable-uploads/73c908e4-72cf-4211-a489-8da3f189af53.png"
+  },
+  cofounder: {
+    name: "Вера Диденко",
+    bio: "Со-основательница и директор по технологиям",
+    story: "Присоединилась к проекту без | паузы, когда поняла, что технологии могут кардинально изменить подход к женскому здоровью. Благодаря моему опыту в области искусственного интеллекта и медицинских технологий, мы создаём персонализированные решения для каждой женщины.",
+    experience: "15+ лет в разработке медицинских AI-решений, кандидат технических наук",
+    vision: "Вижу будущее, где искусственный интеллект станет лучшим помощником врача в заботе о женском здоровье",
+    photo: veraPhoto
   },
   principles: {
     scientific: {

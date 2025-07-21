@@ -4,6 +4,7 @@ import { UserRole } from '@/types/roles';
 import { Layout } from '@/components/layout/Layout';
 import { PlatformMission } from '@/components/about/PlatformMission';
 import { FounderSection } from '@/components/about/FounderSection';
+import { CoFounderSection } from '@/components/about/CoFounderSection';
 import { PrinciplesSection } from '@/components/about/PrinciplesSection';
 import { ExpertTeam } from '@/components/about/ExpertTeam';
 import { TechnologiesSection } from '@/components/about/TechnologiesSection';
@@ -67,6 +68,12 @@ const AboutPlatform = () => {
             data={aboutData.founder} 
             isEditing={isEditing && isAdmin}
             onUpdate={(field, value) => updateData(`founder.${field}`, value)}
+          />
+          
+          <CoFounderSection 
+            data={aboutData.cofounder} 
+            isEditing={isEditing && isAdmin}
+            onUpdate={(field, value) => updateData(`cofounder.${field}`, value)}
           />
           
           <PrinciplesSection 
