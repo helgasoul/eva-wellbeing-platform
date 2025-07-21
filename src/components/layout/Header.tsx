@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Heart, User, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BackButton } from './BackButton';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useSubscription } from '@/context/SubscriptionContext';
 import { Logo } from '@/components/ui/logo';
 
